@@ -111,6 +111,34 @@ export function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
+const ACCENTS = ["accent-1", "accent-2", "accent-3", "accent-4"];
+
+export function createThread(name: string, members?: string): Thread {
+  const trimmed = name.trim();
+  const existing = getThreads();
+  const base =
+    trimmed
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || "room";
+  let id = base;
+  let n = 2;
+  while (existing.some((t) => t.id === id)) id = `${base}-${n++}`;
+
+  const memberCount = Number(members ?? 0);
+  const thread: Thread = {
+    id,
+    name: trimmed,
+    handle:
+      memberCount > 1 ? `${memberCount} members` : `#${base}`,
+    accent: ACCENTS[existing.length % ACCENTS.length]!,
+    online: true,
+    messages: [],
+  };
+  persist([thread, ...existing]);
+  return thread;
+}
+
 export function sendMessage(threadId: string, text: string) {
   const threads = getThreads().map((t) =>
     t.id === threadId
