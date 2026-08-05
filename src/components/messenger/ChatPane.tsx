@@ -2,11 +2,13 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Phone, SendHorizonal, Video } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Avatar } from "./Avatar";
+import { CallOverlay } from "./CallOverlay";
 import { formatTime, sendMessage, type Thread } from "@/lib/messenger";
 import { cn } from "@/lib/utils";
 
 export function ChatPane({ thread }: { thread: Thread }) {
   const [draft, setDraft] = useState("");
+  const [call, setCall] = useState<"voice" | "video" | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -28,7 +30,7 @@ export function ChatPane({ thread }: { thread: Thread }) {
   };
 
   return (
-    <section className="flex h-full min-h-0 flex-col bg-background">
+    <section className="relative flex h-full min-h-0 flex-col bg-background">
       <header className="flex items-center gap-3 border-b border-border px-4 py-3">
         <Link
           to="/"
@@ -45,18 +47,22 @@ export function ChatPane({ thread }: { thread: Thread }) {
           </p>
         </div>
         <button
+          onClick={() => setCall("voice")}
           className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
           aria-label="Start voice call"
         >
           <Phone className="size-4" />
         </button>
         <button
+          onClick={() => setCall("video")}
           className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
           aria-label="Start video call"
         >
           <Video className="size-4" />
         </button>
       </header>
+
+      {call ? <CallOverlay thread={thread} mode={call} onEnd={() => setCall(null)} /> : null}
 
       <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto px-4 py-5">
         {thread.messages.map((m, i) => {
