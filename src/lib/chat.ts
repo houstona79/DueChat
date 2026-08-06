@@ -101,6 +101,25 @@ export async function fetchRooms(): Promise<Room[]> {
 
 export type Membership = { room_id: string; user_id: string };
 
+export type RoomEvent = {
+  id: string;
+  room_id: string;
+  user_id: string;
+  kind: "join" | "leave";
+  created_at: string;
+};
+
+export async function fetchRoomEvents(roomId: string): Promise<RoomEvent[]> {
+  const { data, error } = await supabase
+    .from("room_events")
+    .select("id, room_id, user_id, kind, created_at")
+    .eq("room_id", roomId)
+    .order("created_at", { ascending: true })
+    .limit(300);
+  if (error) throw error;
+  return (data ?? []) as RoomEvent[];
+}
+
 export async function fetchMemberships(): Promise<Membership[]> {
   const { data, error } = await supabase.from("room_members").select("room_id, user_id");
   if (error) throw error;

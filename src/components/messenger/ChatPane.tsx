@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { CallOverlay } from "./CallOverlay";
 import { MemberList } from "./MemberList";
-import { useMessages } from "@/hooks/use-chat";
+import { useMessages, useRoomEvents } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
 import {
   accentFor,
@@ -13,6 +13,7 @@ import {
   formatTime,
   isOnline,
   joinRoom,
+  leaveRoom,
   sendMessage,
   type Membership,
   type Profile,
@@ -51,6 +52,22 @@ export function ChatPane({
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const { data: messages = [], isLoading } = useMessages(room.id, joined);
+  const { data: roomEvents = [] } = useRoomEvents(room.id, joined && !room.is_direct);
+
+  type TimelineItem =
+    | { kind: "message"; id: string; at: string; message: (typeof messages)[number] }
+    | { kind: "event"; id: string; at: string; userId: string; action: "join" | "leave" };
+
+  const timeline: TimelineItem[] = [
+    ...messages.map((m) => ({ kind: "message" as const, id: m.id, at: m.created_at, message: m })),
+    ...roomEvents.map((e) => ({
+      kind: "event" as const,
+      id: e.id,
+      at: e.created_at,
+      userId: e.user_id,
+      action: e.kind,
+    })),
+  ].sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime());
 
   useEffect(() => {
     if (joined) inputRef.current?.focus();
@@ -77,6 +94,11 @@ export function ChatPane({
 
   const join = async () => {
     await joinRoom(room.id, meId);
+    await queryClient.invalidateQueries({ queryKey: ["memberships"] });
+  };
+
+  const leave = async () => {
+    await leaveRoom(room.id, meId);
     await queryClient.invalidateQueries({ queryKey: ["memberships"] });
   };
 
@@ -158,6 +180,14 @@ export function ChatPane({
             setShowMembers(false);
             void openDirect(userId);
           }}
+          onLeave={
+            room.is_direct
+              ? undefined
+              : () => {
+                  setShowMembers(false);
+                  void leave();
+                }
+          }
         />
       ) : null}
 
@@ -172,10 +202,23 @@ export function ChatPane({
                 No messages yet — say hello.
               </p>
             ) : null}
-            {messages.map((m, i) => {
+            {timeline.map((item, i) => {
+              if (item.kind === "event") {
+                const who = profileOf(item.userId);
+                const name = item.userId === meId ? "You" : (who?.display_name ?? "Someone");
+                return (
+                  <div key={item.id} className="mt-4 flex justify-center">
+                    <span className="rounded-full bg-secondary px-3 py-1 text-[11px] text-muted-foreground">
+                      {name} {item.action === "join" ? "joined" : "left"} the room ·{" "}
+                      {formatTime(item.at)}
+                    </span>
+                  </div>
+                );
+              }
+              const m = item.message;
               const mine = m.user_id === meId;
-              const prev = messages[i - 1];
-              const grouped = prev?.user_id === m.user_id;
+              const prev = timeline[i - 1];
+              const grouped = prev?.kind === "message" && prev.message.user_id === m.user_id;
               const author = profileOf(m.user_id);
               return (
                 <div

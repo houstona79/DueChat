@@ -5,6 +5,7 @@ import {
   fetchMemberships,
   fetchMessages,
   fetchProfiles,
+  fetchRoomEvents,
   fetchRooms,
   touchPresence,
 } from "@/lib/chat";
@@ -29,6 +30,14 @@ export function useMessages(roomId: string, enabled: boolean) {
   });
 }
 
+export function useRoomEvents(roomId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["room-events", roomId],
+    queryFn: () => fetchRoomEvents(roomId),
+    enabled,
+  });
+}
+
 /** Keeps queries fresh from realtime table changes. */
 export function useChatRealtime() {
   const queryClient = useQueryClient();
@@ -47,6 +56,10 @@ export function useChatRealtime() {
       })
       .on("postgres_changes", { event: "*", schema: "public", table: "room_members" }, () => {
         void queryClient.invalidateQueries({ queryKey: ["memberships"] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "room_events" }, (payload) => {
+        const roomId = (payload.new as { room_id?: string } | null)?.room_id;
+        if (roomId) void queryClient.invalidateQueries({ queryKey: ["room-events", roomId] });
       })
       .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, () => {
         void queryClient.invalidateQueries({ queryKey: ["profiles"] });

@@ -1,4 +1,4 @@
-import { MessageSquare, X } from "lucide-react";
+import { LogOut, MessageSquare, X } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { accentFor, isOnline, type Membership, type Profile } from "@/lib/chat";
 
@@ -8,12 +8,14 @@ export function MemberList({
   meId,
   onClose,
   onMessage,
+  onLeave,
 }: {
   memberships: Membership[];
   profiles: Profile[];
   meId: string;
   onClose: () => void;
   onMessage: (userId: string) => void;
+  onLeave?: (() => void) | undefined;
 }) {
   const members = memberships
     .map((m) => profiles.find((p) => p.id === m.user_id))
@@ -48,6 +50,10 @@ export function MemberList({
                 {p.id === meId ? " (you)" : ""}
               </span>
               <span className="block truncate text-xs text-muted-foreground">
+                <span className={isOnline(p) ? "text-primary" : undefined}>
+                  {isOnline(p) ? "Online" : "Offline"}
+                </span>
+                {" · "}
                 {p.status_message || `@${p.username}`}
               </span>
             </span>
@@ -68,6 +74,17 @@ export function MemberList({
           </li>
         ) : null}
       </ul>
+      {onLeave ? (
+        <div className="border-t border-border p-3">
+          <button
+            onClick={onLeave}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-destructive/15 px-3 py-2 text-xs font-medium text-destructive hover:bg-destructive/25"
+          >
+            <LogOut className="size-4" />
+            Leave room
+          </button>
+        </div>
+      ) : null}
     </aside>
   );
 }
