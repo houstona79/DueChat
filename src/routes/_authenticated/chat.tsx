@@ -41,7 +41,7 @@ function ChatLayout() {
   const activeRoomId = params.roomId;
 
   return (
-    <main className="grid h-screen grid-cols-1 overflow-hidden md:grid-cols-[340px_1fr]">
+    <main className="grid h-dvh grid-cols-1 overflow-hidden md:grid-cols-[280px_1fr] lg:grid-cols-[340px_1fr]">
       <div
         className={
           activeRoomId
