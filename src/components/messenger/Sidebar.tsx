@@ -33,10 +33,23 @@ export function Sidebar({
   const [creating, setCreating] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { open: openDirect, pending: dmPending } = useOpenDirect(me?.id);
 
-  const filtered = rooms.filter((r) =>
-    (r.name + (r.topic ?? "")).toLowerCase().includes(query.toLowerCase()),
+  const profileOf = (id: string) => profiles.find((p) => p.id === id);
+  const dmPartner = (room: Room) => {
+    const other = me ? counterpartId(room, me.id) : null;
+    return other ? profileOf(other) : undefined;
+  };
+  const roomLabel = (room: Room) =>
+    room.is_direct ? (dmPartner(room)?.display_name ?? "Direct message") : room.name;
+
+  const matches = (r: Room) =>
+    (roomLabel(r) + (r.topic ?? "")).toLowerCase().includes(query.toLowerCase());
+  const myRoomIds = new Set(
+    memberships.filter((m) => m.user_id === me?.id).map((m) => m.room_id),
   );
+  const filtered = rooms.filter((r) => !r.is_direct && matches(r));
+  const directs = rooms.filter((r) => r.is_direct && myRoomIds.has(r.id) && matches(r));
   const onlineOthers = profiles.filter((p) => isOnline(p) && p.id !== me?.id);
 
   const signOut = async () => {
