@@ -189,8 +189,6 @@ export function CallOverlay({
 }
 
 function PeerTile({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
-  return null as never;
-}
   const ref = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -216,6 +214,23 @@ function PeerTile({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
       <audio ref={audioRef} autoPlay className="hidden" />
     </Tile>
   );
+}
+
+/** Audio-only playback used while the call is minimized. */
+function PeerAudio({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    attachStream(audioRef.current, peer.stream);
+  }, [peer.stream]);
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.muted = !speaker;
+    if (!speaker) return;
+    void audioRef.current?.play().catch(() => undefined);
+  }, [speaker]);
+
+  return <audio ref={audioRef} autoPlay className="hidden" />;
 }
 
 function Tile({
