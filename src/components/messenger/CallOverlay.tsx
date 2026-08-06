@@ -189,6 +189,8 @@ export function CallOverlay({
 }
 
 function PeerTile({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
+  return null as never;
+}
   const ref = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
