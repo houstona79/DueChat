@@ -272,6 +272,24 @@ export function ChatPane({
           <footer className="border-t border-border px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             {error ? <p className="px-2 pb-2 text-xs text-destructive">{error}</p> : null}
             <div className="flex items-end gap-2 rounded-2xl bg-secondary p-2">
+              <EmojiPicker
+                onSelect={(emoji) => {
+                  const el = inputRef.current;
+                  if (!el) {
+                    setDraft((d) => d + emoji);
+                    return;
+                  }
+                  const start = el.selectionStart ?? el.value.length;
+                  const end = el.selectionEnd ?? start;
+                  const next = el.value.slice(0, start) + emoji + el.value.slice(end);
+                  setDraft(next.slice(0, 2000));
+                  requestAnimationFrame(() => {
+                    el.focus();
+                    const caret = start + emoji.length;
+                    el.setSelectionRange(caret, caret);
+                  });
+                }}
+              />
               <textarea
                 ref={inputRef}
                 rows={1}
