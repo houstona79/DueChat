@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, Plus, Search, Settings, ShieldCheck, Users } from "lucide-react";
+import { LogOut, Plus, Search, Settings, Shield, ShieldCheck, Users } from "lucide-react";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
@@ -65,6 +65,7 @@ export function Sidebar({
   const { data: roles } = useSiteRoles(!!me?.id);
   const myRole = me ? siteRoleOf(roles, me.id) : null;
   const isAdmin = myRole === "admin";
+  const isModerator = myRole === "moderator";
 
   const signOut = async () => {
     await queryClient.cancelQueries();
@@ -86,6 +87,15 @@ export function Sidebar({
                 className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
               >
                 <ShieldCheck className="size-4" />
+              </Link>
+            ) : null}
+            {isModerator ? (
+              <Link
+                to="/moderator"
+                aria-label="Moderator panel"
+                className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+              >
+                <Shield className="size-4" />
               </Link>
             ) : null}
             <Link
