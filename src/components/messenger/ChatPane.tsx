@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Phone, SendHorizonal, Users, Video } from "lucide-react";
 import { EmojiPicker } from "./EmojiPicker";
+import { GifPicker } from "./GifPicker";
 
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -42,6 +43,18 @@ function isEmojiOnly(body: string) {
   const trimmed = body.trim();
   if (!trimmed || trimmed.length > 12) return false;
   return /^[\p{Extended_Pictographic}\uFE0F\u200D\s\u{1F3FB}-\u{1F3FF}\u{20E3}]+$/u.test(trimmed);
+}
+
+function gifUrlOf(body: string) {
+  const trimmed = body.trim();
+  if (!/^https:\/\/\S+$/i.test(trimmed) || /\s/.test(trimmed)) return null;
+  try {
+    const url = new URL(trimmed);
+    if (!url.hostname.endsWith("klipy.com") && !url.hostname.endsWith("klipy.co")) return null;
+    return trimmed;
+  } catch {
+    return null;
+  }
 }
 
 export function ChatPane({
@@ -343,17 +356,26 @@ export function ChatPane({
                         ) : null}
                       </span>
                     ) : null}
-                    <div
-                      className={cn(
-                        "max-w-[78%] px-4 py-2.5 text-sm leading-relaxed",
-                        mine
-                          ? "rounded-3xl rounded-br-md bg-bubble-me text-bubble-me-foreground"
-                          : "rounded-3xl rounded-bl-md bg-bubble-them text-bubble-them-foreground",
-                        isEmojiOnly(m.body) && "bg-transparent px-1 py-0.5 text-3xl leading-tight",
-                      )}
-                    >
-                      {m.body}
-                    </div>
+                    {gifUrlOf(m.body) ? (
+                      <img
+                        src={gifUrlOf(m.body)!}
+                        alt="GIF"
+                        loading="lazy"
+                        className="max-h-56 max-w-[78%] rounded-2xl border border-border object-cover"
+                      />
+                    ) : (
+                      <div
+                        className={cn(
+                          "max-w-[78%] px-4 py-2.5 text-sm leading-relaxed",
+                          mine
+                            ? "rounded-3xl rounded-br-md bg-bubble-me text-bubble-me-foreground"
+                            : "rounded-3xl rounded-bl-md bg-bubble-them text-bubble-them-foreground",
+                          isEmojiOnly(m.body) && "bg-transparent px-1 py-0.5 text-3xl leading-tight",
+                        )}
+                      >
+                        {m.body}
+                      </div>
+                    )}
                     <span className="mt-1 px-1 text-[10px] text-muted-foreground">
                       {formatTime(m.created_at)}
                     </span>
@@ -382,6 +404,18 @@ export function ChatPane({
                     const caret = start + emoji.length;
                     el.setSelectionRange(caret, caret);
                   });
+                }}
+              />
+              <GifPicker
+                onSelect={(url) => {
+                  void (async () => {
+                    try {
+                      await sendMessage(room.id, meId, url);
+                      await queryClient.invalidateQueries({ queryKey: ["messages", room.id] });
+                    } catch (err) {
+                      setError(err instanceof Error ? err.message : "GIF failed to send.");
+                    }
+                  })();
                 }}
               />
               <textarea
