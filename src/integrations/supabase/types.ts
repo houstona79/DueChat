@@ -79,6 +79,73 @@ export type Database = {
         }
         Relationships: []
       }
+      room_admins: {
+        Row: {
+          created_at: string
+          granted_by: string
+          id: string
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted_by: string
+          id?: string
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          granted_by?: string
+          id?: string
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_admins_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      room_bans: {
+        Row: {
+          banned_by: string
+          created_at: string
+          id: string
+          reason: string | null
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          banned_by: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          banned_by?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_bans_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       room_events: {
         Row: {
           created_at: string
@@ -206,7 +273,19 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_room_admin: {
+        Args: { _room_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_room_banned: {
+        Args: { _room_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_room_member: {
+        Args: { _room_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_room_owner: {
         Args: { _room_id: string; _user_id: string }
         Returns: boolean
       }
