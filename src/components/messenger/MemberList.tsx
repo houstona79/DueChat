@@ -5,6 +5,7 @@ import {
   siteRoleLabel,
   siteRoleOf,
   siteRoleTextClass,
+  nameColorStyle,
   useSiteRoles,
 } from "@/hooks/use-roles";
 import { accentFor, isOnline, type Membership, type Profile, type RoomBan } from "@/lib/chat";
@@ -89,7 +90,10 @@ export function MemberList({
                 />
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-1.5">
-                    <span className={cn("truncate text-sm font-medium", siteRoleTextClass(siteRole))}>
+                    <span
+                      className={cn("truncate text-sm font-medium", siteRoleTextClass(siteRole))}
+                      style={nameColorStyle(siteRole, p.name_color)}
+                    >
                       {p.display_name}
                       {p.id === meId ? " (you)" : ""}
                     </span>
