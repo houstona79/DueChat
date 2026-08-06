@@ -205,6 +205,18 @@ export function ChatPane({
         </button>
       </header>
 
+      {!room.is_direct ? (
+        <RadioPlayer
+          url={room.radio_url}
+          name={room.radio_name}
+          canEdit={isOwner}
+          onSave={async (radio) => {
+            await setRoomRadio(room.id, radio);
+            await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+          }}
+        />
+      ) : null}
+
       {call ? (
         <CallOverlay
           title={title}
