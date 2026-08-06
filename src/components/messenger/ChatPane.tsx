@@ -7,6 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { CallOverlay } from "./CallOverlay";
 import { MemberList } from "./MemberList";
+import { RadioPlayer } from "./RadioPlayer";
 import { useMessages, useRoomAdmins, useRoomBans, useRoomEvents } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
 import {
@@ -29,6 +30,7 @@ import {
   leaveRoom,
   removeRoomAdmin,
   sendMessage,
+  setRoomRadio,
   unbanMember,
   type Membership,
   type Profile,
