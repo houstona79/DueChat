@@ -352,7 +352,9 @@ export async function unbanMember(roomId: string, userId: string) {
 
 export async function updateProfile(
   userId: string,
-  patch: Partial<Pick<Profile, "display_name" | "username" | "status_message" | "avatar_url">>,
+  patch: Partial<
+    Pick<Profile, "display_name" | "username" | "status_message" | "avatar_url" | "name_color">
+  >,
 ) {
   const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
   if (error) throw error;
