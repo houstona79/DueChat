@@ -1,5 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Phone, SendHorizonal, Users, Video } from "lucide-react";
+import { EmojiPicker } from "./EmojiPicker";
+
+const EMOJI_ONLY = /^(?:\p{Extended_Pictographic}|\p{Emoji_Component}|\uFE0F|\u200D|\s)+$/u;
+function isEmojiOnly(body: string) {
+  const trimmed = body.trim();
+  if (!trimmed || trimmed.length > 12) return false;
+  return EMOJI_ONLY.test(trimmed) && /\p{Extended_Pictographic}/u.test(trimmed);
+}
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
@@ -256,6 +264,7 @@ export function ChatPane({
                         mine
                           ? "rounded-3xl rounded-br-md bg-bubble-me text-bubble-me-foreground"
                           : "rounded-3xl rounded-bl-md bg-bubble-them text-bubble-them-foreground",
+                        isEmojiOnly(m.body) && "bg-transparent px-1 py-0.5 text-3xl leading-tight",
                       )}
                     >
                       {m.body}
@@ -272,6 +281,24 @@ export function ChatPane({
           <footer className="border-t border-border px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             {error ? <p className="px-2 pb-2 text-xs text-destructive">{error}</p> : null}
             <div className="flex items-end gap-2 rounded-2xl bg-secondary p-2">
+              <EmojiPicker
+                onSelect={(emoji) => {
+                  const el = inputRef.current;
+                  if (!el) {
+                    setDraft((d) => d + emoji);
+                    return;
+                  }
+                  const start = el.selectionStart ?? el.value.length;
+                  const end = el.selectionEnd ?? start;
+                  const next = el.value.slice(0, start) + emoji + el.value.slice(end);
+                  setDraft(next.slice(0, 2000));
+                  requestAnimationFrame(() => {
+                    el.focus();
+                    const caret = start + emoji.length;
+                    el.setSelectionRange(caret, caret);
+                  });
+                }}
+              />
               <textarea
                 ref={inputRef}
                 rows={1}
