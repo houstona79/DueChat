@@ -48,8 +48,15 @@ function AdminPage() {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["admin-snapshot"] });
 
   const roleMutation = useMutation({
-    mutationFn: ({ userId, make }: { userId: string; make: boolean }) =>
-      make ? grantRole(userId, "admin") : revokeRole(userId, "admin"),
+    mutationFn: ({
+      userId,
+      role,
+      make,
+    }: {
+      userId: string;
+      role: "admin" | "moderator";
+      make: boolean;
+    }) => (make ? grantRole(userId, role) : revokeRole(userId, role)),
     onSuccess: refresh,
   });
   const roomMutation = useMutation({ mutationFn: deleteRoom, onSuccess: refresh });
