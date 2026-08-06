@@ -148,12 +148,15 @@ function AdminPage() {
         <ul className="mt-5 space-y-2">
           {data.profiles.map((p) => {
             const admin = data.roles.some((r) => r.user_id === p.id && r.role === "admin");
+            const moderator = data.roles.some(
+              (r) => r.user_id === p.id && r.role === "moderator",
+            );
             const locked = p.id === OWNER_USER_ID || p.id === user?.id;
             const banned = data.bans.some((b) => b.user_id === p.id);
             return (
               <li
                 key={p.id}
-                className="flex items-center gap-3 rounded-2xl border border-border bg-card px-3 py-2.5"
+                className="flex flex-wrap items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2.5"
               >
                 <Avatar
                   name={p.display_name}
@@ -162,7 +165,7 @@ function AdminPage() {
                   online={isOnline(p)}
                   size="sm"
                 />
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 flex-1 basis-40">
                   <p className="truncate text-sm font-semibold">{p.display_name}</p>
                   <p className="truncate text-xs text-muted-foreground">
                     @{p.username} · {isOnline(p) ? "Online" : `Seen ${formatTime(p.last_seen_at)}`}
@@ -175,12 +178,32 @@ function AdminPage() {
                       ? "Owner account — admin access can’t be removed"
                       : undefined
                   }
-                  onClick={() => roleMutation.mutate({ userId: p.id, make: !admin })}
+                  onClick={() =>
+                    roleMutation.mutate({ userId: p.id, role: "admin", make: !admin })
+                  }
                   className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold disabled:opacity-50 ${
                     admin ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground"
                   }`}
                 >
                   {p.id === OWNER_USER_ID ? "Owner" : admin ? "Admin" : "Make admin"}
+                </button>
+                <button
+                  disabled={roleMutation.isPending || locked || admin}
+                  title={
+                    admin
+                      ? "Admins already have every moderator power"
+                      : moderator
+                        ? "Remove moderator role"
+                        : "Make this member a moderator"
+                  }
+                  onClick={() =>
+                    roleMutation.mutate({ userId: p.id, role: "moderator", make: !moderator })
+                  }
+                  className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold disabled:opacity-50 ${
+                    moderator ? "bg-accent/20 text-accent" : "bg-secondary text-muted-foreground"
+                  }`}
+                >
+                  {moderator ? "Moderator" : "Make mod"}
                 </button>
                 <button
                   disabled={banMutation.isPending || locked || (admin && !banned)}
