@@ -251,7 +251,9 @@ export function Sidebar({
             Online now · {onlineOthers.length}
           </h2>
           <ul className="mt-2 space-y-1">
-            {onlineOthers.map((p) => (
+            {onlineOthers.map((p) => {
+              const pRole = siteRoleOf(roles, p.id);
+              return (
               <li key={p.id}>
                 <button
                   onClick={() => void openDirect(p.id)}
@@ -267,7 +269,23 @@ export function Sidebar({
                     size="sm"
                   />
                   <span className="min-w-0">
-                    <span className="block truncate text-sm">{p.display_name}</span>
+                    <span className="flex min-w-0 items-center gap-1.5">
+                      <span
+                        className={cn("truncate text-sm", siteRoleTextClass(pRole))}
+                      >
+                        {p.display_name}
+                      </span>
+                      {siteRoleLabel(pRole) ? (
+                        <span
+                          className={cn(
+                            "shrink-0 rounded-full px-1.5 py-px text-[9px] font-semibold uppercase tracking-wide",
+                            siteRoleBadgeClass(pRole),
+                          )}
+                        >
+                          {siteRoleLabel(pRole)}
+                        </span>
+                      ) : null}
+                    </span>
                     <span className="block truncate text-xs text-muted-foreground">
                       {dmPending === p.id
                         ? "Opening chat…"
@@ -276,7 +294,8 @@ export function Sidebar({
                   </span>
                 </button>
               </li>
-            ))}
+              );
+            })}
             {onlineOthers.length === 0 ? (
               <li className="py-2 text-xs text-muted-foreground">Nobody else is online right now.</li>
             ) : null}
