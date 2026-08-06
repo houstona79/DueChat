@@ -180,6 +180,14 @@ export function ChatPane({
             setShowMembers(false);
             void openDirect(userId);
           }}
+          onLeave={
+            room.is_direct
+              ? undefined
+              : () => {
+                  setShowMembers(false);
+                  void leave();
+                }
+          }
         />
       ) : null}
 
@@ -194,10 +202,23 @@ export function ChatPane({
                 No messages yet — say hello.
               </p>
             ) : null}
-            {messages.map((m, i) => {
+            {timeline.map((item, i) => {
+              if (item.kind === "event") {
+                const who = profileOf(item.userId);
+                const name = item.userId === meId ? "You" : (who?.display_name ?? "Someone");
+                return (
+                  <div key={item.id} className="mt-4 flex justify-center">
+                    <span className="rounded-full bg-secondary px-3 py-1 text-[11px] text-muted-foreground">
+                      {name} {item.action === "join" ? "joined" : "left"} the room ·{" "}
+                      {formatTime(item.at)}
+                    </span>
+                  </div>
+                );
+              }
+              const m = item.message;
               const mine = m.user_id === meId;
-              const prev = messages[i - 1];
-              const grouped = prev?.user_id === m.user_id;
+              const prev = timeline[i - 1];
+              const grouped = prev?.kind === "message" && prev.message.user_id === m.user_id;
               const author = profileOf(m.user_id);
               return (
                 <div
