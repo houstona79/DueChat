@@ -4,13 +4,13 @@ import { MessagesSquare, Radio, Video } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Halo Messenger — Rooms, presence and calls" },
+      { title: "DueChat — Rooms, presence and calls" },
       {
         name: "description",
         content:
           "Create an account, join chat rooms, see who's online in real time and jump into voice or video calls.",
       },
-      { property: "og:title", content: "Halo Messenger — Rooms, presence and calls" },
+      { property: "og:title", content: "DueChat — Rooms, presence and calls" },
       {
         property: "og:description",
         content:
@@ -29,7 +29,7 @@ function Landing() {
           <MessagesSquare className="size-7" />
         </span>
         <h1 className="mt-6 font-display text-4xl font-semibold tracking-tight sm:text-5xl">
-          Halo Messenger
+          DueChat
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
           Chat rooms with real accounts, live online status and one-tap voice or video calls — synced

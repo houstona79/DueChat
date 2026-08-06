@@ -6,12 +6,12 @@ import { lovable } from "@/integrations/lovable/index";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — Halo Messenger" },
-      { name: "description", content: "Create your Halo Messenger account or sign in to your rooms." },
-      { property: "og:title", content: "Sign in — Halo Messenger" },
+      { title: "Sign in — DueChat" },
+      { name: "description", content: "Create your DueChat account or sign in to your rooms." },
+      { property: "og:title", content: "Sign in — DueChat" },
       {
         property: "og:description",
-        content: "Create your Halo Messenger account or sign in to your rooms.",
+        content: "Create your DueChat account or sign in to your rooms.",
       },
     ],
   }),
