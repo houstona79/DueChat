@@ -1,6 +1,14 @@
 import { Ban, LogOut, MessageSquare, ShieldCheck, ShieldOff, UserMinus, X } from "lucide-react";
 import { Avatar } from "./Avatar";
+import {
+  siteRoleBadgeClass,
+  siteRoleLabel,
+  siteRoleOf,
+  siteRoleTextClass,
+  useSiteRoles,
+} from "@/hooks/use-roles";
 import { accentFor, isOnline, type Membership, type Profile, type RoomBan } from "@/lib/chat";
+import { cn } from "@/lib/utils";
 
 export function MemberList({
   memberships,
@@ -38,6 +46,7 @@ export function MemberList({
   onUnban?: ((userId: string) => void) | undefined;
 }) {
   const adminIds = new Set(roomAdminIds ?? []);
+  const { data: siteRoles } = useSiteRoles();
   const members = memberships
     .map((m) => profiles.find((p) => p.id === m.user_id))
     .filter((p): p is Profile => Boolean(p))
@@ -65,6 +74,7 @@ export function MemberList({
       <ul className="min-h-0 flex-1 overflow-y-auto px-2 pb-4">
         {members.map((p) => {
           const role = roleLabel(p.id);
+          const siteRole = siteRoleOf(siteRoles, p.id);
           const isTargetProtected = p.id === ownerId || p.id === meId;
           const canActOn = Boolean(canModerate) && !isTargetProtected;
           return (
@@ -79,10 +89,20 @@ export function MemberList({
                 />
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-1.5">
-                    <span className="truncate text-sm font-medium">
+                    <span className={cn("truncate text-sm font-medium", siteRoleTextClass(siteRole))}>
                       {p.display_name}
                       {p.id === meId ? " (you)" : ""}
                     </span>
+                    {siteRoleLabel(siteRole) ? (
+                      <span
+                        className={cn(
+                          "shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold",
+                          siteRoleBadgeClass(siteRole),
+                        )}
+                      >
+                        {siteRoleLabel(siteRole)}
+                      </span>
+                    ) : null}
                     {role ? (
                       <span className="shrink-0 rounded-md bg-primary/15 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
                         {role}

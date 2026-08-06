@@ -10,6 +10,13 @@ import { MemberList } from "./MemberList";
 import { useMessages, useRoomAdmins, useRoomBans, useRoomEvents } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
 import {
+  siteRoleBadgeClass,
+  siteRoleLabel,
+  siteRoleOf,
+  siteRoleTextClass,
+  useSiteRoles,
+} from "@/hooks/use-roles";
+import {
   accentFor,
   addRoomAdmin,
   banMember,
@@ -70,6 +77,7 @@ export function ChatPane({
   const isOwner = room.created_by === meId;
   const canModerate = !room.is_direct && (isOwner || roomAdmins.some((a) => a.user_id === meId));
   const { data: bans = [] } = useRoomBans(room.id, canModerate);
+  const { data: siteRoles } = useSiteRoles();
 
   type TimelineItem =
     | { kind: "message"; id: string; at: string; message: (typeof messages)[number] }
@@ -295,8 +303,25 @@ export function ChatPane({
                   )}
                   <div className={cn("flex min-w-0 flex-col", mine ? "items-end" : "items-start")}>
                     {!mine && !grouped ? (
-                      <span className="mb-1 px-1 text-[11px] font-medium text-muted-foreground">
-                        {authorName}
+                      <span className="mb-1 flex items-center gap-1.5 px-1 text-[11px] font-medium">
+                        <span
+                          className={
+                            siteRoleTextClass(siteRoleOf(siteRoles, m.user_id)) ??
+                            "text-muted-foreground"
+                          }
+                        >
+                          {authorName}
+                        </span>
+                        {siteRoleLabel(siteRoleOf(siteRoles, m.user_id)) ? (
+                          <span
+                            className={cn(
+                              "rounded-md px-1 py-0.5 text-[9px] font-semibold uppercase tracking-wide",
+                              siteRoleBadgeClass(siteRoleOf(siteRoles, m.user_id)),
+                            )}
+                          >
+                            {siteRoleLabel(siteRoleOf(siteRoles, m.user_id))}
+                          </span>
+                        ) : null}
                       </span>
                     ) : null}
                     <div
