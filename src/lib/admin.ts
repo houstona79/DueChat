@@ -36,6 +36,18 @@ export async function unbanUser(userId: string) {
   if (error) throw error;
 }
 
+/** Force-signs a member out of DueChat on every device they are signed in on. */
+export async function kickUser(userId: string, reason?: string) {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) throw new Error("Not signed in");
+  const { error } = await supabase.from("session_kicks").insert({
+    user_id: userId,
+    kicked_by: auth.user.id,
+    reason: reason?.trim() ? reason.trim() : null,
+  });
+  if (error) throw error;
+}
+
 export async function fetchRoles(): Promise<UserRole[]> {
   const { data, error } = await supabase.from("user_roles").select("id, user_id, role");
   if (error) throw error;
