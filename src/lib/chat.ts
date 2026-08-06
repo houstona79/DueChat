@@ -75,7 +75,7 @@ export function slugify(name: string) {
 export async function fetchProfiles(): Promise<Profile[]> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, username, display_name, avatar_url, status_message, last_seen_at")
+    .select("id, username, display_name, avatar_url, status_message, name_color, last_seen_at")
     .order("last_seen_at", { ascending: false });
   if (error) throw error;
   return data ?? [];
@@ -84,7 +84,7 @@ export async function fetchProfiles(): Promise<Profile[]> {
 export async function fetchMyProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, username, display_name, avatar_url, status_message, last_seen_at")
+    .select("id, username, display_name, avatar_url, status_message, name_color, last_seen_at")
     .eq("id", userId)
     .maybeSingle();
   if (error) throw error;
