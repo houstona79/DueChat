@@ -4,7 +4,13 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/klipy";
 
-export type GifItem = { id: string; title: string; url: string; width?: number; height?: number };
+export type GifItem = {
+  id: string;
+  title: string;
+  url: string;
+  width?: number | undefined;
+  height?: number | undefined;
+};
 
 type KlipyFile = Record<string, Record<string, { url?: string; width?: number; height?: number }>>;
 
