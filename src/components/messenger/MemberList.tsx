@@ -23,13 +23,13 @@ export function MemberList({
     .sort((a, b) => Number(isOnline(b)) - Number(isOnline(a)));
 
   return (
-    <aside className="absolute inset-y-0 right-0 z-20 flex w-full max-w-xs flex-col border-l border-border bg-sidebar shadow-xl">
-      <header className="flex items-center justify-between px-4 py-3">
+    <aside className="absolute inset-y-0 right-0 z-20 flex w-full max-w-[85%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl sm:max-w-xs">
+      <header className="flex items-center justify-between px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <h3 className="text-sm font-semibold">Members · {members.length}</h3>
         <button
           onClick={onClose}
           aria-label="Close members"
-          className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+          className="grid size-10 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
         >
           <X className="size-4" />
         </button>
@@ -61,7 +61,7 @@ export function MemberList({
               <button
                 onClick={() => onMessage(p.id)}
                 aria-label={`Message ${p.display_name}`}
-                className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary hover:bg-primary/25"
+                className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary hover:bg-primary/25"
               >
                 <MessageSquare className="size-4" />
               </button>
