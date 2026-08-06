@@ -220,33 +220,47 @@ export function ChatPane({
               const prev = timeline[i - 1];
               const grouped = prev?.kind === "message" && prev.message.user_id === m.user_id;
               const author = profileOf(m.user_id);
+              const authorName = author?.display_name ?? "Someone";
               return (
                 <div
                   key={m.id}
                   className={cn(
-                    "flex flex-col",
-                    mine ? "items-end" : "items-start",
+                    "flex items-end gap-2",
+                    mine ? "flex-row-reverse" : "flex-row",
                     grouped ? "mt-0.5" : "mt-4",
                   )}
                 >
-                  {!mine && !grouped ? (
-                    <span className="mb-1 px-1 text-[11px] font-medium text-muted-foreground">
-                      {author?.display_name ?? "Someone"}
+                  {grouped ? (
+                    <span className="size-9 shrink-0" aria-hidden="true" />
+                  ) : (
+                    <Avatar
+                      name={authorName}
+                      accent={accentFor(m.user_id)}
+                      avatarPath={author?.avatar_url ?? null}
+                      online={author ? isOnline(author) : false}
+                      size="sm"
+                    />
+                  )}
+                  <div className={cn("flex min-w-0 flex-col", mine ? "items-end" : "items-start")}>
+                    {!mine && !grouped ? (
+                      <span className="mb-1 px-1 text-[11px] font-medium text-muted-foreground">
+                        {authorName}
+                      </span>
+                    ) : null}
+                    <div
+                      className={cn(
+                        "max-w-[78%] px-4 py-2.5 text-sm leading-relaxed",
+                        mine
+                          ? "rounded-3xl rounded-br-md bg-bubble-me text-bubble-me-foreground"
+                          : "rounded-3xl rounded-bl-md bg-bubble-them text-bubble-them-foreground",
+                      )}
+                    >
+                      {m.body}
+                    </div>
+                    <span className="mt-1 px-1 text-[10px] text-muted-foreground">
+                      {formatTime(m.created_at)}
                     </span>
-                  ) : null}
-                  <div
-                    className={cn(
-                      "max-w-[78%] px-4 py-2.5 text-sm leading-relaxed",
-                      mine
-                        ? "rounded-3xl rounded-br-md bg-bubble-me text-bubble-me-foreground"
-                        : "rounded-3xl rounded-bl-md bg-bubble-them text-bubble-them-foreground",
-                    )}
-                  >
-                    {m.body}
                   </div>
-                  <span className="mt-1 px-1 text-[10px] text-muted-foreground">
-                    {formatTime(m.created_at)}
-                  </span>
                 </div>
               );
             })}
