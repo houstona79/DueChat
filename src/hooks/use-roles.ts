@@ -31,7 +31,7 @@ export function siteRoleBadgeClass(role: AppRole | null) {
 export function isRedish(hex: string) {
   const m = /^#([0-9a-f]{6})$/i.exec(hex.trim());
   if (!m) return false;
-  const n = parseInt(m[1], 16);
+  const n = parseInt(m[1] ?? "", 16);
   const r = (n >> 16) & 255;
   const g = (n >> 8) & 255;
   const b = n & 255;
