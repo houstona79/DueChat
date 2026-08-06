@@ -5,7 +5,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { NewRoomForm } from "./NewRoomForm";
 import { supabase } from "@/integrations/supabase/client";
-import { accentFor, isOnline, type Membership, type Profile, type Room } from "@/lib/chat";
+import { useOpenDirect } from "@/hooks/use-direct";
+import {
+  accentFor,
+  counterpartId,
+  isOnline,
+  type Membership,
+  type Profile,
+  type Room,
+} from "@/lib/chat";
 import { cn } from "@/lib/utils";
 
 export function Sidebar({
@@ -25,10 +33,23 @@ export function Sidebar({
   const [creating, setCreating] = useState(false);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { open: openDirect, pending: dmPending } = useOpenDirect(me?.id);
 
-  const filtered = rooms.filter((r) =>
-    (r.name + (r.topic ?? "")).toLowerCase().includes(query.toLowerCase()),
+  const profileOf = (id: string) => profiles.find((p) => p.id === id);
+  const dmPartner = (room: Room) => {
+    const other = me ? counterpartId(room, me.id) : null;
+    return other ? profileOf(other) : undefined;
+  };
+  const roomLabel = (room: Room) =>
+    room.is_direct ? (dmPartner(room)?.display_name ?? "Direct message") : room.name;
+
+  const matches = (r: Room) =>
+    (roomLabel(r) + (r.topic ?? "")).toLowerCase().includes(query.toLowerCase());
+  const myRoomIds = new Set(
+    memberships.filter((m) => m.user_id === me?.id).map((m) => m.room_id),
   );
+  const filtered = rooms.filter((r) => !r.is_direct && matches(r));
+  const directs = rooms.filter((r) => r.is_direct && myRoomIds.has(r.id) && matches(r));
   const onlineOthers = profiles.filter((p) => isOnline(p) && p.id !== me?.id);
 
   const signOut = async () => {
@@ -103,6 +124,49 @@ export function Sidebar({
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-6">
+        {directs.length > 0 ? (
+          <section className="mb-2">
+            <h2 className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Direct messages
+            </h2>
+            <nav>
+              {directs.map((room) => {
+                const partner = dmPartner(room);
+                return (
+                  <Link
+                    key={room.id}
+                    to="/chat/$roomId"
+                    params={{ roomId: room.id }}
+                    className={cn(
+                      "flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors",
+                      room.id === activeRoomId ? "bg-accent" : "hover:bg-secondary",
+                    )}
+                  >
+                    <Avatar
+                      name={partner?.display_name ?? "Direct message"}
+                      accent={accentFor(partner?.id ?? room.id)}
+                      avatarPath={partner?.avatar_url ?? null}
+                      online={partner ? isOnline(partner) : false}
+                      size="sm"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-semibold">
+                        {partner?.display_name ?? "Direct message"}
+                      </span>
+                      <span className="block truncate text-xs text-muted-foreground">
+                        {partner ? `@${partner.username}` : "Private chat"}
+                      </span>
+                    </span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </section>
+        ) : null}
+
+        <h2 className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          Rooms
+        </h2>
         <nav>
           {filtered.map((room) => {
             const members = memberships.filter((m) => m.room_id === room.id);
@@ -152,20 +216,29 @@ export function Sidebar({
           </h2>
           <ul className="mt-2 space-y-1">
             {onlineOthers.map((p) => (
-              <li key={p.id} className="flex items-center gap-3 rounded-2xl px-1 py-1.5">
-                <Avatar
-                  name={p.display_name}
-                  accent={accentFor(p.id)}
-                  avatarPath={p.avatar_url}
-                  online
-                  size="sm"
-                />
-                <span className="min-w-0">
-                  <span className="block truncate text-sm">{p.display_name}</span>
-                  <span className="block truncate text-xs text-muted-foreground">
-                    {p.status_message || `@${p.username}`}
+              <li key={p.id}>
+                <button
+                  onClick={() => void openDirect(p.id)}
+                  disabled={dmPending === p.id}
+                  aria-label={`Message ${p.display_name}`}
+                  className="flex w-full items-center gap-3 rounded-2xl px-1 py-1.5 text-left hover:bg-secondary disabled:opacity-60"
+                >
+                  <Avatar
+                    name={p.display_name}
+                    accent={accentFor(p.id)}
+                    avatarPath={p.avatar_url}
+                    online
+                    size="sm"
+                  />
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm">{p.display_name}</span>
+                    <span className="block truncate text-xs text-muted-foreground">
+                      {dmPending === p.id
+                        ? "Opening chat…"
+                        : p.status_message || `@${p.username}`}
+                    </span>
                   </span>
-                </span>
+                </button>
               </li>
             ))}
             {onlineOthers.length === 0 ? (

@@ -16,6 +16,8 @@ export type Room = {
   topic: string | null;
   created_by: string;
   created_at: string;
+  is_direct: boolean;
+  direct_key: string | null;
 };
 
 export type Message = {
@@ -91,7 +93,7 @@ export async function fetchMyProfile(userId: string): Promise<Profile | null> {
 export async function fetchRooms(): Promise<Room[]> {
   const { data, error } = await supabase
     .from("rooms")
-    .select("id, name, slug, topic, created_by, created_at")
+    .select("id, name, slug, topic, created_by, created_at, is_direct, direct_key")
     .order("created_at", { ascending: true });
   if (error) throw error;
   return data ?? [];
@@ -127,12 +129,71 @@ export async function createRoom(userId: string, name: string, topic: string) {
   const { data, error } = await supabase
     .from("rooms")
     .insert({ name: name.trim(), slug: slugify(name), topic: topic.trim() || null, created_by: userId })
-    .select("id, name, slug, topic, created_by, created_at")
+    .select("id, name, slug, topic, created_by, created_at, is_direct, direct_key")
     .single();
   if (error) throw error;
   const join = await supabase.from("room_members").insert({ room_id: data.id, user_id: userId });
   if (join.error) throw join.error;
   return data as Room;
+}
+
+export function directKeyFor(a: string, b: string) {
+  return [a, b].sort().join(":");
+}
+
+/** Finds or creates the 1:1 conversation between two users and returns it. */
+export async function openDirectRoom(meId: string, otherId: string): Promise<Room> {
+  const key = directKeyFor(meId, otherId);
+  const cols = "id, name, slug, topic, created_by, created_at, is_direct, direct_key";
+
+  const existing = await supabase.from("rooms").select(cols).eq("direct_key", key).maybeSingle();
+  if (existing.error) throw existing.error;
+  if (existing.data) {
+    await joinRoom(existing.data.id, meId);
+    return existing.data as Room;
+  }
+
+  const created = await supabase
+    .from("rooms")
+    .insert({
+      name: "Direct message",
+      slug: `dm-${Math.random().toString(36).slice(2, 9)}`,
+      topic: null,
+      created_by: meId,
+      is_direct: true,
+      direct_key: key,
+    })
+    .select(cols)
+    .single();
+
+  if (created.error) {
+    // Someone created it concurrently — read it back.
+    const retry = await supabase.from("rooms").select(cols).eq("direct_key", key).maybeSingle();
+    if (retry.data) return retry.data as Room;
+    throw created.error;
+  }
+
+  const members = await supabase
+    .from("room_members")
+    .upsert(
+      [
+        { room_id: created.data.id, user_id: meId },
+        { room_id: created.data.id, user_id: otherId },
+      ],
+      { onConflict: "room_id,user_id" },
+    );
+  if (members.error) throw members.error;
+  return created.data as Room;
+}
+
+/** For a direct room, returns the other participant's id. */
+export function counterpartId(
+  room: Pick<Room, "is_direct" | "direct_key">,
+  meId: string,
+): string | null {
+  if (!room.is_direct || !room.direct_key) return null;
+  const ids = room.direct_key.split(":");
+  return ids.find((id) => id !== meId) ?? meId;
 }
 
 export async function joinRoom(roomId: string, userId: string) {

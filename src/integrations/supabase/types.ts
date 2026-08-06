@@ -112,7 +112,9 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string
+          direct_key: string | null
           id: string
+          is_direct: boolean
           name: string
           slug: string
           topic: string | null
@@ -120,7 +122,9 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by: string
+          direct_key?: string | null
           id?: string
+          is_direct?: boolean
           name: string
           slug: string
           topic?: string | null
@@ -128,7 +132,9 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string
+          direct_key?: string | null
           id?: string
+          is_direct?: boolean
           name?: string
           slug?: string
           topic?: string | null

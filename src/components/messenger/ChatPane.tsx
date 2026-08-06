@@ -1,12 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Phone, SendHorizonal, Video } from "lucide-react";
+import { ArrowLeft, Phone, SendHorizonal, Users, Video } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { CallOverlay } from "./CallOverlay";
+import { MemberList } from "./MemberList";
 import { useMessages } from "@/hooks/use-chat";
+import { useOpenDirect } from "@/hooks/use-direct";
 import {
   accentFor,
+  counterpartId,
   formatTime,
   isOnline,
   joinRoom,
@@ -35,6 +38,12 @@ export function ChatPane({
     profiles.some((p) => p.id === m.user_id && isOnline(p)),
   ).length;
 
+  const profileOf = (userId: string) => profiles.find((p) => p.id === userId);
+  const partner = room.is_direct ? profileOf(counterpartId(room, meId) ?? "") : undefined;
+  const title = room.is_direct ? (partner?.display_name ?? "Direct message") : room.name;
+  const { open: openDirect } = useOpenDirect(meId);
+  const [showMembers, setShowMembers] = useState(false);
+
   const [draft, setDraft] = useState("");
   const [call, setCall] = useState<"voice" | "video" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -51,8 +60,6 @@ export function ChatPane({
     const el = scroller.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages.length, room.id]);
-
-  const profileOf = (userId: string) => profiles.find((p) => p.id === userId);
 
   const submit = async () => {
     const text = draft.trim();
@@ -83,14 +90,35 @@ export function ChatPane({
         >
           <ArrowLeft className="size-5" />
         </Link>
-        <Avatar name={room.name} accent={accentFor(room.id)} online={onlineCount > 0} size="sm" />
+        <Avatar
+          name={title}
+          accent={accentFor(partner?.id ?? room.id)}
+          avatarPath={partner?.avatar_url ?? null}
+          online={partner ? isOnline(partner) : onlineCount > 0}
+          size="sm"
+        />
         <div className="min-w-0 flex-1">
-          <h2 className="truncate text-sm font-semibold">{room.name}</h2>
+          <h2 className="truncate text-sm font-semibold">{title}</h2>
           <p className="truncate text-xs text-muted-foreground">
-            {members.length} {members.length === 1 ? "member" : "members"} · {onlineCount} online
-            {room.topic ? ` · ${room.topic}` : ""}
+            {room.is_direct
+              ? partner
+                ? `${isOnline(partner) ? "Online" : "Offline"} · @${partner.username}`
+                : "Private chat"
+              : `${members.length} ${members.length === 1 ? "member" : "members"} · ${onlineCount} online${
+                  room.topic ? ` · ${room.topic}` : ""
+                }`}
           </p>
         </div>
+        {room.is_direct ? null : (
+          <button
+            onClick={() => setShowMembers((v) => !v)}
+            className="flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-xs text-muted-foreground hover:bg-secondary"
+            aria-label="Show members"
+          >
+            <Users className="size-4" />
+            {members.length}
+          </button>
+        )}
         <button
           onClick={() => setCall("voice")}
           className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
@@ -109,10 +137,23 @@ export function ChatPane({
 
       {call ? (
         <CallOverlay
-          title={room.name}
-          accent={accentFor(room.id)}
+          title={title}
+          accent={accentFor(partner?.id ?? room.id)}
           mode={call}
           onEnd={() => setCall(null)}
+        />
+      ) : null}
+
+      {showMembers ? (
+        <MemberList
+          memberships={members}
+          profiles={profiles}
+          meId={meId}
+          onClose={() => setShowMembers(false)}
+          onMessage={(userId) => {
+            setShowMembers(false);
+            void openDirect(userId);
+          }}
         />
       ) : null}
 
@@ -197,7 +238,7 @@ export function ChatPane({
       ) : (
         <div className="grid min-h-0 flex-1 place-items-center px-6 text-center">
           <div className="max-w-sm">
-            <h3 className="text-lg font-semibold">Join {room.name}</h3>
+              <h3 className="text-lg font-semibold">Join {title}</h3>
             <p className="mt-2 text-sm text-muted-foreground">
               Messages in this room are only visible to members.
             </p>
