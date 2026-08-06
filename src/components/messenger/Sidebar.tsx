@@ -12,6 +12,7 @@ import {
   siteRoleLabel,
   siteRoleOf,
   siteRoleTextClass,
+  nameColorStyle,
   useSiteRoles,
 } from "@/hooks/use-roles";
 import {
@@ -126,6 +127,7 @@ export function Sidebar({
               <span className="flex items-center gap-1.5">
                 <span
                   className={cn("truncate text-sm font-semibold", siteRoleTextClass(myRole))}
+                  style={nameColorStyle(myRole, me.name_color)}
                 >
                   {me.display_name}
                 </span>
@@ -274,6 +276,7 @@ export function Sidebar({
                     <span className="flex min-w-0 items-center gap-1.5">
                       <span
                         className={cn("truncate text-sm", siteRoleTextClass(pRole))}
+                        style={nameColorStyle(pRole, p.name_color)}
                       >
                         {p.display_name}
                       </span>

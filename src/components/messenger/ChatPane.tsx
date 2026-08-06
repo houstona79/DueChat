@@ -14,6 +14,7 @@ import {
   siteRoleLabel,
   siteRoleOf,
   siteRoleTextClass,
+  nameColorStyle,
   useSiteRoles,
 } from "@/hooks/use-roles";
 import {
@@ -309,6 +310,10 @@ export function ChatPane({
                             siteRoleTextClass(siteRoleOf(siteRoles, m.user_id)) ??
                             "text-muted-foreground"
                           }
+                          style={nameColorStyle(
+                            siteRoleOf(siteRoles, m.user_id),
+                            author?.name_color,
+                          )}
                         >
                           {authorName}
                         </span>

@@ -26,3 +26,20 @@ export function siteRoleBadgeClass(role: AppRole | null) {
     ? "bg-destructive/15 text-destructive"
     : "bg-primary/15 text-primary";
 }
+
+/** Reds are reserved for admins, so custom colors are filtered client-side too. */
+export function isRedish(hex: string) {
+  const m = /^#([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return false;
+  const n = parseInt(m[1] ?? "", 16);
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  return r >= 120 && r > g * 2 && r > b * 2;
+}
+
+/** Role colors win over a personal name color. */
+export function nameColorStyle(role: AppRole | null, color: string | null | undefined) {
+  if (role || !color || isRedish(color)) return undefined;
+  return { color } as const;
+}

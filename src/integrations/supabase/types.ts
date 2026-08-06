@@ -80,6 +80,7 @@ export type Database = {
           display_name: string
           id: string
           last_seen_at: string
+          name_color: string | null
           status_message: string | null
           updated_at: string
           username: string
@@ -90,6 +91,7 @@ export type Database = {
           display_name: string
           id: string
           last_seen_at?: string
+          name_color?: string | null
           status_message?: string | null
           updated_at?: string
           username: string
@@ -100,6 +102,7 @@ export type Database = {
           display_name?: string
           id?: string
           last_seen_at?: string
+          name_color?: string | null
           status_message?: string | null
           updated_at?: string
           username?: string
