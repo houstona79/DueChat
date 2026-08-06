@@ -1,16 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Hash, MessageSquare, ShieldCheck, Trash2, Users } from "lucide-react";
+import { ArrowLeft, Ban, Hash, MessageSquare, ShieldCheck, Trash2, Users } from "lucide-react";
 import { Avatar } from "@/components/messenger/Avatar";
 import { useAuth } from "@/hooks/use-auth";
 import { accentFor, formatTime, isOnline } from "@/lib/chat";
 import {
+  banUser,
   deleteMessage,
   deleteRoom,
   fetchAdminSnapshot,
   grantRole,
   revokeRole,
+  unbanUser,
 } from "@/lib/admin";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -27,7 +29,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-type Tab = "overview" | "users" | "rooms" | "messages";
+type Tab = "overview" | "users" | "bans" | "rooms" | "messages";
 
 /** The owner account keeps admin access permanently (also enforced in the database). */
 const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
@@ -52,6 +54,11 @@ function AdminPage() {
   });
   const roomMutation = useMutation({ mutationFn: deleteRoom, onSuccess: refresh });
   const messageMutation = useMutation({ mutationFn: deleteMessage, onSuccess: refresh });
+  const banMutation = useMutation({
+    mutationFn: ({ userId, ban }: { userId: string; ban: boolean }) =>
+      ban ? banUser(userId) : unbanUser(userId),
+    onSuccess: refresh,
+  });
 
   const isAdmin = useMemo(
     () => !!user && !!data?.roles.some((r) => r.user_id === user.id && r.role === "admin"),
@@ -99,7 +106,7 @@ function AdminPage() {
   return (
     <Shell>
       <div className="flex gap-1 overflow-x-auto rounded-2xl bg-secondary p-1">
-        {(["overview", "users", "rooms", "messages"] as Tab[]).map((t) => (
+        {(["overview", "users", "bans", "rooms", "messages"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -135,6 +142,7 @@ function AdminPage() {
           {data.profiles.map((p) => {
             const admin = data.roles.some((r) => r.user_id === p.id && r.role === "admin");
             const locked = p.id === OWNER_USER_ID || p.id === user?.id;
+            const banned = data.bans.some((b) => b.user_id === p.id);
             return (
               <li
                 key={p.id}
@@ -167,9 +175,57 @@ function AdminPage() {
                 >
                   {p.id === OWNER_USER_ID ? "Owner" : admin ? "Admin" : "Make admin"}
                 </button>
+                <button
+                  disabled={banMutation.isPending || locked || (admin && !banned)}
+                  title={
+                    locked
+                      ? "This account can’t be banned"
+                      : banned
+                        ? "Unban this member"
+                        : "Ban this member from DueChat"
+                  }
+                  onClick={() => banMutation.mutate({ userId: p.id, ban: !banned })}
+                  className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold disabled:opacity-50 ${
+                    banned
+                      ? "bg-destructive/15 text-destructive"
+                      : "bg-secondary text-muted-foreground"
+                  }`}
+                >
+                  {banned ? "Unban" : "Ban"}
+                </button>
               </li>
             );
           })}
+        </ul>
+      )}
+
+      {tab === "bans" && (
+        <ul className="mt-5 space-y-2">
+          {data.bans.map((b) => (
+            <li
+              key={b.id}
+              className="flex items-center gap-3 rounded-2xl border border-border bg-card px-3 py-2.5"
+            >
+              <Ban className="size-4 shrink-0 text-destructive" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold">{nameOf(b.user_id)}</p>
+                <p className="truncate text-xs text-muted-foreground">
+                  Banned {formatTime(b.created_at)} by {nameOf(b.banned_by)}
+                  {b.reason ? ` · ${b.reason}` : ""}
+                </p>
+              </div>
+              <button
+                disabled={banMutation.isPending}
+                onClick={() => banMutation.mutate({ userId: b.user_id, ban: false })}
+                className="shrink-0 rounded-xl bg-secondary px-3 py-1.5 text-xs font-semibold text-foreground disabled:opacity-50"
+              >
+                Unban
+              </button>
+            </li>
+          ))}
+          {data.bans.length === 0 && (
+            <p className="text-sm text-muted-foreground">Nobody is banned from DueChat.</p>
+          )}
         </ul>
       )}
 

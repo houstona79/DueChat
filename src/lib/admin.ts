@@ -3,6 +3,38 @@ import type { Message, Profile, Room } from "@/lib/chat";
 
 export type AppRole = "admin" | "moderator" | "user";
 export type UserRole = { id: string; user_id: string; role: AppRole };
+export type SiteBan = {
+  id: string;
+  user_id: string;
+  banned_by: string;
+  reason: string | null;
+  created_at: string;
+};
+
+export async function fetchSiteBans(): Promise<SiteBan[]> {
+  const { data, error } = await supabase
+    .from("site_bans")
+    .select("id, user_id, banned_by, reason, created_at")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as SiteBan[];
+}
+
+export async function banUser(userId: string, reason?: string) {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) throw new Error("Not signed in");
+  const { error } = await supabase.from("site_bans").insert({
+    user_id: userId,
+    banned_by: auth.user.id,
+    reason: reason?.trim() ? reason.trim() : null,
+  });
+  if (error) throw error;
+}
+
+export async function unbanUser(userId: string) {
+  const { error } = await supabase.from("site_bans").delete().eq("user_id", userId);
+  if (error) throw error;
+}
 
 export async function fetchRoles(): Promise<UserRole[]> {
   const { data, error } = await supabase.from("user_roles").select("id, user_id, role");
@@ -50,10 +82,11 @@ export type AdminSnapshot = {
   roles: UserRole[];
   messages: Message[];
   memberships: { room_id: string; user_id: string }[];
+  bans: SiteBan[];
 };
 
 export async function fetchAdminSnapshot(): Promise<AdminSnapshot> {
-  const [profiles, rooms, roles, messages, memberships] = await Promise.all([
+  const [profiles, rooms, roles, messages, memberships, bans] = await Promise.all([
     supabase
       .from("profiles")
       .select("id, username, display_name, avatar_url, status_message, last_seen_at")
@@ -65,6 +98,7 @@ export async function fetchAdminSnapshot(): Promise<AdminSnapshot> {
     fetchRoles(),
     fetchRecentMessages(120),
     supabase.from("room_members").select("room_id, user_id"),
+    fetchSiteBans(),
   ]);
   if (profiles.error) throw profiles.error;
   if (rooms.error) throw rooms.error;
@@ -75,5 +109,6 @@ export async function fetchAdminSnapshot(): Promise<AdminSnapshot> {
     roles,
     messages,
     memberships: memberships.data ?? [],
+    bans,
   };
 }
