@@ -238,6 +238,41 @@ export async function touchPresence(userId: string) {
 /* ---------- room moderation ---------- */
 
 export type RoomAdmin = { room_id: string; user_id: string };
+
+export type Buddy = {
+  id: string;
+  owner_id: string;
+  buddy_id: string;
+  nickname: string | null;
+  created_at: string;
+};
+
+export async function fetchBuddies(ownerId: string): Promise<Buddy[]> {
+  const { data, error } = await supabase
+    .from("buddies")
+    .select("id, owner_id, buddy_id, nickname, created_at")
+    .eq("owner_id", ownerId)
+    .order("created_at", { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function addBuddy(ownerId: string, buddyId: string) {
+  const { error } = await supabase
+    .from("buddies")
+    .insert({ owner_id: ownerId, buddy_id: buddyId });
+  if (error && error.code !== "23505") throw error;
+}
+
+export async function removeBuddy(ownerId: string, buddyId: string) {
+  const { error } = await supabase
+    .from("buddies")
+    .delete()
+    .eq("owner_id", ownerId)
+    .eq("buddy_id", buddyId);
+  if (error) throw error;
+}
+
 export type RoomBan = {
   room_id: string;
   user_id: string;
