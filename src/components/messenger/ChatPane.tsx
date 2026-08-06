@@ -23,6 +23,12 @@ import {
 } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 
+function isEmojiOnly(body: string) {
+  const trimmed = body.trim();
+  if (!trimmed || trimmed.length > 12) return false;
+  return /^[\p{Extended_Pictographic}\uFE0F\u200D\s\u{1F3FB}-\u{1F3FF}\u{20E3}]+$/u.test(trimmed);
+}
+
 export function ChatPane({
   room,
   memberships,
