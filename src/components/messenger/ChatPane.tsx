@@ -356,17 +356,26 @@ export function ChatPane({
                         ) : null}
                       </span>
                     ) : null}
-                    <div
-                      className={cn(
-                        "max-w-[78%] px-4 py-2.5 text-sm leading-relaxed",
-                        mine
-                          ? "rounded-3xl rounded-br-md bg-bubble-me text-bubble-me-foreground"
-                          : "rounded-3xl rounded-bl-md bg-bubble-them text-bubble-them-foreground",
-                        isEmojiOnly(m.body) && "bg-transparent px-1 py-0.5 text-3xl leading-tight",
-                      )}
-                    >
-                      {m.body}
-                    </div>
+                    {gifUrlOf(m.body) ? (
+                      <img
+                        src={gifUrlOf(m.body)!}
+                        alt="GIF"
+                        loading="lazy"
+                        className="max-h-56 max-w-[78%] rounded-2xl border border-border object-cover"
+                      />
+                    ) : (
+                      <div
+                        className={cn(
+                          "max-w-[78%] px-4 py-2.5 text-sm leading-relaxed",
+                          mine
+                            ? "rounded-3xl rounded-br-md bg-bubble-me text-bubble-me-foreground"
+                            : "rounded-3xl rounded-bl-md bg-bubble-them text-bubble-them-foreground",
+                          isEmojiOnly(m.body) && "bg-transparent px-1 py-0.5 text-3xl leading-tight",
+                        )}
+                      >
+                        {m.body}
+                      </div>
+                    )}
                     <span className="mt-1 px-1 text-[10px] text-muted-foreground">
                       {formatTime(m.created_at)}
                     </span>
