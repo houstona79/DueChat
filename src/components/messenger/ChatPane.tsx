@@ -207,6 +207,22 @@ export function ChatPane({
           memberships={members}
           profiles={profiles}
           meId={meId}
+          ownerId={room.is_direct ? undefined : room.created_by}
+          roomAdminIds={roomAdmins.map((a) => a.user_id)}
+          bans={bans}
+          canModerate={canModerate}
+          isOwner={isOwner}
+          onPromote={(userId) =>
+            void runModeration(() => addRoomAdmin(room.id, userId, meId), ["room-admins"])
+          }
+          onDemote={(userId) =>
+            void runModeration(() => removeRoomAdmin(room.id, userId), ["room-admins"])
+          }
+          onKick={(userId) => void runModeration(() => kickMember(room.id, userId), [])}
+          onBan={(userId) =>
+            void runModeration(() => banMember(room.id, userId, meId), ["room-bans"])
+          }
+          onUnban={(userId) => void runModeration(() => unbanMember(room.id, userId), ["room-bans"])}
           onClose={() => setShowMembers(false)}
           onMessage={(userId) => {
             setShowMembers(false);
