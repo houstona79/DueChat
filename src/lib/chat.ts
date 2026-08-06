@@ -6,6 +6,7 @@ export type Profile = {
   display_name: string;
   avatar_url: string | null;
   status_message: string | null;
+  name_color: string | null;
   last_seen_at: string;
 };
 
