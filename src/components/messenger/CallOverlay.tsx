@@ -1,6 +1,8 @@
 import { Mic, MicOff, PhoneOff, Video, VideoOff, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Avatar } from "./Avatar";
+import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
+import { accentFor } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 
 function formatDuration(s: number) {
@@ -12,75 +14,39 @@ export function CallOverlay({
   title,
   accent,
   mode,
+  roomId,
+  meId,
+  myName,
   onEnd,
 }: {
   title: string;
   accent: string;
   mode: "voice" | "video";
+  roomId: string;
+  meId: string;
+  myName: string;
   onEnd: () => void;
 }) {
-  const [connected, setConnected] = useState(false);
   const [seconds, setSeconds] = useState(0);
-  const [muted, setMuted] = useState(false);
-  const [camOn, setCamOn] = useState(mode === "video");
   const [speaker, setSpeaker] = useState(true);
-  const [mediaError, setMediaError] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+
+  const { localStream, mediaError, participants, muted, camOn, setMuted, setCamOn } = useGroupCall({
+    roomId,
+    userId: meId,
+    name: myName,
+    mode,
+    enabled: true,
+  });
 
   useEffect(() => {
-    const t = window.setTimeout(() => setConnected(true), 1600);
-    return () => window.clearTimeout(t);
-  }, []);
-
-  // Use the phone's real mic/camera so calls work from a mobile browser.
-  useEffect(() => {
-    let cancelled = false;
-    const start = async () => {
-      if (!navigator.mediaDevices?.getUserMedia) {
-        setMediaError("This browser can't access the camera or microphone.");
-        return;
-      }
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: mode === "video" ? { facingMode: "user" } : false,
-        });
-        if (cancelled) {
-          stream.getTracks().forEach((t) => t.stop());
-          return;
-        }
-        streamRef.current = stream;
-        setMediaError(null);
-        if (videoRef.current) videoRef.current.srcObject = stream;
-      } catch {
-        if (!cancelled) setMediaError("Camera and microphone access was blocked.");
-      }
-    };
-    void start();
-    return () => {
-      cancelled = true;
-      streamRef.current?.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
-    };
-  }, [mode]);
+    if (videoRef.current) videoRef.current.srcObject = localStream;
+  }, [localStream, camOn]);
 
   useEffect(() => {
-    streamRef.current?.getAudioTracks().forEach((t) => (t.enabled = !muted));
-  }, [muted]);
-
-  useEffect(() => {
-    streamRef.current?.getVideoTracks().forEach((t) => (t.enabled = camOn));
-    if (camOn && videoRef.current && streamRef.current) {
-      videoRef.current.srcObject = streamRef.current;
-    }
-  }, [camOn]);
-
-  useEffect(() => {
-    if (!connected) return;
     const i = window.setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => window.clearInterval(i);
-  }, [connected]);
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -94,33 +60,35 @@ export function CallOverlay({
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={`${mode === "video" ? "Video" : "Voice"} call with ${title}`}
-      className="absolute inset-0 z-20 flex flex-col bg-sidebar/95 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] backdrop-blur-sm"
+      aria-label={`${mode === "video" ? "Video" : "Voice"} call in ${title}`}
+      className="absolute inset-0 z-30 flex flex-col bg-sidebar/95 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] backdrop-blur-sm"
     >
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-5 text-center">
-        {mode === "video" && camOn ? (
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            className="aspect-[3/4] w-full max-w-xs rounded-3xl bg-secondary object-cover"
-          />
-        ) : (
-          <div className="scale-150">
-            <Avatar name={title} accent={accent} />
-          </div>
-        )}
-        <div>
-          <h2 className="font-display text-xl font-semibold sm:text-2xl">{title}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {connected
-              ? `${mode === "video" ? "Video" : "Voice"} call · ${formatDuration(seconds)}`
-              : `Ringing…`}
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+        <div className="text-center">
+          <h2 className="font-display text-lg font-semibold sm:text-xl">{title}</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {mode === "video" ? "Group video call" : "Group voice call"} ·{" "}
+            {participants.length + 1} {participants.length === 0 ? "person" : "people"} ·{" "}
+            {formatDuration(seconds)}
+            {participants.length === 0 ? " · waiting for others…" : ""}
           </p>
           {mediaError ? (
             <p className="mx-auto mt-2 max-w-xs text-xs text-muted-foreground">{mediaError}</p>
           ) : null}
+        </div>
+
+        <div
+          className={cn(
+            "mx-auto mt-4 grid max-w-3xl gap-3",
+            participants.length === 0 ? "max-w-sm grid-cols-1" : "grid-cols-2 lg:grid-cols-3",
+          )}
+        >
+          <Tile name={`${myName} (you)`} accent={accent} muted={muted} showVideo={camOn}>
+            <video ref={videoRef} autoPlay playsInline muted className="size-full object-cover" />
+          </Tile>
+          {participants.map((peer) => (
+            <PeerTile key={peer.userId} peer={peer} speaker={speaker} />
+          ))}
         </div>
       </div>
 
@@ -148,11 +116,60 @@ export function CallOverlay({
         </CallButton>
         <button
           onClick={onEnd}
-          aria-label="End call"
+          aria-label="Leave call"
           className="grid size-16 place-items-center rounded-full bg-destructive text-destructive-foreground active:scale-95 sm:size-14"
         >
           <PhoneOff className="size-6 sm:size-5" />
         </button>
+      </div>
+    </div>
+  );
+}
+
+function PeerTile({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
+  const ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (ref.current) ref.current.srcObject = peer.stream;
+  }, [peer.stream]);
+
+  useEffect(() => {
+    if (ref.current) ref.current.muted = !speaker;
+  }, [speaker]);
+
+  const hasVideo = Boolean(peer.stream?.getVideoTracks().some((t) => t.enabled)) && peer.camOn;
+
+  return (
+    <Tile name={peer.name} accent={accentFor(peer.userId)} muted={peer.muted} showVideo={hasVideo}>
+      <video ref={ref} autoPlay playsInline className="size-full object-cover" />
+    </Tile>
+  );
+}
+
+function Tile({
+  name,
+  accent,
+  muted,
+  showVideo,
+  children,
+}: {
+  name: string;
+  accent: string;
+  muted: boolean;
+  showVideo: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="relative aspect-[3/4] overflow-hidden rounded-3xl bg-secondary sm:aspect-square">
+      <div className={showVideo ? "size-full" : "sr-only"}>{children}</div>
+      {showVideo ? null : (
+        <div className="grid size-full place-items-center">
+          <Avatar name={name} accent={accent} />
+        </div>
+      )}
+      <div className="absolute inset-x-0 bottom-0 flex items-center gap-1.5 bg-gradient-to-t from-background/85 to-transparent px-3 py-2">
+        <span className="truncate text-[11px] font-medium">{name}</span>
+        {muted ? <MicOff className="size-3 shrink-0 text-muted-foreground" /> : null}
       </div>
     </div>
   );
