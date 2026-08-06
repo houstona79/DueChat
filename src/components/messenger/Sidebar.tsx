@@ -1,11 +1,12 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, Plus, Search, Settings, Users } from "lucide-react";
+import { LogOut, Plus, Search, Settings, ShieldCheck, Users } from "lucide-react";
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { NewRoomForm } from "./NewRoomForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useOpenDirect } from "@/hooks/use-direct";
+import { fetchRoles } from "@/lib/admin";
 import {
   accentFor,
   counterpartId,
@@ -52,6 +53,13 @@ export function Sidebar({
   const directs = rooms.filter((r) => r.is_direct && myRoomIds.has(r.id) && matches(r));
   const onlineOthers = profiles.filter((p) => isOnline(p) && p.id !== me?.id);
 
+  const { data: roles } = useQuery({
+    queryKey: ["user-roles"],
+    queryFn: fetchRoles,
+    enabled: !!me?.id,
+  });
+  const isAdmin = !!roles?.some((r) => r.user_id === me?.id && r.role === "admin");
+
   const signOut = async () => {
     await queryClient.cancelQueries();
     queryClient.clear();
@@ -65,6 +73,15 @@ export function Sidebar({
         <div className="flex items-center justify-between gap-2">
           <h1 className="text-2xl font-semibold">Rooms</h1>
           <div className="flex items-center gap-1">
+            {isAdmin ? (
+              <Link
+                to="/admin"
+                aria-label="Admin panel"
+                className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+              >
+                <ShieldCheck className="size-4" />
+              </Link>
+            ) : null}
             <Link
               to="/settings"
               aria-label="Profile settings"
