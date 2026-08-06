@@ -1,0 +1,154 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Avatar } from "@/components/messenger/Avatar";
+import { useAuth, useMyProfile } from "@/hooks/use-auth";
+import { accentFor, updateProfile, uploadAvatar } from "@/lib/chat";
+
+export const Route = createFileRoute("/_authenticated/settings")({
+  head: () => ({
+    meta: [
+      { title: "Your profile — Halo Messenger" },
+      { name: "description", content: "Update your display name, handle, photo and status." },
+      { property: "og:title", content: "Your profile — Halo Messenger" },
+      {
+        property: "og:description",
+        content: "Update your display name, handle, photo and status.",
+      },
+    ],
+  }),
+  component: SettingsPage,
+});
+
+function SettingsPage() {
+  const { user } = useAuth();
+  const { data: me } = useMyProfile(user?.id);
+  const queryClient = useQueryClient();
+  const [displayName, setDisplayName] = useState("");
+  const [username, setUsername] = useState("");
+  const [status, setStatus] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (!me) return;
+    setDisplayName(me.display_name);
+    setUsername(me.username);
+    setStatus(me.status_message ?? "");
+  }, [me]);
+
+  if (!user || !me) return null;
+
+  const save = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setMessage(null);
+    try {
+      await updateProfile(user.id, {
+        display_name: displayName.trim().slice(0, 60) || me.display_name,
+        username: username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 24) || me.username,
+        status_message: status.trim().slice(0, 120) || null,
+      });
+      await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+      await queryClient.invalidateQueries({ queryKey: ["profiles"] });
+      setMessage("Profile saved.");
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Could not save profile.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const onPickFile = async (file: File | undefined) => {
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) {
+      setMessage("Please pick an image under 4 MB.");
+      return;
+    }
+    setBusy(true);
+    try {
+      await uploadAvatar(user.id, file);
+      await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+      await queryClient.invalidateQueries({ queryKey: ["profiles"] });
+      setMessage("Photo updated.");
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <main className="mx-auto min-h-screen max-w-lg px-5 py-8">
+      <Link
+        to="/chat"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft className="size-4" /> Back to rooms
+      </Link>
+      <h1 className="mt-6 text-2xl font-semibold">Your profile</h1>
+
+      <div className="mt-6 flex items-center gap-4">
+        <Avatar
+          name={me.display_name}
+          accent={accentFor(me.id)}
+          avatarPath={me.avatar_url}
+          size="lg"
+        />
+        <label className="cursor-pointer rounded-xl bg-secondary px-3 py-2 text-sm">
+          Change photo
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => void onPickFile(e.target.files?.[0])}
+          />
+        </label>
+      </div>
+
+      <form onSubmit={save} className="mt-6 space-y-4">
+        <Field label="Display name" id="display-name" value={displayName} onChange={setDisplayName} />
+        <Field label="Username" id="username" value={username} onChange={setUsername} />
+        <Field label="Status" id="status" value={status} onChange={setStatus} placeholder="Working on something new" />
+        {message ? <p className="text-xs text-muted-foreground">{message}</p> : null}
+        <button
+          type="submit"
+          disabled={busy}
+          className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground disabled:opacity-50"
+        >
+          {busy ? "Saving…" : "Save profile"}
+        </button>
+      </form>
+    </main>
+  );
+}
+
+function Field({
+  label,
+  id,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  id: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <div>
+      <label htmlFor={id} className="block text-[11px] font-medium text-muted-foreground">
+        {label}
+      </label>
+      <input
+        id={id}
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground"
+      />
+    </div>
+  );
+}
