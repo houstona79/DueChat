@@ -5,6 +5,8 @@ import {
   fetchMemberships,
   fetchMessages,
   fetchProfiles,
+  fetchRoomAdmins,
+  fetchRoomBans,
   fetchRoomEvents,
   fetchRooms,
   touchPresence,
@@ -38,6 +40,22 @@ export function useRoomEvents(roomId: string, enabled: boolean) {
   });
 }
 
+export function useRoomAdmins(roomId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["room-admins", roomId],
+    queryFn: () => fetchRoomAdmins(roomId),
+    enabled,
+  });
+}
+
+export function useRoomBans(roomId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["room-bans", roomId],
+    queryFn: () => fetchRoomBans(roomId),
+    enabled,
+  });
+}
+
 /** Keeps queries fresh from realtime table changes. */
 export function useChatRealtime() {
   const queryClient = useQueryClient();
@@ -63,6 +81,18 @@ export function useChatRealtime() {
       })
       .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, () => {
         void queryClient.invalidateQueries({ queryKey: ["profiles"] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "room_admins" }, (payload) => {
+        const roomId =
+          (payload.new as { room_id?: string } | null)?.room_id ??
+          (payload.old as { room_id?: string } | null)?.room_id;
+        if (roomId) void queryClient.invalidateQueries({ queryKey: ["room-admins", roomId] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "room_bans" }, (payload) => {
+        const roomId =
+          (payload.new as { room_id?: string } | null)?.room_id ??
+          (payload.old as { room_id?: string } | null)?.room_id;
+        if (roomId) void queryClient.invalidateQueries({ queryKey: ["room-bans", roomId] });
       })
       .subscribe();
 
