@@ -1,12 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Phone, SendHorizonal, Video } from "lucide-react";
+import { ArrowLeft, Phone, SendHorizonal, Users, Video } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { CallOverlay } from "./CallOverlay";
+import { MemberList } from "./MemberList";
 import { useMessages } from "@/hooks/use-chat";
+import { useOpenDirect } from "@/hooks/use-direct";
 import {
   accentFor,
+  counterpartId,
   formatTime,
   isOnline,
   joinRoom,
@@ -35,6 +38,12 @@ export function ChatPane({
     profiles.some((p) => p.id === m.user_id && isOnline(p)),
   ).length;
 
+  const profileOf = (userId: string) => profiles.find((p) => p.id === userId);
+  const partner = room.is_direct ? profileOf(counterpartId(room, meId) ?? "") : undefined;
+  const title = room.is_direct ? (partner?.display_name ?? "Direct message") : room.name;
+  const { open: openDirect } = useOpenDirect(meId);
+  const [showMembers, setShowMembers] = useState(false);
+
   const [draft, setDraft] = useState("");
   const [call, setCall] = useState<"voice" | "video" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -51,8 +60,6 @@ export function ChatPane({
     const el = scroller.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages.length, room.id]);
-
-  const profileOf = (userId: string) => profiles.find((p) => p.id === userId);
 
   const submit = async () => {
     const text = draft.trim();
