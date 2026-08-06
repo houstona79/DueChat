@@ -1,7 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Ban, Hash, MessageSquare, ShieldCheck, Trash2, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  Ban,
+  Hash,
+  LogOut,
+  MessageSquare,
+  ShieldCheck,
+  Trash2,
+  Users,
+} from "lucide-react";
+import { toast } from "sonner";
 import { Avatar } from "@/components/messenger/Avatar";
 import { useAuth } from "@/hooks/use-auth";
 import { accentFor, formatTime, isOnline } from "@/lib/chat";
@@ -11,6 +21,7 @@ import {
   deleteRoom,
   fetchAdminSnapshot,
   grantRole,
+  kickUser,
   revokeRole,
   unbanUser,
 } from "@/lib/admin";
@@ -65,6 +76,14 @@ function AdminPage() {
     mutationFn: ({ userId, ban }: { userId: string; ban: boolean }) =>
       ban ? banUser(userId) : unbanUser(userId),
     onSuccess: refresh,
+  });
+  const kickMutation = useMutation({
+    mutationFn: ({ userId }: { userId: string; name: string }) => kickUser(userId),
+    onSuccess: (_data, vars) => {
+      toast.success(`${vars.name} was kicked off DueChat.`);
+      refresh();
+    },
+    onError: () => toast.error("Could not kick that member."),
   });
 
   const isAdmin = useMemo(
@@ -222,6 +241,21 @@ function AdminPage() {
                   }`}
                 >
                   {banned ? "Unban" : "Ban"}
+                </button>
+                <button
+                  disabled={kickMutation.isPending || locked || admin}
+                  title={
+                    locked
+                      ? "This account can’t be kicked"
+                      : admin
+                        ? "Admins can’t be kicked"
+                        : "Sign this member out of DueChat everywhere"
+                  }
+                  onClick={() => kickMutation.mutate({ userId: p.id, name: p.display_name })}
+                  className="flex shrink-0 items-center gap-1.5 rounded-xl bg-secondary px-3 py-1.5 text-xs font-semibold text-muted-foreground disabled:opacity-50"
+                >
+                  <LogOut className="size-3.5" />
+                  Kick
                 </button>
               </li>
             );
