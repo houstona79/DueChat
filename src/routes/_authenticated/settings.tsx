@@ -5,6 +5,22 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "@/components/messenger/Avatar";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { accentFor, updateProfile, uploadAvatar } from "@/lib/chat";
+import { isRedish } from "@/hooks/use-roles";
+import { cn } from "@/lib/utils";
+
+const NAME_COLORS = [
+  { label: "Default", value: "" },
+  { label: "Electric blue", value: "#4c8dff" },
+  { label: "Cyan", value: "#22d3ee" },
+  { label: "Mint", value: "#34d399" },
+  { label: "Lime", value: "#a3e635" },
+  { label: "Amber", value: "#fbbf24" },
+  { label: "Orange", value: "#fb923c" },
+  { label: "Pink", value: "#f472b6" },
+  { label: "Violet", value: "#a78bfa" },
+  { label: "Indigo", value: "#818cf8" },
+  { label: "Slate", value: "#cbd5e1" },
+];
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -28,6 +44,7 @@ function SettingsPage() {
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [status, setStatus] = useState("");
+  const [nameColor, setNameColor] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -36,6 +53,7 @@ function SettingsPage() {
     setDisplayName(me.display_name);
     setUsername(me.username);
     setStatus(me.status_message ?? "");
+    setNameColor(me.name_color ?? "");
   }, [me]);
 
   if (!user || !me) return null;
@@ -45,10 +63,16 @@ function SettingsPage() {
     setBusy(true);
     setMessage(null);
     try {
+      if (nameColor && isRedish(nameColor)) {
+        setMessage("Red name colors are reserved for admins — pick another color.");
+        setBusy(false);
+        return;
+      }
       await updateProfile(user.id, {
         display_name: displayName.trim().slice(0, 60) || me.display_name,
         username: username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 24) || me.username,
         status_message: status.trim().slice(0, 120) || null,
+        name_color: nameColor || null,
       });
       await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
       await queryClient.invalidateQueries({ queryKey: ["profiles"] });
@@ -111,6 +135,41 @@ function SettingsPage() {
         <Field label="Display name" id="display-name" value={displayName} onChange={setDisplayName} />
         <Field label="Username" id="username" value={username} onChange={setUsername} />
         <Field label="Status" id="status" value={status} onChange={setStatus} placeholder="Working on something new" />
+
+        <div>
+          <span className="block text-[11px] font-medium text-muted-foreground">Name color</span>
+          <p className="mt-1 text-[11px] text-muted-foreground/80">
+            Red is reserved for admins.
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {NAME_COLORS.map((c) => (
+              <button
+                key={c.label}
+                type="button"
+                onClick={() => setNameColor(c.value)}
+                aria-label={c.label}
+                aria-pressed={nameColor === c.value}
+                className={cn(
+                  "size-9 rounded-full border-2 bg-secondary text-[10px] font-semibold",
+                  nameColor === c.value ? "border-primary" : "border-transparent",
+                )}
+                style={c.value ? { backgroundColor: c.value } : undefined}
+              >
+                {c.value ? "" : "A"}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2 text-sm">
+            Preview:{" "}
+            <span
+              className="font-semibold"
+              style={nameColor ? { color: nameColor } : undefined}
+            >
+              {displayName || me.display_name}
+            </span>
+          </p>
+        </div>
+
         {message ? <p className="text-xs text-muted-foreground">{message}</p> : null}
         <button
           type="submit"
