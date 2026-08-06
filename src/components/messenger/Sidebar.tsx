@@ -3,6 +3,7 @@ import { LogOut, Plus, Search, Settings, ShieldCheck, Users } from "lucide-react
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
+import { BuddyList } from "./BuddyList";
 import { NewRoomForm } from "./NewRoomForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useOpenDirect } from "@/hooks/use-direct";
@@ -160,6 +161,7 @@ export function Sidebar({
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-6">
+        <BuddyList profiles={profiles} me={me} />
         {directs.length > 0 ? (
           <section className="mb-2">
             <h2 className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
