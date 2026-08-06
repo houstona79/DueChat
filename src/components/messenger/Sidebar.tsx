@@ -216,20 +216,29 @@ export function Sidebar({
           </h2>
           <ul className="mt-2 space-y-1">
             {onlineOthers.map((p) => (
-              <li key={p.id} className="flex items-center gap-3 rounded-2xl px-1 py-1.5">
-                <Avatar
-                  name={p.display_name}
-                  accent={accentFor(p.id)}
-                  avatarPath={p.avatar_url}
-                  online
-                  size="sm"
-                />
-                <span className="min-w-0">
-                  <span className="block truncate text-sm">{p.display_name}</span>
-                  <span className="block truncate text-xs text-muted-foreground">
-                    {p.status_message || `@${p.username}`}
+              <li key={p.id}>
+                <button
+                  onClick={() => void openDirect(p.id)}
+                  disabled={dmPending === p.id}
+                  aria-label={`Message ${p.display_name}`}
+                  className="flex w-full items-center gap-3 rounded-2xl px-1 py-1.5 text-left hover:bg-secondary disabled:opacity-60"
+                >
+                  <Avatar
+                    name={p.display_name}
+                    accent={accentFor(p.id)}
+                    avatarPath={p.avatar_url}
+                    online
+                    size="sm"
+                  />
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm">{p.display_name}</span>
+                    <span className="block truncate text-xs text-muted-foreground">
+                      {dmPending === p.id
+                        ? "Opening chat…"
+                        : p.status_message || `@${p.username}`}
+                    </span>
                   </span>
-                </span>
+                </button>
               </li>
             ))}
             {onlineOthers.length === 0 ? (
