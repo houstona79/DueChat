@@ -9,9 +9,9 @@ import { accentFor, updateProfile, uploadAvatar } from "@/lib/chat";
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
-      { title: "Your profile — Halo Messenger" },
+      { title: "Your profile — DueChat" },
       { name: "description", content: "Update your display name, handle, photo and status." },
-      { property: "og:title", content: "Your profile — Halo Messenger" },
+      { property: "og:title", content: "Your profile — DueChat" },
       {
         property: "og:description",
         content: "Update your display name, handle, photo and status.",

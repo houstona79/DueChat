@@ -13,12 +13,12 @@ import {
 export const Route = createFileRoute("/_authenticated/chat")({
   head: () => ({
     meta: [
-      { title: "Your rooms — Halo Messenger" },
+      { title: "Your rooms — DueChat" },
       {
         name: "description",
         content: "Chat rooms, live presence and voice or video calls with your people.",
       },
-      { property: "og:title", content: "Your rooms — Halo Messenger" },
+      { property: "og:title", content: "Your rooms — DueChat" },
       {
         property: "og:description",
         content: "Chat rooms, live presence and voice or video calls with your people.",
