@@ -235,6 +235,89 @@ export async function touchPresence(userId: string) {
   await supabase.from("profiles").update({ last_seen_at: new Date().toISOString() }).eq("id", userId);
 }
 
+/* ---------- room moderation ---------- */
+
+export type RoomAdmin = { room_id: string; user_id: string };
+export type RoomBan = {
+  room_id: string;
+  user_id: string;
+  banned_by: string;
+  reason: string | null;
+  created_at: string;
+};
+
+export async function fetchRoomAdmins(roomId: string): Promise<RoomAdmin[]> {
+  const { data, error } = await supabase
+    .from("room_admins")
+    .select("room_id, user_id")
+    .eq("room_id", roomId);
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function fetchRoomBans(roomId: string): Promise<RoomBan[]> {
+  const { data, error } = await supabase
+    .from("room_bans")
+    .select("room_id, user_id, banned_by, reason, created_at")
+    .eq("room_id", roomId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function addRoomAdmin(roomId: string, userId: string, grantedBy: string) {
+  const { error } = await supabase
+    .from("room_admins")
+    .insert({ room_id: roomId, user_id: userId, granted_by: grantedBy });
+  if (error) throw error;
+}
+
+export async function removeRoomAdmin(roomId: string, userId: string) {
+  const { error } = await supabase
+    .from("room_admins")
+    .delete()
+    .eq("room_id", roomId)
+    .eq("user_id", userId);
+  if (error) throw error;
+}
+
+/** Removes someone from the room without banning them. */
+export async function kickMember(roomId: string, userId: string) {
+  const { error } = await supabase
+    .from("room_members")
+    .delete()
+    .eq("room_id", roomId)
+    .eq("user_id", userId);
+  if (error) throw error;
+}
+
+/** Bans someone from the room and removes them from the roster. */
+export async function banMember(
+  roomId: string,
+  userId: string,
+  bannedBy: string,
+  reason?: string,
+) {
+  const { error } = await supabase
+    .from("room_bans")
+    .insert({ room_id: roomId, user_id: userId, banned_by: bannedBy, reason: reason ?? null });
+  if (error) throw error;
+  await kickMember(roomId, userId);
+}
+
+export async function unbanMember(roomId: string, userId: string) {
+  const { error } = await supabase
+    .from("room_bans")
+    .delete()
+    .eq("room_id", roomId)
+    .eq("user_id", userId);
+  if (error) throw error;
+}
+
+async function _unusedTouch(userId: string) {
+  await supabase.from("profiles").update({ last_seen_at: new Date().toISOString() }).eq("id", userId);
+}
+
 export async function updateProfile(
   userId: string,
   patch: Partial<Pick<Profile, "display_name" | "username" | "status_message" | "avatar_url">>,
