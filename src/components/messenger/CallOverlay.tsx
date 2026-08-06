@@ -1,4 +1,14 @@
-import { Mic, MicOff, PhoneOff, Video, VideoOff, Volume2, VolumeX } from "lucide-react";
+import {
+  ChevronDown,
+  Maximize2,
+  Mic,
+  MicOff,
+  PhoneOff,
+  Video,
+  VideoOff,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Avatar } from "./Avatar";
 import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
@@ -30,6 +40,7 @@ export function CallOverlay({
 }) {
   const [seconds, setSeconds] = useState(0);
   const [speaker, setSpeaker] = useState(true);
+  const [minimized, setMinimized] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const { localStream, mediaError, participants, muted, camOn, setMuted, setCamOn } = useGroupCall({
@@ -42,7 +53,7 @@ export function CallOverlay({
 
   useEffect(() => {
     attachStream(videoRef.current, localStream);
-  }, [localStream, camOn]);
+  }, [localStream, camOn, minimized]);
 
   useEffect(() => {
     const i = window.setInterval(() => setSeconds((s) => s + 1), 1000);
@@ -57,6 +68,48 @@ export function CallOverlay({
     return () => window.removeEventListener("keydown", onKey);
   }, [onEnd]);
 
+  if (minimized) {
+    return (
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex justify-center px-3 pt-[calc(env(safe-area-inset-top)+0.5rem)]">
+        <div className="pointer-events-auto flex w-full max-w-md items-center gap-2 rounded-2xl border border-border bg-sidebar/95 px-3 py-2 shadow-lg backdrop-blur-sm">
+          <span className="size-2 shrink-0 animate-pulse rounded-full bg-primary" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-xs font-medium">{title}</p>
+            <p className="truncate text-[11px] text-muted-foreground">
+              {mode === "video" ? "Video call" : "Voice call"} · {participants.length + 1} ·{" "}
+              {formatDuration(seconds)}
+            </p>
+          </div>
+          <button
+            onClick={() => setMuted((v) => !v)}
+            aria-label={muted ? "Unmute microphone" : "Mute microphone"}
+            className="grid size-9 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+          >
+            {muted ? <MicOff className="size-4" /> : <Mic className="size-4" />}
+          </button>
+          <button
+            onClick={() => setMinimized(false)}
+            aria-label="Return to call"
+            className="grid size-9 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+          >
+            <Maximize2 className="size-4" />
+          </button>
+          <button
+            onClick={onEnd}
+            aria-label="Leave call"
+            className="grid size-9 shrink-0 place-items-center rounded-xl bg-destructive text-destructive-foreground"
+          >
+            <PhoneOff className="size-4" />
+          </button>
+          <video ref={videoRef} autoPlay playsInline muted className="sr-only" />
+          {participants.map((peer) => (
+            <PeerAudio key={peer.userId} peer={peer} speaker={speaker} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       role="dialog"
@@ -65,6 +118,14 @@ export function CallOverlay({
       className="absolute inset-0 z-30 flex flex-col bg-sidebar/95 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] backdrop-blur-sm"
     >
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+        <button
+          onClick={() => setMinimized(true)}
+          aria-label="Minimize call and keep chatting"
+          className="flex h-10 items-center gap-1.5 rounded-xl px-2.5 text-xs font-medium text-muted-foreground hover:bg-secondary"
+        >
+          <ChevronDown className="size-4" />
+          Back to chat
+        </button>
         <div className="text-center">
           <h2 className="font-display text-lg font-semibold sm:text-xl">{title}</h2>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -153,6 +214,23 @@ function PeerTile({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
       <audio ref={audioRef} autoPlay className="hidden" />
     </Tile>
   );
+}
+
+/** Audio-only playback used while the call is minimized. */
+function PeerAudio({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    attachStream(audioRef.current, peer.stream);
+  }, [peer.stream]);
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.muted = !speaker;
+    if (!speaker) return;
+    void audioRef.current?.play().catch(() => undefined);
+  }, [speaker]);
+
+  return <audio ref={audioRef} autoPlay className="hidden" />;
 }
 
 function Tile({
