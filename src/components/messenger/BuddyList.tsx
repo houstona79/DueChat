@@ -10,6 +10,7 @@ import {
   siteRoleLabel,
   siteRoleOf,
   siteRoleTextClass,
+  nameColorStyle,
   useSiteRoles,
 } from "@/hooks/use-roles";
 import { accentFor, addBuddy, isOnline, removeBuddy, type Profile } from "@/lib/chat";
@@ -169,6 +170,7 @@ export function BuddyList({
                           "truncate text-sm font-medium",
                           online ? siteRoleTextClass(role) : "text-muted-foreground",
                         )}
+                        style={online ? nameColorStyle(role, p.name_color) : undefined}
                       >
                         {p.display_name}
                       </span>
