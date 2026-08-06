@@ -2,12 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Phone, SendHorizonal, Users, Video } from "lucide-react";
 import { EmojiPicker } from "./EmojiPicker";
 
-const EMOJI_ONLY = /^(?:\p{Extended_Pictographic}|\p{Emoji_Component}|\uFE0F|\u200D|\s)+$/u;
-function isEmojiOnly(body: string) {
-  const trimmed = body.trim();
-  if (!trimmed || trimmed.length > 12) return false;
-  return EMOJI_ONLY.test(trimmed) && /\p{Extended_Pictographic}/u.test(trimmed);
-}
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
@@ -28,6 +22,12 @@ import {
   type Room,
 } from "@/lib/chat";
 import { cn } from "@/lib/utils";
+
+function isEmojiOnly(body: string) {
+  const trimmed = body.trim();
+  if (!trimmed || trimmed.length > 12) return false;
+  return /^[\p{Extended_Pictographic}\uFE0F\u200D\s\u{1F3FB}-\u{1F3FF}\u{20E3}]+$/u.test(trimmed);
+}
 
 export function ChatPane({
   room,
