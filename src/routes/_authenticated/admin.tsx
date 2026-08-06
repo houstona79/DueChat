@@ -29,6 +29,9 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 type Tab = "overview" | "users" | "rooms" | "messages";
 
+/** The owner account keeps admin access permanently (also enforced in the database). */
+const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
+
 function AdminPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -131,6 +134,7 @@ function AdminPage() {
         <ul className="mt-5 space-y-2">
           {data.profiles.map((p) => {
             const admin = data.roles.some((r) => r.user_id === p.id && r.role === "admin");
+            const locked = p.id === OWNER_USER_ID || p.id === user?.id;
             return (
               <li
                 key={p.id}
@@ -150,13 +154,18 @@ function AdminPage() {
                   </p>
                 </div>
                 <button
-                  disabled={roleMutation.isPending || p.id === user?.id}
+                  disabled={roleMutation.isPending || locked}
+                  title={
+                    p.id === OWNER_USER_ID
+                      ? "Owner account — admin access can’t be removed"
+                      : undefined
+                  }
                   onClick={() => roleMutation.mutate({ userId: p.id, make: !admin })}
                   className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold disabled:opacity-50 ${
                     admin ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground"
                   }`}
                 >
-                  {admin ? "Admin" : "Make admin"}
+                  {p.id === OWNER_USER_ID ? "Owner" : admin ? "Admin" : "Make admin"}
                 </button>
               </li>
             );
