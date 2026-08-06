@@ -104,10 +104,10 @@ export function ChatPane({
 
   return (
     <section className="relative flex h-full min-h-0 flex-col bg-background">
-      <header className="flex items-center gap-3 border-b border-border px-4 py-3">
+      <header className="flex items-center gap-2 border-b border-border px-3 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:gap-3 sm:px-4">
         <Link
           to="/chat"
-          className="-ml-1 grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary md:hidden"
+          className="-ml-1 grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary md:hidden"
           aria-label="Back to rooms"
         >
           <ArrowLeft className="size-5" />
@@ -134,7 +134,7 @@ export function ChatPane({
         <button
           onClick={() => setShowMembers((v) => !v)}
           className={cn(
-            "flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
+            "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
             showMembers
               ? "bg-primary/15 text-primary"
               : "text-muted-foreground hover:bg-secondary",
@@ -147,14 +147,14 @@ export function ChatPane({
         </button>
         <button
           onClick={() => setCall("voice")}
-          className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+          className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
           aria-label="Start voice call"
         >
           <Phone className="size-4" />
         </button>
         <button
           onClick={() => setCall("video")}
-          className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+          className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
           aria-label="Start video call"
         >
           <Video className="size-4" />
@@ -252,7 +252,7 @@ export function ChatPane({
             })}
           </div>
 
-          <footer className="border-t border-border px-3 py-3">
+          <footer className="border-t border-border px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             {error ? <p className="px-2 pb-2 text-xs text-destructive">{error}</p> : null}
             <div className="flex items-end gap-2 rounded-2xl bg-secondary p-2">
               <textarea
@@ -275,7 +275,7 @@ export function ChatPane({
                 onClick={() => void submit()}
                 disabled={draft.trim().length === 0}
                 aria-label="Send message"
-                className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40"
+                className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40"
               >
                 <SendHorizonal className="size-4" />
               </button>
