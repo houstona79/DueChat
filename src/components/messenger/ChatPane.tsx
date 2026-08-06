@@ -7,6 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { CallOverlay } from "./CallOverlay";
 import { MemberList } from "./MemberList";
+import { RadioPlayer } from "./RadioPlayer";
 import { useMessages, useRoomAdmins, useRoomBans, useRoomEvents } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
 import {
@@ -29,6 +30,7 @@ import {
   leaveRoom,
   removeRoomAdmin,
   sendMessage,
+  setRoomRadio,
   unbanMember,
   type Membership,
   type Profile,
@@ -202,6 +204,18 @@ export function ChatPane({
           <Video className="size-4" />
         </button>
       </header>
+
+      {!room.is_direct ? (
+        <RadioPlayer
+          url={room.radio_url}
+          name={room.radio_name}
+          canEdit={isOwner}
+          onSave={async (radio) => {
+            await setRoomRadio(room.id, radio);
+            await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+          }}
+        />
+      ) : null}
 
       {call ? (
         <CallOverlay

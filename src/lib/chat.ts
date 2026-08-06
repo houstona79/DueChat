@@ -19,6 +19,8 @@ export type Room = {
   created_at: string;
   is_direct: boolean;
   direct_key: string | null;
+  radio_url: string | null;
+  radio_name: string | null;
 };
 
 export type Message = {
@@ -94,7 +96,9 @@ export async function fetchMyProfile(userId: string): Promise<Profile | null> {
 export async function fetchRooms(): Promise<Room[]> {
   const { data, error } = await supabase
     .from("rooms")
-    .select("id, name, slug, topic, created_by, created_at, is_direct, direct_key")
+    .select(
+      "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name",
+    )
     .order("created_at", { ascending: true });
   if (error) throw error;
   return data ?? [];
@@ -149,7 +153,9 @@ export async function createRoom(userId: string, name: string, topic: string) {
   const { data, error } = await supabase
     .from("rooms")
     .insert({ name: name.trim(), slug: slugify(name), topic: topic.trim() || null, created_by: userId })
-    .select("id, name, slug, topic, created_by, created_at, is_direct, direct_key")
+    .select(
+      "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name",
+    )
     .single();
   if (error) throw error;
   const join = await supabase.from("room_members").insert({ room_id: data.id, user_id: userId });
@@ -234,6 +240,31 @@ export async function leaveRoom(roomId: string, userId: string) {
 
 export async function touchPresence(userId: string) {
   await supabase.from("profiles").update({ last_seen_at: new Date().toISOString() }).eq("id", userId);
+}
+
+/* ---------- room radio ---------- */
+
+/** Only https stream URLs are accepted (matches the database check). */
+export function isValidRadioUrl(url: string) {
+  const trimmed = url.trim();
+  if (!/^https:\/\/\S+$/i.test(trimmed)) return false;
+  try {
+    new URL(trimmed);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function setRoomRadio(
+  roomId: string,
+  radio: { url: string | null; name: string | null },
+) {
+  const { error } = await supabase
+    .from("rooms")
+    .update({ radio_url: radio.url, radio_name: radio.name })
+    .eq("id", roomId);
+  if (error) throw error;
 }
 
 /* ---------- room moderation ---------- */

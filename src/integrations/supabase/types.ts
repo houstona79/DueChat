@@ -245,6 +245,8 @@ export type Database = {
           id: string
           is_direct: boolean
           name: string
+          radio_name: string | null
+          radio_url: string | null
           slug: string
           topic: string | null
         }
@@ -255,6 +257,8 @@ export type Database = {
           id?: string
           is_direct?: boolean
           name: string
+          radio_name?: string | null
+          radio_url?: string | null
           slug: string
           topic?: string | null
         }
@@ -265,6 +269,8 @@ export type Database = {
           id?: string
           is_direct?: boolean
           name?: string
+          radio_name?: string | null
+          radio_url?: string | null
           slug?: string
           topic?: string | null
         }
