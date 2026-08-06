@@ -77,6 +77,7 @@ export function ChatPane({
   const isOwner = room.created_by === meId;
   const canModerate = !room.is_direct && (isOwner || roomAdmins.some((a) => a.user_id === meId));
   const { data: bans = [] } = useRoomBans(room.id, canModerate);
+  const { data: siteRoles } = useSiteRoles();
 
   type TimelineItem =
     | { kind: "message"; id: string; at: string; message: (typeof messages)[number] }
