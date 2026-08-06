@@ -314,10 +314,6 @@ export async function unbanMember(roomId: string, userId: string) {
   if (error) throw error;
 }
 
-async function _unusedTouch(userId: string) {
-  await supabase.from("profiles").update({ last_seen_at: new Date().toISOString() }).eq("id", userId);
-}
-
 export async function updateProfile(
   userId: string,
   patch: Partial<Pick<Profile, "display_name" | "username" | "status_message" | "avatar_url">>,
