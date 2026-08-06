@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Phone, SendHorizonal, Users, Video } from "lucide-react";
 import { EmojiPicker } from "./EmojiPicker";
+import { GifPicker } from "./GifPicker";
 
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -42,6 +43,18 @@ function isEmojiOnly(body: string) {
   const trimmed = body.trim();
   if (!trimmed || trimmed.length > 12) return false;
   return /^[\p{Extended_Pictographic}\uFE0F\u200D\s\u{1F3FB}-\u{1F3FF}\u{20E3}]+$/u.test(trimmed);
+}
+
+function gifUrlOf(body: string) {
+  const trimmed = body.trim();
+  if (!/^https:\/\/\S+$/i.test(trimmed) || /\s/.test(trimmed)) return null;
+  try {
+    const url = new URL(trimmed);
+    if (!url.hostname.endsWith("klipy.com") && !url.hostname.endsWith("klipy.co")) return null;
+    return trimmed;
+  } catch {
+    return null;
+  }
 }
 
 export function ChatPane({
