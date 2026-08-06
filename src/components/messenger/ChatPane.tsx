@@ -257,6 +257,7 @@ export function ChatPane({
                         mine
                           ? "rounded-3xl rounded-br-md bg-bubble-me text-bubble-me-foreground"
                           : "rounded-3xl rounded-bl-md bg-bubble-them text-bubble-them-foreground",
+                        isEmojiOnly(m.body) && "bg-transparent px-1 py-0.5 text-3xl leading-tight",
                       )}
                     >
                       {m.body}
