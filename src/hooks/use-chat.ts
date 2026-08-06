@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
+  fetchBuddies,
   fetchMemberships,
   fetchMessages,
   fetchProfiles,
@@ -56,6 +57,14 @@ export function useRoomBans(roomId: string, enabled: boolean) {
   });
 }
 
+export function useBuddies(ownerId: string | undefined) {
+  return useQuery({
+    queryKey: ["buddies", ownerId],
+    queryFn: () => fetchBuddies(ownerId!),
+    enabled: !!ownerId,
+  });
+}
+
 /** Keeps queries fresh from realtime table changes. */
 export function useChatRealtime() {
   const queryClient = useQueryClient();
@@ -93,6 +102,9 @@ export function useChatRealtime() {
           (payload.new as { room_id?: string } | null)?.room_id ??
           (payload.old as { room_id?: string } | null)?.room_id;
         if (roomId) void queryClient.invalidateQueries({ queryKey: ["room-bans", roomId] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "buddies" }, () => {
+        void queryClient.invalidateQueries({ queryKey: ["buddies"] });
       })
       .subscribe();
 
