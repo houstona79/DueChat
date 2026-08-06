@@ -7,16 +7,21 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { CallOverlay } from "./CallOverlay";
 import { MemberList } from "./MemberList";
-import { useMessages, useRoomEvents } from "@/hooks/use-chat";
+import { useMessages, useRoomAdmins, useRoomBans, useRoomEvents } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
 import {
   accentFor,
+  addRoomAdmin,
+  banMember,
   counterpartId,
   formatTime,
   isOnline,
   joinRoom,
+  kickMember,
   leaveRoom,
+  removeRoomAdmin,
   sendMessage,
+  unbanMember,
   type Membership,
   type Profile,
   type Room,
@@ -61,6 +66,10 @@ export function ChatPane({
 
   const { data: messages = [], isLoading } = useMessages(room.id, joined);
   const { data: roomEvents = [] } = useRoomEvents(room.id, joined && !room.is_direct);
+  const { data: roomAdmins = [] } = useRoomAdmins(room.id, joined && !room.is_direct);
+  const isOwner = room.created_by === meId;
+  const canModerate = !room.is_direct && (isOwner || roomAdmins.some((a) => a.user_id === meId));
+  const { data: bans = [] } = useRoomBans(room.id, canModerate);
 
   type TimelineItem =
     | { kind: "message"; id: string; at: string; message: (typeof messages)[number] }
@@ -101,13 +110,29 @@ export function ChatPane({
   };
 
   const join = async () => {
-    await joinRoom(room.id, meId);
-    await queryClient.invalidateQueries({ queryKey: ["memberships"] });
+    try {
+      await joinRoom(room.id, meId);
+      await queryClient.invalidateQueries({ queryKey: ["memberships"] });
+    } catch {
+      setError("You can’t join this room — you’ve been banned by a room admin.");
+    }
   };
 
   const leave = async () => {
     await leaveRoom(room.id, meId);
     await queryClient.invalidateQueries({ queryKey: ["memberships"] });
+  };
+
+  const runModeration = async (action: () => Promise<void>, keys: string[]) => {
+    try {
+      await action();
+      for (const key of keys) {
+        await queryClient.invalidateQueries({ queryKey: [key, room.id] });
+      }
+      await queryClient.invalidateQueries({ queryKey: ["memberships"] });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "That action was not allowed.");
+    }
   };
 
   return (
@@ -186,6 +211,22 @@ export function ChatPane({
           memberships={members}
           profiles={profiles}
           meId={meId}
+          ownerId={room.is_direct ? undefined : room.created_by}
+          roomAdminIds={roomAdmins.map((a) => a.user_id)}
+          bans={bans}
+          canModerate={canModerate}
+          isOwner={isOwner}
+          onPromote={(userId) =>
+            void runModeration(() => addRoomAdmin(room.id, userId, meId), ["room-admins"])
+          }
+          onDemote={(userId) =>
+            void runModeration(() => removeRoomAdmin(room.id, userId), ["room-admins"])
+          }
+          onKick={(userId) => void runModeration(() => kickMember(room.id, userId), [])}
+          onBan={(userId) =>
+            void runModeration(() => banMember(room.id, userId, meId), ["room-bans"])
+          }
+          onUnban={(userId) => void runModeration(() => unbanMember(room.id, userId), ["room-bans"])}
           onClose={() => setShowMembers(false)}
           onMessage={(userId) => {
             setShowMembers(false);
