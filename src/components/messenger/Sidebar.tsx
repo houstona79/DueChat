@@ -1,12 +1,18 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { LogOut, Plus, Search, Settings, ShieldCheck, Users } from "lucide-react";
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { NewRoomForm } from "./NewRoomForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useOpenDirect } from "@/hooks/use-direct";
-import { fetchRoles } from "@/lib/admin";
+import {
+  siteRoleBadgeClass,
+  siteRoleLabel,
+  siteRoleOf,
+  siteRoleTextClass,
+  useSiteRoles,
+} from "@/hooks/use-roles";
 import {
   accentFor,
   counterpartId,
@@ -53,12 +59,9 @@ export function Sidebar({
   const directs = rooms.filter((r) => r.is_direct && myRoomIds.has(r.id) && matches(r));
   const onlineOthers = profiles.filter((p) => isOnline(p) && p.id !== me?.id);
 
-  const { data: roles } = useQuery({
-    queryKey: ["user-roles"],
-    queryFn: fetchRoles,
-    enabled: !!me?.id,
-  });
-  const isAdmin = !!roles?.some((r) => r.user_id === me?.id && r.role === "admin");
+  const { data: roles } = useSiteRoles(!!me?.id);
+  const myRole = me ? siteRoleOf(roles, me.id) : null;
+  const isAdmin = myRole === "admin";
 
   const signOut = async () => {
     await queryClient.cancelQueries();
@@ -119,7 +122,23 @@ export function Sidebar({
               size="sm"
             />
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-semibold">{me.display_name}</span>
+              <span className="flex items-center gap-1.5">
+                <span
+                  className={cn("truncate text-sm font-semibold", siteRoleTextClass(myRole))}
+                >
+                  {me.display_name}
+                </span>
+                {siteRoleLabel(myRole) ? (
+                  <span
+                    className={cn(
+                      "shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold",
+                      siteRoleBadgeClass(myRole),
+                    )}
+                  >
+                    {siteRoleLabel(myRole)}
+                  </span>
+                ) : null}
+              </span>
               <span className="block truncate text-xs text-muted-foreground">
                 {me.status_message || `@${me.username}`}
               </span>
