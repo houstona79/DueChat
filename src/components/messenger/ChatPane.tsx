@@ -110,8 +110,12 @@ export function ChatPane({
   };
 
   const join = async () => {
-    await joinRoom(room.id, meId);
-    await queryClient.invalidateQueries({ queryKey: ["memberships"] });
+    try {
+      await joinRoom(room.id, meId);
+      await queryClient.invalidateQueries({ queryKey: ["memberships"] });
+    } catch {
+      setError("You can’t join this room — you’ve been banned by a room admin.");
+    }
   };
 
   const leave = async () => {
