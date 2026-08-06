@@ -19,6 +19,8 @@ export type Room = {
   created_at: string;
   is_direct: boolean;
   direct_key: string | null;
+  radio_url: string | null;
+  radio_name: string | null;
 };
 
 export type Message = {
@@ -94,7 +96,9 @@ export async function fetchMyProfile(userId: string): Promise<Profile | null> {
 export async function fetchRooms(): Promise<Room[]> {
   const { data, error } = await supabase
     .from("rooms")
-    .select("id, name, slug, topic, created_by, created_at, is_direct, direct_key")
+    .select(
+      "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name",
+    )
     .order("created_at", { ascending: true });
   if (error) throw error;
   return data ?? [];
