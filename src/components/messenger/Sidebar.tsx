@@ -53,6 +53,13 @@ export function Sidebar({
   const directs = rooms.filter((r) => r.is_direct && myRoomIds.has(r.id) && matches(r));
   const onlineOthers = profiles.filter((p) => isOnline(p) && p.id !== me?.id);
 
+  const { data: roles } = useQuery({
+    queryKey: ["user-roles"],
+    queryFn: fetchRoles,
+    enabled: !!me?.id,
+  });
+  const isAdmin = !!roles?.some((r) => r.user_id === me?.id && r.role === "admin");
+
   const signOut = async () => {
     await queryClient.cancelQueries();
     queryClient.clear();
