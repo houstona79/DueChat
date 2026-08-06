@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Avatar } from "./Avatar";
 import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
 import { accentFor } from "@/lib/chat";
+import { attachStream } from "@/lib/webrtc";
 import { cn } from "@/lib/utils";
 
 function formatDuration(s: number) {
@@ -40,7 +41,7 @@ export function CallOverlay({
   });
 
   useEffect(() => {
-    if (videoRef.current) videoRef.current.srcObject = localStream;
+    attachStream(videoRef.current, localStream);
   }, [localStream, camOn]);
 
   useEffect(() => {
@@ -128,20 +129,28 @@ export function CallOverlay({
 
 function PeerTile({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
   const ref = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    if (ref.current) ref.current.srcObject = peer.stream;
+    attachStream(ref.current, peer.stream);
+    // Safari won't play audio from a hidden/unrendered video element, so remote
+    // audio always goes through its own always-mounted <audio> element.
+    attachStream(audioRef.current, peer.stream);
   }, [peer.stream]);
 
   useEffect(() => {
-    if (ref.current) ref.current.muted = !speaker;
+    if (ref.current) ref.current.muted = true;
+    if (audioRef.current) audioRef.current.muted = !speaker;
+    if (!speaker) return;
+    void audioRef.current?.play().catch(() => undefined);
   }, [speaker]);
 
   const hasVideo = Boolean(peer.stream?.getVideoTracks().some((t) => t.enabled)) && peer.camOn;
 
   return (
     <Tile name={peer.name} accent={accentFor(peer.userId)} muted={peer.muted} showVideo={hasVideo}>
-      <video ref={ref} autoPlay playsInline className="size-full object-cover" />
+      <video ref={ref} autoPlay playsInline muted className="size-full object-cover" />
+      <audio ref={audioRef} autoPlay className="hidden" />
     </Tile>
   );
 }
