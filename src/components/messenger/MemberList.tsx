@@ -15,7 +15,7 @@ export function MemberList({
   meId: string;
   onClose: () => void;
   onMessage: (userId: string) => void;
-  onLeave?: () => void;
+  onLeave?: (() => void) | undefined;
 }) {
   const members = memberships
     .map((m) => profiles.find((p) => p.id === m.user_id))
