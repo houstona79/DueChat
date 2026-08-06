@@ -10,6 +10,13 @@ import { MemberList } from "./MemberList";
 import { useMessages, useRoomAdmins, useRoomBans, useRoomEvents } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
 import {
+  siteRoleBadgeClass,
+  siteRoleLabel,
+  siteRoleOf,
+  siteRoleTextClass,
+  useSiteRoles,
+} from "@/hooks/use-roles";
+import {
   accentFor,
   addRoomAdmin,
   banMember,
