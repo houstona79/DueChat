@@ -5,7 +5,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { NewRoomForm } from "./NewRoomForm";
 import { supabase } from "@/integrations/supabase/client";
-import { accentFor, isOnline, type Membership, type Profile, type Room } from "@/lib/chat";
+import { useOpenDirect } from "@/hooks/use-direct";
+import {
+  accentFor,
+  counterpartId,
+  isOnline,
+  type Membership,
+  type Profile,
+  type Room,
+} from "@/lib/chat";
 import { cn } from "@/lib/utils";
 
 export function Sidebar({
