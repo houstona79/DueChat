@@ -109,16 +109,20 @@ export function ChatPane({
                 }`}
           </p>
         </div>
-        {room.is_direct ? null : (
-          <button
-            onClick={() => setShowMembers((v) => !v)}
-            className="flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-xs text-muted-foreground hover:bg-secondary"
-            aria-label="Show members"
-          >
-            <Users className="size-4" />
-            {members.length}
-          </button>
-        )}
+        <button
+          onClick={() => setShowMembers((v) => !v)}
+          className={cn(
+            "flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
+            showMembers
+              ? "bg-primary/15 text-primary"
+              : "text-muted-foreground hover:bg-secondary",
+          )}
+          aria-label="Show members"
+          title="Show members"
+        >
+          <Users className="size-4" />
+          {members.length}
+        </button>
         <button
           onClick={() => setCall("voice")}
           className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
