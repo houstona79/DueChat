@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      buddies: {
+        Row: {
+          buddy_id: string
+          created_at: string
+          id: string
+          nickname: string | null
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          buddy_id: string
+          created_at?: string
+          id?: string
+          nickname?: string | null
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          buddy_id?: string
+          created_at?: string
+          id?: string
+          nickname?: string | null
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           body: string
