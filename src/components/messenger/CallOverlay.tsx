@@ -2,7 +2,6 @@ import { Mic, MicOff, PhoneOff, Video, VideoOff, Volume2, VolumeX } from "lucide
 import { useEffect, useRef, useState } from "react";
 import { Avatar } from "./Avatar";
 import { cn } from "@/lib/utils";
-import type { Thread } from "@/lib/messenger";
 
 function formatDuration(s: number) {
   const m = Math.floor(s / 60);
@@ -10,11 +9,13 @@ function formatDuration(s: number) {
 }
 
 export function CallOverlay({
-  thread,
+  title,
+  accent,
   mode,
   onEnd,
 }: {
-  thread: Thread;
+  title: string;
+  accent: string;
   mode: "voice" | "video";
   onEnd: () => void;
 }) {
@@ -93,7 +94,7 @@ export function CallOverlay({
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={`${mode === "video" ? "Video" : "Voice"} call with ${thread.name}`}
+      aria-label={`${mode === "video" ? "Video" : "Voice"} call with ${title}`}
       className="absolute inset-0 z-20 flex flex-col bg-sidebar/95 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] backdrop-blur-sm"
     >
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-5 text-center">
@@ -107,11 +108,11 @@ export function CallOverlay({
           />
         ) : (
           <div className="scale-150">
-            <Avatar name={thread.name} accent={thread.accent} />
+            <Avatar name={title} accent={accent} />
           </div>
         )}
         <div>
-          <h2 className="font-display text-xl font-semibold sm:text-2xl">{thread.name}</h2>
+          <h2 className="font-display text-xl font-semibold sm:text-2xl">{title}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {connected
               ? `${mode === "video" ? "Video" : "Voice"} call · ${formatDuration(seconds)}`
