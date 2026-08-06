@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { CallOverlay } from "./CallOverlay";
 import { MemberList } from "./MemberList";
-import { useMessages } from "@/hooks/use-chat";
+import { useMessages, useRoomEvents } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
 import {
   accentFor,
@@ -13,6 +13,7 @@ import {
   formatTime,
   isOnline,
   joinRoom,
+  leaveRoom,
   sendMessage,
   type Membership,
   type Profile,
@@ -51,6 +52,22 @@ export function ChatPane({
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const { data: messages = [], isLoading } = useMessages(room.id, joined);
+  const { data: roomEvents = [] } = useRoomEvents(room.id, joined && !room.is_direct);
+
+  type TimelineItem =
+    | { kind: "message"; id: string; at: string; message: (typeof messages)[number] }
+    | { kind: "event"; id: string; at: string; userId: string; action: "join" | "leave" };
+
+  const timeline: TimelineItem[] = [
+    ...messages.map((m) => ({ kind: "message" as const, id: m.id, at: m.created_at, message: m })),
+    ...roomEvents.map((e) => ({
+      kind: "event" as const,
+      id: e.id,
+      at: e.created_at,
+      userId: e.user_id,
+      action: e.kind,
+    })),
+  ].sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime());
 
   useEffect(() => {
     if (joined) inputRef.current?.focus();
@@ -77,6 +94,11 @@ export function ChatPane({
 
   const join = async () => {
     await joinRoom(room.id, meId);
+    await queryClient.invalidateQueries({ queryKey: ["memberships"] });
+  };
+
+  const leave = async () => {
+    await leaveRoom(room.id, meId);
     await queryClient.invalidateQueries({ queryKey: ["memberships"] });
   };
 
