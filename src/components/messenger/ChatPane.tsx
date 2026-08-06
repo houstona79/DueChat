@@ -166,6 +166,9 @@ export function ChatPane({
           title={title}
           accent={accentFor(partner?.id ?? room.id)}
           mode={call}
+          roomId={room.id}
+          meId={meId}
+          myName={profileOf(meId)?.display_name ?? "You"}
           onEnd={() => setCall(null)}
         />
       ) : null}
