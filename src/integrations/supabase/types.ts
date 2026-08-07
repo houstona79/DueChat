@@ -100,6 +100,50 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          emoji: string | null
+          id: string
+          kind: string
+          preview: string | null
+          read_at: string | null
+          update_id: string | null
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          kind: string
+          preview?: string | null
+          read_at?: string | null
+          update_id?: string | null
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          kind?: string
+          preview?: string | null
+          read_at?: string | null
+          update_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_update_id_fkey"
+            columns: ["update_id"]
+            isOneToOne: false
+            referencedRelation: "profile_updates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_photos: {
         Row: {
           caption: string | null
