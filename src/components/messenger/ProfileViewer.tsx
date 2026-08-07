@@ -51,6 +51,7 @@ export function ProfileViewer() {
   const userId = useOpenProfileId();
   const { user } = useAuth();
   const { data: profiles = [] } = useProfiles();
+  const { data: myBuddies = [] } = useBuddies(user?.id);
   const { data: roles } = useSiteRoles();
   const { open: openDirect, pending } = useOpenDirect(user?.id);
   const [mounted, setMounted] = useState(false);
