@@ -38,6 +38,8 @@ import {
   sendMessage,
   setRoomRadio,
   setRoomRating,
+  setRoomCategory,
+  ROOM_CATEGORIES,
   setRoomYouTube,
   unbanMember,
   type Membership,
