@@ -64,6 +64,15 @@ export function ProfilePhotos({
   const [error, setError] = useState<string | null>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
 
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightbox(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightbox]);
+
   const { data: photos = [] } = useQuery({
     queryKey: ["profile-photos", userId],
     queryFn: () => fetchProfilePhotos(userId),
