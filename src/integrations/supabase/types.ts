@@ -76,6 +76,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          birth_date: string | null
           created_at: string
           display_name: string
           id: string
@@ -87,6 +88,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          birth_date?: string | null
           created_at?: string
           display_name: string
           id: string
@@ -98,6 +100,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          birth_date?: string | null
           created_at?: string
           display_name?: string
           id?: string
@@ -366,6 +369,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_adult: { Args: { _user_id: string }; Returns: boolean }
       is_room_admin: {
         Args: { _room_id: string; _user_id: string }
         Returns: boolean
@@ -383,6 +387,7 @@ export type Database = {
         Returns: boolean
       }
       is_site_banned: { Args: { _user_id: string }; Returns: boolean }
+      room_requires_adult: { Args: { _room_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
