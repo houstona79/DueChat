@@ -508,3 +508,22 @@ export function isAdultProfile(profile: Pick<Profile, "birth_date"> | null | und
   const age = ageFromBirthDate(profile?.birth_date);
   return age !== null && age >= 18;
 }
+
+/**
+ * Normalize a user-entered profile link to a safe https URL.
+ * Returns null when empty or not a usable http(s) link.
+ */
+export function normalizeWebsiteUrl(raw: string): string | null {
+  const value = raw.trim();
+  if (!value) return null;
+  const candidate = /^https?:\/\//i.test(value) ? value : `https://${value}`;
+  try {
+    const url = new URL(candidate);
+    if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+    url.protocol = "https:";
+    const normalized = url.toString();
+    return normalized.length <= 300 ? normalized : null;
+  } catch {
+    return null;
+  }
+}
