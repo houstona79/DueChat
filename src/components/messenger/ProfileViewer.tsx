@@ -1,5 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { ExternalLink, Globe, MapPin, MessageSquare, User, X } from "lucide-react";
+import { BadgeCheck, ExternalLink, Globe, MapPin, MessageSquare, User, X } from "lucide-react";
 import { genderLabel } from "@/lib/genders";
 import { Link } from "@tanstack/react-router";
 import { Avatar } from "./Avatar";
