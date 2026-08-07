@@ -45,7 +45,7 @@ export function ImageCropper({
     setWorking(true);
     setError(null);
     try {
-      onDone(await cropToSquareFile(file, area));
+      onDone(await cropToSquareFile(file, area, rotation));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not crop that image.");
     } finally {
