@@ -88,6 +88,23 @@ export async function fetchRecentMessages(limit = 100): Promise<Message[]> {
   return data ?? [];
 }
 
+/** Full transcript of one conversation, oldest first (admins/moderators can read any room). */
+export async function fetchRoomTranscript(roomId: string, limit = 300): Promise<Message[]> {
+  const { data, error } = await supabase
+    .from("messages")
+    .select("id, room_id, user_id, body, created_at")
+    .eq("room_id", roomId)
+    .order("created_at", { ascending: true })
+    .limit(limit);
+  if (error) throw error;
+  return data ?? [];
+}
+
+/** Participant ids of a direct room, taken from its `a:b` key. */
+export function directParticipants(room: Pick<Room, "direct_key">): string[] {
+  return (room.direct_key ?? "").split(":").filter(Boolean);
+}
+
 export type AdminSnapshot = {
   profiles: Profile[];
   rooms: Room[];
