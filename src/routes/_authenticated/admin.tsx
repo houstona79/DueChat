@@ -641,6 +641,8 @@ function AdminPage() {
           deleting={messageMutation.isPending}
         />
       )}
+
+      {tab === "reports" && <ReportQueue />}
     </Shell>
   );
 }
