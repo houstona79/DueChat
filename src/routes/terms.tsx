@@ -114,7 +114,20 @@ function TermsPage() {
           </p>
 
           <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
-            6. Termination and Moderation
+            6. VPN, Proxy, and Anonymizing Networks
+          </h2>
+          <p>
+            Access to DueChat through VPNs, proxies, Tor, relays, or hosting/datacenter networks is not
+            permitted. To keep the community safe and enforce bans and age restrictions, we check the
+            network address used at sign-in and may block or sign out connections that appear to come
+            from an anonymizing or commercial hosting network. Attempting to evade a ban, device lock,
+            or age gate by masking your network address is a violation of this Agreement and may result
+            in permanent removal. Approved staff accounts may be exempt for administrative purposes. If
+            you believe your connection was blocked in error, contact us using the details in section 10.
+          </p>
+
+          <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
+            7. Termination and Moderation
           </h2>
           <p>
             DueChat administrators and moderators may kick, ban, or remove users from rooms or the
@@ -123,21 +136,24 @@ function TermsPage() {
           </p>
 
           <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
-            7. Privacy and Data
+            8. Privacy and Data
           </h2>
           <p>
             Your use of DueChat is also governed by our Privacy Policy. We collect and process data as
-            described there, including account information, messages, profile data, and usage logs.
+            described there, including account information, messages, profile data, usage logs, and
+            connection details such as your network address, browser identifier, and whether the
+            connection was detected as a VPN or proxy. This information is visible only to
+            administrators and is used for safety, ban enforcement, and abuse prevention.
           </p>
 
-          <h2 className="mt-6 font-display text-lg font-semibold text-foreground">8. Changes</h2>
+          <h2 className="mt-6 font-display text-lg font-semibold text-foreground">9. Changes</h2>
           <p>
             We may update this Agreement from time to time. Continued use of DueChat after changes
             means you accept the updated terms. Material changes will be communicated through the
             platform or by email when possible.
           </p>
 
-          <h2 className="mt-6 font-display text-lg font-semibold text-foreground">9. Contact</h2>
+          <h2 className="mt-6 font-display text-lg font-semibold text-foreground">10. Contact</h2>
           <p>
             If you have questions about this Agreement, contact the DueChat team through the platform or
             at the support channel listed on your account settings.
