@@ -206,7 +206,10 @@ function PeerTile({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
     void audioRef.current?.play().catch(() => undefined);
   }, [speaker]);
 
-  const hasVideo = Boolean(peer.stream?.getVideoTracks().some((t) => t.enabled)) && peer.camOn;
+  // Android Chrome can drop the state broadcast, so trust live video tracks too.
+  const videoTracks = peer.stream?.getVideoTracks() ?? [];
+  const hasLiveVideo = videoTracks.some((t) => t.readyState === "live" && !t.muted);
+  const hasVideo = videoTracks.length > 0 && (peer.camOn || hasLiveVideo);
 
   return (
     <Tile name={peer.name} accent={accentFor(peer.userId)} muted={peer.muted} showVideo={hasVideo}>
