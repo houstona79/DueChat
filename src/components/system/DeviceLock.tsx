@@ -3,6 +3,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { claimDevice, deviceClaimedByOther, DEVICE_BLOCK_KEY } from "@/lib/devices";
+import { deviceId } from "@/lib/devices";
+import { recordMyIp } from "@/lib/ip-log.functions";
 
 /**
  * One account per browser: the first member to sign in from a browser claims it.
@@ -31,6 +33,8 @@ export function DeviceLock() {
         return;
       }
       await claimDevice().catch(() => {});
+      // Log the connection IP for admin review.
+      await recordMyIp({ data: { deviceId: deviceId() } }).catch(() => {});
     };
 
     void enforce();
