@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -42,6 +42,7 @@ function AuthPage() {
   const [status, setStatus] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [country, setCountry] = useState("");
+  const [eulaAccepted, setEulaAccepted] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -67,6 +68,10 @@ function AuthPage() {
         setNotice("You must be 16 or older to create a DueChat account.");
         return;
       }
+      if (!eulaAccepted) {
+        setNotice("Please read and accept the End User Agreement to continue.");
+        return;
+      }
       if (!country) {
         setNotice("Please select your country.");
         return;
@@ -87,6 +92,7 @@ function AuthPage() {
               status_message: status.trim(),
               birth_date: birthDate,
               country,
+              accepted_eula_at: new Date().toISOString(),
             },
           },
         });
@@ -171,6 +177,22 @@ function AuthPage() {
                 </select>
               </div>
               <p className="text-xs text-muted-foreground">You must be 16 or older to join DueChat.</p>
+              <label className="flex items-start gap-3 rounded-xl bg-secondary px-3 py-2.5">
+                <input
+                  id="eula"
+                  type="checkbox"
+                  checked={eulaAccepted}
+                  onChange={(e) => setEulaAccepted(e.target.checked)}
+                  className="mt-0.5 size-4 accent-primary"
+                />
+                <span className="text-xs text-muted-foreground">
+                  I agree to the{" "}
+                  <Link to="/terms" className="text-primary underline hover:text-foreground">
+                    End User Agreement
+                  </Link>
+                  .
+                </span>
+              </label>
             </>
           ) : null}
           <Input id="email" label="Email" type="email" value={email} onChange={setEmail} />
@@ -179,7 +201,10 @@ function AuthPage() {
           <button
             type="submit"
             disabled={
-              busy || !email || password.length < 6 || (mode === "signup" && (!birthDate || !country))
+              busy ||
+              !email ||
+              password.length < 6 ||
+              (mode === "signup" && (!birthDate || !country || !eulaAccepted))
             }
             className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground disabled:opacity-50"
           >
