@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bell, Check, ChevronDown, ChevronRight, ExternalLink, Trash2 } from "lucide-react";
+import { Bell, Check, ChevronDown, ChevronRight, ExternalLink, MessageSquare, Send, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "./Avatar";
 import { openProfile } from "./ProfileViewer";
@@ -19,6 +19,12 @@ import {
   toggleProfileUpdateReaction,
 } from "@/lib/profile-updates";
 import { accentFor, type Profile } from "@/lib/chat";
+import {
+  MAX_COMMENT_LENGTH,
+  addUpdateComment,
+  deleteUpdateComment,
+  fetchUpdateComments,
+} from "@/lib/update-comments";
 import { cn } from "@/lib/utils";
 
 export function NotificationsPanel({
@@ -30,6 +36,9 @@ export function NotificationsPanel({
 }) {
   const queryClient = useQueryClient();
   const [collapsed, setCollapsed] = useState(true);
+  const [openComments, setOpenComments] = useState<string | null>(null);
+  const [draft, setDraft] = useState("");
+  const [sending, setSending] = useState(false);
 
   const { data: items = [] } = useQuery({
     queryKey: ["notifications", me?.id],
@@ -68,6 +77,31 @@ export function NotificationsPanel({
     queryFn: () => fetchProfileUpdateReactions(updateIds),
     enabled: !!me?.id && updateIds.length > 0,
   });
+
+  const { data: comments = [] } = useQuery({
+    queryKey: ["notification-comments", me?.id, updateIds.join(",")],
+    queryFn: () => fetchUpdateComments(updateIds),
+    enabled: !!me?.id && updateIds.length > 0,
+  });
+
+  const refreshComments = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["notification-comments", me?.id] });
+    await queryClient.invalidateQueries({ queryKey: ["update-comments"] });
+  };
+
+  const sendComment = async (updateId: string) => {
+    if (!me || !draft.trim()) return;
+    setSending(true);
+    try {
+      await addUpdateComment(updateId, me.id, draft);
+      setDraft("");
+      await refreshComments();
+    } catch {
+      toast.error("Couldn’t post that comment.");
+    } finally {
+      setSending(false);
+    }
+  };
 
   const react = async (updateId: string, emoji: string, mine: boolean) => {
     if (!me) return;
@@ -227,6 +261,90 @@ export function NotificationsPanel({
                       <ExternalLink className="size-3" aria-hidden />
                       View update
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDraft("");
+                        setOpenComments((v) => (v === n.id ? null : n.id));
+                      }}
+                      aria-expanded={openComments === n.id}
+                      className="flex min-h-8 items-center gap-1 rounded-full border border-border px-2 text-xs text-muted-foreground hover:border-primary/60 hover:text-foreground"
+                    >
+                      <MessageSquare className="size-3" aria-hidden />
+                      {comments.filter((c) => c.update_id === n.update_id).length || ""} Comment
+                    </button>
+                  </div>
+                ) : null}
+
+                {n.update_id && openComments === n.id ? (
+                  <div className="px-3 pb-3 pl-12">
+                    <ul className="space-y-1.5">
+                      {comments
+                        .filter((c) => c.update_id === n.update_id)
+                        .map((c) => {
+                          const author = actorOf(c.user_id);
+                          return (
+                            <li
+                              key={c.id}
+                              className="flex items-start gap-2 rounded-xl bg-secondary/60 px-2.5 py-1.5"
+                            >
+                              <span className="min-w-0 flex-1 text-xs">
+                                <span className="font-semibold">
+                                  {author?.display_name ?? "Someone"}
+                                </span>{" "}
+                                <span className="break-words">{c.body}</span>
+                                <span className="block text-[11px] text-muted-foreground">
+                                  {relativeTime(c.created_at)}
+                                </span>
+                              </span>
+                              {c.user_id === me.id ? (
+                                <button
+                                  type="button"
+                                  aria-label="Delete comment"
+                                  onClick={async () => {
+                                    try {
+                                      await deleteUpdateComment(c.id);
+                                      await refreshComments();
+                                    } catch {
+                                      toast.error("Couldn’t delete that comment.");
+                                    }
+                                  }}
+                                  className="grid size-7 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-background"
+                                >
+                                  <X className="size-3" />
+                                </button>
+                              ) : null}
+                            </li>
+                          );
+                        })}
+                    </ul>
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        void sendComment(n.update_id!);
+                      }}
+                      className="mt-1.5 flex items-center gap-1.5"
+                    >
+                      <label className="sr-only" htmlFor={`comment-${n.id}`}>
+                        Write a comment
+                      </label>
+                      <input
+                        id={`comment-${n.id}`}
+                        value={draft}
+                        maxLength={MAX_COMMENT_LENGTH}
+                        onChange={(e) => setDraft(e.target.value)}
+                        placeholder="Write a comment…"
+                        className="min-h-9 flex-1 rounded-xl bg-secondary px-2.5 text-xs outline-none placeholder:text-muted-foreground"
+                      />
+                      <button
+                        type="submit"
+                        disabled={sending || !draft.trim()}
+                        aria-label="Post comment"
+                        className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground disabled:opacity-50"
+                      >
+                        <Send className="size-3.5" />
+                      </button>
+                    </form>
                   </div>
                 ) : null}
               </li>
