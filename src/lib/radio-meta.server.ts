@@ -18,7 +18,11 @@ async function get(url: string, headers?: Record<string, string>) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT);
   try {
-    return await fetch(url, { headers, signal: controller.signal, redirect: "follow" });
+    return await fetch(url, {
+      headers: headers ?? {},
+      signal: controller.signal,
+      redirect: "follow",
+    });
   } finally {
     clearTimeout(timer);
   }
