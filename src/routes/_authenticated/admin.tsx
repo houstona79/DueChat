@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import { Avatar } from "@/components/messenger/Avatar";
 import { ReportQueue } from "@/components/messenger/ReportQueue";
+import { NotificationAudit } from "@/components/messenger/NotificationAudit";
 import { useAuth } from "@/hooks/use-auth";
 import { accentFor, formatTime, isOnline } from "@/lib/chat";
 import {
