@@ -390,7 +390,7 @@ export function useGroupCall({
     let cancelled = false;
     void (async () => {
       try {
-        const extra = await getMediaStream({ video: { facingMode: "user" } });
+        const extra = await getMediaStreamResilient({ video: { facingMode: "user" } });
         const track = extra.getVideoTracks()[0];
         if (!track) return;
         if (cancelled || localStreamRef.current !== stream) {
