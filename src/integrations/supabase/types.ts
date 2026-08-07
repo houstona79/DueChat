@@ -76,6 +76,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           birth_date: string | null
           country: string | null
           created_at: string
@@ -86,9 +87,11 @@ export type Database = {
           status_message: string | null
           updated_at: string
           username: string
+          website_url: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           birth_date?: string | null
           country?: string | null
           created_at?: string
@@ -99,9 +102,11 @@ export type Database = {
           status_message?: string | null
           updated_at?: string
           username: string
+          website_url?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           birth_date?: string | null
           country?: string | null
           created_at?: string
@@ -112,6 +117,7 @@ export type Database = {
           status_message?: string | null
           updated_at?: string
           username?: string
+          website_url?: string | null
         }
         Relationships: []
       }
