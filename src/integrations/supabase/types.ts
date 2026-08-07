@@ -578,6 +578,53 @@ export type Database = {
         }
         Relationships: []
       }
+      update_reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          reason: string
+          reporter_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["report_status"]
+          update_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason: string
+          reporter_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["report_status"]
+          update_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string
+          reporter_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["report_status"]
+          update_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "update_reports_update_id_fkey"
+            columns: ["update_id"]
+            isOneToOne: false
+            referencedRelation: "profile_updates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -633,6 +680,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      report_status: "pending" | "reviewed" | "dismissed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -761,6 +809,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      report_status: ["pending", "reviewed", "dismissed"],
     },
   },
 } as const
