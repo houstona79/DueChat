@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ImagePlus, Trash2, X } from "lucide-react";
 import { ImageCropper } from "./ImageCropper";
@@ -182,6 +182,7 @@ export function ProfilePhotos({
           />
           <button
             type="button"
+            autoFocus
             onClick={() => setLightbox(null)}
             aria-label="Close photo"
             className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] grid size-10 place-items-center rounded-xl bg-card text-muted-foreground"
