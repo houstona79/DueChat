@@ -52,6 +52,7 @@ function SettingsPage() {
   const [birthDate, setBirthDate] = useState("");
   const [country, setCountry] = useState("");
   const [gender, setGender] = useState("");
+  const [pronouns, setPronouns] = useState("");
   const [bio, setBio] = useState("");
   const [website, setWebsite] = useState("");
   const [message, setMessage] = useState<string | null>(null);
@@ -67,6 +68,7 @@ function SettingsPage() {
     setBirthDate(me.birth_date ?? "");
     setCountry(me.country ?? "");
     setGender(me.gender ?? "");
+    setPronouns(me.pronouns ?? "");
     setBio(me.bio ?? "");
     setWebsite(me.website_url ?? "");
   }, [me]);
@@ -96,6 +98,7 @@ function SettingsPage() {
         name_color: nameColor || null,
         country: country || null,
         gender: gender || null,
+        pronouns: pronouns.trim().slice(0, 40) || null,
         bio: bio.trim().slice(0, 500) || null,
         website_url: websiteUrl,
         ...(me.birth_date ? {} : { birth_date: birthDate || null }),
@@ -266,6 +269,20 @@ function SettingsPage() {
               </option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <label htmlFor="pronouns" className="block text-[11px] font-medium text-muted-foreground">
+            Pronouns
+          </label>
+          <input
+            id="pronouns"
+            value={pronouns}
+            onChange={(e) => setPronouns(e.target.value)}
+            maxLength={40}
+            placeholder="she/her, he/him, they/them…"
+            className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none"
+          />
         </div>
 
         <div>
