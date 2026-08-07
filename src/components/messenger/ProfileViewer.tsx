@@ -6,6 +6,7 @@ import { useBuddies } from "@/hooks/use-chat";
 import { Link } from "@tanstack/react-router";
 import { Avatar } from "./Avatar";
 import { ProfilePhotos } from "./ProfilePhotos";
+import { ProfileFeed } from "./ProfileFeed";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfiles } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
@@ -173,6 +174,7 @@ export function ProfileViewer() {
               <p className="text-xs text-muted-foreground">Verified 18+</p>
             ) : null}
             <ProfilePhotos userId={profile.id} />
+            <ProfileFeed userId={profile.id} />
           </div>
         ) : (
           <p className="mt-4 text-sm text-muted-foreground">This profile isn’t available.</p>
