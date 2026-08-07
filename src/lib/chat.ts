@@ -11,6 +11,7 @@ export type Profile = {
   country: string | null;
   bio: string | null;
   website_url: string | null;
+  accepted_eula_at: string | null;
   last_seen_at: string;
 };
 
@@ -92,7 +93,7 @@ export async function fetchProfiles(): Promise<Profile[]> {
   const { data, error } = await supabase
     .from("profiles")
     .select(
-      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, bio, website_url, last_seen_at",
+      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, bio, website_url, accepted_eula_at, last_seen_at",
     )
     .order("last_seen_at", { ascending: false });
   if (error) throw error;
@@ -103,7 +104,7 @@ export async function fetchMyProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from("profiles")
     .select(
-      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, bio, website_url, last_seen_at",
+      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, bio, website_url, accepted_eula_at, last_seen_at",
     )
     .eq("id", userId)
     .maybeSingle();
@@ -469,11 +470,16 @@ export async function updateProfile(
       | "country"
       | "bio"
       | "website_url"
+      | "accepted_eula_at"
     >
   >,
 ) {
   const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
   if (error) throw error;
+}
+
+export async function acceptEula(userId: string) {
+  await updateProfile(userId, { accepted_eula_at: new Date().toISOString() });
 }
 
 export async function uploadAvatar(userId: string, file: File) {
