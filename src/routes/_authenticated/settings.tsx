@@ -10,6 +10,7 @@ import { accentFor, normalizeWebsiteUrl, updateProfile, uploadAvatar } from "@/l
 import { isRedish } from "@/hooks/use-roles";
 import { cn } from "@/lib/utils";
 import { COUNTRIES } from "@/lib/countries";
+import { GENDERS } from "@/lib/genders";
 
 const NAME_COLORS = [
   { label: "Default", value: "" },
@@ -50,6 +51,7 @@ function SettingsPage() {
   const [nameColor, setNameColor] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [country, setCountry] = useState("");
+  const [gender, setGender] = useState("");
   const [bio, setBio] = useState("");
   const [website, setWebsite] = useState("");
   const [message, setMessage] = useState<string | null>(null);
@@ -64,6 +66,7 @@ function SettingsPage() {
     setNameColor(me.name_color ?? "");
     setBirthDate(me.birth_date ?? "");
     setCountry(me.country ?? "");
+    setGender(me.gender ?? "");
     setBio(me.bio ?? "");
     setWebsite(me.website_url ?? "");
   }, [me]);
@@ -92,6 +95,7 @@ function SettingsPage() {
         status_message: status.trim().slice(0, 120) || null,
         name_color: nameColor || null,
         country: country || null,
+        gender: gender || null,
         bio: bio.trim().slice(0, 500) || null,
         website_url: websiteUrl,
         ...(me.birth_date ? {} : { birth_date: birthDate || null }),
@@ -240,6 +244,25 @@ function SettingsPage() {
             {COUNTRIES.map((c) => (
               <option key={c} value={c}>
                 {c}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="gender" className="block text-[11px] font-medium text-muted-foreground">
+            Gender
+          </label>
+          <select
+            id="gender"
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+            className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none"
+          >
+            <option value="">Not set</option>
+            {GENDERS.map((g) => (
+              <option key={g.value} value={g.value}>
+                {g.label}
               </option>
             ))}
           </select>

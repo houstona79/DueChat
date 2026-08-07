@@ -142,6 +142,12 @@ export function ProfileViewer() {
                 {profile.country}
               </p>
             ) : null}
+            {genderLabel(profile.gender) ? (
+              <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                <User className="size-3.5 shrink-0" aria-hidden />
+                {genderLabel(profile.gender)}
+              </p>
+            ) : null}
             {profile.website_url ? (
               <a
                 href={profile.website_url}
