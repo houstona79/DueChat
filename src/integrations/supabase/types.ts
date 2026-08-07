@@ -137,10 +137,12 @@ export type Database = {
           created_at: string
           display_name: string
           gender: string | null
+          gender_visibility: string
           id: string
           last_seen_at: string
           name_color: string | null
           pronouns: string | null
+          pronouns_visibility: string
           status_message: string | null
           updated_at: string
           username: string
@@ -155,10 +157,12 @@ export type Database = {
           created_at?: string
           display_name: string
           gender?: string | null
+          gender_visibility?: string
           id: string
           last_seen_at?: string
           name_color?: string | null
           pronouns?: string | null
+          pronouns_visibility?: string
           status_message?: string | null
           updated_at?: string
           username: string
@@ -173,10 +177,12 @@ export type Database = {
           created_at?: string
           display_name?: string
           gender?: string | null
+          gender_visibility?: string
           id?: string
           last_seen_at?: string
           name_color?: string | null
           pronouns?: string | null
+          pronouns_visibility?: string
           status_message?: string | null
           updated_at?: string
           username?: string

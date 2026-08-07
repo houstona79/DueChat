@@ -11,6 +11,7 @@ import { isRedish } from "@/hooks/use-roles";
 import { cn } from "@/lib/utils";
 import { COUNTRIES } from "@/lib/countries";
 import { GENDERS } from "@/lib/genders";
+import { FIELD_VISIBILITIES } from "@/lib/field-visibility";
 
 const NAME_COLORS = [
   { label: "Default", value: "" },
@@ -53,6 +54,8 @@ function SettingsPage() {
   const [country, setCountry] = useState("");
   const [gender, setGender] = useState("");
   const [pronouns, setPronouns] = useState("");
+  const [genderVisibility, setGenderVisibility] = useState("public");
+  const [pronounsVisibility, setPronounsVisibility] = useState("public");
   const [bio, setBio] = useState("");
   const [website, setWebsite] = useState("");
   const [message, setMessage] = useState<string | null>(null);
@@ -69,6 +72,8 @@ function SettingsPage() {
     setCountry(me.country ?? "");
     setGender(me.gender ?? "");
     setPronouns(me.pronouns ?? "");
+    setGenderVisibility(me.gender_visibility ?? "public");
+    setPronounsVisibility(me.pronouns_visibility ?? "public");
     setBio(me.bio ?? "");
     setWebsite(me.website_url ?? "");
   }, [me]);
@@ -99,6 +104,8 @@ function SettingsPage() {
         country: country || null,
         gender: gender || null,
         pronouns: pronouns.trim().slice(0, 40) || null,
+        gender_visibility: genderVisibility,
+        pronouns_visibility: pronounsVisibility,
         bio: bio.trim().slice(0, 500) || null,
         website_url: websiteUrl,
         ...(me.birth_date ? {} : { birth_date: birthDate || null }),
@@ -269,6 +276,21 @@ function SettingsPage() {
               </option>
             ))}
           </select>
+          <label htmlFor="gender-visibility" className="mt-2 block text-[11px] font-medium text-muted-foreground">
+            Who can see my gender
+          </label>
+          <select
+            id="gender-visibility"
+            value={genderVisibility}
+            onChange={(e) => setGenderVisibility(e.target.value)}
+            className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none"
+          >
+            {FIELD_VISIBILITIES.map((v) => (
+              <option key={v.value} value={v.value}>
+                {v.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
@@ -283,6 +305,21 @@ function SettingsPage() {
             placeholder="she/her, he/him, they/them…"
             className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none"
           />
+          <label htmlFor="pronouns-visibility" className="mt-2 block text-[11px] font-medium text-muted-foreground">
+            Who can see my pronouns
+          </label>
+          <select
+            id="pronouns-visibility"
+            value={pronounsVisibility}
+            onChange={(e) => setPronounsVisibility(e.target.value)}
+            className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none"
+          >
+            {FIELD_VISIBILITIES.map((v) => (
+              <option key={v.value} value={v.value}>
+                {v.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>

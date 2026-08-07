@@ -4,7 +4,8 @@ import { genderLabel } from "@/lib/genders";
 import { Avatar } from "@/components/messenger/Avatar";
 import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { useAuth } from "@/hooks/use-auth";
-import { useProfiles } from "@/hooks/use-chat";
+import { useBuddies, useProfiles } from "@/hooks/use-chat";
+import { visibleGender, visiblePronouns } from "@/lib/field-visibility";
 import { useOpenDirect } from "@/hooks/use-direct";
 import {
   nameColorStyle,
@@ -38,6 +39,7 @@ function ProfilePage() {
   const { username } = Route.useParams();
   const { user } = useAuth();
   const { data: profiles = [], isLoading } = useProfiles();
+  const { data: myBuddies = [] } = useBuddies(user?.id);
   const { data: roles } = useSiteRoles();
   const { open: openDirect, pending } = useOpenDirect(user?.id);
 
@@ -114,16 +116,16 @@ function ProfilePage() {
                 {profile.country}
               </p>
             ) : null}
-            {genderLabel(profile.gender) ? (
+            {genderLabel(visibleGender(profile, user?.id, myBuddies)) ? (
               <p className="flex items-center gap-2 text-xs text-muted-foreground">
                 <User className="size-3.5 shrink-0" aria-hidden />
-                {genderLabel(profile.gender)}
+                {genderLabel(visibleGender(profile, user?.id, myBuddies))}
               </p>
             ) : null}
-            {profile.pronouns ? (
+            {visiblePronouns(profile, user?.id, myBuddies) ? (
               <p className="flex items-center gap-2 text-xs text-muted-foreground">
                 <BadgeCheck className="size-3.5 shrink-0" aria-hidden />
-                {profile.pronouns}
+                {visiblePronouns(profile, user?.id, myBuddies)}
               </p>
             ) : null}
             {profile.website_url ? (
