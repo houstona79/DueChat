@@ -8,6 +8,7 @@ import {
   Hash,
   LogOut,
   MessageSquare,
+  MonitorSmartphone,
   ShieldCheck,
   Trash2,
   Users,
@@ -28,6 +29,12 @@ import {
   revokeRole,
   unbanUser,
 } from "@/lib/admin";
+import {
+  clearSessions,
+  deviceLabel,
+  fetchActiveSessions,
+  multiSessionUsers,
+} from "@/lib/sessions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -43,7 +50,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-type Tab = "overview" | "users" | "bans" | "rooms" | "messages" | "dms";
+type Tab = "overview" | "users" | "sessions" | "bans" | "rooms" | "messages" | "dms";
 
 /** The owner account keeps admin access permanently (also enforced in the database). */
 const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
@@ -64,6 +71,22 @@ function AdminPage() {
     queryKey: ["admin-snapshot"],
     queryFn: fetchAdminSnapshot,
     enabled: !!user,
+  });
+
+  const sessions = useQuery({
+    queryKey: ["admin-sessions"],
+    queryFn: fetchActiveSessions,
+    enabled: !!user,
+    refetchInterval: 30_000,
+  });
+
+  const clearSessionsMutation = useMutation({
+    mutationFn: clearSessions,
+    onSuccess: () => {
+      toast.success("Session records cleared.");
+      void sessions.refetch();
+    },
+    onError: () => toast.error("Could not clear those sessions."),
   });
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["admin-snapshot"] });
@@ -131,18 +154,23 @@ function AdminPage() {
   }
 
   const groupRooms = data.rooms.filter((r) => !r.is_direct);
+  const liveSessions = sessions.data ?? [];
+  const flagged = multiSessionUsers(liveSessions);
   const onlineCount = data.profiles.filter(isOnline).length;
   const stats = [
     { label: "Members", value: data.profiles.length, icon: Users },
     { label: "Online now", value: onlineCount, icon: ShieldCheck },
     { label: "Rooms", value: groupRooms.length, icon: Hash },
     { label: "Recent messages", value: data.messages.length, icon: MessageSquare },
+    { label: "Multi-nick alerts", value: flagged.length, icon: MonitorSmartphone },
   ];
 
   return (
     <Shell>
       <div className="flex gap-1 overflow-x-auto rounded-2xl bg-secondary p-1">
-        {(["overview", "users", "bans", "rooms", "messages", "dms"] as Tab[]).map((t) => (
+        {(
+          ["overview", "users", "sessions", "bans", "rooms", "messages", "dms"] as Tab[]
+        ).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -271,6 +299,68 @@ function AdminPage() {
             );
           })}
         </ul>
+      )}
+
+      {tab === "sessions" && (
+        <div className="mt-5 space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <p className="text-sm font-semibold">Multi-nick watch</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              DueChat allows one active session per account. Accounts signed in from more
+              than one place right now are flagged here.
+            </p>
+          </div>
+
+          {sessions.isLoading && (
+            <p className="text-sm text-muted-foreground">Checking sessions…</p>
+          )}
+
+          {flagged.length === 0 && !sessions.isLoading && (
+            <p className="text-sm text-muted-foreground">
+              No duplicate sign-ins detected. {liveSessions.length} session
+              {liveSessions.length === 1 ? "" : "s"} active.
+            </p>
+          )}
+
+          <ul className="space-y-2">
+            {flagged.map((f) => (
+              <li key={f.userId} className="rounded-2xl border border-destructive/40 bg-card p-3">
+                <div className="flex items-center gap-3">
+                  <MonitorSmartphone className="size-4 shrink-0 text-destructive" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold">{nameOf(f.userId)}</p>
+                    <p className="text-xs text-destructive">
+                      {f.sessions.length} sessions signed in at once
+                    </p>
+                  </div>
+                  <button
+                    disabled={clearSessionsMutation.isPending}
+                    onClick={() => clearSessionsMutation.mutate(f.userId)}
+                    className="shrink-0 rounded-xl bg-secondary px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    disabled={kickMutation.isPending || f.userId === OWNER_USER_ID}
+                    onClick={() =>
+                      kickMutation.mutate({ userId: f.userId, name: nameOf(f.userId) })
+                    }
+                    className="shrink-0 rounded-xl bg-destructive/15 px-3 py-1.5 text-xs font-semibold text-destructive disabled:opacity-50"
+                  >
+                    Kick
+                  </button>
+                </div>
+                <ul className="mt-2 space-y-1 border-t border-border pt-2">
+                  {f.sessions.map((s) => (
+                    <li key={s.id} className="text-xs text-muted-foreground">
+                      {deviceLabel(s.user_agent)} · last active {formatTime(s.updated_at)}
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {tab === "bans" && (
