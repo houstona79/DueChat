@@ -33,6 +33,7 @@ export type Room = {
 };
 
 export const ROOM_CATEGORIES = [
+  "Help",
   "General",
   "Music",
   "Gaming",
