@@ -155,7 +155,11 @@ function AdminPage() {
 
   const groupRooms = data.rooms.filter((r) => !r.is_direct);
   const liveSessions = sessions.data ?? [];
-  const flagged = multiSessionUsers(liveSessions);
+  /** Admins and moderators are allowed to be signed in from several places. */
+  const isStaff = (id: string) =>
+    data.roles.some((r) => r.user_id === id && (r.role === "admin" || r.role === "moderator"));
+  const flagged = multiSessionUsers(liveSessions).filter((f) => !isStaff(f.userId));
+  const staffMulti = multiSessionUsers(liveSessions).filter((f) => isStaff(f.userId));
   const onlineCount = data.profiles.filter(isOnline).length;
   const stats = [
     { label: "Members", value: data.profiles.length, icon: Users },
@@ -306,8 +310,9 @@ function AdminPage() {
           <div className="rounded-2xl border border-border bg-card p-4">
             <p className="text-sm font-semibold">Multi-nick watch</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              DueChat allows one active session per account. Accounts signed in from more
-              than one place right now are flagged here.
+              DueChat allows one active session per member account. Accounts signed in from
+              more than one place right now are flagged here. Admins and moderators are
+              exempt and may use multiple sessions.
             </p>
           </div>
 
@@ -360,6 +365,19 @@ function AdminPage() {
               </li>
             ))}
           </ul>
+
+          {staffMulti.length > 0 && (
+            <div className="rounded-2xl border border-border bg-card p-3">
+              <p className="text-sm font-semibold">Staff with multiple sessions (allowed)</p>
+              <ul className="mt-2 space-y-1">
+                {staffMulti.map((f) => (
+                  <li key={f.userId} className="text-xs text-muted-foreground">
+                    {nameOf(f.userId)} · {f.sessions.length} sessions
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
 
