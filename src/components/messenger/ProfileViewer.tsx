@@ -149,6 +149,12 @@ export function ProfileViewer() {
                 {genderLabel(profile.gender)}
               </p>
             ) : null}
+            {profile.pronouns ? (
+              <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                <BadgeCheck className="size-3.5 shrink-0" aria-hidden />
+                {profile.pronouns}
+              </p>
+            ) : null}
             {profile.website_url ? (
               <a
                 href={profile.website_url}
