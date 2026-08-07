@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Megaphone, Send, SmilePlus, Trash2 } from "lucide-react";
+import { Check, Megaphone, Pencil, Pin, PinOff, Send, SmilePlus, Trash2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { siteRoleOf, useSiteRoles } from "@/hooks/use-roles";
@@ -8,10 +8,12 @@ import {
   MAX_UPDATE_LENGTH,
   REACTION_EMOJIS,
   deleteProfileUpdate,
+  editProfileUpdate,
   fetchProfileUpdateReactions,
   fetchProfileUpdates,
   postProfileUpdate,
   relativeTime,
+  setProfileUpdatePinned,
   toggleProfileUpdateReaction,
 } from "@/lib/profile-updates";
 
@@ -22,6 +24,8 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pickerFor, setPickerFor] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState("");
 
   const myRole = user ? siteRoleOf(roles, user.id) : null;
   const isStaff = myRole === "admin" || myRole === "moderator";
@@ -77,6 +81,23 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
 
   const remove = useMutation({
     mutationFn: (id: string) => deleteProfileUpdate(id),
+    onSuccess: () => invalidate(),
+  });
+
+  const edit = useMutation({
+    mutationFn: ({ id, body }: { id: string; body: string }) => editProfileUpdate(id, body),
+    onSuccess: () => {
+      setEditingId(null);
+      setEditDraft("");
+      setError(null);
+      return invalidate();
+    },
+    onError: (e: unknown) => setError(e instanceof Error ? e.message : "Couldn’t save that edit."),
+  });
+
+  const pin = useMutation({
+    mutationFn: ({ id, pinned }: { id: string; pinned: boolean }) =>
+      setProfileUpdatePinned(userId, id, pinned),
     onSuccess: () => invalidate(),
   });
 
