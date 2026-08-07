@@ -3,6 +3,17 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
+function ageFrom(value: string): number | null {
+  if (!value) return null;
+  const dob = new Date(value + "T00:00:00");
+  if (Number.isNaN(dob.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - dob.getFullYear();
+  const m = now.getMonth() - dob.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) age -= 1;
+  return age;
+}
+
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
