@@ -10,6 +10,7 @@ import { CallOverlay } from "./CallOverlay";
 import { MemberList } from "./MemberList";
 import { RadioPlayer } from "./RadioPlayer";
 import { RatingControl } from "./RoomRating";
+import { YouTubeEmbed } from "./YouTubeEmbed";
 import { useMessages, useRoomAdmins, useRoomBans, useRoomEvents } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
 import {
@@ -34,6 +35,7 @@ import {
   sendMessage,
   setRoomRadio,
   setRoomRating,
+  setRoomYouTube,
   unbanMember,
   type Membership,
   type Profile,
@@ -241,7 +243,8 @@ export function ChatPane({
       </header>
 
       {!room.is_direct ? (
-        <RadioPlayer
+        <>
+          <RadioPlayer
           url={room.radio_url}
           name={room.radio_name}
           canEdit={isOwner}
@@ -249,7 +252,17 @@ export function ChatPane({
             await setRoomRadio(room.id, radio);
             await queryClient.invalidateQueries({ queryKey: ["rooms"] });
           }}
-        />
+          />
+          <YouTubeEmbed
+            url={room.youtube_url}
+            title={room.youtube_title}
+            canEdit={canModerate}
+            onSave={async (video) => {
+              await setRoomYouTube(room.id, video);
+              await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+            }}
+          />
+        </>
       ) : null}
 
       {call ? (
