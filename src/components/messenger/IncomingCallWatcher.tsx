@@ -45,6 +45,7 @@ export function IncomingCallWatcher({
           const without = prev.filter((r) => r.roomId !== roomId);
           if (others.length === 0) return without;
           const first = others[0];
+          if (!first) return without;
           return [...without, { roomId, callerId: first.user_id, mode: first.mode ?? "voice" }];
         });
         if (others.length === 0) setDismissed((d) => d.filter((id) => id !== roomId));
