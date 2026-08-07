@@ -254,6 +254,7 @@ export type Database = {
       }
       rooms: {
         Row: {
+          category: string
           created_at: string
           created_by: string
           direct_key: string | null
@@ -269,6 +270,7 @@ export type Database = {
           youtube_url: string | null
         }
         Insert: {
+          category?: string
           created_at?: string
           created_by: string
           direct_key?: string | null
@@ -284,6 +286,7 @@ export type Database = {
           youtube_url?: string | null
         }
         Update: {
+          category?: string
           created_at?: string
           created_by?: string
           direct_key?: string | null
