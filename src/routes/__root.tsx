@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import { KickWatcher } from "@/components/system/KickWatcher";
 import { SessionTracker } from "@/components/system/SessionTracker";
+import { AuthWatcher } from "@/components/system/AuthWatcher";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -153,6 +154,7 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <KickWatcher />
+      <AuthWatcher />
       <SessionTracker />
       <Toaster />
     </QueryClientProvider>
