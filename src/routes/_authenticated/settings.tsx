@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { COUNTRIES } from "@/lib/countries";
 import { GENDERS } from "@/lib/genders";
 import { FIELD_VISIBILITIES } from "@/lib/field-visibility";
+import { postStatusChangeUpdate } from "@/lib/profile-updates";
 
 const NAME_COLORS = [
   { label: "Default", value: "" },
@@ -97,10 +98,12 @@ function SettingsPage() {
         setBusy(false);
         return;
       }
+      const nextStatus = status.trim().slice(0, 120) || null;
+      const statusChanged = nextStatus !== (me.status_message ?? null);
       await updateProfile(user.id, {
         display_name: displayName.trim().slice(0, 60) || me.display_name,
         username: username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 24) || me.username,
-        status_message: status.trim().slice(0, 120) || null,
+        status_message: nextStatus,
         name_color: nameColor || null,
         country: country || null,
         gender: gender || null,
@@ -111,9 +114,17 @@ function SettingsPage() {
         website_url: websiteUrl,
         ...(me.birth_date ? {} : { birth_date: birthDate || null }),
       });
+      if (statusChanged && nextStatus) {
+        try {
+          await postStatusChangeUpdate(user.id, nextStatus);
+          await queryClient.invalidateQueries({ queryKey: ["profile-updates", user.id] });
+        } catch {
+          // Status saved; the feed entry is best-effort.
+        }
+      }
       await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
       await queryClient.invalidateQueries({ queryKey: ["profiles"] });
-      setMessage("Profile saved.");
+      setMessage(statusChanged && nextStatus ? "Profile saved — status shared to your feed." : "Profile saved.");
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Could not save profile.");
     } finally {
