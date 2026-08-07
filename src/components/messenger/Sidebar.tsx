@@ -164,7 +164,7 @@ export function Sidebar({
                 {siteRoleLabel(myRole) ? (
                   <span
                     className={cn(
-                      "shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold",
+                      "shrink-0 rounded-md px-1.5 py-0.5 text-[11px] font-semibold",
                       siteRoleBadgeClass(myRole),
                     )}
                   >
@@ -201,7 +201,7 @@ export function Sidebar({
             <h2 className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
               Direct messages
             </h2>
-            <nav>
+            <nav aria-label="Direct messages">
               {directs.map((room) => {
                 const partner = dmPartner(room);
                 return (
@@ -266,7 +266,7 @@ export function Sidebar({
           <span>{group.category}</span>
           <span className="font-normal normal-case">{group.rooms.length}</span>
         </h2>
-        <nav>
+        <nav aria-label={`${group.category} rooms`}>
           {group.rooms.map((room) => {
             const members = memberships.filter((m) => m.room_id === room.id);
             const joined = members.some((m) => m.user_id === me?.id);
@@ -291,7 +291,7 @@ export function Sidebar({
                       <RatingBadge rating={room.rating} />
                     </span>
                     {joined ? null : (
-                      <span className="shrink-0 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-medium text-primary">
+                      <span className="shrink-0 rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-medium text-primary">
                         Join
                       </span>
                     )}
@@ -308,7 +308,7 @@ export function Sidebar({
         </nav>
         </section>
         ))}
-        <nav>
+        <nav aria-label="Room results">
           {visible.length === 0 ? (
             <p className="px-4 py-8 text-center text-sm text-muted-foreground">
               {rooms.length === 0 ? "No rooms yet — create the first one." : "No matches."}
@@ -349,7 +349,7 @@ export function Sidebar({
                       {siteRoleLabel(pRole) ? (
                         <span
                           className={cn(
-                            "shrink-0 rounded-full px-1.5 py-px text-[9px] font-semibold uppercase tracking-wide",
+                            "shrink-0 rounded-full px-1.5 py-px text-[11px] font-semibold uppercase tracking-wide",
                             siteRoleBadgeClass(pRole),
                           )}
                         >

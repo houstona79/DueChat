@@ -51,7 +51,7 @@ function ProfilePage() {
   const isMe = !!profile && user?.id === profile.id;
 
   return (
-    <main className="mx-auto w-full max-w-xl px-5 py-8 pb-[max(2rem,env(safe-area-inset-bottom))]">
+    <main id="main-content" className="mx-auto w-full max-w-xl px-5 py-8 pb-[max(2rem,env(safe-area-inset-bottom))]">
       <Link
         to="/chat"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -87,7 +87,7 @@ function ProfilePage() {
                 {siteRoleLabel(role) ? (
                   <span
                     className={cn(
-                      "rounded-md px-1.5 py-0.5 text-[10px] font-semibold",
+                      "rounded-md px-1.5 py-0.5 text-[11px] font-semibold",
                       siteRoleBadgeClass(role),
                     )}
                   >

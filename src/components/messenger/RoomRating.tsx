@@ -8,7 +8,7 @@ export function RatingBadge({ rating, className }: { rating: Rating; className?:
     <span
       title={ROOM_RATING_LABEL[rating]}
       className={cn(
-        "inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide",
+        "inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide",
         rating === "R"
           ? "bg-destructive/15 text-destructive"
           : "bg-primary/15 text-primary",

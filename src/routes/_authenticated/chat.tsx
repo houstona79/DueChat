@@ -44,7 +44,7 @@ function ChatLayout() {
 
   return (
     <>
-    <main className="grid h-dvh grid-cols-1 overflow-hidden md:grid-cols-[280px_1fr] lg:grid-cols-[340px_1fr]">
+    <main id="main-content" className="grid h-dvh grid-cols-1 overflow-hidden md:grid-cols-[280px_1fr] lg:grid-cols-[340px_1fr]">
       <div
         className={
           activeRoomId

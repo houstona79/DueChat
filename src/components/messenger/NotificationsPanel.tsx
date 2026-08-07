@@ -73,7 +73,7 @@ export function NotificationsPanel({
           <Bell className="size-3.5" aria-hidden />
           Notifications
           {unread > 0 ? (
-            <span className="ml-1 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+            <span className="ml-1 rounded-full bg-primary px-1.5 py-0.5 text-[11px] font-bold text-primary-foreground">
               {unread}
             </span>
           ) : null}

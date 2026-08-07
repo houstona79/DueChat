@@ -83,11 +83,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         name: "viewport",
         content: "width=device-width, initial-scale=1, viewport-fit=cover",
       },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "DueChat — chat rooms, presence and calls" },
+      {
+        name: "description",
+        content:
+          "DueChat is an accessible chat messenger with rooms, live presence, buddy lists and voice or video calls.",
+      },
+      { name: "author", content: "DueChat" },
+      { property: "og:title", content: "DueChat — chat rooms, presence and calls" },
+      {
+        property: "og:description",
+        content:
+          "DueChat is an accessible chat messenger with rooms, live presence, buddy lists and voice or video calls.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
@@ -124,6 +132,12 @@ function RootShell({ children }: { children: ReactNode }) {
         />
       </head>
       <body>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground"
+        >
+          Skip to main content
+        </a>
         {children}
         <Scripts />
       </body>

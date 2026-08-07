@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ImagePlus, Trash2, X } from "lucide-react";
 import { ImageCropper } from "./ImageCropper";
@@ -64,6 +64,15 @@ export function ProfilePhotos({
   const [error, setError] = useState<string | null>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
 
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightbox(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightbox]);
+
   const { data: photos = [] } = useQuery({
     queryKey: ["profile-photos", userId],
     queryFn: () => fetchProfilePhotos(userId),
@@ -94,9 +103,9 @@ export function ProfilePhotos({
   return (
     <section className="space-y-2">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-[11px] font-medium text-muted-foreground">{title}</h3>
+        <p className="text-[11px] font-medium text-muted-foreground">{title}</p>
         {editable ? (
-          <span className="text-[11px] text-muted-foreground/80">
+          <span className="text-[11px] text-muted-foreground">
             {photos.length}/{MAX_PROFILE_PHOTOS}
           </span>
         ) : null}
@@ -139,6 +148,7 @@ export function ProfilePhotos({
           ref={fileRef}
           type="file"
           accept="image/*"
+          aria-label="Upload a photo"
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
@@ -181,6 +191,7 @@ export function ProfilePhotos({
           />
           <button
             type="button"
+            autoFocus
             onClick={() => setLightbox(null)}
             aria-label="Close photo"
             className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] grid size-10 place-items-center rounded-xl bg-card text-muted-foreground"

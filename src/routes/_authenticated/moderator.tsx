@@ -344,6 +344,7 @@ function Stat({
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main
+      id="main-content"
       className="mx-auto min-h-dvh w-full max-w-2xl px-5 pb-10"
       style={{ paddingTop: "calc(1.5rem + env(safe-area-inset-top))" }}
     >

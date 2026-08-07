@@ -49,7 +49,7 @@ function TermsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-background px-5 py-10">
+    <main id="main-content" className="min-h-screen bg-background px-5 py-10">
       <div className="mx-auto w-full max-w-2xl">
         <Link to="/auth">
           <img

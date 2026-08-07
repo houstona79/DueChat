@@ -62,7 +62,7 @@ export function MemberList({
     id === ownerId ? "Owner" : adminIds.has(id) ? "Room admin" : null;
 
   return (
-    <aside className="absolute inset-y-0 right-0 z-20 flex w-full max-w-[85%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl sm:max-w-xs">
+    <section className="absolute inset-y-0 right-0 z-20 flex w-full max-w-[85%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl sm:max-w-xs" role="region" aria-label="Room members">
       <header className="flex items-center justify-between px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <h3 className="text-sm font-semibold">Members · {members.length}</h3>
         <button
@@ -107,7 +107,7 @@ export function MemberList({
                     {siteRoleLabel(siteRole) ? (
                       <span
                         className={cn(
-                          "shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold",
+                          "shrink-0 rounded-md px-1.5 py-0.5 text-[11px] font-semibold",
                           siteRoleBadgeClass(siteRole),
                         )}
                       >
@@ -115,7 +115,7 @@ export function MemberList({
                       </span>
                     ) : null}
                     {role ? (
-                      <span className="shrink-0 rounded-md bg-primary/15 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                      <span className="shrink-0 rounded-md bg-primary/15 px-1.5 py-0.5 text-[11px] font-semibold text-primary">
                         {role}
                       </span>
                     ) : null}
@@ -243,6 +243,6 @@ export function MemberList({
           </button>
         </div>
       ) : null}
-    </aside>
+    </section>
   );
 }

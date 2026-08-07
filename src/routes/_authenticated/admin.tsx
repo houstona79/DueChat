@@ -401,6 +401,7 @@ function AdminPage() {
               value={staffSearch}
               onChange={(e) => setStaffSearch(e.target.value)}
               placeholder="Search members by name or @username"
+              aria-label="Search members by name or username"
               className="mt-3 w-full rounded-xl border border-border bg-secondary px-3 py-2 text-sm outline-none focus:border-primary"
             />
             <ul className="mt-3 space-y-2">
@@ -734,6 +735,7 @@ function DmTab({
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main
+      id="main-content"
       className="mx-auto min-h-dvh w-full max-w-2xl px-5 pb-10"
       style={{ paddingTop: "calc(1.5rem + env(safe-area-inset-top))" }}
     >

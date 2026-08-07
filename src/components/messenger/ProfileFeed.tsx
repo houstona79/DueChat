@@ -188,6 +188,7 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
             onChange={(e) => setDraft(e.target.value.slice(0, MAX_UPDATE_LENGTH))}
             rows={2}
             placeholder="Share an update…"
+            aria-label="Share a profile update"
             className="w-full resize-none rounded-2xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
           />
           <div className="flex items-center justify-between gap-2">
@@ -252,6 +253,7 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
                     onChange={(e) => setEditDraft(e.target.value.slice(0, MAX_UPDATE_LENGTH))}
                     rows={3}
                     autoFocus
+                    aria-label="Edit your update"
                     className="w-full resize-none rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
                   />
                   <div className="flex items-center justify-end gap-1.5">
@@ -414,6 +416,7 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
                       onChange={(e) => setReportDetails(e.target.value.slice(0, MAX_REPORT_DETAILS))}
                       rows={2}
                       placeholder="Anything else moderators should know? (optional)"
+                      aria-label="Additional details for moderators"
                       className="w-full resize-none rounded-lg border border-border bg-background px-2 py-1.5 text-sm outline-none focus:border-primary"
                     />
                     <div className="flex items-center justify-end gap-1.5">

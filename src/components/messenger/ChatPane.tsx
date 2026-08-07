@@ -193,7 +193,10 @@ export function ChatPane({
   };
 
   return (
-    <section className="relative flex h-full min-h-0 flex-col bg-background">
+    <section
+      className="relative flex h-full min-h-0 flex-col bg-background"
+      aria-label={`Conversation: ${title}`}
+    >
       <header className="flex items-center gap-2 border-b border-border px-3 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:gap-3 sm:px-4">
         <Link
           to="/chat"
@@ -270,6 +273,7 @@ export function ChatPane({
               : "text-muted-foreground hover:bg-secondary",
           )}
           aria-label="Show members"
+          aria-pressed={showMembers}
           title="Show members"
         >
           <Users className="size-4" />
@@ -286,6 +290,7 @@ export function ChatPane({
               showFeed ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
             )}
             aria-label="Show room feed"
+            aria-pressed={showFeed}
             title="Room feed"
           >
             <Newspaper className="size-4" />
@@ -381,7 +386,15 @@ export function ChatPane({
 
       {joined ? (
         <>
-          <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto px-4 py-5">
+          <div
+            ref={scroller}
+            className="min-h-0 flex-1 overflow-y-auto px-4 py-5"
+            role="log"
+            aria-live="polite"
+            aria-relevant="additions text"
+            aria-label="Messages"
+            tabIndex={0}
+          >
             {isLoading ? (
               <p className="text-center text-sm text-muted-foreground">Loading messages…</p>
             ) : null}
@@ -454,7 +467,7 @@ export function ChatPane({
                         {siteRoleLabel(siteRoleOf(siteRoles, m.user_id)) ? (
                           <span
                             className={cn(
-                              "rounded-md px-1 py-0.5 text-[9px] font-semibold uppercase tracking-wide",
+                              "rounded-md px-1 py-0.5 text-[11px] font-semibold uppercase tracking-wide",
                               siteRoleBadgeClass(siteRoleOf(siteRoles, m.user_id)),
                             )}
                           >
@@ -466,7 +479,7 @@ export function ChatPane({
                     {gifUrlOf(m.body) ? (
                       <img
                         src={gifUrlOf(m.body)!}
-                        alt="GIF"
+                        alt={`GIF sent by ${authorName}`}
                         loading="lazy"
                         className="max-h-56 max-w-[78%] rounded-2xl border border-border object-cover"
                       />
@@ -485,7 +498,7 @@ export function ChatPane({
                         {m.body}
                       </div>
                     )}
-                    <span className="mt-1 px-1 text-[10px] text-muted-foreground">
+                    <span className="mt-1 px-1 text-[11px] text-muted-foreground">
                       {formatTime(m.created_at)}
                     </span>
                   </div>
@@ -495,7 +508,11 @@ export function ChatPane({
           </div>
 
           <footer className="border-t border-border px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-            {error ? <p className="px-2 pb-2 text-xs text-destructive">{error}</p> : null}
+            {error ? (
+              <p role="alert" className="px-2 pb-2 text-xs text-destructive">
+                {error}
+              </p>
+            ) : null}
             <div className="flex items-end gap-2 rounded-2xl bg-secondary p-2">
               <EmojiPicker
                 onSelect={(emoji) => {
