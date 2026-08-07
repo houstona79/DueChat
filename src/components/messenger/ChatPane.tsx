@@ -27,6 +27,7 @@ import {
   banMember,
   counterpartId,
   formatTime,
+  isAdultProfile,
   isOnline,
   joinRoom,
   kickMember,
@@ -98,6 +99,9 @@ export function ChatPane({
   const canModerate = !room.is_direct && (isOwner || roomAdmins.some((a) => a.user_id === meId));
   const { data: bans = [] } = useRoomBans(room.id, canModerate);
   const { data: siteRoles } = useSiteRoles();
+  const myProfile = profileOf(meId);
+  const adultsOnly = room.rating === "R" && !room.is_direct;
+  const ageBlocked = adultsOnly && !isAdultProfile(myProfile);
 
   type TimelineItem =
     | { kind: "message"; id: string; at: string; message: (typeof messages)[number] }
@@ -138,11 +142,13 @@ export function ChatPane({
   };
 
   const join = async () => {
-    if (room.rating === "R") {
-      const ok = window.confirm(
-        `“${room.name}” is rated R — adults only. Confirm you are 18 or older to join.`,
+    if (ageBlocked) {
+      setError(
+        myProfile?.birth_date
+          ? `“${room.name}” is rated R — you must be 18 or older to join.`
+          : `“${room.name}” is rated R. Add your date of birth in Settings to confirm you are 18 or older.`,
       );
-      if (!ok) return;
+      return;
     }
     try {
       await joinRoom(room.id, meId);
