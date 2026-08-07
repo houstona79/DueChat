@@ -182,14 +182,25 @@ export function useGroupCall({
       };
       pc.ontrack = (event) => {
         // Safari doesn't always populate event.streams — build our own stream.
-        remote.addTrack(event.track);
-        patchPeer(peerId, { stream: remote });
+        if (!remote.getTracks().includes(event.track)) remote.addTrack(event.track);
+        // A fresh MediaStream identity is required so React re-attaches the
+        // element when a second (video) track arrives after the audio track.
+        const snapshot = () => new MediaStream(remote.getTracks());
+        patchPeer(peerId, {
+          stream: snapshot(),
+          ...(event.track.kind === "video" ? { camOn: true } : {}),
+        });
+        event.track.onunmute = () => patchPeer(peerId, { stream: snapshot() });
         event.track.onended = () => {
           try {
             remote.removeTrack(event.track);
           } catch {
             /* noop */
           }
+          patchPeer(peerId, {
+            stream: snapshot(),
+            ...(event.track.kind === "video" ? { camOn: false } : {}),
+          });
         };
       };
       pc.onnegotiationneeded = async () => {
@@ -218,6 +229,13 @@ export function useGroupCall({
         if (pc.connectionState === "failed" || pc.connectionState === "closed") dropPeer(peerId);
       };
       patchPeer(peerId, {});
+      // Tell the new peer our current mic/cam state right away — otherwise they
+      // only learn about it the next time we toggle something.
+      void channel.send({
+        type: "broadcast",
+        event: "state",
+        payload: { from: userId, camOn: camOnRef.current, muted: mutedRef.current },
+      });
       return ctx;
     };
 
