@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
 import { MessagesSquare } from "lucide-react";
 import { Sidebar } from "@/components/messenger/Sidebar";
+import { ProfileViewer } from "@/components/messenger/ProfileViewer";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import {
   useChatRealtime,
@@ -41,6 +42,7 @@ function ChatLayout() {
   const activeRoomId = params.roomId;
 
   return (
+    <>
     <main className="grid h-dvh grid-cols-1 overflow-hidden md:grid-cols-[280px_1fr] lg:grid-cols-[340px_1fr]">
       <div
         className={
@@ -75,5 +77,7 @@ function ChatLayout() {
         )}
       </div>
     </main>
+    <ProfileViewer />
+    </>
   );
 }
