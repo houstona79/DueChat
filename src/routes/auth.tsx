@@ -46,6 +46,7 @@ function AuthPage() {
   const [birthDate, setBirthDate] = useState("");
   const [country, setCountry] = useState("");
   const [gender, setGender] = useState("");
+  const [pronouns, setPronouns] = useState("");
   const [eulaAccepted, setEulaAccepted] = useState(false);
   const [human, setHuman] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -102,6 +103,7 @@ function AuthPage() {
               birth_date: birthDate,
               country,
               gender,
+              pronouns: pronouns.trim().slice(0, 40),
               accepted_eula_at: new Date().toISOString(),
             },
           },
@@ -207,6 +209,19 @@ function AuthPage() {
                     </option>
                   ))}
                 </select>
+              </div>
+              <div>
+                <label htmlFor="pronouns" className="block text-[11px] font-medium text-muted-foreground">
+                  Pronouns (optional)
+                </label>
+                <input
+                  id="pronouns"
+                  value={pronouns}
+                  onChange={(e) => setPronouns(e.target.value)}
+                  maxLength={40}
+                  placeholder="she/her, he/him, they/them…"
+                  className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none"
+                />
               </div>
               <p className="text-xs text-muted-foreground">You must be 16 or older to join DueChat.</p>
               <label className="flex items-start gap-3 rounded-xl bg-secondary px-3 py-2.5">

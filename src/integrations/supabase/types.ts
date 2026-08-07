@@ -140,6 +140,7 @@ export type Database = {
           id: string
           last_seen_at: string
           name_color: string | null
+          pronouns: string | null
           status_message: string | null
           updated_at: string
           username: string
@@ -157,6 +158,7 @@ export type Database = {
           id: string
           last_seen_at?: string
           name_color?: string | null
+          pronouns?: string | null
           status_message?: string | null
           updated_at?: string
           username: string
@@ -174,6 +176,7 @@ export type Database = {
           id?: string
           last_seen_at?: string
           name_color?: string | null
+          pronouns?: string | null
           status_message?: string | null
           updated_at?: string
           username?: string
