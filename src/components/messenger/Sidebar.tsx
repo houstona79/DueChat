@@ -1,3 +1,4 @@
+import { RatingBadge } from "./RoomRating";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { LogOut, Plus, Search, Settings, Shield, ShieldCheck, Users } from "lucide-react";
 import { useState } from "react";
