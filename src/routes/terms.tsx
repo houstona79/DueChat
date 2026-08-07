@@ -27,11 +27,8 @@ function TermsPage() {
   const [user, setUser] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
-  const [acceptMode, setAcceptMode] = useState(false);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setAcceptMode(params.get("accept") === "1");
     void supabase.auth.getUser().then(({ data }) => {
       if (data.user) setUser(data.user.id);
     });
@@ -148,34 +145,28 @@ function TermsPage() {
         </section>
 
         <div className="mt-8 flex flex-col gap-3">
-          {acceptMode ? (
-            <>
-              {notice ? <p className="text-xs text-muted-foreground">{notice}</p> : null}
-              <button
-                onClick={() => void onAccept()}
-                disabled={busy || !user}
-                className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground disabled:opacity-50"
-              >
-                {busy ? "Please wait…" : "I agree to the End User Agreement"}
-              </button>
-              {!user ? (
-                <p className="text-xs text-muted-foreground">
-                  Please{" "}
-                  <Link to="/auth" className="text-primary underline">
-                    sign in
-                  </Link>{" "}
-                  first to accept the agreement.
-                </p>
-              ) : null}
-            </>
-          ) : (
-            <Link
-              to="/auth"
-              className="inline-flex w-full items-center justify-center rounded-xl bg-secondary px-4 py-2.5 text-sm font-medium"
+          {notice ? <p className="text-xs text-muted-foreground">{notice}</p> : null}
+          {user ? (
+            <button
+              onClick={() => void onAccept()}
+              disabled={busy}
+              className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground disabled:opacity-50"
             >
-              Back to sign in
-            </Link>
-          )}
+              {busy ? "Please wait…" : "I agree to the End User Agreement"}
+            </button>
+          ) : null}
+          <Link
+            to="/auth"
+            className="inline-flex w-full items-center justify-center rounded-xl bg-secondary px-4 py-2.5 text-sm font-medium"
+          >
+            {user ? "Back to DueChat" : "Back to sign in"}
+          </Link>
+          {!user ? (
+            <p className="text-center text-xs text-muted-foreground">
+              You accept this agreement with the checkbox on the sign-up form, or by signing in and
+              agreeing here.
+            </p>
+          ) : null}
         </div>
       </div>
     </main>
