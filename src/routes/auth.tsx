@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { COUNTRIES } from "@/lib/countries";
+import duechatLogo from "@/assets/duechat-logo.png.asset.json";
+
 
 function ageFrom(value: string): number | null {
   if (!value) return null;
