@@ -15,11 +15,18 @@ export function KickWatcher() {
   useEffect(() => {
     let channel: ReturnType<typeof supabase.channel> | null = null;
     let cancelled = false;
+    let currentUserId: string | null = null;
 
     const boot = async () => {
       const { data } = await supabase.auth.getUser();
       const userId = data.user?.id;
       if (!userId || cancelled) return;
+      if (currentUserId === userId && channel) return;
+      currentUserId = userId;
+      if (channel) {
+        await supabase.removeChannel(channel);
+        channel = null;
+      }
 
       channel = supabase
         .channel(`kicks:${userId}`)

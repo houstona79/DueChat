@@ -27,6 +27,7 @@ import {
   banMember,
   counterpartId,
   formatTime,
+  isAdultProfile,
   isOnline,
   joinRoom,
   kickMember,
@@ -98,6 +99,9 @@ export function ChatPane({
   const canModerate = !room.is_direct && (isOwner || roomAdmins.some((a) => a.user_id === meId));
   const { data: bans = [] } = useRoomBans(room.id, canModerate);
   const { data: siteRoles } = useSiteRoles();
+  const myProfile = profileOf(meId);
+  const adultsOnly = room.rating === "R" && !room.is_direct;
+  const ageBlocked = adultsOnly && !isAdultProfile(myProfile);
 
   type TimelineItem =
     | { kind: "message"; id: string; at: string; message: (typeof messages)[number] }
@@ -126,6 +130,10 @@ export function ChatPane({
   const submit = async () => {
     const text = draft.trim();
     if (!text) return;
+    if (ageBlocked) {
+      setError("This room is rated R — you must be 18 or older to post here.");
+      return;
+    }
     setDraft("");
     try {
       await sendMessage(room.id, meId, text);
@@ -138,11 +146,13 @@ export function ChatPane({
   };
 
   const join = async () => {
-    if (room.rating === "R") {
-      const ok = window.confirm(
-        `“${room.name}” is rated R — adults only. Confirm you are 18 or older to join.`,
+    if (ageBlocked) {
+      setError(
+        myProfile?.birth_date
+          ? `“${room.name}” is rated R — you must be 18 or older to join.`
+          : `“${room.name}” is rated R. Add your date of birth in Settings to confirm you are 18 or older.`,
       );
-      if (!ok) return;
+      return;
     }
     try {
       await joinRoom(room.id, meId);
@@ -496,6 +506,26 @@ export function ChatPane({
       ) : (
         <div className="grid min-h-0 flex-1 place-items-center px-6 text-center">
           <div className="max-w-sm">
+            {ageBlocked ? (
+              <>
+                <h3 className="text-lg font-semibold">Adults only</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  “{title}” is rated R. You must be 18 or older to join.
+                  {myProfile?.birth_date
+                    ? ""
+                    : " Add your date of birth in Settings to confirm your age."}
+                </p>
+                {myProfile?.birth_date ? null : (
+                  <Link
+                    to="/settings"
+                    className="mt-5 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                  >
+                    Open settings
+                  </Link>
+                )}
+              </>
+            ) : (
+              <>
               <h3 className="text-lg font-semibold">Join {title}</h3>
             <p className="mt-2 text-sm text-muted-foreground">
               Messages in this room are only visible to members.
@@ -506,6 +536,8 @@ export function ChatPane({
             >
               Join room
             </button>
+              </>
+            )}
           </div>
         </div>
       )}

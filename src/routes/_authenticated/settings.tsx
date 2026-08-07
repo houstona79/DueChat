@@ -45,6 +45,7 @@ function SettingsPage() {
   const [username, setUsername] = useState("");
   const [status, setStatus] = useState("");
   const [nameColor, setNameColor] = useState("");
+  const [birthDate, setBirthDate] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -54,6 +55,7 @@ function SettingsPage() {
     setUsername(me.username);
     setStatus(me.status_message ?? "");
     setNameColor(me.name_color ?? "");
+    setBirthDate(me.birth_date ?? "");
   }, [me]);
 
   if (!user || !me) return null;
@@ -73,6 +75,7 @@ function SettingsPage() {
         username: username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 24) || me.username,
         status_message: status.trim().slice(0, 120) || null,
         name_color: nameColor || null,
+        ...(me.birth_date ? {} : { birth_date: birthDate || null }),
       });
       await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
       await queryClient.invalidateQueries({ queryKey: ["profiles"] });
@@ -135,6 +138,31 @@ function SettingsPage() {
         <Field label="Display name" id="display-name" value={displayName} onChange={setDisplayName} />
         <Field label="Username" id="username" value={username} onChange={setUsername} />
         <Field label="Status" id="status" value={status} onChange={setStatus} placeholder="Working on something new" />
+
+        <div>
+          <span className="block text-[11px] font-medium text-muted-foreground">Date of birth</span>
+          {me.birth_date ? (
+            <p className="mt-1 text-sm">
+              {me.birth_date}{" "}
+              <span className="text-[11px] text-muted-foreground">
+                · locked (used for age-restricted rooms)
+              </span>
+            </p>
+          ) : (
+            <>
+              <input
+                id="birth-date"
+                type="date"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-border bg-secondary px-3 py-2.5 text-sm outline-none"
+              />
+              <p className="mt-1 text-[11px] text-muted-foreground/80">
+                Required to enter R-rated (18+) rooms. You can only set this once.
+              </p>
+            </>
+          )}
+        </div>
 
         <div>
           <span className="block text-[11px] font-medium text-muted-foreground">Name color</span>
