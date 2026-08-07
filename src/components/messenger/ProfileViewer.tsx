@@ -1,6 +1,8 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { BadgeCheck, ExternalLink, Globe, MapPin, MessageSquare, User, X } from "lucide-react";
 import { genderLabel } from "@/lib/genders";
+import { visibleGender, visiblePronouns } from "@/lib/field-visibility";
+import { useBuddies } from "@/hooks/use-chat";
 import { Link } from "@tanstack/react-router";
 import { Avatar } from "./Avatar";
 import { ProfilePhotos } from "./ProfilePhotos";
@@ -143,16 +145,16 @@ export function ProfileViewer() {
                 {profile.country}
               </p>
             ) : null}
-            {genderLabel(profile.gender) ? (
+            {genderLabel(visibleGender(profile, user?.id, myBuddies)) ? (
               <p className="flex items-center gap-2 text-xs text-muted-foreground">
                 <User className="size-3.5 shrink-0" aria-hidden />
-                {genderLabel(profile.gender)}
+                {genderLabel(visibleGender(profile, user?.id, myBuddies))}
               </p>
             ) : null}
-            {profile.pronouns ? (
+            {visiblePronouns(profile, user?.id, myBuddies) ? (
               <p className="flex items-center gap-2 text-xs text-muted-foreground">
                 <BadgeCheck className="size-3.5 shrink-0" aria-hidden />
-                {profile.pronouns}
+                {visiblePronouns(profile, user?.id, myBuddies)}
               </p>
             ) : null}
             {profile.website_url ? (
