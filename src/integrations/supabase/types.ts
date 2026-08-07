@@ -164,6 +164,7 @@ export type Database = {
           body: string
           created_at: string
           id: string
+          pinned_at: string | null
           updated_at: string
           user_id: string
         }
@@ -171,6 +172,7 @@ export type Database = {
           body: string
           created_at?: string
           id?: string
+          pinned_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -178,6 +180,7 @@ export type Database = {
           body?: string
           created_at?: string
           id?: string
+          pinned_at?: string | null
           updated_at?: string
           user_id?: string
         }
