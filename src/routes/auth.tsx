@@ -120,6 +120,11 @@ function AuthPage() {
   return (
     <main className="grid min-h-screen place-items-center bg-background px-5 py-10">
       <div className="w-full max-w-sm">
+        <img
+          src={duechatLogo.url}
+          alt="DueChat"
+          className="mx-auto mb-6 h-16 w-auto object-contain"
+        />
         <h1 className="font-display text-2xl font-semibold">
           {mode === "signin" ? "Welcome back" : "Create your account"}
         </h1>
