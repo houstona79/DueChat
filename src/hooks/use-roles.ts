@@ -39,28 +39,41 @@ export function isRedish(hex: string) {
 }
 
 /** Role colors win over a personal name color. */
+/** Relative luminance of a #rrggbb color. */
+function luminance(rgb: number[]) {
+  const [r, g, b] = rgb.map((v) => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  }) as [number, number, number];
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function toHex(rgb: number[]) {
+  return `#${rgb
+    .map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0"))
+    .join("")}`;
+}
+
+function parseHex(hex: string) {
+  const m = /^#([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return null;
+  const n = parseInt(m[1] ?? "", 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
 /**
- * Keeps a personal name color inside a luminance band that stays readable
- * (WCAG AA-ish) on both the light and dark surfaces.
+ * Personal name colors are nudged per theme so they always clear WCAG AA
+ * against the current background: darkened for the light theme, lightened
+ * for the dark theme, emitted as a CSS light-dark() pair.
  */
 export function readableNameColor(hex: string) {
-  const m = /^#([0-9a-f]{6})$/i.exec(hex.trim());
-  if (!m) return hex;
-  const n = parseInt(m[1] ?? "", 16);
-  let rgb = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-  const lum = (c: number[]) => {
-    const [r, g, b] = c.map((v) => {
-      const s = v / 255;
-      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
-    }) as [number, number, number];
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  };
-  const MIN = 0.12;
-  const MAX = 0.45;
-  for (let i = 0; i < 24 && lum(rgb) > MAX; i++) rgb = rgb.map((v) => Math.round(v * 0.92));
-  for (let i = 0; i < 24 && lum(rgb) < MIN; i++)
-    rgb = rgb.map((v) => Math.round(v + (255 - v) * 0.08));
-  return `#${rgb.map((v) => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0")).join("")}`;
+  const rgb = parseHex(hex);
+  if (!rgb) return hex;
+  let light = [...rgb];
+  for (let i = 0; i < 40 && luminance(light) > 0.17; i++) light = light.map((v) => v * 0.94);
+  let dark = [...rgb];
+  for (let i = 0; i < 40 && luminance(dark) < 0.36; i++) dark = dark.map((v) => v + (255 - v) * 0.07);
+  return `light-dark(${toHex(light)}, ${toHex(dark)})`;
 }
 
 /** Role colors win over a personal name color. */
