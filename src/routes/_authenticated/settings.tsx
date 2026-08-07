@@ -118,6 +118,7 @@ function SettingsPage() {
         try {
           await postStatusChangeUpdate(user.id, nextStatus);
           await queryClient.invalidateQueries({ queryKey: ["profile-updates", user.id] });
+          await queryClient.invalidateQueries({ queryKey: ["notifications", user.id] });
         } catch {
           // Status saved; the feed entry is best-effort.
         }
