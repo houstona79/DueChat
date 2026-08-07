@@ -31,7 +31,12 @@ function pickUrl(file: KlipyFile | undefined) {
 export const searchGifs = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) =>
-    z.object({ query: z.string().trim().max(80).optional() }).parse(data ?? {}),
+    z
+      .object({
+        query: z.string().trim().max(80).optional(),
+        media: z.enum(["gifs", "stickers"]).default("gifs"),
+      })
+      .parse(data ?? {}),
   )
   .handler(async ({ data, context }): Promise<GifItem[]> => {
     const lovableKey = process.env["LOVABLE_API_KEY"];
@@ -47,7 +52,7 @@ export const searchGifs = createServerFn({ method: "GET" })
     if (query) params.set("q", query);
 
     const res = await fetch(
-      `${GATEWAY_URL}/gifs/${query ? "search" : "trending"}?${params.toString()}`,
+      `${GATEWAY_URL}/${data.media}/${query ? "search" : "trending"}?${params.toString()}`,
       {
         headers: {
           Authorization: `Bearer ${lovableKey}`,
