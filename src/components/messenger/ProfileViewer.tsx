@@ -2,6 +2,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { ExternalLink, Globe, MapPin, MessageSquare, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Avatar } from "./Avatar";
+import { ProfilePhotos } from "./ProfilePhotos";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfiles } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
@@ -155,6 +156,7 @@ export function ProfileViewer() {
             {isAdultProfile(profile) ? (
               <p className="text-xs text-muted-foreground">Verified 18+</p>
             ) : null}
+            <ProfilePhotos userId={profile.id} />
           </div>
         ) : (
           <p className="mt-4 text-sm text-muted-foreground">This profile isn’t available.</p>

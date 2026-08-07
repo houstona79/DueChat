@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "@/components/messenger/Avatar";
+import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { accentFor, normalizeWebsiteUrl, updateProfile, uploadAvatar } from "@/lib/chat";
 import { isRedish } from "@/hooks/use-roles";
@@ -266,6 +267,13 @@ function SettingsPage() {
           {busy ? "Saving…" : "Save profile"}
         </button>
       </form>
+
+      <div className="mt-8">
+        <ProfilePhotos userId={user.id} editable title="Your photos" />
+        <p className="mt-2 text-[11px] text-muted-foreground/80">
+          Photos show on your profile. Images up to 8 MB.
+        </p>
+      </div>
     </main>
   );
 }

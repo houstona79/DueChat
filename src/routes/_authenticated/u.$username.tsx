@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Globe, MapPin, MessageSquare } from "lucide-react";
 import { Avatar } from "@/components/messenger/Avatar";
+import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfiles } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
@@ -126,6 +127,7 @@ function ProfilePage() {
             {isAdultProfile(profile) ? (
               <p className="text-xs text-muted-foreground">Verified 18+</p>
             ) : null}
+            <ProfilePhotos userId={profile.id} />
           </div>
 
           {!isMe ? (
