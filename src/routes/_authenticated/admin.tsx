@@ -388,7 +388,7 @@ function DmTab({
   nameOf: (id: string) => string;
   openDm: string | null;
   setOpenDm: (id: string | null) => void;
-  transcript: { data?: import("@/lib/chat").Message[]; isLoading: boolean };
+  transcript: { data?: import("@/lib/chat").Message[] | undefined; isLoading: boolean };
   onDelete: (id: string) => void;
   deleting: boolean;
 }) {
