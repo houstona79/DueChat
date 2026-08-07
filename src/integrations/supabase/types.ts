@@ -127,6 +127,38 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_update_reactions: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          update_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          id?: string
+          update_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          update_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_update_reactions_update_id_fkey"
+            columns: ["update_id"]
+            isOneToOne: false
+            referencedRelation: "profile_updates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_updates: {
         Row: {
           body: string

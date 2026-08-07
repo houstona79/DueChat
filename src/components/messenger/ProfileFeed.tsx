@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Megaphone, Send, Trash2 } from "lucide-react";
+import { Megaphone, Send, SmilePlus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { siteRoleOf, useSiteRoles } from "@/hooks/use-roles";
 import {
   MAX_UPDATE_LENGTH,
+  REACTION_EMOJIS,
   deleteProfileUpdate,
+  fetchProfileUpdateReactions,
   fetchProfileUpdates,
   postProfileUpdate,
   relativeTime,
+  toggleProfileUpdateReaction,
 } from "@/lib/profile-updates";
 
 export function ProfileFeed({ userId, title = "Updates" }: { userId: string; title?: string }) {
@@ -18,6 +21,7 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
   const { data: roles } = useSiteRoles();
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [pickerFor, setPickerFor] = useState<string | null>(null);
 
   const myRole = user ? siteRoleOf(roles, user.id) : null;
   const isStaff = myRole === "admin" || myRole === "moderator";
@@ -28,7 +32,18 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
     queryFn: () => fetchProfileUpdates(userId),
   });
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["profile-updates", userId] });
+  const updateIds = updates.map((u) => u.id);
+
+  const { data: reactions = [] } = useQuery({
+    queryKey: ["profile-update-reactions", userId, updateIds.join(",")],
+    queryFn: () => fetchProfileUpdateReactions(updateIds),
+    enabled: updateIds.length > 0,
+  });
+
+  const invalidate = () => {
+    void queryClient.invalidateQueries({ queryKey: ["profile-update-reactions", userId] });
+    return queryClient.invalidateQueries({ queryKey: ["profile-updates", userId] });
+  };
 
   useEffect(() => {
     const channel = supabase
@@ -37,6 +52,11 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
         "postgres_changes",
         { event: "*", schema: "public", table: "profile_updates", filter: `user_id=eq.${userId}` },
         () => void invalidate(),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "profile_update_reactions" },
+        () => void queryClient.invalidateQueries({ queryKey: ["profile-update-reactions", userId] }),
       )
       .subscribe();
     return () => {
@@ -59,6 +79,25 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
     mutationFn: (id: string) => deleteProfileUpdate(id),
     onSuccess: () => invalidate(),
   });
+
+  const react = useMutation({
+    mutationFn: ({ id, emoji, mine }: { id: string; emoji: string; mine: boolean }) =>
+      toggleProfileUpdateReaction(id, user!.id, emoji, mine),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["profile-update-reactions", userId] }),
+  });
+
+  const summarize = (updateId: string) => {
+    const rows = reactions.filter((r) => r.update_id === updateId);
+    const map = new Map<string, { count: number; mine: boolean }>();
+    for (const r of rows) {
+      const entry = map.get(r.emoji) ?? { count: 0, mine: false };
+      entry.count += 1;
+      if (r.user_id === user?.id) entry.mine = true;
+      map.set(r.emoji, entry);
+    }
+    return [...map.entries()].sort((a, b) => b[1].count - a[1].count);
+  };
 
   return (
     <section className="mt-4 space-y-3">
@@ -107,6 +146,63 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
           {updates.map((u) => (
             <li key={u.id} className="group rounded-2xl bg-secondary px-3 py-2">
               <p className="whitespace-pre-line break-words text-sm">{u.body}</p>
+
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                {summarize(u.id).map(([emoji, info]) => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    disabled={!user || react.isPending}
+                    onClick={() => react.mutate({ id: u.id, emoji, mine: info.mine })}
+                    aria-label={`${emoji} ${info.count} reaction${info.count === 1 ? "" : "s"}`}
+                    aria-pressed={info.mine}
+                    className={`flex min-h-8 items-center gap-1 rounded-full border px-2 text-xs transition ${
+                      info.mine
+                        ? "border-primary bg-primary/10 text-foreground"
+                        : "border-border bg-background text-muted-foreground hover:border-primary/60"
+                    }`}
+                  >
+                    <span aria-hidden>{emoji}</span>
+                    <span className="font-semibold tabular-nums">{info.count}</span>
+                  </button>
+                ))}
+
+                {user ? (
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setPickerFor((p) => (p === u.id ? null : u.id))}
+                      aria-label="Add reaction"
+                      className="grid size-8 place-items-center rounded-full border border-border bg-background text-muted-foreground hover:border-primary/60 hover:text-foreground"
+                    >
+                      <SmilePlus className="size-3.5" />
+                    </button>
+                    {pickerFor === u.id ? (
+                      <div className="absolute bottom-9 left-0 z-20 flex gap-1 rounded-2xl border border-border bg-popover p-1.5 shadow-lg">
+                        {REACTION_EMOJIS.map((emoji) => {
+                          const mine = reactions.some(
+                            (r) => r.update_id === u.id && r.emoji === emoji && r.user_id === user.id,
+                          );
+                          return (
+                            <button
+                              key={emoji}
+                              type="button"
+                              onClick={() => {
+                                react.mutate({ id: u.id, emoji, mine });
+                                setPickerFor(null);
+                              }}
+                              className="grid size-8 place-items-center rounded-lg text-base hover:bg-secondary"
+                            >
+                              <span aria-hidden>{emoji}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
+
               <div className="mt-1 flex items-center justify-between gap-2">
                 <span className="text-[11px] text-muted-foreground">{relativeTime(u.created_at)}</span>
                 {isMe || isStaff ? (
