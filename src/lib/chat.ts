@@ -9,6 +9,7 @@ export type Profile = {
   name_color: string | null;
   birth_date: string | null;
   country: string | null;
+  gender: string | null;
   bio: string | null;
   website_url: string | null;
   accepted_eula_at: string | null;
@@ -108,7 +109,7 @@ export async function fetchProfiles(): Promise<Profile[]> {
   const { data, error } = await supabase
     .from("profiles")
     .select(
-      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, bio, website_url, accepted_eula_at, last_seen_at",
+      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, bio, website_url, accepted_eula_at, last_seen_at",
     )
     .order("last_seen_at", { ascending: false });
   if (error) throw error;
@@ -119,7 +120,7 @@ export async function fetchMyProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from("profiles")
     .select(
-      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, bio, website_url, accepted_eula_at, last_seen_at",
+      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, bio, website_url, accepted_eula_at, last_seen_at",
     )
     .eq("id", userId)
     .maybeSingle();
@@ -493,6 +494,7 @@ export async function updateProfile(
       | "name_color"
       | "birth_date"
       | "country"
+      | "gender"
       | "bio"
       | "website_url"
       | "accepted_eula_at"
