@@ -16,18 +16,18 @@ export function siteRoleLabel(role: AppRole | null) {
   return role === "admin" ? "Admin" : role === "moderator" ? "Moderator" : null;
 }
 
-/** Admins are red; moderators use the app accent. */
+/** Admins and moderators are both red. */
 export function siteRoleTextClass(role: AppRole | null) {
-  return role === "admin" ? "text-destructive" : role === "moderator" ? "text-primary" : undefined;
+  return role === "admin" || role === "moderator" ? "text-destructive" : undefined;
 }
 
 export function siteRoleBadgeClass(role: AppRole | null) {
-  return role === "admin"
+  return role === "admin" || role === "moderator"
     ? "bg-destructive/15 text-destructive"
     : "bg-primary/15 text-primary";
 }
 
-/** Reds are reserved for admins, so custom colors are filtered client-side too. */
+/** Reds are reserved for staff, so custom colors are filtered client-side too. */
 export function isRedish(hex: string) {
   const m = /^#([0-9a-f]{6})$/i.exec(hex.trim());
   if (!m) return false;
