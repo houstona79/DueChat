@@ -1,5 +1,6 @@
 import { Ban, LogOut, MessageSquare, ShieldCheck, ShieldOff, UserMinus, X } from "lucide-react";
 import { Avatar } from "./Avatar";
+import { openProfile } from "./ProfileViewer";
 import {
   siteRoleBadgeClass,
   siteRoleLabel,
@@ -81,6 +82,12 @@ export function MemberList({
           return (
             <li key={p.id} className="rounded-2xl px-2 py-2">
               <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => openProfile(p.id)}
+                  aria-label={`View ${p.display_name}'s profile`}
+                  className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl text-left hover:opacity-80"
+                >
                 <Avatar
                   name={p.display_name}
                   accent={accentFor(p.id)}
@@ -121,6 +128,7 @@ export function MemberList({
                     {p.status_message || `@${p.username}`}
                   </span>
                 </span>
+                </button>
                 {p.id === meId ? null : (
                   <button
                     onClick={() => onMessage(p.id)}

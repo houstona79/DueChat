@@ -6,6 +6,7 @@ import { GifPicker } from "./GifPicker";
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
+import { openProfile } from "./ProfileViewer";
 import { CallOverlay } from "./CallOverlay";
 import { MemberList } from "./MemberList";
 import { RadioPlayer } from "./RadioPlayer";
@@ -366,13 +367,20 @@ export function ChatPane({
                   {grouped ? (
                     <span className="size-9 shrink-0" aria-hidden="true" />
                   ) : (
-                    <Avatar
-                      name={authorName}
-                      accent={accentFor(m.user_id)}
-                      avatarPath={author?.avatar_url ?? null}
-                      online={author ? isOnline(author) : false}
-                      size="sm"
-                    />
+                    <button
+                      type="button"
+                      onClick={() => openProfile(m.user_id)}
+                      aria-label={`View ${authorName}'s profile`}
+                      className="shrink-0 rounded-2xl hover:opacity-80"
+                    >
+                      <Avatar
+                        name={authorName}
+                        accent={accentFor(m.user_id)}
+                        avatarPath={author?.avatar_url ?? null}
+                        online={author ? isOnline(author) : false}
+                        size="sm"
+                      />
+                    </button>
                   )}
                   <div className={cn("flex min-w-0 flex-col", mine ? "items-end" : "items-start")}>
                     {!mine && !grouped ? (
