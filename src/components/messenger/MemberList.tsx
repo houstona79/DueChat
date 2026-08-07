@@ -62,7 +62,7 @@ export function MemberList({
     id === ownerId ? "Owner" : adminIds.has(id) ? "Room admin" : null;
 
   return (
-    <aside className="absolute inset-y-0 right-0 z-20 flex w-full max-w-[85%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl sm:max-w-xs">
+    <section className="absolute inset-y-0 right-0 z-20 flex w-full max-w-[85%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl sm:max-w-xs" role="region" aria-label="Room members">
       <header className="flex items-center justify-between px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <h3 className="text-sm font-semibold">Members · {members.length}</h3>
         <button
@@ -243,6 +243,6 @@ export function MemberList({
           </button>
         </div>
       ) : null}
-    </aside>
+    </section>
   );
 }

@@ -163,7 +163,7 @@ export function RoomFeed({
   };
 
   return (
-    <aside className="absolute inset-y-0 right-0 z-20 flex w-full max-w-[92%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl sm:max-w-sm">
+    <section className="absolute inset-y-0 right-0 z-20 flex w-full max-w-[92%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl sm:max-w-sm" role="region" aria-label="Room feed">
       <header className="flex items-center justify-between px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <h3 className="flex items-center gap-2 text-sm font-semibold">
           <Newspaper className="size-4" aria-hidden />
@@ -347,6 +347,6 @@ export function RoomFeed({
           </ul>
         )}
       </div>
-    </aside>
+    </section>
   );
 }
