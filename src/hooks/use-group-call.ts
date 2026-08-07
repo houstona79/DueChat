@@ -310,11 +310,23 @@ export function useGroupCall({
       }
     });
 
+    // Separate presence-only channel so watchers can ring without touching the
+    // signalling channel (one channel per topic — sharing it breaks callbacks).
+    const ring = supabase.channel(`ring:${roomId}`, {
+      config: { presence: { key: userId } },
+    });
+    ring.subscribe((status) => {
+      if (status === "SUBSCRIBED") {
+        void ring.track({ user_id: userId, name, mode });
+      }
+    });
+
     return () => {
       pcsRef.current.forEach((ctx) => ctx.pc.close());
       pcsRef.current.clear();
       setPeers({});
       channelRef.current = null;
+      void supabase.removeChannel(ring);
       void supabase.removeChannel(channel);
     };
   }, [enabled, roomId, userId, name, mode, patchPeer, dropPeer]);
