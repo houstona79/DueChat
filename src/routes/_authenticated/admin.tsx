@@ -8,6 +8,7 @@ import {
   Hash,
   LogOut,
   MessageSquare,
+  MonitorSmartphone,
   ShieldCheck,
   Trash2,
   Users,
@@ -28,6 +29,12 @@ import {
   revokeRole,
   unbanUser,
 } from "@/lib/admin";
+import {
+  clearSessions,
+  deviceLabel,
+  fetchActiveSessions,
+  multiSessionUsers,
+} from "@/lib/sessions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -43,7 +50,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-type Tab = "overview" | "users" | "bans" | "rooms" | "messages" | "dms";
+type Tab = "overview" | "users" | "sessions" | "bans" | "rooms" | "messages" | "dms";
 
 /** The owner account keeps admin access permanently (also enforced in the database). */
 const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
@@ -64,6 +71,22 @@ function AdminPage() {
     queryKey: ["admin-snapshot"],
     queryFn: fetchAdminSnapshot,
     enabled: !!user,
+  });
+
+  const sessions = useQuery({
+    queryKey: ["admin-sessions"],
+    queryFn: fetchActiveSessions,
+    enabled: !!user,
+    refetchInterval: 30_000,
+  });
+
+  const clearSessionsMutation = useMutation({
+    mutationFn: clearSessions,
+    onSuccess: () => {
+      toast.success("Session records cleared.");
+      void sessions.refetch();
+    },
+    onError: () => toast.error("Could not clear those sessions."),
   });
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["admin-snapshot"] });
@@ -142,7 +165,9 @@ function AdminPage() {
   return (
     <Shell>
       <div className="flex gap-1 overflow-x-auto rounded-2xl bg-secondary p-1">
-        {(["overview", "users", "bans", "rooms", "messages", "dms"] as Tab[]).map((t) => (
+        {(
+          ["overview", "users", "sessions", "bans", "rooms", "messages", "dms"] as Tab[]
+        ).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
