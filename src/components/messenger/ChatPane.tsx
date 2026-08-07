@@ -502,6 +502,26 @@ export function ChatPane({
       ) : (
         <div className="grid min-h-0 flex-1 place-items-center px-6 text-center">
           <div className="max-w-sm">
+            {ageBlocked ? (
+              <>
+                <h3 className="text-lg font-semibold">Adults only</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  “{title}” is rated R. You must be 18 or older to join.
+                  {myProfile?.birth_date
+                    ? ""
+                    : " Add your date of birth in Settings to confirm your age."}
+                </p>
+                {myProfile?.birth_date ? null : (
+                  <Link
+                    to="/settings"
+                    className="mt-5 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                  >
+                    Open settings
+                  </Link>
+                )}
+              </>
+            ) : (
+              <>
               <h3 className="text-lg font-semibold">Join {title}</h3>
             <p className="mt-2 text-sm text-muted-foreground">
               Messages in this room are only visible to members.
@@ -512,6 +532,8 @@ export function ChatPane({
             >
               Join room
             </button>
+              </>
+            )}
           </div>
         </div>
       )}
