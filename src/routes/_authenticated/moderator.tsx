@@ -1,12 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Ban, MessageSquare, Shield, Trash2, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  Ban,
+  LogOut,
+  MessageSquare,
+  MonitorSmartphone,
+  Shield,
+  Trash2,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "@/components/messenger/Avatar";
 import { useAuth } from "@/hooks/use-auth";
 import { accentFor, formatTime, isOnline } from "@/lib/chat";
-import { banUser, deleteMessage, fetchAdminSnapshot, unbanUser } from "@/lib/admin";
+import { banUser, deleteMessage, fetchAdminSnapshot, kickUser, unbanUser } from "@/lib/admin";
+import {
+  clearSessions,
+  deviceLabel,
+  fetchActiveSessions,
+  multiSessionUsers,
+} from "@/lib/sessions";
 
 export const Route = createFileRoute("/_authenticated/moderator")({
   head: () => ({
@@ -22,7 +37,7 @@ export const Route = createFileRoute("/_authenticated/moderator")({
   component: ModeratorPage,
 });
 
-type Tab = "members" | "messages" | "bans";
+type Tab = "members" | "sessions" | "messages" | "bans";
 
 const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
 
@@ -40,6 +55,32 @@ function ModeratorPage() {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["admin-snapshot"] });
   const fail = (e: unknown) =>
     toast.error(e instanceof Error ? e.message : "That action isn’t allowed for moderators.");
+
+  const sessions = useQuery({
+    queryKey: ["admin-sessions"],
+    queryFn: fetchActiveSessions,
+    enabled: !!user,
+    refetchInterval: 30_000,
+  });
+
+  const clearSessionsMutation = useMutation({
+    mutationFn: clearSessions,
+    onSuccess: () => {
+      toast.success("Session records cleared.");
+      void sessions.refetch();
+    },
+    onError: fail,
+  });
+
+  const kickMutation = useMutation({
+    mutationFn: ({ userId }: { userId: string; name: string }) => kickUser(userId),
+    onSuccess: (_d, vars) => {
+      toast.success(`${vars.name} was kicked off DueChat.`);
+      void sessions.refetch();
+      refresh();
+    },
+    onError: fail,
+  });
 
   const banMutation = useMutation({
     mutationFn: ({ userId, ban }: { userId: string; ban: boolean }) =>
@@ -95,7 +136,7 @@ function ModeratorPage() {
       </p>
 
       <div className="flex gap-1 rounded-2xl bg-secondary p-1">
-        {(["members", "messages", "bans"] as Tab[]).map((t) => (
+        {(["members", "sessions", "messages", "bans"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
