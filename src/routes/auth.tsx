@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { COUNTRIES } from "@/lib/countries";
+import { GENDERS } from "@/lib/genders";
 import { HumanCheck } from "@/components/auth/HumanCheck";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { ThemeToggle } from "@/components/system/ThemeToggle";
@@ -44,6 +45,7 @@ function AuthPage() {
   const [status, setStatus] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [country, setCountry] = useState("");
+  const [gender, setGender] = useState("");
   const [eulaAccepted, setEulaAccepted] = useState(false);
   const [human, setHuman] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -99,6 +101,7 @@ function AuthPage() {
               status_message: status.trim(),
               birth_date: birthDate,
               country,
+              gender,
               accepted_eula_at: new Date().toISOString(),
             },
           },
@@ -183,6 +186,24 @@ function AuthPage() {
                   {COUNTRIES.map((c) => (
                     <option key={c} value={c}>
                       {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="gender" className="block text-[11px] font-medium text-muted-foreground">
+                  Gender (optional)
+                </label>
+                <select
+                  id="gender"
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none"
+                >
+                  <option value="">Not specified</option>
+                  {GENDERS.map((g) => (
+                    <option key={g.value} value={g.value}>
+                      {g.label}
                     </option>
                   ))}
                 </select>

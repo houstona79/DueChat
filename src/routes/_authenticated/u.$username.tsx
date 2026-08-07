@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Globe, MapPin, MessageSquare } from "lucide-react";
+import { ArrowLeft, Globe, MapPin, MessageSquare, User } from "lucide-react";
+import { genderLabel } from "@/lib/genders";
 import { Avatar } from "@/components/messenger/Avatar";
 import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { useAuth } from "@/hooks/use-auth";
@@ -111,6 +112,12 @@ function ProfilePage() {
               <p className="flex items-center gap-2 text-xs text-muted-foreground">
                 <MapPin className="size-3.5 shrink-0" aria-hidden />
                 {profile.country}
+              </p>
+            ) : null}
+            {genderLabel(profile.gender) ? (
+              <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                <User className="size-3.5 shrink-0" aria-hidden />
+                {genderLabel(profile.gender)}
               </p>
             ) : null}
             {profile.website_url ? (
