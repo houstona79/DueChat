@@ -9,6 +9,7 @@ import { Avatar } from "./Avatar";
 import { CallOverlay } from "./CallOverlay";
 import { MemberList } from "./MemberList";
 import { RadioPlayer } from "./RadioPlayer";
+import { RatingControl } from "./RoomRating";
 import { useMessages, useRoomAdmins, useRoomBans, useRoomEvents } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
 import {
@@ -32,6 +33,7 @@ import {
   removeRoomAdmin,
   sendMessage,
   setRoomRadio,
+  setRoomRating,
   unbanMember,
   type Membership,
   type Profile,
@@ -134,6 +136,12 @@ export function ChatPane({
   };
 
   const join = async () => {
+    if (room.rating === "R") {
+      const ok = window.confirm(
+        `“${room.name}” is rated R — adults only. Confirm you are 18 or older to join.`,
+      );
+      if (!ok) return;
+    }
     try {
       await joinRoom(room.id, meId);
       await queryClient.invalidateQueries({ queryKey: ["memberships"] });
@@ -188,6 +196,20 @@ export function ChatPane({
                 }`}
           </p>
         </div>
+        {!room.is_direct ? (
+          <RatingControl
+            rating={room.rating}
+            canEdit={isOwner}
+            onChange={async (next) => {
+              try {
+                await setRoomRating(room.id, next);
+                await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+              } catch (err) {
+                setError(err instanceof Error ? err.message : "Could not change the room rating.");
+              }
+            }}
+          />
+        ) : null}
         <button
           onClick={() => setShowMembers((v) => !v)}
           className={cn(
