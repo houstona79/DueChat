@@ -14,6 +14,7 @@ import { RatingControl } from "./RoomRating";
 import { YouTubeEmbed } from "./YouTubeEmbed";
 import { useMessages, useRoomAdmins, useRoomBans, useRoomEvents } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
+import { takePendingCall } from "@/lib/call-invites";
 import {
   siteRoleBadgeClass,
   siteRoleLabel,
