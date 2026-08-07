@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { Avatar } from "./Avatar";
 import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
 import { accentFor } from "@/lib/chat";
-import { attachStream } from "@/lib/webrtc";
+import { attachStream, playWithUnlock } from "@/lib/webrtc";
 import { cn } from "@/lib/utils";
 
 function formatDuration(s: number) {
@@ -203,10 +203,13 @@ function PeerTile({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
     if (ref.current) ref.current.muted = true;
     if (audioRef.current) audioRef.current.muted = !speaker;
     if (!speaker) return;
-    void audioRef.current?.play().catch(() => undefined);
-  }, [speaker]);
+    playWithUnlock(audioRef.current);
+  }, [speaker, peer.stream]);
 
-  const hasVideo = Boolean(peer.stream?.getVideoTracks().some((t) => t.enabled)) && peer.camOn;
+  // Android Chrome can drop the state broadcast, so trust live video tracks too.
+  const videoTracks = peer.stream?.getVideoTracks() ?? [];
+  const hasLiveVideo = videoTracks.some((t) => t.readyState === "live" && !t.muted);
+  const hasVideo = videoTracks.length > 0 && (peer.camOn || hasLiveVideo);
 
   return (
     <Tile name={peer.name} accent={accentFor(peer.userId)} muted={peer.muted} showVideo={hasVideo}>
@@ -227,8 +230,8 @@ function PeerAudio({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
   useEffect(() => {
     if (audioRef.current) audioRef.current.muted = !speaker;
     if (!speaker) return;
-    void audioRef.current?.play().catch(() => undefined);
-  }, [speaker]);
+    playWithUnlock(audioRef.current);
+  }, [speaker, peer.stream]);
 
   return <audio ref={audioRef} autoPlay className="hidden" />;
 }

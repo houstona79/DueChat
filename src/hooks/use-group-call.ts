@@ -25,6 +25,18 @@ const ICE_SERVERS: RTCIceServer[] = [
   { urls: "stun:stun.l.google.com:19302" },
   { urls: "stun:stun1.l.google.com:19302" },
   { urls: "stun:global.stun.twilio.com:3478" },
+  // Mobile networks (Android on 4G/5G especially) sit behind symmetric NAT, so
+  // STUN alone can't connect. Relay candidates are required there.
+  {
+    urls: [
+      "turn:openrelay.metered.ca:80",
+      "turn:openrelay.metered.ca:443",
+      "turn:openrelay.metered.ca:443?transport=tcp",
+      "turns:openrelay.metered.ca:443",
+    ],
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  },
 ];
 
 type PeerCtx = {
@@ -163,7 +175,11 @@ export function useGroupCall({
       const existing = pcsRef.current.get(peerId);
       if (existing) return existing;
 
-      const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS, bundlePolicy: "max-bundle" });
+      const pc = new RTCPeerConnection({
+        iceServers: ICE_SERVERS,
+        bundlePolicy: "max-bundle",
+        iceCandidatePoolSize: 4,
+      });
       const remote = new MediaStream();
       const ctx: PeerCtx = {
         pc,
