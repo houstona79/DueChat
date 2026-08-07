@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.notify_update_reaction() FROM anon, authenticated, PUBLIC;
