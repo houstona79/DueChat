@@ -7,6 +7,7 @@ import { Link } from "@tanstack/react-router";
 import { Avatar } from "./Avatar";
 import { ProfilePhotos } from "./ProfilePhotos";
 import { ProfileFeed } from "./ProfileFeed";
+import { SocialStatus } from "./SocialStatus";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfiles } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
@@ -133,9 +134,7 @@ export function ProfileViewer() {
 
         {profile ? (
           <div className="mt-4 space-y-3 text-sm">
-            {profile.status_message ? (
-              <p className="rounded-2xl bg-secondary px-3 py-2 text-sm">{profile.status_message}</p>
-            ) : null}
+            <SocialStatus profile={profile} />
             {profile.bio ? (
               <p className="whitespace-pre-line leading-relaxed text-muted-foreground">
                 {profile.bio}
