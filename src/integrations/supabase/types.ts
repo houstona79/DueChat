@@ -68,6 +68,33 @@ export type Database = {
         }
         Relationships: []
       }
+      device_accounts: {
+        Row: {
+          created_at: string
+          device_id: string
+          id: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          id?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          id?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           body: string
@@ -757,6 +784,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_device: {
+        Args: { _device_id: string; _user_agent: string }
+        Returns: undefined
+      }
+      device_claimed_by_other: {
+        Args: { _device_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

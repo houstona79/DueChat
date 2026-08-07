@@ -14,6 +14,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { KickWatcher } from "@/components/system/KickWatcher";
 import { SessionTracker } from "@/components/system/SessionTracker";
 import { AuthWatcher } from "@/components/system/AuthWatcher";
+import { DeviceLock } from "@/components/system/DeviceLock";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -155,6 +156,7 @@ function RootComponent() {
       <Outlet />
       <KickWatcher />
       <AuthWatcher />
+      <DeviceLock />
       <SessionTracker />
       <Toaster />
     </QueryClientProvider>

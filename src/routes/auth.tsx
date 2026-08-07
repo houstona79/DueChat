@@ -5,6 +5,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { COUNTRIES } from "@/lib/countries";
 import { GENDERS } from "@/lib/genders";
 import { HumanCheck } from "@/components/auth/HumanCheck";
+import { DEVICE_BLOCK_KEY } from "@/lib/devices";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { ThemeToggle } from "@/components/system/ThemeToggle";
 
@@ -53,6 +54,11 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    const blocked = window.sessionStorage.getItem(DEVICE_BLOCK_KEY);
+    if (blocked) {
+      window.sessionStorage.removeItem(DEVICE_BLOCK_KEY);
+      setNotice(blocked);
+    }
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       if (session) void navigate({ to: "/chat", replace: true });
     });
