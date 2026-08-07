@@ -214,9 +214,22 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
             <li
               key={u.id}
               className={`group rounded-2xl px-3 py-2 ${
-                u.pinned_at ? "border border-primary/40 bg-primary/5" : "bg-secondary"
+                u.hidden_at
+                  ? "border border-destructive/40 bg-destructive/5"
+                  : u.pinned_at
+                    ? "border border-primary/40 bg-primary/5"
+                    : "bg-secondary"
               }`}
             >
+              {u.hidden_at ? (
+                <p className="mb-1 flex items-center gap-1 text-[11px] font-semibold text-destructive">
+                  <EyeOff className="size-3" aria-hidden />
+                  Hidden after reports — only you and moderators can see this
+                  {u.hidden_reason ? (
+                    <span className="font-normal text-muted-foreground">· {u.hidden_reason}</span>
+                  ) : null}
+                </p>
+              ) : null}
               {u.pinned_at ? (
                 <p className="mb-1 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-primary">
                   <Pin className="size-3" aria-hidden />
