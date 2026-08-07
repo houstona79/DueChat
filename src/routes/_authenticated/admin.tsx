@@ -50,7 +50,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-type Tab = "overview" | "users" | "sessions" | "bans" | "rooms" | "messages" | "dms";
+type Tab = "overview" | "users" | "staff" | "sessions" | "bans" | "rooms" | "messages" | "dms";
 
 /** The owner account keeps admin access permanently (also enforced in the database). */
 const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
@@ -60,6 +60,7 @@ function AdminPage() {
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Tab>("overview");
   const [openDm, setOpenDm] = useState<string | null>(null);
+  const [staffSearch, setStaffSearch] = useState("");
 
   const transcript = useQuery({
     queryKey: ["admin-transcript", openDm],
@@ -123,6 +124,7 @@ function AdminPage() {
     () => !!user && !!data?.roles.some((r) => r.user_id === user.id && r.role === "admin"),
     [data, user],
   );
+  const isOwner = user?.id === OWNER_USER_ID;
 
   const nameOf = (id: string) =>
     data?.profiles.find((p) => p.id === id)?.display_name ?? "Unknown";
@@ -173,7 +175,7 @@ function AdminPage() {
     <Shell>
       <div className="flex gap-1 overflow-x-auto rounded-2xl bg-secondary p-1">
         {(
-          ["overview", "users", "sessions", "bans", "rooms", "messages", "dms"] as Tab[]
+          ["overview", "users", "staff", "sessions", "bans", "rooms", "messages", "dms"] as Tab[]
         ).map((t) => (
           <button
             key={t}
@@ -233,11 +235,13 @@ function AdminPage() {
                   </p>
                 </div>
                 <button
-                  disabled={roleMutation.isPending || locked}
+                  disabled={roleMutation.isPending || locked || !isOwner}
                   title={
                     p.id === OWNER_USER_ID
                       ? "Owner account — admin access can’t be removed"
-                      : undefined
+                      : isOwner
+                        ? undefined
+                        : "Only the owner can assign admins"
                   }
                   onClick={() =>
                     roleMutation.mutate({ userId: p.id, role: "admin", make: !admin })
@@ -303,6 +307,145 @@ function AdminPage() {
             );
           })}
         </ul>
+      )}
+
+      {tab === "staff" && (
+        <div className="mt-5 space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <p className="text-sm font-semibold">Staff roles</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {isOwner
+                ? "As the owner you can assign or remove Admin and Moderator for any member."
+                : "Admins can add or remove moderators. Only the owner can assign admins."}
+            </p>
+          </div>
+
+          {(["admin", "moderator"] as const).map((role) => {
+            const holders = data.profiles.filter((p) =>
+              data.roles.some((r) => r.user_id === p.id && r.role === role),
+            );
+            return (
+              <div key={role} className="rounded-2xl border border-border bg-card p-4">
+                <p className="text-sm font-semibold">
+                  {role === "admin" ? "Admins" : "Moderators"} ({holders.length})
+                </p>
+                <ul className="mt-3 space-y-2">
+                  {holders.length === 0 && (
+                    <li className="text-xs text-muted-foreground">Nobody has this role yet.</li>
+                  )}
+                  {holders.map((p) => {
+                    const canRemove =
+                      p.id !== OWNER_USER_ID && (role === "moderator" || isOwner);
+                    return (
+                      <li key={p.id} className="flex items-center gap-2">
+                        <Avatar
+                          name={p.display_name}
+                          accent={accentFor(p.id)}
+                          avatarPath={p.avatar_url}
+                          online={isOnline(p)}
+                          size="sm"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold text-destructive">
+                            {p.display_name}
+                          </p>
+                          <p className="truncate text-xs text-muted-foreground">@{p.username}</p>
+                        </div>
+                        <button
+                          disabled={roleMutation.isPending || !canRemove}
+                          title={
+                            p.id === OWNER_USER_ID
+                              ? "Owner account — admin access can’t be removed"
+                              : canRemove
+                                ? `Remove ${role} role`
+                                : "Only the owner can remove admins"
+                          }
+                          onClick={() =>
+                            roleMutation.mutate({ userId: p.id, role, make: false })
+                          }
+                          className="shrink-0 rounded-xl bg-secondary px-3 py-1.5 text-xs font-semibold text-muted-foreground disabled:opacity-50"
+                        >
+                          {p.id === OWNER_USER_ID ? "Owner" : "Remove"}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            );
+          })}
+
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <p className="text-sm font-semibold">Assign a role</p>
+            <input
+              value={staffSearch}
+              onChange={(e) => setStaffSearch(e.target.value)}
+              placeholder="Search members by name or @username"
+              className="mt-3 w-full rounded-xl border border-border bg-secondary px-3 py-2 text-sm outline-none focus:border-primary"
+            />
+            <ul className="mt-3 space-y-2">
+              {staffSearch.trim().length < 2 && (
+                <li className="text-xs text-muted-foreground">
+                  Type at least two characters to find a member.
+                </li>
+              )}
+              {staffSearch.trim().length >= 2 &&
+                data.profiles
+                  .filter((p) => {
+                    const q = staffSearch.trim().toLowerCase();
+                    return (
+                      p.display_name.toLowerCase().includes(q) ||
+                      p.username.toLowerCase().includes(q)
+                    );
+                  })
+                  .slice(0, 8)
+                  .map((p) => {
+                    const admin = data.roles.some(
+                      (r) => r.user_id === p.id && r.role === "admin",
+                    );
+                    const moderator = data.roles.some(
+                      (r) => r.user_id === p.id && r.role === "moderator",
+                    );
+                    return (
+                      <li key={p.id} className="flex flex-wrap items-center gap-2">
+                        <Avatar
+                          name={p.display_name}
+                          accent={accentFor(p.id)}
+                          avatarPath={p.avatar_url}
+                          online={isOnline(p)}
+                          size="sm"
+                        />
+                        <div className="min-w-0 flex-1 basis-32">
+                          <p className="truncate text-sm font-semibold">{p.display_name}</p>
+                          <p className="truncate text-xs text-muted-foreground">@{p.username}</p>
+                        </div>
+                        <button
+                          disabled={roleMutation.isPending || !isOwner || admin}
+                          title={
+                            isOwner ? "Assign Admin" : "Only the owner can assign admins"
+                          }
+                          onClick={() =>
+                            roleMutation.mutate({ userId: p.id, role: "admin", make: true })
+                          }
+                          className="shrink-0 rounded-xl bg-destructive/15 px-3 py-1.5 text-xs font-semibold text-destructive disabled:opacity-50"
+                        >
+                          {admin ? "Already admin" : "Make admin"}
+                        </button>
+                        <button
+                          disabled={roleMutation.isPending || admin || moderator}
+                          onClick={() =>
+                            roleMutation.mutate({ userId: p.id, role: "moderator", make: true })
+                          }
+                          className="shrink-0 rounded-xl bg-secondary px-3 py-1.5 text-xs font-semibold text-muted-foreground disabled:opacity-50"
+                        >
+                          {moderator ? "Already mod" : "Make moderator"}
+                        </button>
+                      </li>
+                    );
+                  })}
+            </ul>
+          </div>
+        </div>
       )}
 
       {tab === "sessions" && (
