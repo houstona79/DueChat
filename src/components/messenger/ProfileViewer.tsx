@@ -24,15 +24,18 @@ import { cn } from "@/lib/utils";
 
 /** Tiny global store so any list can open a profile card. */
 let currentId: string | null = null;
+let currentHighlight: string | null = null;
 const listeners = new Set<() => void>();
 
-export function openProfile(userId: string) {
+export function openProfile(userId: string, highlightUpdateId?: string) {
   currentId = userId;
+  currentHighlight = highlightUpdateId ?? null;
   listeners.forEach((l) => l());
 }
 
 export function closeProfile() {
   currentId = null;
+  currentHighlight = null;
   listeners.forEach((l) => l());
 }
 
@@ -49,8 +52,17 @@ function useOpenProfileId() {
   );
 }
 
+function useHighlightUpdateId() {
+  return useSyncExternalStore(
+    subscribe,
+    () => currentHighlight,
+    () => null,
+  );
+}
+
 export function ProfileViewer() {
   const userId = useOpenProfileId();
+  const highlightUpdateId = useHighlightUpdateId();
   const { user } = useAuth();
   const { data: profiles = [], isLoading: profilesLoading } = useProfiles();
   const { data: myBuddies = [] } = useBuddies(user?.id);
@@ -173,7 +185,7 @@ export function ProfileViewer() {
               <p className="text-xs text-muted-foreground">Verified 18+</p>
             ) : null}
             <ProfilePhotos userId={profile.id} />
-            <ProfileFeed userId={profile.id} />
+            <ProfileFeed userId={profile.id} highlightUpdateId={highlightUpdateId} />
           </div>
         ) : profilesLoading ? (
           <p className="mt-4 text-sm text-muted-foreground">Loading profile…</p>

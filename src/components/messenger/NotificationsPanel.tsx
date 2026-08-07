@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bell, Check, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
+import { Bell, Check, ChevronDown, ChevronRight, ExternalLink, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "./Avatar";
 import { openProfile } from "./ProfileViewer";
@@ -12,7 +12,12 @@ import {
   markNotificationRead,
   notificationText,
 } from "@/lib/notifications";
-import { relativeTime } from "@/lib/profile-updates";
+import {
+  REACTION_EMOJIS,
+  fetchProfileUpdateReactions,
+  relativeTime,
+  toggleProfileUpdateReaction,
+} from "@/lib/profile-updates";
 import { accentFor, type Profile } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 
@@ -56,6 +61,24 @@ export function NotificationsPanel({
 
   const unread = items.filter((n) => !n.read_at).length;
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["notifications", me?.id] });
+
+  const updateIds = [...new Set(items.map((n) => n.update_id).filter(Boolean))] as string[];
+  const { data: reactions = [] } = useQuery({
+    queryKey: ["notification-reactions", me?.id, updateIds.join(",")],
+    queryFn: () => fetchProfileUpdateReactions(updateIds),
+    enabled: !!me?.id && updateIds.length > 0,
+  });
+
+  const react = async (updateId: string, emoji: string, mine: boolean) => {
+    if (!me) return;
+    try {
+      await toggleProfileUpdateReaction(updateId, me.id, emoji, mine);
+      await queryClient.invalidateQueries({ queryKey: ["notification-reactions", me.id] });
+      await queryClient.invalidateQueries({ queryKey: ["profile-update-reactions"] });
+    } catch {
+      toast.error("Couldn’t add that reaction.");
+    }
+  };
 
   if (!me) return null;
 
@@ -163,6 +186,49 @@ export function NotificationsPanel({
                     <span className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" aria-hidden />
                   ) : null}
                 </button>
+
+                {n.update_id ? (
+                  <div className="flex flex-wrap items-center gap-1 px-3 pb-2 pl-12">
+                    {REACTION_EMOJIS.slice(0, 4).map((emoji) => {
+                      const mine = reactions.some(
+                        (r) => r.update_id === n.update_id && r.emoji === emoji && r.user_id === me.id,
+                      );
+                      const count = reactions.filter(
+                        (r) => r.update_id === n.update_id && r.emoji === emoji,
+                      ).length;
+                      return (
+                        <button
+                          key={emoji}
+                          type="button"
+                          onClick={() => void react(n.update_id!, emoji, mine)}
+                          aria-pressed={mine}
+                          aria-label={`React ${emoji}`}
+                          className={cn(
+                            "flex min-h-8 items-center gap-1 rounded-full border px-2 text-xs",
+                            mine
+                              ? "border-primary bg-primary/10 text-foreground"
+                              : "border-border text-muted-foreground hover:border-primary/60",
+                          )}
+                        >
+                          <span aria-hidden>{emoji}</span>
+                          {count > 0 ? (
+                            <span className="font-semibold tabular-nums">{count}</span>
+                          ) : null}
+                        </button>
+                      );
+                    })}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        openProfile(n.kind === "update" ? (n.actor_id ?? me.id) : me.id, n.update_id!)
+                      }
+                      className="flex min-h-8 items-center gap-1 rounded-full border border-border px-2 text-xs text-muted-foreground hover:border-primary/60 hover:text-foreground"
+                    >
+                      <ExternalLink className="size-3" aria-hidden />
+                      View update
+                    </button>
+                  </div>
+                ) : null}
               </li>
             );
           })}

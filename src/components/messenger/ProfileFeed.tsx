@@ -36,7 +36,15 @@ import {
   reportProfileUpdate,
 } from "@/lib/update-reports";
 
-export function ProfileFeed({ userId, title = "Updates" }: { userId: string; title?: string }) {
+export function ProfileFeed({
+  userId,
+  title = "Updates",
+  highlightUpdateId = null,
+}: {
+  userId: string;
+  title?: string;
+  highlightUpdateId?: string | null;
+}) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { data: roles } = useSiteRoles();
@@ -63,6 +71,12 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
   });
 
   const updateIds = updates.map((u) => u.id);
+
+  useEffect(() => {
+    if (!highlightUpdateId) return;
+    const el = document.getElementById(`update-${highlightUpdateId}`);
+    el?.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, [highlightUpdateId, updates.length]);
 
   const { data: reactions = [] } = useQuery({
     queryKey: ["profile-update-reactions", userId, updateIds.join(",")],
@@ -225,7 +239,10 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
           {updates.map((u) => (
             <li
               key={u.id}
+              id={`update-${u.id}`}
               className={`group rounded-2xl px-3 py-2 ${
+                highlightUpdateId === u.id ? "ring-2 ring-primary " : ""
+              }${
                 u.hidden_at
                   ? "border border-destructive/40 bg-destructive/5"
                   : u.pinned_at
