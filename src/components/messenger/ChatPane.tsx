@@ -45,6 +45,7 @@ import {
   type Room,
 } from "@/lib/chat";
 import { cn } from "@/lib/utils";
+import { MessageVideo, videoEmbedOf } from "./MessageVideo";
 
 function isEmojiOnly(body: string) {
   const trimmed = body.trim();
@@ -423,6 +424,8 @@ export function ChatPane({
                         loading="lazy"
                         className="max-h-56 max-w-[78%] rounded-2xl border border-border object-cover"
                       />
+                    ) : videoEmbedOf(m.body) ? (
+                      <MessageVideo video={videoEmbedOf(m.body)!} />
                     ) : (
                       <div
                         className={cn(
