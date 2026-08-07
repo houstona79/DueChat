@@ -169,6 +169,25 @@ function SettingsPage() {
         </div>
 
         <div>
+          <label htmlFor="country" className="block text-[11px] font-medium text-muted-foreground">
+            Country
+          </label>
+          <select
+            id="country"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none"
+          >
+            <option value="">Not set</option>
+            {COUNTRIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
           <span className="block text-[11px] font-medium text-muted-foreground">Name color</span>
           <p className="mt-1 text-[11px] text-muted-foreground/80">
             Red is reserved for admins.
