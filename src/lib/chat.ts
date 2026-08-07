@@ -8,6 +8,7 @@ export type Profile = {
   status_message: string | null;
   name_color: string | null;
   birth_date: string | null;
+  country: string | null;
   last_seen_at: string;
 };
 
@@ -88,7 +89,7 @@ export function slugify(name: string) {
 export async function fetchProfiles(): Promise<Profile[]> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, username, display_name, avatar_url, status_message, name_color, birth_date, last_seen_at")
+    .select("id, username, display_name, avatar_url, status_message, name_color, birth_date, country, last_seen_at")
     .order("last_seen_at", { ascending: false });
   if (error) throw error;
   return data ?? [];
@@ -97,7 +98,7 @@ export async function fetchProfiles(): Promise<Profile[]> {
 export async function fetchMyProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, username, display_name, avatar_url, status_message, name_color, birth_date, last_seen_at")
+    .select("id, username, display_name, avatar_url, status_message, name_color, birth_date, country, last_seen_at")
     .eq("id", userId)
     .maybeSingle();
   if (error) throw error;
@@ -451,7 +452,10 @@ export async function unbanMember(roomId: string, userId: string) {
 export async function updateProfile(
   userId: string,
   patch: Partial<
-    Pick<Profile, "display_name" | "username" | "status_message" | "avatar_url" | "name_color" | "birth_date">
+    Pick<
+      Profile,
+      "display_name" | "username" | "status_message" | "avatar_url" | "name_color" | "birth_date" | "country"
+    >
   >,
 ) {
   const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
