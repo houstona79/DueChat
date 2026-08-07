@@ -19,7 +19,9 @@ import {
   banUser,
   deleteMessage,
   deleteRoom,
+  directParticipants,
   fetchAdminSnapshot,
+  fetchRoomTranscript,
   grantRole,
   kickUser,
   revokeRole,
@@ -40,7 +42,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-type Tab = "overview" | "users" | "bans" | "rooms" | "messages";
+type Tab = "overview" | "users" | "bans" | "rooms" | "messages" | "dms";
 
 /** The owner account keeps admin access permanently (also enforced in the database). */
 const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
@@ -49,6 +51,13 @@ function AdminPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Tab>("overview");
+  const [openDm, setOpenDm] = useState<string | null>(null);
+
+  const transcript = useQuery({
+    queryKey: ["admin-transcript", openDm],
+    queryFn: () => fetchRoomTranscript(openDm!),
+    enabled: !!openDm,
+  });
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["admin-snapshot"],
@@ -132,7 +141,7 @@ function AdminPage() {
   return (
     <Shell>
       <div className="flex gap-1 overflow-x-auto rounded-2xl bg-secondary p-1">
-        {(["overview", "users", "bans", "rooms", "messages"] as Tab[]).map((t) => (
+        {(["overview", "users", "bans", "rooms", "messages", "dms"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -140,7 +149,7 @@ function AdminPage() {
               tab === t ? "bg-primary text-primary-foreground" : "text-muted-foreground"
             }`}
           >
-            {t}
+            {t === "dms" ? "DMs" : t}
           </button>
         ))}
       </div>
