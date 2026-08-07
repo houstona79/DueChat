@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Globe, MapPin, MessageSquare } from "lucide-react";
+import { ArrowLeft, Globe, MapPin, MessageSquare, User } from "lucide-react";
+import { genderLabel } from "@/lib/genders";
 import { Avatar } from "@/components/messenger/Avatar";
 import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { useAuth } from "@/hooks/use-auth";
