@@ -155,7 +155,11 @@ function AdminPage() {
 
   const groupRooms = data.rooms.filter((r) => !r.is_direct);
   const liveSessions = sessions.data ?? [];
-  const flagged = multiSessionUsers(liveSessions);
+  /** Admins and moderators are allowed to be signed in from several places. */
+  const isStaff = (id: string) =>
+    data.roles.some((r) => r.user_id === id && (r.role === "admin" || r.role === "moderator"));
+  const flagged = multiSessionUsers(liveSessions).filter((f) => !isStaff(f.userId));
+  const staffMulti = multiSessionUsers(liveSessions).filter((f) => isStaff(f.userId));
   const onlineCount = data.profiles.filter(isOnline).length;
   const stats = [
     { label: "Members", value: data.profiles.length, icon: Users },
