@@ -98,3 +98,20 @@ export function attachStream(
   // iOS Safari sometimes needs a nudge once tracks/metadata arrive.
   el.onloadedmetadata = () => void play();
 }
+
+/**
+ * Android Chrome blocks unmuted playback without a fresh gesture in some
+ * WebViews. Retry playback on the next user interaction if it was rejected.
+ */
+export function playWithUnlock(el: HTMLMediaElement | null): void {
+  if (!el) return;
+  el.play().catch(() => {
+    const retry = () => {
+      void el.play().catch(() => undefined);
+      document.removeEventListener("pointerdown", retry);
+      document.removeEventListener("touchend", retry);
+    };
+    document.addEventListener("pointerdown", retry, { once: true });
+    document.addEventListener("touchend", retry, { once: true });
+  });
+}
