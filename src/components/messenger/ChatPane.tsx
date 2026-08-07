@@ -130,6 +130,10 @@ export function ChatPane({
   const submit = async () => {
     const text = draft.trim();
     if (!text) return;
+    if (ageBlocked) {
+      setError("This room is rated R — you must be 18 or older to post here.");
+      return;
+    }
     setDraft("");
     try {
       await sendMessage(room.id, meId, text);
