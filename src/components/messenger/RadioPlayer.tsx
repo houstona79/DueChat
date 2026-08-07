@@ -44,12 +44,21 @@ export function RadioPlayer({
       return;
     }
     try {
-      el.load();
+      // Cache-bust so a previously failed/stalled stream retries cleanly.
+      if (el.error || el.readyState === 0) {
+        el.src = url ?? "";
+        el.load();
+      }
+      el.volume = volume;
       await el.play();
       setPlaying(true);
     } catch {
       setPlaying(false);
-      setError("Could not play this station. Check the stream link.");
+      setError(
+        /\.(m3u8?|pls|asx)(\?|$)/i.test(url ?? "")
+          ? "Playlist links (.m3u/.pls) can't play directly — use the raw stream link (usually ends in /stream, .mp3 or .aac)."
+          : "Could not play this station. The stream may be offline or blocking playback in the browser.",
+      );
     }
   };
 
@@ -179,10 +188,9 @@ export function RadioPlayer({
           ref={audioRef}
           src={url}
           preload="none"
-          crossOrigin="anonymous"
           onError={() => {
-            if (playing) setError("Stream stopped or is unavailable.");
             setPlaying(false);
+            setError("Stream is unavailable or blocked. Try another station link.");
           }}
           onPause={() => setPlaying(false)}
           onPlaying={() => setPlaying(true)}
