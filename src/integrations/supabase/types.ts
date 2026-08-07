@@ -247,6 +247,7 @@ export type Database = {
           name: string
           radio_name: string | null
           radio_url: string | null
+          rating: string
           slug: string
           topic: string | null
         }
@@ -259,6 +260,7 @@ export type Database = {
           name: string
           radio_name?: string | null
           radio_url?: string | null
+          rating?: string
           slug: string
           topic?: string | null
         }
@@ -271,6 +273,7 @@ export type Database = {
           name?: string
           radio_name?: string | null
           radio_url?: string | null
+          rating?: string
           slug?: string
           topic?: string | null
         }
