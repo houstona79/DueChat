@@ -239,7 +239,10 @@ export function ProfileFeed({
           {updates.map((u) => (
             <li
               key={u.id}
+              id={`update-${u.id}`}
               className={`group rounded-2xl px-3 py-2 ${
+                highlightUpdateId === u.id ? "ring-2 ring-primary " : ""
+              }${
                 u.hidden_at
                   ? "border border-destructive/40 bg-destructive/5"
                   : u.pinned_at
