@@ -97,9 +97,9 @@ export function ProfileViewer() {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg rounded-t-3xl border border-border bg-card p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-2xl sm:max-w-xl sm:rounded-3xl sm:pb-5"
+        className="flex max-h-[90vh] max-h-[90dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-border bg-card shadow-2xl sm:max-w-xl sm:rounded-3xl"
       >
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex shrink-0 items-start justify-between gap-3 p-5 pb-3">
           <div className="flex min-w-0 items-center gap-3">
             <Avatar
               name={profile?.display_name ?? "Unknown"}
@@ -144,57 +144,59 @@ export function ProfileViewer() {
           </button>
         </div>
 
-        {profile ? (
-          <div className="mt-4 space-y-3 text-sm">
-            <SocialStatus profile={profile} />
-            {profile.bio ? (
-              <p className="whitespace-pre-line leading-relaxed text-muted-foreground">
-                {profile.bio}
-              </p>
-            ) : null}
-            {profile.country ? (
-              <p className="flex items-center gap-2 text-xs text-muted-foreground">
-                <MapPin className="size-3.5 shrink-0" aria-hidden />
-                {profile.country}
-              </p>
-            ) : null}
-            {genderLabel(visibleGender(profile, user?.id, myBuddies)) ? (
-              <p className="flex items-center gap-2 text-xs text-muted-foreground">
-                <User className="size-3.5 shrink-0" aria-hidden />
-                {genderLabel(visibleGender(profile, user?.id, myBuddies))}
-              </p>
-            ) : null}
-            {visiblePronouns(profile, user?.id, myBuddies) ? (
-              <p className="flex items-center gap-2 text-xs text-muted-foreground">
-                <BadgeCheck className="size-3.5 shrink-0" aria-hidden />
-                {visiblePronouns(profile, user?.id, myBuddies)}
-              </p>
-            ) : null}
-            {profile.website_url ? (
-              <a
-                href={profile.website_url}
-                target="_blank"
-                rel="noopener noreferrer nofollow ugc"
-                className="flex items-center gap-2 text-xs text-primary hover:underline"
-              >
-                <Globe className="size-3.5 shrink-0" aria-hidden />
-                <span className="truncate">{profile.website_url.replace(/^https?:\/\//, "")}</span>
-              </a>
-            ) : null}
-            {isAdultProfile(profile) ? (
-              <p className="text-xs text-muted-foreground">Verified 18+</p>
-            ) : null}
-            <ProfilePhotos userId={profile.id} />
-            <ProfileFeed userId={profile.id} highlightUpdateId={highlightUpdateId} />
-          </div>
-        ) : profilesLoading ? (
-          <p className="mt-4 text-sm text-muted-foreground">Loading profile…</p>
-        ) : (
-          <p className="mt-4 text-sm text-muted-foreground">This profile isn’t available.</p>
-        )}
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-3">
+          {profile ? (
+            <div className="space-y-3 text-sm">
+              <SocialStatus profile={profile} />
+              {profile.bio ? (
+                <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">
+                  {profile.bio}
+                </p>
+              ) : null}
+              {profile.country ? (
+                <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <MapPin className="size-3.5 shrink-0" aria-hidden />
+                  {profile.country}
+                </p>
+              ) : null}
+              {genderLabel(visibleGender(profile, user?.id, myBuddies)) ? (
+                <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <User className="size-3.5 shrink-0" aria-hidden />
+                  {genderLabel(visibleGender(profile, user?.id, myBuddies))}
+                </p>
+              ) : null}
+              {visiblePronouns(profile, user?.id, myBuddies) ? (
+                <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <BadgeCheck className="size-3.5 shrink-0" aria-hidden />
+                  {visiblePronouns(profile, user?.id, myBuddies)}
+                </p>
+              ) : null}
+              {profile.website_url ? (
+                <a
+                  href={profile.website_url}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow ugc"
+                  className="flex items-center gap-2 text-xs text-primary hover:underline"
+                >
+                  <Globe className="size-3.5 shrink-0" aria-hidden />
+                  <span className="truncate">{profile.website_url.replace(/^https?:\/\//, "")}</span>
+                </a>
+              ) : null}
+              {isAdultProfile(profile) ? (
+                <p className="text-xs text-muted-foreground">Verified 18+</p>
+              ) : null}
+              <ProfilePhotos userId={profile.id} />
+              <ProfileFeed userId={profile.id} highlightUpdateId={highlightUpdateId} />
+            </div>
+          ) : profilesLoading ? (
+            <p className="text-sm text-muted-foreground">Loading profile…</p>
+          ) : (
+            <p className="text-sm text-muted-foreground">This profile isn’t available.</p>
+          )}
+        </div>
 
         {profile ? (
-          <div className="mt-5 flex flex-col gap-2">
+          <div className="flex shrink-0 flex-col gap-2 border-t border-border p-5 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:pb-5">
             {!isMe ? (
               <button
                 onClick={() => {

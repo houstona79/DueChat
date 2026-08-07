@@ -52,7 +52,7 @@ function ProfilePage() {
   const isMe = !!profile && user?.id === profile.id;
 
   return (
-    <main id="main-content" className="mx-auto w-full max-w-3xl px-5 py-8 pb-[max(2rem,env(safe-area-inset-bottom))]">
+    <main id="main-content" className="mx-auto min-w-0 w-full max-w-3xl px-3 py-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-5 sm:py-8">
       <Link
         to="/chat"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -106,7 +106,7 @@ function ProfilePage() {
           <div className="mt-5 space-y-3 text-sm">
             <SocialStatus profile={profile} />
             {profile.bio ? (
-              <p className="whitespace-pre-line leading-relaxed text-muted-foreground">
+              <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">
                 {profile.bio}
               </p>
             ) : null}
