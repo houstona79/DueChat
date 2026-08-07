@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "@/components/messenger/Avatar";
+import { ReportQueue } from "@/components/messenger/ReportQueue";
 import { useAuth } from "@/hooks/use-auth";
 import { accentFor, formatTime, isOnline } from "@/lib/chat";
 import {
@@ -50,7 +51,16 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-type Tab = "overview" | "users" | "staff" | "sessions" | "bans" | "rooms" | "messages" | "dms";
+type Tab =
+  | "overview"
+  | "users"
+  | "staff"
+  | "sessions"
+  | "bans"
+  | "rooms"
+  | "messages"
+  | "dms"
+  | "reports";
 
 /** The owner account keeps admin access permanently (also enforced in the database). */
 const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
@@ -175,7 +185,17 @@ function AdminPage() {
     <Shell>
       <div className="flex gap-1 overflow-x-auto rounded-2xl bg-secondary p-1">
         {(
-          ["overview", "users", "staff", "sessions", "bans", "rooms", "messages", "dms"] as Tab[]
+          [
+            "overview",
+            "users",
+            "staff",
+            "sessions",
+            "bans",
+            "rooms",
+            "messages",
+            "dms",
+            "reports",
+          ] as Tab[]
         ).map((t) => (
           <button
             key={t}
