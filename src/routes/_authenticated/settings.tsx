@@ -53,6 +53,8 @@ function SettingsPage() {
   const [country, setCountry] = useState("");
   const [gender, setGender] = useState("");
   const [pronouns, setPronouns] = useState("");
+  const [genderVisibility, setGenderVisibility] = useState("public");
+  const [pronounsVisibility, setPronounsVisibility] = useState("public");
   const [bio, setBio] = useState("");
   const [website, setWebsite] = useState("");
   const [message, setMessage] = useState<string | null>(null);
@@ -69,6 +71,8 @@ function SettingsPage() {
     setCountry(me.country ?? "");
     setGender(me.gender ?? "");
     setPronouns(me.pronouns ?? "");
+    setGenderVisibility(me.gender_visibility ?? "public");
+    setPronounsVisibility(me.pronouns_visibility ?? "public");
     setBio(me.bio ?? "");
     setWebsite(me.website_url ?? "");
   }, [me]);
@@ -99,6 +103,8 @@ function SettingsPage() {
         country: country || null,
         gender: gender || null,
         pronouns: pronouns.trim().slice(0, 40) || null,
+        gender_visibility: genderVisibility,
+        pronouns_visibility: pronounsVisibility,
         bio: bio.trim().slice(0, 500) || null,
         website_url: websiteUrl,
         ...(me.birth_date ? {} : { birth_date: birthDate || null }),
