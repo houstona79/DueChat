@@ -53,7 +53,11 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
   const isStaff = myRole === "admin" || myRole === "moderator";
   const isMe = user?.id === userId;
 
-  const { data: updates = [] } = useQuery({
+  const {
+    data: updates = [],
+    isLoading: updatesLoading,
+    error: updatesError,
+  } = useQuery({
     queryKey: ["profile-updates", userId],
     queryFn: () => fetchProfileUpdates(userId),
   });
@@ -208,7 +212,13 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
         </form>
       ) : null}
 
-      {updates.length === 0 ? (
+      {updatesError ? (
+        <p className="text-xs text-destructive">
+          Couldn’t load updates. Try refreshing or signing in again.
+        </p>
+      ) : updatesLoading ? (
+        <p className="text-xs text-muted-foreground">Loading updates…</p>
+      ) : updates.length === 0 ? (
         <p className="text-xs text-muted-foreground">No updates yet.</p>
       ) : (
         <ul className="space-y-2">
