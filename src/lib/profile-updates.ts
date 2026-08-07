@@ -6,6 +6,7 @@ export type ProfileUpdate = {
   body: string;
   created_at: string;
   updated_at: string;
+  pinned_at: string | null;
 };
 
 export const MAX_UPDATE_LENGTH = 500;
@@ -49,12 +50,37 @@ export async function toggleProfileUpdateReaction(
 export async function fetchProfileUpdates(userId: string) {
   const { data, error } = await supabase
     .from("profile_updates")
-    .select("id,user_id,body,created_at,updated_at")
+    .select("id,user_id,body,created_at,updated_at,pinned_at")
     .eq("user_id", userId)
+    .order("pinned_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false })
     .limit(50);
   if (error) throw error;
   return (data ?? []) as ProfileUpdate[];
+}
+
+export async function editProfileUpdate(id: string, body: string) {
+  const text = body.trim().slice(0, MAX_UPDATE_LENGTH);
+  if (!text) throw new Error("Update can’t be empty.");
+  const { error } = await supabase.from("profile_updates").update({ body: text }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function setProfileUpdatePinned(userId: string, id: string, pinned: boolean) {
+  if (pinned) {
+    // Only one pinned update at a time.
+    const { error: clearError } = await supabase
+      .from("profile_updates")
+      .update({ pinned_at: null })
+      .eq("user_id", userId)
+      .not("pinned_at", "is", null);
+    if (clearError) throw clearError;
+  }
+  const { error } = await supabase
+    .from("profile_updates")
+    .update({ pinned_at: pinned ? new Date().toISOString() : null })
+    .eq("id", id);
+  if (error) throw error;
 }
 
 export async function postProfileUpdate(userId: string, body: string) {
