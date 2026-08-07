@@ -349,7 +349,7 @@ function SettingsPage() {
             Preview:{" "}
             <span
               className="font-semibold"
-              style={nameColor ? { color: nameColor } : undefined}
+              style={nameColor ? { color: readableNameColor(nameColor) } : undefined}
             >
               {displayName || me.display_name}
             </span>
