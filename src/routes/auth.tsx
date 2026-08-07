@@ -3,6 +3,17 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
+function ageFrom(value: string): number | null {
+  if (!value) return null;
+  const dob = new Date(value + "T00:00:00");
+  if (Number.isNaN(dob.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - dob.getFullYear();
+  const m = now.getMonth() - dob.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) age -= 1;
+  return age;
+}
+
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
@@ -26,6 +37,7 @@ function AuthPage() {
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [status, setStatus] = useState("");
+  const [birthDate, setBirthDate] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -41,6 +53,17 @@ function AuthPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (mode === "signup") {
+      const age = ageFrom(birthDate);
+      if (age === null) {
+        setNotice("Please enter your date of birth.");
+        return;
+      }
+      if (age < 16) {
+        setNotice("You must be 16 or older to create a DueChat account.");
+        return;
+      }
+    }
     setBusy(true);
     setNotice(null);
     try {
@@ -54,6 +77,7 @@ function AuthPage() {
               display_name: displayName.trim(),
               username: username.trim().toLowerCase().replace(/[^a-z0-9_]/g, ""),
               status_message: status.trim(),
+              birth_date: birthDate,
             },
           },
         });
@@ -113,6 +137,8 @@ function AuthPage() {
               <Input id="display-name" label="Display name" value={displayName} onChange={setDisplayName} />
               <Input id="username" label="Username" value={username} onChange={setUsername} placeholder="mira" />
               <Input id="status" label="Status (optional)" value={status} onChange={setStatus} placeholder="Building things" />
+              <Input id="birth-date" label="Date of birth" type="date" value={birthDate} onChange={setBirthDate} />
+              <p className="text-xs text-muted-foreground">You must be 16 or older to join DueChat.</p>
             </>
           ) : null}
           <Input id="email" label="Email" type="email" value={email} onChange={setEmail} />
@@ -120,7 +146,7 @@ function AuthPage() {
           {notice ? <p className="text-xs text-muted-foreground">{notice}</p> : null}
           <button
             type="submit"
-            disabled={busy || !email || password.length < 6}
+            disabled={busy || !email || password.length < 6 || (mode === "signup" && !birthDate)}
             className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground disabled:opacity-50"
           >
             {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
