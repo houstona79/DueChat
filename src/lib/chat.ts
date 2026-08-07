@@ -21,6 +21,8 @@ export type Room = {
   direct_key: string | null;
   radio_url: string | null;
   radio_name: string | null;
+  youtube_url: string | null;
+  youtube_title: string | null;
   rating: RoomRating;
 };
 
@@ -105,7 +107,7 @@ export async function fetchRooms(): Promise<Room[]> {
   const { data, error } = await supabase
     .from("rooms")
     .select(
-      "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating",
+      "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title",
     )
     .order("created_at", { ascending: true });
   if (error) throw error;
@@ -162,7 +164,7 @@ export async function createRoom(userId: string, name: string, topic: string) {
     .from("rooms")
     .insert({ name: name.trim(), slug: slugify(name), topic: topic.trim() || null, created_by: userId })
     .select(
-      "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating",
+      "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title",
     )
     .single();
   if (error) throw error;
@@ -179,7 +181,7 @@ export function directKeyFor(a: string, b: string) {
 export async function openDirectRoom(meId: string, otherId: string): Promise<Room> {
   const key = directKeyFor(meId, otherId);
   const cols =
-    "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating";
+    "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title";
 
   const existing = await supabase.from("rooms").select(cols).eq("direct_key", key).maybeSingle();
   if (existing.error) throw existing.error;
@@ -263,6 +265,56 @@ export function isValidRadioUrl(url: string) {
   } catch {
     return false;
   }
+}
+
+export async function setRoomYouTube(
+  roomId: string,
+  video: { url: string | null; title: string | null },
+) {
+  const { error } = await supabase
+    .from("rooms")
+    .update({ youtube_url: video.url, youtube_title: video.title })
+    .eq("id", roomId);
+  if (error) throw error;
+}
+
+/** Returns the embeddable YouTube URL for a watch/share/playlist link, or null. */
+export function youtubeEmbedUrl(raw: string): string | null {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  let url: URL;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    return null;
+  }
+  if (url.protocol !== "https:") return null;
+  const host = url.hostname.replace(/^www\.|^m\./, "");
+  let videoId: string | null = null;
+  let listId = url.searchParams.get("list");
+
+  if (host === "youtu.be") {
+    videoId = url.pathname.slice(1) || null;
+  } else if (host === "youtube.com" || host === "youtube-nocookie.com") {
+    if (url.pathname === "/watch") videoId = url.searchParams.get("v");
+    else if (url.pathname.startsWith("/embed/")) videoId = url.pathname.slice(7);
+    else if (url.pathname.startsWith("/shorts/")) videoId = url.pathname.slice(8);
+    else if (url.pathname.startsWith("/live/")) videoId = url.pathname.slice(6);
+    else if (url.pathname === "/playlist" && listId) videoId = null;
+    else if (!listId) return null;
+  } else {
+    return null;
+  }
+
+  if (videoId && !/^[\w-]{6,20}$/.test(videoId)) return null;
+  if (listId && !/^[\w-]{6,50}$/.test(listId)) listId = null;
+  if (!videoId && !listId) return null;
+
+  const params = new URLSearchParams({ rel: "0" });
+  if (listId) params.set("list", listId);
+  return videoId
+    ? `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`
+    : `https://www.youtube-nocookie.com/embed/videoseries?${params.toString()}`;
 }
 
 export async function setRoomRating(roomId: string, rating: RoomRating) {
