@@ -106,7 +106,7 @@ function ProfilePage() {
           <div className="mt-5 space-y-3 text-sm">
             <SocialStatus profile={profile} />
             {profile.bio ? (
-              <p className="whitespace-pre-line leading-relaxed text-muted-foreground">
+              <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">
                 {profile.bio}
               </p>
             ) : null}
