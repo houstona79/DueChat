@@ -9,6 +9,8 @@ export type Profile = {
   name_color: string | null;
   birth_date: string | null;
   country: string | null;
+  bio: string | null;
+  website_url: string | null;
   last_seen_at: string;
 };
 
@@ -89,7 +91,9 @@ export function slugify(name: string) {
 export async function fetchProfiles(): Promise<Profile[]> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, username, display_name, avatar_url, status_message, name_color, birth_date, country, last_seen_at")
+    .select(
+      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, bio, website_url, last_seen_at",
+    )
     .order("last_seen_at", { ascending: false });
   if (error) throw error;
   return data ?? [];
@@ -98,7 +102,9 @@ export async function fetchProfiles(): Promise<Profile[]> {
 export async function fetchMyProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, username, display_name, avatar_url, status_message, name_color, birth_date, country, last_seen_at")
+    .select(
+      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, bio, website_url, last_seen_at",
+    )
     .eq("id", userId)
     .maybeSingle();
   if (error) throw error;
@@ -454,7 +460,15 @@ export async function updateProfile(
   patch: Partial<
     Pick<
       Profile,
-      "display_name" | "username" | "status_message" | "avatar_url" | "name_color" | "birth_date" | "country"
+      | "display_name"
+      | "username"
+      | "status_message"
+      | "avatar_url"
+      | "name_color"
+      | "birth_date"
+      | "country"
+      | "bio"
+      | "website_url"
     >
   >,
 ) {
