@@ -48,5 +48,6 @@ export async function clearNotifications(userId: string) {
 export function notificationText(n: Notification) {
   if (n.kind === "reaction") return `reacted ${n.emoji ?? ""} to your update`;
   if (n.kind === "comment") return "replied to your update";
+  if (n.kind === "update") return "posted a new update";
   return "interacted with your update";
 }
