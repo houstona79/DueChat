@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { COUNTRIES } from "@/lib/countries";
 
 function ageFrom(value: string): number | null {
   if (!value) return null;
@@ -38,6 +39,7 @@ function AuthPage() {
   const [username, setUsername] = useState("");
   const [status, setStatus] = useState("");
   const [birthDate, setBirthDate] = useState("");
+  const [country, setCountry] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -63,6 +65,10 @@ function AuthPage() {
         setNotice("You must be 16 or older to create a DueChat account.");
         return;
       }
+      if (!country) {
+        setNotice("Please select your country.");
+        return;
+      }
     }
     setBusy(true);
     setNotice(null);
@@ -78,6 +84,7 @@ function AuthPage() {
               username: username.trim().toLowerCase().replace(/[^a-z0-9_]/g, ""),
               status_message: status.trim(),
               birth_date: birthDate,
+              country,
             },
           },
         });
@@ -138,6 +145,24 @@ function AuthPage() {
               <Input id="username" label="Username" value={username} onChange={setUsername} placeholder="mira" />
               <Input id="status" label="Status (optional)" value={status} onChange={setStatus} placeholder="Building things" />
               <Input id="birth-date" label="Date of birth" type="date" value={birthDate} onChange={setBirthDate} />
+              <div>
+                <label htmlFor="country" className="block text-[11px] font-medium text-muted-foreground">
+                  Country
+                </label>
+                <select
+                  id="country"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none"
+                >
+                  <option value="">Select your country</option>
+                  {COUNTRIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <p className="text-xs text-muted-foreground">You must be 16 or older to join DueChat.</p>
             </>
           ) : null}
@@ -146,7 +171,9 @@ function AuthPage() {
           {notice ? <p className="text-xs text-muted-foreground">{notice}</p> : null}
           <button
             type="submit"
-            disabled={busy || !email || password.length < 6 || (mode === "signup" && !birthDate)}
+            disabled={
+              busy || !email || password.length < 6 || (mode === "signup" && (!birthDate || !country))
+            }
             className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground disabled:opacity-50"
           >
             {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
