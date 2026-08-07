@@ -122,6 +122,7 @@ export function Sidebar({
             >
               <Settings className="size-4" />
             </Link>
+            <ThemeToggle />
             <button
               onClick={signOut}
               aria-label="Sign out"
