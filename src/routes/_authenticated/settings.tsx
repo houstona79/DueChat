@@ -156,6 +156,30 @@ function SettingsPage() {
         <Field label="Status" id="status" value={status} onChange={setStatus} placeholder="Working on something new" />
 
         <div>
+          <label htmlFor="bio" className="block text-[11px] font-medium text-muted-foreground">
+            Bio
+          </label>
+          <textarea
+            id="bio"
+            value={bio}
+            maxLength={500}
+            rows={4}
+            placeholder="Tell people a bit about you"
+            onChange={(e) => setBio(e.target.value)}
+            className="mt-1 w-full resize-y rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground"
+          />
+          <p className="mt-1 text-[11px] text-muted-foreground/80">{bio.length}/500</p>
+        </div>
+
+        <Field
+          label="Website or link"
+          id="website"
+          value={website}
+          onChange={setWebsite}
+          placeholder="https://example.com"
+        />
+
+        <div>
           <span className="block text-[11px] font-medium text-muted-foreground">Date of birth</span>
           {me.birth_date ? (
             <p className="mt-1 text-sm">
