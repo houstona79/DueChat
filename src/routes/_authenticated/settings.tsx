@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "@/components/messenger/Avatar";
 import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
+import { ImageCropper } from "@/components/messenger/ImageCropper";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { accentFor, normalizeWebsiteUrl, updateProfile, uploadAvatar } from "@/lib/chat";
 import { isRedish } from "@/hooks/use-roles";
@@ -53,6 +54,7 @@ function SettingsPage() {
   const [website, setWebsite] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (!me) return;
@@ -104,18 +106,28 @@ function SettingsPage() {
     }
   };
 
-  const onPickFile = async (file: File | undefined) => {
+  const onPickFile = (file: File | undefined) => {
     if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setMessage("Please pick an image file.");
+      return;
+    }
     if (file.size > 4 * 1024 * 1024) {
       setMessage("Please pick an image under 4 MB.");
       return;
     }
+    setMessage(null);
+    setAvatarFile(file);
+  };
+
+  const saveAvatar = async (file: File) => {
     setBusy(true);
     try {
       await uploadAvatar(user.id, file);
       await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
       await queryClient.invalidateQueries({ queryKey: ["profiles"] });
       setMessage("Photo updated.");
+      setAvatarFile(null);
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Upload failed.");
     } finally {
@@ -150,6 +162,15 @@ function SettingsPage() {
           />
         </label>
       </div>
+
+      {avatarFile ? (
+        <ImageCropper
+          file={avatarFile}
+          busy={busy}
+          onCancel={() => setAvatarFile(null)}
+          onDone={(cropped) => void saveAvatar(cropped)}
+        />
+      ) : null}
 
       <form onSubmit={save} className="mt-6 space-y-4">
         <Field label="Display name" id="display-name" value={displayName} onChange={setDisplayName} />

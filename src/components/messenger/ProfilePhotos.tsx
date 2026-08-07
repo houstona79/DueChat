@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ImagePlus, Trash2, X } from "lucide-react";
+import { ImageCropper } from "./ImageCropper";
 import {
   MAX_PROFILE_PHOTOS,
   type ProfilePhoto,
@@ -61,6 +62,7 @@ export function ProfilePhotos({
   const fileRef = useRef<HTMLInputElement>(null);
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
   const { data: photos = [] } = useQuery({
     queryKey: ["profile-photos", userId],
@@ -72,8 +74,14 @@ export function ProfilePhotos({
 
   const upload = useMutation({
     mutationFn: (file: File) => uploadProfilePhoto(userId, file),
-    onSuccess: invalidate,
-    onError: (e: Error) => setError(e.message || "Upload failed."),
+    onSuccess: () => {
+      setPendingFile(null);
+      return invalidate();
+    },
+    onError: (e: Error) => {
+      setPendingFile(null);
+      setError(e.message || "Upload failed.");
+    },
   });
 
   const remove = useMutation({
@@ -137,12 +145,25 @@ export function ProfilePhotos({
             e.target.value = "";
             if (!file) return;
             setError(null);
-            upload.mutate(file);
+            if (!file.type.startsWith("image/")) {
+              setError("Please pick an image file.");
+              return;
+            }
+            setPendingFile(file);
           }}
         />
       ) : null}
 
       {error ? <p className="text-xs text-destructive">{error}</p> : null}
+
+      {pendingFile ? (
+        <ImageCropper
+          file={pendingFile}
+          busy={upload.isPending}
+          onCancel={() => setPendingFile(null)}
+          onDone={(cropped) => upload.mutate(cropped)}
+        />
+      ) : null}
 
       {lightbox ? (
         <div
