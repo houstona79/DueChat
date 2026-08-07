@@ -21,6 +21,14 @@ export type Room = {
   direct_key: string | null;
   radio_url: string | null;
   radio_name: string | null;
+  rating: RoomRating;
+};
+
+export type RoomRating = "G" | "R";
+
+export const ROOM_RATING_LABEL: Record<RoomRating, string> = {
+  G: "All ages",
+  R: "Adults only",
 };
 
 export type Message = {
@@ -97,11 +105,11 @@ export async function fetchRooms(): Promise<Room[]> {
   const { data, error } = await supabase
     .from("rooms")
     .select(
-      "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name",
+      "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating",
     )
     .order("created_at", { ascending: true });
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []) as Room[];
 }
 
 export type Membership = { room_id: string; user_id: string };
@@ -154,7 +162,7 @@ export async function createRoom(userId: string, name: string, topic: string) {
     .from("rooms")
     .insert({ name: name.trim(), slug: slugify(name), topic: topic.trim() || null, created_by: userId })
     .select(
-      "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name",
+      "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating",
     )
     .single();
   if (error) throw error;
@@ -170,7 +178,8 @@ export function directKeyFor(a: string, b: string) {
 /** Finds or creates the 1:1 conversation between two users and returns it. */
 export async function openDirectRoom(meId: string, otherId: string): Promise<Room> {
   const key = directKeyFor(meId, otherId);
-  const cols = "id, name, slug, topic, created_by, created_at, is_direct, direct_key";
+  const cols =
+    "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating";
 
   const existing = await supabase.from("rooms").select(cols).eq("direct_key", key).maybeSingle();
   if (existing.error) throw existing.error;
@@ -254,6 +263,11 @@ export function isValidRadioUrl(url: string) {
   } catch {
     return false;
   }
+}
+
+export async function setRoomRating(roomId: string, rating: RoomRating) {
+  const { error } = await supabase.from("rooms").update({ rating }).eq("id", roomId);
+  if (error) throw error;
 }
 
 export async function setRoomRadio(

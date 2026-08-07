@@ -1,13 +1,15 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { createRoom } from "@/lib/chat";
+import { createRoom, setRoomRating, ROOM_RATING_LABEL, type RoomRating } from "@/lib/chat";
+import { cn } from "@/lib/utils";
 
 export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => void }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [name, setName] = useState("");
   const [topic, setTopic] = useState("");
+  const [rating, setRating] = useState<RoomRating>("G");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,6 +20,7 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
     setError(null);
     try {
       const room = await createRoom(userId, name, topic);
+      if (rating !== "G") await setRoomRating(room.id, rating);
       await queryClient.invalidateQueries({ queryKey: ["rooms"] });
       await queryClient.invalidateQueries({ queryKey: ["memberships"] });
       onDone();
@@ -54,6 +57,26 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
         placeholder="Weekly reviews"
         className="mt-1 w-full rounded-xl bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
       />
+      <span className="mt-2 block text-[11px] font-medium text-muted-foreground">Audience</span>
+      <div className="mt-1 flex gap-2">
+        {(["G", "R"] as RoomRating[]).map((option) => (
+          <button
+            key={option}
+            type="button"
+            onClick={() => setRating(option)}
+            className={cn(
+              "flex-1 rounded-xl px-3 py-2 text-xs font-medium",
+              rating === option
+                ? option === "R"
+                  ? "bg-destructive/20 text-destructive"
+                  : "bg-primary/20 text-primary"
+                : "bg-background text-muted-foreground",
+            )}
+          >
+            {option} · {ROOM_RATING_LABEL[option]}
+          </button>
+        ))}
+      </div>
       {error ? <p className="mt-2 text-xs text-destructive">{error}</p> : null}
       <div className="mt-3 flex gap-2">
         <button
