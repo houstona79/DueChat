@@ -467,7 +467,7 @@ export function ChatPane({
                         {siteRoleLabel(siteRoleOf(siteRoles, m.user_id)) ? (
                           <span
                             className={cn(
-                              "rounded-md px-1 py-0.5 text-[9px] font-semibold uppercase tracking-wide",
+                              "rounded-md px-1 py-0.5 text-[11px] font-semibold uppercase tracking-wide",
                               siteRoleBadgeClass(siteRoleOf(siteRoles, m.user_id)),
                             )}
                           >
@@ -498,7 +498,7 @@ export function ChatPane({
                         {m.body}
                       </div>
                     )}
-                    <span className="mt-1 px-1 text-[10px] text-muted-foreground">
+                    <span className="mt-1 px-1 text-[11px] text-muted-foreground">
                       {formatTime(m.created_at)}
                     </span>
                   </div>

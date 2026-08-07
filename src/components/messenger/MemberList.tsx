@@ -107,7 +107,7 @@ export function MemberList({
                     {siteRoleLabel(siteRole) ? (
                       <span
                         className={cn(
-                          "shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold",
+                          "shrink-0 rounded-md px-1.5 py-0.5 text-[11px] font-semibold",
                           siteRoleBadgeClass(siteRole),
                         )}
                       >
@@ -115,7 +115,7 @@ export function MemberList({
                       </span>
                     ) : null}
                     {role ? (
-                      <span className="shrink-0 rounded-md bg-primary/15 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                      <span className="shrink-0 rounded-md bg-primary/15 px-1.5 py-0.5 text-[11px] font-semibold text-primary">
                         {role}
                       </span>
                     ) : null}

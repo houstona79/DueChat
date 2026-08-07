@@ -204,7 +204,7 @@ function SettingsPage() {
             onChange={(e) => setBio(e.target.value)}
             className="mt-1 w-full resize-y rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground"
           />
-          <p className="mt-1 text-[11px] text-muted-foreground/80">{bio.length}/500</p>
+          <p className="mt-1 text-[11px] text-muted-foreground">{bio.length}/500</p>
         </div>
 
         <Field
@@ -233,7 +233,7 @@ function SettingsPage() {
                 onChange={(e) => setBirthDate(e.target.value)}
                 className="mt-1 w-full rounded-xl border border-border bg-secondary px-3 py-2.5 text-sm outline-none"
               />
-              <p className="mt-1 text-[11px] text-muted-foreground/80">
+              <p className="mt-1 text-[11px] text-muted-foreground">
                 Required to enter R-rated (18+) rooms. You can only set this once.
               </p>
             </>
@@ -324,7 +324,7 @@ function SettingsPage() {
 
         <div>
           <span className="block text-[11px] font-medium text-muted-foreground">Name color</span>
-          <p className="mt-1 text-[11px] text-muted-foreground/80">
+          <p className="mt-1 text-[11px] text-muted-foreground">
             Red is reserved for admins.
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
@@ -336,7 +336,7 @@ function SettingsPage() {
                 aria-label={c.label}
                 aria-pressed={nameColor === c.value}
                 className={cn(
-                  "size-9 rounded-full border-2 bg-secondary text-[10px] font-semibold",
+                  "size-9 rounded-full border-2 bg-secondary text-[11px] font-semibold",
                   nameColor === c.value ? "border-primary" : "border-transparent",
                 )}
                 style={c.value ? { backgroundColor: c.value } : undefined}
@@ -368,7 +368,7 @@ function SettingsPage() {
 
       <div className="mt-8">
         <ProfilePhotos userId={user.id} editable title="Your photos" />
-        <p className="mt-2 text-[11px] text-muted-foreground/80">
+        <p className="mt-2 text-[11px] text-muted-foreground">
           Photos show on your profile. Images up to 8 MB.
         </p>
       </div>

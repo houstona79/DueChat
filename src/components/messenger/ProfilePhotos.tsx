@@ -105,7 +105,7 @@ export function ProfilePhotos({
       <div className="flex items-center justify-between gap-2">
         <h3 className="text-[11px] font-medium text-muted-foreground">{title}</h3>
         {editable ? (
-          <span className="text-[11px] text-muted-foreground/80">
+          <span className="text-[11px] text-muted-foreground">
             {photos.length}/{MAX_PROFILE_PHOTOS}
           </span>
         ) : null}

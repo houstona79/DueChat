@@ -116,7 +116,7 @@ export function ImageCropper({
           </button>
         </div>
 
-        <p className="mt-1 text-[11px] text-muted-foreground/80">
+        <p className="mt-1 text-[11px] text-muted-foreground">
           Drag to reposition. Photos are saved as a square, up to 1024×1024.
         </p>
 

@@ -87,7 +87,7 @@ function ProfilePage() {
                 {siteRoleLabel(role) ? (
                   <span
                     className={cn(
-                      "rounded-md px-1.5 py-0.5 text-[10px] font-semibold",
+                      "rounded-md px-1.5 py-0.5 text-[11px] font-semibold",
                       siteRoleBadgeClass(role),
                     )}
                   >

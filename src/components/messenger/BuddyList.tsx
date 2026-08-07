@@ -177,7 +177,7 @@ export function BuddyList({
                       {siteRoleLabel(role) ? (
                         <span
                           className={cn(
-                            "shrink-0 rounded-full px-1.5 py-px text-[9px] font-semibold uppercase tracking-wide",
+                            "shrink-0 rounded-full px-1.5 py-px text-[11px] font-semibold uppercase tracking-wide",
                             siteRoleBadgeClass(role),
                           )}
                         >

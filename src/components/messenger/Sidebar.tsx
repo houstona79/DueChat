@@ -164,7 +164,7 @@ export function Sidebar({
                 {siteRoleLabel(myRole) ? (
                   <span
                     className={cn(
-                      "shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold",
+                      "shrink-0 rounded-md px-1.5 py-0.5 text-[11px] font-semibold",
                       siteRoleBadgeClass(myRole),
                     )}
                   >
@@ -291,7 +291,7 @@ export function Sidebar({
                       <RatingBadge rating={room.rating} />
                     </span>
                     {joined ? null : (
-                      <span className="shrink-0 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-medium text-primary">
+                      <span className="shrink-0 rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-medium text-primary">
                         Join
                       </span>
                     )}
@@ -349,7 +349,7 @@ export function Sidebar({
                       {siteRoleLabel(pRole) ? (
                         <span
                           className={cn(
-                            "shrink-0 rounded-full px-1.5 py-px text-[9px] font-semibold uppercase tracking-wide",
+                            "shrink-0 rounded-full px-1.5 py-px text-[11px] font-semibold uppercase tracking-wide",
                             siteRoleBadgeClass(pRole),
                           )}
                         >
