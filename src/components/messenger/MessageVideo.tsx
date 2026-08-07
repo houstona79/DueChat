@@ -26,7 +26,7 @@ export function videoEmbedOf(body: string): VideoKind | null {
     const v = url.searchParams.get("v");
     if (v) return ytEmbed(v, url);
     const m = url.pathname.match(/^\/(?:shorts|embed|live)\/([^/?#]+)/);
-    if (m) return ytEmbed(m[1], url);
+    if (m?.[1]) return ytEmbed(m[1], url);
   }
 
   // Vimeo
