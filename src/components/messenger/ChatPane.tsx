@@ -123,6 +123,12 @@ export function ChatPane({
     if (joined) inputRef.current?.focus();
   }, [room.id, joined]);
 
+  // Answering an incoming direct call opens the overlay on arrival.
+  useEffect(() => {
+    const mode = takePendingCall(room.id);
+    if (mode) setCall(mode);
+  }, [room.id]);
+
   useEffect(() => {
     const el = scroller.current;
     if (el) el.scrollTop = el.scrollHeight;
