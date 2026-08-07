@@ -18,11 +18,29 @@ function loadImage(src: string) {
 export async function cropToSquareFile(
   file: File,
   area: CropArea,
+  rotation = 0,
   size = OUTPUT_SIZE,
 ): Promise<File> {
   const url = URL.createObjectURL(file);
   try {
     const img = await loadImage(url);
+
+    // Draw the (optionally rotated) source onto a scratch canvas first so the
+    // crop area coordinates from the cropper line up with the pixels.
+    const rad = ((rotation % 360) * Math.PI) / 180;
+    const sin = Math.abs(Math.sin(rad));
+    const cos = Math.abs(Math.cos(rad));
+    const boxW = Math.round(img.width * cos + img.height * sin);
+    const boxH = Math.round(img.width * sin + img.height * cos);
+    const scratch = document.createElement("canvas");
+    scratch.width = boxW;
+    scratch.height = boxH;
+    const sctx = scratch.getContext("2d");
+    if (!sctx) throw new Error("Cropping isn’t supported in this browser.");
+    sctx.translate(boxW / 2, boxH / 2);
+    sctx.rotate(rad);
+    sctx.drawImage(img, -img.width / 2, -img.height / 2);
+
     const edge = Math.max(1, Math.round(Math.min(area.width, area.height)));
     const target = Math.min(size, edge);
     const canvas = document.createElement("canvas");
@@ -32,7 +50,7 @@ export async function cropToSquareFile(
     if (!ctx) throw new Error("Cropping isn’t supported in this browser.");
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
-    ctx.drawImage(img, area.x, area.y, edge, edge, 0, 0, target, target);
+    ctx.drawImage(scratch, area.x, area.y, edge, edge, 0, 0, target, target);
 
     const blob = await new Promise<Blob | null>((resolve) =>
       canvas.toBlob((b) => resolve(b), "image/jpeg", 0.9),
