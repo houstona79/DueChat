@@ -132,6 +132,24 @@ export function MemberList({
                 )}
               </div>
 
+              {p.bio || p.website_url ? (
+                <div className="mt-1 space-y-1 pl-11">
+                  {p.bio ? (
+                    <p className="whitespace-pre-line text-xs leading-relaxed text-muted-foreground">{p.bio}</p>
+                  ) : null}
+                  {p.website_url ? (
+                    <a
+                      href={p.website_url}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow ugc"
+                      className="block truncate text-xs text-primary hover:underline"
+                    >
+                      {p.website_url.replace(/^https?:\/\//, "")}
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
+
               {canActOn ? (
                 <div className="mt-1.5 flex flex-wrap gap-1.5 pl-11">
                   {isOwner && onPromote && onDemote ? (
