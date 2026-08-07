@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Phone, SendHorizonal, Users, Video } from "lucide-react";
+import { ArrowLeft, Newspaper, Phone, SendHorizonal, Users, Video } from "lucide-react";
 import { EmojiPicker } from "./EmojiPicker";
 import { GifPicker } from "./GifPicker";
 
@@ -9,6 +9,7 @@ import { Avatar } from "./Avatar";
 import { openProfile } from "./ProfileViewer";
 import { CallOverlay } from "./CallOverlay";
 import { MemberList } from "./MemberList";
+import { RoomFeed } from "./RoomFeed";
 import { RadioPlayer } from "./RadioPlayer";
 import { RatingControl } from "./RoomRating";
 import { YouTubeEmbed } from "./YouTubeEmbed";
@@ -90,6 +91,7 @@ export function ChatPane({
   const title = room.is_direct ? (partner?.display_name ?? "Direct message") : room.name;
   const { open: openDirect } = useOpenDirect(meId);
   const [showMembers, setShowMembers] = useState(false);
+  const [showFeed, setShowFeed] = useState(false);
 
   const [draft, setDraft] = useState("");
   const [call, setCall] = useState<"voice" | "video" | null>(null);
@@ -257,7 +259,10 @@ export function ChatPane({
           />
         ) : null}
         <button
-          onClick={() => setShowMembers((v) => !v)}
+          onClick={() => {
+            setShowFeed(false);
+            setShowMembers((v) => !v);
+          }}
           className={cn(
             "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
             showMembers
@@ -270,6 +275,22 @@ export function ChatPane({
           <Users className="size-4" />
           {members.length}
         </button>
+        {!room.is_direct && joined ? (
+          <button
+            onClick={() => {
+              setShowMembers(false);
+              setShowFeed((v) => !v);
+            }}
+            className={cn(
+              "grid size-10 shrink-0 place-items-center rounded-xl",
+              showFeed ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+            )}
+            aria-label="Show room feed"
+            title="Room feed"
+          >
+            <Newspaper className="size-4" />
+          </button>
+        ) : null}
         <button
           onClick={() => setCall("voice")}
           className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
