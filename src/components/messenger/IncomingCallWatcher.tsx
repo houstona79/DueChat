@@ -33,7 +33,7 @@ export function IncomingCallWatcher({
     if (!meId || !directKeys) return;
     const ids = directKeys.split(",");
     const channels = ids.map((roomId) => {
-      const channel = supabase.channel(`call:${roomId}`, {
+      const channel = supabase.channel(`ring:${roomId}`, {
         config: { presence: { key: `watch-${meId}` } },
       });
       channel.on("presence", { event: "sync" }, () => {
