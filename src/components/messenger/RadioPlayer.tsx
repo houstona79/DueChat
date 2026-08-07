@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Pause, Play, Radio, Settings2, Volume2, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { Music2, Pause, Play, Radio, Settings2, Volume2, X } from "lucide-react";
 import { isValidRadioUrl } from "@/lib/chat";
+import { getNowPlaying } from "@/lib/radio-meta.functions";
 import { cn } from "@/lib/utils";
 
 export function RadioPlayer({
@@ -22,6 +25,18 @@ export function RadioPlayer({
   const [draftUrl, setDraftUrl] = useState(url ?? "");
   const [draftName, setDraftName] = useState(name ?? "");
   const [busy, setBusy] = useState(false);
+
+  const fetchNowPlaying = useServerFn(getNowPlaying);
+  const { data: nowPlaying } = useQuery({
+    queryKey: ["radio-now-playing", url],
+    queryFn: () => fetchNowPlaying({ data: { url: url! } }),
+    enabled: !!url,
+    refetchInterval: playing ? 20_000 : 60_000,
+    staleTime: 15_000,
+    retry: false,
+  });
+  const artist = nowPlaying?.artist ?? null;
+  const track = nowPlaying?.title ?? null;
 
   useEffect(() => {
     setDraftUrl(url ?? "");
@@ -100,9 +115,30 @@ export function RadioPlayer({
           <p className="truncate text-xs font-semibold">
             {url ? (name ?? "Room radio") : "No station yet"}
           </p>
-          <p className="truncate text-[11px] text-muted-foreground">
-            {url ? (playing ? "Playing live" : "Tap play to listen") : "Add a stream link to play music"}
-          </p>
+          {url && track ? (
+            <p className="flex items-center gap-1 truncate text-[11px] text-muted-foreground">
+              <Music2 className="size-3 shrink-0" aria-hidden="true" />
+              <span className="truncate">
+                {artist ? (
+                  <>
+                    <span className="font-medium text-foreground">{artist}</span>
+                    {" — "}
+                    {track}
+                  </>
+                ) : (
+                  track
+                )}
+              </span>
+            </p>
+          ) : (
+            <p className="truncate text-[11px] text-muted-foreground">
+              {url
+                ? playing
+                  ? "Playing live"
+                  : "Tap play to listen"
+                : "Add a stream link to play music"}
+            </p>
+          )}
         </div>
 
         {url ? (
