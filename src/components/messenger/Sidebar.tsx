@@ -21,6 +21,7 @@ import {
   accentFor,
   counterpartId,
   isOnline,
+  ROOM_CATEGORIES,
   type Membership,
   type Profile,
   type Room,
@@ -42,6 +43,7 @@ export function Sidebar({
 }) {
   const [query, setQuery] = useState("");
   const [creating, setCreating] = useState(false);
+  const [category, setCategory] = useState<string | null>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { open: openDirect, pending: dmPending } = useOpenDirect(me?.id);
@@ -60,6 +62,19 @@ export function Sidebar({
     memberships.filter((m) => m.user_id === me?.id).map((m) => m.room_id),
   );
   const filtered = rooms.filter((r) => !r.is_direct && matches(r));
+  const categoryOf = (r: Room) => r.category || "General";
+  const usedCategories = [...ROOM_CATEGORIES, "General"].filter(
+    (c, i, arr) => arr.indexOf(c) === i && filtered.some((r) => categoryOf(r) === c),
+  );
+  const extraCategories = [
+    ...new Set(filtered.map(categoryOf).filter((c) => !usedCategories.includes(c))),
+  ];
+  const allCategories = [...usedCategories, ...extraCategories];
+  const visible = category ? filtered.filter((r) => categoryOf(r) === category) : filtered;
+  const groups = allCategories
+    .filter((c) => !category || c === category)
+    .map((c) => ({ category: c, rooms: visible.filter((r) => categoryOf(r) === c) }))
+    .filter((g) => g.rooms.length > 0);
   const directs = rooms.filter((r) => r.is_direct && myRoomIds.has(r.id) && matches(r));
   const onlineOthers = profiles.filter((p) => isOnline(p) && p.id !== me?.id);
 
@@ -217,11 +232,38 @@ export function Sidebar({
           </section>
         ) : null}
 
-        <h2 className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-          Rooms
+        <div className="flex flex-wrap gap-1.5 px-3 pb-2 pt-2">
+          <button
+            onClick={() => setCategory(null)}
+            className={cn(
+              "rounded-full px-2.5 py-1 text-[11px] font-medium",
+              category === null ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground",
+            )}
+          >
+            All
+          </button>
+          {allCategories.map((c) => (
+            <button
+              key={c}
+              onClick={() => setCategory(c === category ? null : c)}
+              className={cn(
+                "rounded-full px-2.5 py-1 text-[11px] font-medium",
+                category === c ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground",
+              )}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+
+        {groups.map((group) => (
+        <section key={group.category}>
+        <h2 className="flex items-center justify-between px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          <span>{group.category}</span>
+          <span className="font-normal normal-case">{group.rooms.length}</span>
         </h2>
         <nav>
-          {filtered.map((room) => {
+          {group.rooms.map((room) => {
             const members = memberships.filter((m) => m.room_id === room.id);
             const joined = members.some((m) => m.user_id === me?.id);
             const onlineCount = members.filter((m) =>
@@ -259,7 +301,11 @@ export function Sidebar({
               </Link>
             );
           })}
-          {filtered.length === 0 ? (
+        </nav>
+        </section>
+        ))}
+        <nav>
+          {visible.length === 0 ? (
             <p className="px-4 py-8 text-center text-sm text-muted-foreground">
               {rooms.length === 0 ? "No rooms yet — create the first one." : "No matches."}
             </p>

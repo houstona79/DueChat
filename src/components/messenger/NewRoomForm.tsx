@@ -1,7 +1,13 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { createRoom, setRoomRating, ROOM_RATING_LABEL, type RoomRating } from "@/lib/chat";
+import {
+  createRoom,
+  setRoomRating,
+  ROOM_RATING_LABEL,
+  ROOM_CATEGORIES,
+  type RoomRating,
+} from "@/lib/chat";
 import { cn } from "@/lib/utils";
 
 export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => void }) {
@@ -10,6 +16,7 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
   const [name, setName] = useState("");
   const [topic, setTopic] = useState("");
   const [rating, setRating] = useState<RoomRating>("G");
+  const [category, setCategory] = useState<string>("General");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,7 +26,7 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
     setBusy(true);
     setError(null);
     try {
-      const room = await createRoom(userId, name, topic);
+      const room = await createRoom(userId, name, topic, category);
       if (rating !== "G") await setRoomRating(room.id, rating);
       await queryClient.invalidateQueries({ queryKey: ["rooms"] });
       await queryClient.invalidateQueries({ queryKey: ["memberships"] });
@@ -57,6 +64,24 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
         placeholder="Weekly reviews"
         className="mt-1 w-full rounded-xl bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
       />
+      <label
+        className="mt-2 block text-[11px] font-medium text-muted-foreground"
+        htmlFor="room-category"
+      >
+        Category
+      </label>
+      <select
+        id="room-category"
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        className="mt-1 w-full rounded-xl bg-background px-3 py-2 text-sm outline-none"
+      >
+        {ROOM_CATEGORIES.map((c) => (
+          <option key={c} value={c}>
+            {c}
+          </option>
+        ))}
+      </select>
       <span className="mt-2 block text-[11px] font-medium text-muted-foreground">Audience</span>
       <div className="mt-1 flex gap-2">
         {(["G", "R"] as RoomRating[]).map((option) => (

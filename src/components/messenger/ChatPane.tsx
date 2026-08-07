@@ -38,6 +38,8 @@ import {
   sendMessage,
   setRoomRadio,
   setRoomRating,
+  setRoomCategory,
+  ROOM_CATEGORIES,
   setRoomYouTube,
   unbanMember,
   type Membership,
@@ -212,11 +214,34 @@ export function ChatPane({
               ? partner
                 ? `${isOnline(partner) ? "Online" : "Offline"} · @${partner.username}`
                 : "Private chat"
-              : `${members.length} ${members.length === 1 ? "member" : "members"} · ${onlineCount} online${
+              : `${room.category || "General"} · ${members.length} ${members.length === 1 ? "member" : "members"} · ${onlineCount} online${
                   room.topic ? ` · ${room.topic}` : ""
                 }`}
           </p>
         </div>
+        {!room.is_direct ? (
+          isOwner ? (
+            <select
+              aria-label="Room category"
+              value={room.category || "General"}
+              onChange={async (e) => {
+                try {
+                  await setRoomCategory(room.id, e.target.value);
+                  await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : "Could not change the category.");
+                }
+              }}
+              className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground outline-none"
+            >
+              {[...new Set([...ROOM_CATEGORIES, room.category || "General"])].map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          ) : null
+        ) : null}
         {!room.is_direct ? (
           <RatingControl
             rating={room.rating}

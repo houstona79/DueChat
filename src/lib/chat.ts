@@ -29,7 +29,21 @@ export type Room = {
   youtube_url: string | null;
   youtube_title: string | null;
   rating: RoomRating;
+  category: string;
 };
+
+export const ROOM_CATEGORIES = [
+  "General",
+  "Music",
+  "Gaming",
+  "Tech",
+  "Sports",
+  "Movies & TV",
+  "Art & Design",
+  "Support",
+  "Local",
+  "Random",
+] as const;
 
 export type RoomRating = "G" | "R";
 
@@ -116,7 +130,7 @@ export async function fetchRooms(): Promise<Room[]> {
   const { data, error } = await supabase
     .from("rooms")
     .select(
-      "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title",
+      "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category",
     )
     .order("created_at", { ascending: true });
   if (error) throw error;
@@ -168,12 +182,22 @@ export async function sendMessage(roomId: string, userId: string, body: string) 
   if (error) throw error;
 }
 
-export async function createRoom(userId: string, name: string, topic: string) {
+export async function setRoomCategory(roomId: string, category: string) {
+  const { error } = await supabase.from("rooms").update({ category }).eq("id", roomId);
+  if (error) throw error;
+}
+
+export async function createRoom(
+  userId: string,
+  name: string,
+  topic: string,
+  category = "General",
+) {
   const { data, error } = await supabase
     .from("rooms")
-    .insert({ name: name.trim(), slug: slugify(name), topic: topic.trim() || null, created_by: userId })
+    .insert({ name: name.trim(), slug: slugify(name), topic: topic.trim() || null, created_by: userId, category })
     .select(
-      "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title",
+      "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category",
     )
     .single();
   if (error) throw error;
@@ -190,7 +214,7 @@ export function directKeyFor(a: string, b: string) {
 export async function openDirectRoom(meId: string, otherId: string): Promise<Room> {
   const key = directKeyFor(meId, otherId);
   const cols =
-    "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title";
+    "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category";
 
   const existing = await supabase.from("rooms").select(cols).eq("direct_key", key).maybeSingle();
   if (existing.error) throw existing.error;
