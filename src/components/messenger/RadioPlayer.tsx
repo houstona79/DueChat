@@ -25,6 +25,7 @@ export function RadioPlayer({
   const [draftUrl, setDraftUrl] = useState(url ?? "");
   const [draftName, setDraftName] = useState(name ?? "");
   const [busy, setBusy] = useState(false);
+  const [licensed, setLicensed] = useState(false);
 
   const fetchNowPlaying = useServerFn(getNowPlaying);
   const { data: nowPlaying } = useQuery({
@@ -43,6 +44,7 @@ export function RadioPlayer({
     setDraftName(name ?? "");
     setPlaying(false);
     setError(null);
+    setLicensed(false);
   }, [url, name]);
 
   useEffect(() => {
@@ -84,6 +86,10 @@ export function RadioPlayer({
       setError("Enter a full https:// stream link.");
       return;
     }
+    if (nextUrl && !licensed) {
+      setError("Confirm the station is properly licensed before adding it.");
+      return;
+    }
     setBusy(true);
     try {
       await onSave({
@@ -91,6 +97,7 @@ export function RadioPlayer({
         name: nextUrl ? draftName.trim().slice(0, 60) || null : null,
       });
       setEditing(false);
+      setLicensed(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save the station.");
     } finally {
