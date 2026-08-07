@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getMediaStream, isWebRTCSupported, mediaErrorMessage } from "@/lib/webrtc";
+import {
+  getMediaStream,
+  getMediaStreamResilient,
+  isWebRTCSupported,
+  mediaErrorMessage,
+} from "@/lib/webrtc";
 
 export type CallPeer = {
   userId: string;
@@ -100,17 +105,29 @@ export function useGroupCall({
         return;
       }
       try {
-        const stream = await getMediaStream({
-          audio: true,
-          video: mode === "video" ? { facingMode: "user" } : false,
-        });
+        let stream: MediaStream;
+        try {
+          stream = await getMediaStreamResilient({
+            audio: true,
+            video: mode === "video" ? { facingMode: "user" } : false,
+          });
+        } catch (error) {
+          // Android: camera may be busy or unavailable — still join with audio.
+          if (mode !== "video") throw error;
+          stream = await getMediaStreamResilient({ audio: true, video: false });
+          setMediaError(
+            "We couldn't reach your camera, so you joined with audio only. Close other camera apps and tap the camera button to retry.",
+          );
+        }
         if (cancelled) {
           stream.getTracks().forEach((t) => t.stop());
           return;
         }
         localStreamRef.current = stream;
         setLocalStream(stream);
-        setMediaError(null);
+        if (stream.getVideoTracks().length > 0 || mode !== "video") setMediaError(null);
+        setCamOn(stream.getVideoTracks().length > 0);
+        setMuted(stream.getAudioTracks().length === 0);
         // Media may resolve after peers exist — push tracks into existing senders.
         const audio = stream.getAudioTracks()[0] ?? null;
         const video = stream.getVideoTracks()[0] ?? null;
