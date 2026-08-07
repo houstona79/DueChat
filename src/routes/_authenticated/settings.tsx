@@ -7,6 +7,7 @@ import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { accentFor, updateProfile, uploadAvatar } from "@/lib/chat";
 import { isRedish } from "@/hooks/use-roles";
 import { cn } from "@/lib/utils";
+import { COUNTRIES } from "@/lib/countries";
 
 const NAME_COLORS = [
   { label: "Default", value: "" },
@@ -46,6 +47,7 @@ function SettingsPage() {
   const [status, setStatus] = useState("");
   const [nameColor, setNameColor] = useState("");
   const [birthDate, setBirthDate] = useState("");
+  const [country, setCountry] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -56,6 +58,7 @@ function SettingsPage() {
     setStatus(me.status_message ?? "");
     setNameColor(me.name_color ?? "");
     setBirthDate(me.birth_date ?? "");
+    setCountry(me.country ?? "");
   }, [me]);
 
   if (!user || !me) return null;
@@ -75,6 +78,7 @@ function SettingsPage() {
         username: username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 24) || me.username,
         status_message: status.trim().slice(0, 120) || null,
         name_color: nameColor || null,
+        country: country || null,
         ...(me.birth_date ? {} : { birth_date: birthDate || null }),
       });
       await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
