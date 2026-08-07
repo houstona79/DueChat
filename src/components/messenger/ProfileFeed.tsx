@@ -36,7 +36,15 @@ import {
   reportProfileUpdate,
 } from "@/lib/update-reports";
 
-export function ProfileFeed({ userId, title = "Updates" }: { userId: string; title?: string }) {
+export function ProfileFeed({
+  userId,
+  title = "Updates",
+  highlightUpdateId = null,
+}: {
+  userId: string;
+  title?: string;
+  highlightUpdateId?: string | null;
+}) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { data: roles } = useSiteRoles();
@@ -52,6 +60,12 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
   const myRole = user ? siteRoleOf(roles, user.id) : null;
   const isStaff = myRole === "admin" || myRole === "moderator";
   const isMe = user?.id === userId;
+
+  useEffect(() => {
+    if (!highlightUpdateId) return;
+    const el = document.getElementById(`update-${highlightUpdateId}`);
+    el?.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, [highlightUpdateId, updatesKey]);
 
   const {
     data: updates = [],
