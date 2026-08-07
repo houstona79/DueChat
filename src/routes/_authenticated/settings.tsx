@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "@/components/messenger/Avatar";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
-import { accentFor, updateProfile, uploadAvatar } from "@/lib/chat";
+import { accentFor, normalizeWebsiteUrl, updateProfile, uploadAvatar } from "@/lib/chat";
 import { isRedish } from "@/hooks/use-roles";
 import { cn } from "@/lib/utils";
 import { COUNTRIES } from "@/lib/countries";
@@ -48,6 +48,8 @@ function SettingsPage() {
   const [nameColor, setNameColor] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [country, setCountry] = useState("");
+  const [bio, setBio] = useState("");
+  const [website, setWebsite] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -59,6 +61,8 @@ function SettingsPage() {
     setNameColor(me.name_color ?? "");
     setBirthDate(me.birth_date ?? "");
     setCountry(me.country ?? "");
+    setBio(me.bio ?? "");
+    setWebsite(me.website_url ?? "");
   }, [me]);
 
   if (!user || !me) return null;
@@ -73,12 +77,20 @@ function SettingsPage() {
         setBusy(false);
         return;
       }
+      const websiteUrl = website.trim() ? normalizeWebsiteUrl(website) : null;
+      if (website.trim() && !websiteUrl) {
+        setMessage("That link doesn't look right — try something like https://example.com");
+        setBusy(false);
+        return;
+      }
       await updateProfile(user.id, {
         display_name: displayName.trim().slice(0, 60) || me.display_name,
         username: username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 24) || me.username,
         status_message: status.trim().slice(0, 120) || null,
         name_color: nameColor || null,
         country: country || null,
+        bio: bio.trim().slice(0, 500) || null,
+        website_url: websiteUrl,
         ...(me.birth_date ? {} : { birth_date: birthDate || null }),
       });
       await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
