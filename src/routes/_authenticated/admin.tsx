@@ -50,7 +50,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-type Tab = "overview" | "users" | "sessions" | "bans" | "rooms" | "messages" | "dms";
+type Tab = "overview" | "users" | "staff" | "sessions" | "bans" | "rooms" | "messages" | "dms";
 
 /** The owner account keeps admin access permanently (also enforced in the database). */
 const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
@@ -60,6 +60,7 @@ function AdminPage() {
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Tab>("overview");
   const [openDm, setOpenDm] = useState<string | null>(null);
+  const [staffSearch, setStaffSearch] = useState("");
 
   const transcript = useQuery({
     queryKey: ["admin-transcript", openDm],
