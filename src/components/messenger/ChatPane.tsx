@@ -418,6 +418,19 @@ export function ChatPane({
                   })();
                 }}
               />
+              <GifPicker
+                media="stickers"
+                onSelect={(url) => {
+                  void (async () => {
+                    try {
+                      await sendMessage(room.id, meId, url);
+                      await queryClient.invalidateQueries({ queryKey: ["messages", room.id] });
+                    } catch (err) {
+                      setError(err instanceof Error ? err.message : "Sticker failed to send.");
+                    }
+                  })();
+                }}
+              />
               <textarea
                 ref={inputRef}
                 rows={1}
