@@ -187,6 +187,24 @@ function AuthPage() {
                   ))}
                 </select>
               </div>
+              <div>
+                <label htmlFor="gender" className="block text-[11px] font-medium text-muted-foreground">
+                  Gender (optional)
+                </label>
+                <select
+                  id="gender"
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none"
+                >
+                  <option value="">Not specified</option>
+                  {GENDERS.map((g) => (
+                    <option key={g.value} value={g.value}>
+                      {g.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <p className="text-xs text-muted-foreground">You must be 16 or older to join DueChat.</p>
               <label className="flex items-start gap-3 rounded-xl bg-secondary px-3 py-2.5">
                 <input
