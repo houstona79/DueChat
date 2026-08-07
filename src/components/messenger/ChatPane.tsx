@@ -479,7 +479,7 @@ export function ChatPane({
                     {gifUrlOf(m.body) ? (
                       <img
                         src={gifUrlOf(m.body)!}
-                        alt="GIF"
+                        alt={`GIF sent by ${authorName}`}
                         loading="lazy"
                         className="max-h-56 max-w-[78%] rounded-2xl border border-border object-cover"
                       />
