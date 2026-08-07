@@ -243,7 +243,7 @@ export function RoomFeed({
 
                   {embed ? (
                     <div className="mt-2">
-                      <MessageVideo embed={embed} />
+                      <MessageVideo video={embed} />
                     </div>
                   ) : image ? (
                     <img
