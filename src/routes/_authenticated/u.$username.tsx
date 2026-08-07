@@ -4,6 +4,7 @@ import { genderLabel } from "@/lib/genders";
 import { Avatar } from "@/components/messenger/Avatar";
 import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { ProfileFeed } from "@/components/messenger/ProfileFeed";
+import { SocialStatus } from "@/components/messenger/SocialStatus";
 import { useAuth } from "@/hooks/use-auth";
 import { useBuddies, useProfiles } from "@/hooks/use-chat";
 import { visibleGender, visiblePronouns } from "@/lib/field-visibility";
@@ -103,9 +104,7 @@ function ProfilePage() {
           </div>
 
           <div className="mt-5 space-y-3 text-sm">
-            {profile.status_message ? (
-              <p className="rounded-2xl bg-secondary px-3 py-2">{profile.status_message}</p>
-            ) : null}
+            <SocialStatus profile={profile} />
             {profile.bio ? (
               <p className="whitespace-pre-line leading-relaxed text-muted-foreground">
                 {profile.bio}
