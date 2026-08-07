@@ -61,12 +61,6 @@ export function ProfileFeed({
   const isStaff = myRole === "admin" || myRole === "moderator";
   const isMe = user?.id === userId;
 
-  useEffect(() => {
-    if (!highlightUpdateId) return;
-    const el = document.getElementById(`update-${highlightUpdateId}`);
-    el?.scrollIntoView({ block: "center", behavior: "smooth" });
-  }, [highlightUpdateId, updatesKey]);
-
   const {
     data: updates = [],
     isLoading: updatesLoading,
@@ -77,6 +71,12 @@ export function ProfileFeed({
   });
 
   const updateIds = updates.map((u) => u.id);
+
+  useEffect(() => {
+    if (!highlightUpdateId) return;
+    const el = document.getElementById(`update-${highlightUpdateId}`);
+    el?.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, [highlightUpdateId, updates.length]);
 
   const { data: reactions = [] } = useQuery({
     queryKey: ["profile-update-reactions", userId, updateIds.join(",")],
