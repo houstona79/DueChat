@@ -196,7 +196,7 @@ export function ProfileViewer() {
         </div>
 
         {profile ? (
-          <div className="flex flex-col gap-2 border-t border-border p-5 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:pb-5">
+          <div className="flex shrink-0 flex-col gap-2 border-t border-border p-5 pt-3 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:pb-5">
             {!isMe ? (
               <button
                 onClick={() => {
