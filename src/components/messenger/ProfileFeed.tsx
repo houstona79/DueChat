@@ -165,8 +165,60 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
       ) : (
         <ul className="space-y-2">
           {updates.map((u) => (
-            <li key={u.id} className="group rounded-2xl bg-secondary px-3 py-2">
-              <p className="whitespace-pre-line break-words text-sm">{u.body}</p>
+            <li
+              key={u.id}
+              className={`group rounded-2xl px-3 py-2 ${
+                u.pinned_at ? "border border-primary/40 bg-primary/5" : "bg-secondary"
+              }`}
+            >
+              {u.pinned_at ? (
+                <p className="mb-1 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-primary">
+                  <Pin className="size-3" aria-hidden />
+                  Pinned
+                </p>
+              ) : null}
+
+              {editingId === u.id ? (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!editDraft.trim() || edit.isPending) return;
+                    edit.mutate({ id: u.id, body: editDraft });
+                  }}
+                  className="space-y-2"
+                >
+                  <textarea
+                    value={editDraft}
+                    onChange={(e) => setEditDraft(e.target.value.slice(0, MAX_UPDATE_LENGTH))}
+                    rows={3}
+                    autoFocus
+                    className="w-full resize-none rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+                  />
+                  <div className="flex items-center justify-end gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingId(null);
+                        setEditDraft("");
+                      }}
+                      className="flex min-h-8 items-center gap-1 rounded-lg border border-border px-2 text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="size-3.5" />
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={!editDraft.trim() || edit.isPending}
+                      className="flex min-h-8 items-center gap-1 rounded-lg bg-primary px-2 text-xs font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
+                    >
+                      <Check className="size-3.5" />
+                      Save
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <p className="whitespace-pre-line break-words text-sm">{u.body}</p>
+              )}
 
               <div className="mt-2 flex flex-wrap items-center gap-1.5">
                 {summarize(u.id).map(([emoji, info]) => (
@@ -225,17 +277,47 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
               </div>
 
               <div className="mt-1 flex items-center justify-between gap-2">
-                <span className="text-[11px] text-muted-foreground">{relativeTime(u.created_at)}</span>
-                {isMe || isStaff ? (
-                  <button
-                    type="button"
-                    onClick={() => remove.mutate(u.id)}
-                    aria-label="Delete update"
-                    className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-background hover:text-destructive"
-                  >
-                    <Trash2 className="size-3.5" />
-                  </button>
-                ) : null}
+                <span className="text-[11px] text-muted-foreground">
+                  {relativeTime(u.created_at)}
+                  {u.updated_at && u.updated_at !== u.created_at ? " · edited" : ""}
+                </span>
+                <div className="flex items-center gap-0.5">
+                  {isMe ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => pin.mutate({ id: u.id, pinned: !u.pinned_at })}
+                        aria-label={u.pinned_at ? "Unpin update" : "Pin update"}
+                        className={`grid size-8 place-items-center rounded-lg hover:bg-background ${
+                          u.pinned_at ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {u.pinned_at ? <PinOff className="size-3.5" /> : <Pin className="size-3.5" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingId(u.id);
+                          setEditDraft(u.body);
+                        }}
+                        aria-label="Edit update"
+                        className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-background hover:text-foreground"
+                      >
+                        <Pencil className="size-3.5" />
+                      </button>
+                    </>
+                  ) : null}
+                  {isMe || isStaff ? (
+                    <button
+                      type="button"
+                      onClick={() => remove.mutate(u.id)}
+                      aria-label="Delete update"
+                      className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-background hover:text-destructive"
+                    >
+                      <Trash2 className="size-3.5" />
+                    </button>
+                  ) : null}
+                </div>
               </div>
             </li>
           ))}
