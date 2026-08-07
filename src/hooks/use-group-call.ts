@@ -62,6 +62,10 @@ export function useGroupCall({
   const pcsRef = useRef<Map<string, PeerCtx>>(new Map());
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const namesRef = useRef<Map<string, string>>(new Map());
+  const camOnRef = useRef(camOn);
+  const mutedRef = useRef(muted);
+  camOnRef.current = camOn;
+  mutedRef.current = muted;
 
   const patchPeer = useCallback((peerId: string, patch: Partial<CallPeer>) => {
     setPeers((prev) => {
