@@ -5,6 +5,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { COUNTRIES } from "@/lib/countries";
 import { HumanCheck } from "@/components/auth/HumanCheck";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
+import { ThemeToggle } from "@/components/system/ThemeToggle";
 
 
 function ageFrom(value: string): number | null {
