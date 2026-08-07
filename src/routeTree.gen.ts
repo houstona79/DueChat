@@ -18,6 +18,7 @@ import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/c
 import { Route as AuthenticatedModeratorRouteImport } from './routes/_authenticated/moderator'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedChatRoomIdRouteImport } from './routes/_authenticated/chat.$roomId'
+import { Route as AuthenticatedUUsernameRouteImport } from './routes/_authenticated/u.$username'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -63,6 +64,11 @@ const AuthenticatedChatRoomIdRoute = AuthenticatedChatRoomIdRouteImport.update({
   path: '/$roomId',
   getParentRoute: () => AuthenticatedChatRoute,
 } as any)
+const AuthenticatedUUsernameRoute = AuthenticatedUUsernameRouteImport.update({
+  id: '/u/$username',
+  path: '/u/$username',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/moderator': typeof AuthenticatedModeratorRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
+  '/u/$username': typeof AuthenticatedUUsernameRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/moderator': typeof AuthenticatedModeratorRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
+  '/u/$username': typeof AuthenticatedUUsernameRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/_authenticated/moderator': typeof AuthenticatedModeratorRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
+  '/_authenticated/u/$username': typeof AuthenticatedUUsernameRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/moderator'
     | '/settings'
     | '/chat/$roomId'
+    | '/u/$username'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/moderator'
     | '/settings'
     | '/chat/$roomId'
+    | '/u/$username'
   id:
     | '__root__'
     | '/'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/_authenticated/moderator'
     | '/_authenticated/settings'
     | '/_authenticated/chat/$roomId'
+    | '/_authenticated/u/$username'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -202,6 +214,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChatRoomIdRouteImport
       parentRoute: typeof AuthenticatedChatRoute
     }
+    '/_authenticated/u/$username': {
+      id: '/_authenticated/u/$username'
+      path: '/u/$username'
+      fullPath: '/u/$username'
+      preLoaderRoute: typeof AuthenticatedUUsernameRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -221,6 +240,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedChatRoute: typeof AuthenticatedChatRouteWithChildren
   AuthenticatedModeratorRoute: typeof AuthenticatedModeratorRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedUUsernameRoute: typeof AuthenticatedUUsernameRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -228,6 +248,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedChatRoute: AuthenticatedChatRouteWithChildren,
   AuthenticatedModeratorRoute: AuthenticatedModeratorRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedUUsernameRoute: AuthenticatedUUsernameRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -242,3 +263,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

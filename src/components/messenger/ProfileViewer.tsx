@@ -1,5 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { Globe, MapPin, MessageSquare, X } from "lucide-react";
+import { ExternalLink, Globe, MapPin, MessageSquare, X } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Avatar } from "./Avatar";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfiles } from "@/hooks/use-chat";
@@ -159,18 +160,33 @@ export function ProfileViewer() {
           <p className="mt-4 text-sm text-muted-foreground">This profile isn’t available.</p>
         )}
 
-        {profile && !isMe ? (
-          <button
-            onClick={() => {
-              closeProfile();
-              void openDirect(profile.id);
-            }}
-            disabled={pending === profile.id}
-            className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
-          >
-            <MessageSquare className="size-4" />
-            Message
-          </button>
+        {profile ? (
+          <div className="mt-5 flex flex-col gap-2">
+            {!isMe ? (
+              <button
+                onClick={() => {
+                  closeProfile();
+                  void openDirect(profile.id);
+                }}
+                disabled={pending === profile.id}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-60"
+              >
+                <MessageSquare className="size-4" />
+                Message
+              </button>
+            ) : null}
+            <Link
+              to="/u/$username"
+              params={{ username: profile.username }}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={closeProfile}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-4 py-2.5 text-sm font-semibold hover:opacity-90"
+            >
+              <ExternalLink className="size-4" />
+              Open profile in new tab
+            </Link>
+          </div>
         ) : null}
       </div>
     </div>
