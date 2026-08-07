@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   return (
-    <main className="mx-auto grid min-h-screen max-w-3xl place-items-center px-6 py-16 text-center">
+    <main id="main-content" className="mx-auto grid min-h-screen max-w-3xl place-items-center px-6 py-16 text-center">
       <div>
         <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/15 text-primary">
           <MessagesSquare className="size-7" />
