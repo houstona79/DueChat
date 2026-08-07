@@ -185,7 +185,7 @@ export function ProfileViewer() {
               <p className="text-xs text-muted-foreground">Verified 18+</p>
             ) : null}
             <ProfilePhotos userId={profile.id} />
-            <ProfileFeed userId={profile.id} />
+            <ProfileFeed userId={profile.id} highlightUpdateId={highlightUpdateId} />
           </div>
         ) : profilesLoading ? (
           <p className="mt-4 text-sm text-muted-foreground">Loading profile…</p>
