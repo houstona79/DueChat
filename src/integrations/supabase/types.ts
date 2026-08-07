@@ -136,6 +136,7 @@ export type Database = {
           country: string | null
           created_at: string
           display_name: string
+          gender: string | null
           id: string
           last_seen_at: string
           name_color: string | null
@@ -152,6 +153,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           display_name: string
+          gender?: string | null
           id: string
           last_seen_at?: string
           name_color?: string | null
@@ -168,6 +170,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           display_name?: string
+          gender?: string | null
           id?: string
           last_seen_at?: string
           name_color?: string | null
