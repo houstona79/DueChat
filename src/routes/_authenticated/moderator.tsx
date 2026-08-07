@@ -1,12 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Ban, MessageSquare, Shield, Trash2, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  Ban,
+  LogOut,
+  MessageSquare,
+  MonitorSmartphone,
+  Shield,
+  Trash2,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "@/components/messenger/Avatar";
 import { useAuth } from "@/hooks/use-auth";
 import { accentFor, formatTime, isOnline } from "@/lib/chat";
-import { banUser, deleteMessage, fetchAdminSnapshot, unbanUser } from "@/lib/admin";
+import { banUser, deleteMessage, fetchAdminSnapshot, kickUser, unbanUser } from "@/lib/admin";
+import {
+  clearSessions,
+  deviceLabel,
+  fetchActiveSessions,
+  multiSessionUsers,
+} from "@/lib/sessions";
 
 export const Route = createFileRoute("/_authenticated/moderator")({
   head: () => ({
@@ -22,7 +37,7 @@ export const Route = createFileRoute("/_authenticated/moderator")({
   component: ModeratorPage,
 });
 
-type Tab = "members" | "messages" | "bans";
+type Tab = "members" | "sessions" | "messages" | "bans";
 
 const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
 
@@ -40,6 +55,32 @@ function ModeratorPage() {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["admin-snapshot"] });
   const fail = (e: unknown) =>
     toast.error(e instanceof Error ? e.message : "That action isn’t allowed for moderators.");
+
+  const sessions = useQuery({
+    queryKey: ["admin-sessions"],
+    queryFn: fetchActiveSessions,
+    enabled: !!user,
+    refetchInterval: 30_000,
+  });
+
+  const clearSessionsMutation = useMutation({
+    mutationFn: clearSessions,
+    onSuccess: () => {
+      toast.success("Session records cleared.");
+      void sessions.refetch();
+    },
+    onError: fail,
+  });
+
+  const kickMutation = useMutation({
+    mutationFn: ({ userId }: { userId: string; name: string }) => kickUser(userId),
+    onSuccess: (_d, vars) => {
+      toast.success(`${vars.name} was kicked off DueChat.`);
+      void sessions.refetch();
+      refresh();
+    },
+    onError: fail,
+  });
 
   const banMutation = useMutation({
     mutationFn: ({ userId, ban }: { userId: string; ban: boolean }) =>
@@ -95,7 +136,7 @@ function ModeratorPage() {
       </p>
 
       <div className="flex gap-1 rounded-2xl bg-secondary p-1">
-        {(["members", "messages", "bans"] as Tab[]).map((t) => (
+        {(["members", "sessions", "messages", "bans"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -150,6 +191,65 @@ function ModeratorPage() {
             );
           })}
         </ul>
+      )}
+
+      {tab === "sessions" && (
+        <div className="mt-5 space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <p className="text-sm font-semibold">Multi-nick watch</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Members signed in from more than one place right now. Admins and moderators are
+              allowed multiple sessions, so they aren’t flagged.
+            </p>
+          </div>
+          {(() => {
+            const flagged = multiSessionUsers(sessions.data ?? []).filter(
+              (f) => !roleOf(f.userId),
+            );
+            if (flagged.length === 0) {
+              return (
+                <p className="text-sm text-muted-foreground">No duplicate sign-ins right now.</p>
+              );
+            }
+            return flagged.map((f) => (
+              <div
+                key={f.userId}
+                className="rounded-2xl border border-destructive/40 bg-card p-4"
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <MonitorSmartphone className="size-4 shrink-0 text-destructive" />
+                  <p className="min-w-0 flex-1 basis-32 truncate text-sm font-semibold">
+                    {nameOf(f.userId)} · {f.sessions.length} sessions
+                  </p>
+                  <button
+                    disabled={clearSessionsMutation.isPending}
+                    onClick={() => clearSessionsMutation.mutate(f.userId)}
+                    className="shrink-0 rounded-xl bg-secondary px-3 py-1.5 text-xs font-semibold text-muted-foreground disabled:opacity-50"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    disabled={kickMutation.isPending || f.userId === OWNER_USER_ID}
+                    onClick={() =>
+                      kickMutation.mutate({ userId: f.userId, name: nameOf(f.userId) })
+                    }
+                    className="flex shrink-0 items-center gap-1.5 rounded-xl bg-destructive/15 px-3 py-1.5 text-xs font-semibold text-destructive disabled:opacity-50"
+                  >
+                    <LogOut className="size-3.5" />
+                    Kick
+                  </button>
+                </div>
+                <ul className="mt-2 space-y-1">
+                  {f.sessions.map((s) => (
+                    <li key={s.id} className="text-xs text-muted-foreground">
+                      {deviceLabel(s.user_agent)} · {formatTime(s.updated_at)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ));
+          })()}
+        </div>
       )}
 
       {tab === "messages" && (
