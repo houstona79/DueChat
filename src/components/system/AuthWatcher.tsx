@@ -29,7 +29,7 @@ export function AuthWatcher() {
       queryClient.clear();
       const path = router.state.location.pathname;
       if (!isPublicPath(path)) {
-        await navigate({ to: "/auth", search: { next: path } as never });
+        await navigate({ to: "/auth" });
       }
     };
 
