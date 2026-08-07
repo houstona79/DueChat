@@ -124,6 +124,7 @@ function AdminPage() {
     () => !!user && !!data?.roles.some((r) => r.user_id === user.id && r.role === "admin"),
     [data, user],
   );
+  const isOwner = user?.id === OWNER_USER_ID;
 
   const nameOf = (id: string) =>
     data?.profiles.find((p) => p.id === id)?.display_name ?? "Unknown";
@@ -174,7 +175,7 @@ function AdminPage() {
     <Shell>
       <div className="flex gap-1 overflow-x-auto rounded-2xl bg-secondary p-1">
         {(
-          ["overview", "users", "sessions", "bans", "rooms", "messages", "dms"] as Tab[]
+          ["overview", "users", "staff", "sessions", "bans", "rooms", "messages", "dms"] as Tab[]
         ).map((t) => (
           <button
             key={t}
