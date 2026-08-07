@@ -52,7 +52,7 @@ function ProfilePage() {
   const isMe = !!profile && user?.id === profile.id;
 
   return (
-    <main id="main-content" className="mx-auto w-full max-w-xl px-5 py-8 pb-[max(2rem,env(safe-area-inset-bottom))]">
+    <main id="main-content" className="mx-auto w-full max-w-3xl px-5 py-8 pb-[max(2rem,env(safe-area-inset-bottom))]">
       <Link
         to="/chat"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"

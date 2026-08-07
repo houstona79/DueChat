@@ -163,7 +163,7 @@ function SettingsPage() {
   };
 
   return (
-    <main id="main-content" className="mx-auto min-h-screen max-w-lg px-5 py-8">
+    <main id="main-content" className="mx-auto min-h-screen max-w-3xl px-5 py-8">
       <Link
         to="/chat"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
