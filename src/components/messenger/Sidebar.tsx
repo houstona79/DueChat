@@ -7,6 +7,7 @@ import { Avatar } from "./Avatar";
 import { BuddyList } from "./BuddyList";
 import { NewRoomForm } from "./NewRoomForm";
 import { WaterUpdates } from "./WaterUpdates";
+import { ThemeToggle } from "@/components/system/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { useOpenDirect } from "@/hooks/use-direct";
 import {
