@@ -271,6 +271,15 @@ function AuthPage() {
         >
           {mode === "signin" ? "New here? Create an account" : "Already have an account? Sign in"}
         </button>
+
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+          <Link to="/terms" className="underline hover:text-foreground">
+            End User Agreement
+          </Link>
+          <Link to="/accessibility" className="underline hover:text-foreground">
+            Accessibility Statement
+          </Link>
+        </div>
       </div>
     </main>
   );
