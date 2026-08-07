@@ -1,0 +1,1 @@
+DELETE FROM public.profile_updates WHERE body = 'hello test update';
