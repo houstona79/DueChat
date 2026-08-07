@@ -14,6 +14,7 @@ import { RatingControl } from "./RoomRating";
 import { YouTubeEmbed } from "./YouTubeEmbed";
 import { useMessages, useRoomAdmins, useRoomBans, useRoomEvents } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
+import { takePendingCall } from "@/lib/call-invites";
 import {
   siteRoleBadgeClass,
   siteRoleLabel,
@@ -122,6 +123,12 @@ export function ChatPane({
   useEffect(() => {
     if (joined) inputRef.current?.focus();
   }, [room.id, joined]);
+
+  // Answering an incoming direct call opens the overlay on arrival.
+  useEffect(() => {
+    const mode = takePendingCall(room.id);
+    if (mode) setCall(mode);
+  }, [room.id]);
 
   useEffect(() => {
     const el = scroller.current;

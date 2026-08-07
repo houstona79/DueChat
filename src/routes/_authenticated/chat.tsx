@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
 import { MessagesSquare } from "lucide-react";
 import { Sidebar } from "@/components/messenger/Sidebar";
 import { ProfileViewer } from "@/components/messenger/ProfileViewer";
+import { IncomingCallWatcher } from "@/components/messenger/IncomingCallWatcher";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import {
   useChatRealtime,
@@ -78,6 +79,7 @@ function ChatLayout() {
       </div>
     </main>
     <ProfileViewer />
+    {user?.id ? <IncomingCallWatcher rooms={rooms} profiles={profiles} meId={user.id} /> : null}
     </>
   );
 }
