@@ -99,7 +99,7 @@ export function ProfileViewer() {
         onClick={(e) => e.stopPropagation()}
         className="flex max-h-[90dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-border bg-card shadow-2xl sm:max-w-xl sm:rounded-3xl"
       >
-        <div className="flex items-start justify-between gap-3 p-5 pb-3">
+        <div className="flex shrink-0 items-start justify-between gap-3 p-5 pb-3">
           <div className="flex min-w-0 items-center gap-3">
             <Avatar
               name={profile?.display_name ?? "Unknown"}
