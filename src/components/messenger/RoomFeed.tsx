@@ -191,6 +191,7 @@ export function RoomFeed({
           onChange={(e) => setDraft(e.target.value.slice(0, MAX_POST_LENGTH))}
           rows={2}
           placeholder="Post something to the room…"
+          aria-label="Write a post for this room"
           className="w-full resize-none rounded-2xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
         />
         <div className="flex items-center justify-between gap-2">
@@ -326,6 +327,7 @@ export function RoomFeed({
                             setCommentDraft(e.target.value.slice(0, MAX_COMMENT_LENGTH))
                           }
                           placeholder="Write a comment…"
+                          aria-label="Write a comment"
                           className="min-h-10 min-w-0 flex-1 rounded-xl border border-border bg-background px-3 text-xs outline-none focus:border-primary"
                         />
                         <button

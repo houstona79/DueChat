@@ -139,6 +139,7 @@ export function ProfilePhotos({
           ref={fileRef}
           type="file"
           accept="image/*"
+          aria-label="Upload a photo"
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];

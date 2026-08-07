@@ -401,6 +401,7 @@ function AdminPage() {
               value={staffSearch}
               onChange={(e) => setStaffSearch(e.target.value)}
               placeholder="Search members by name or @username"
+              aria-label="Search members by name or username"
               className="mt-3 w-full rounded-xl border border-border bg-secondary px-3 py-2 text-sm outline-none focus:border-primary"
             />
             <ul className="mt-3 space-y-2">
