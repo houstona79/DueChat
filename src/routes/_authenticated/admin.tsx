@@ -310,8 +310,9 @@ function AdminPage() {
           <div className="rounded-2xl border border-border bg-card p-4">
             <p className="text-sm font-semibold">Multi-nick watch</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              DueChat allows one active session per account. Accounts signed in from more
-              than one place right now are flagged here.
+              DueChat allows one active session per member account. Accounts signed in from
+              more than one place right now are flagged here. Admins and moderators are
+              exempt and may use multiple sessions.
             </p>
           </div>
 
