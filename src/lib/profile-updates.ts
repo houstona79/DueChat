@@ -10,6 +10,42 @@ export type ProfileUpdate = {
 
 export const MAX_UPDATE_LENGTH = 500;
 
+export const REACTION_EMOJIS = ["👍", "❤️", "😂", "🎉", "😮", "😢", "🔥"] as const;
+
+export type ReactionRow = { update_id: string; user_id: string; emoji: string };
+
+export async function fetchProfileUpdateReactions(updateIds: string[]) {
+  if (updateIds.length === 0) return [] as ReactionRow[];
+  const { data, error } = await supabase
+    .from("profile_update_reactions")
+    .select("update_id,user_id,emoji")
+    .in("update_id", updateIds);
+  if (error) throw error;
+  return (data ?? []) as ReactionRow[];
+}
+
+export async function toggleProfileUpdateReaction(
+  updateId: string,
+  userId: string,
+  emoji: string,
+  mine: boolean,
+) {
+  if (mine) {
+    const { error } = await supabase
+      .from("profile_update_reactions")
+      .delete()
+      .eq("update_id", updateId)
+      .eq("user_id", userId)
+      .eq("emoji", emoji);
+    if (error) throw error;
+    return;
+  }
+  const { error } = await supabase
+    .from("profile_update_reactions")
+    .insert({ update_id: updateId, user_id: userId, emoji });
+  if (error) throw error;
+}
+
 export async function fetchProfileUpdates(userId: string) {
   const { data, error } = await supabase
     .from("profile_updates")
