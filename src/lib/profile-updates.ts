@@ -92,6 +92,13 @@ export async function postProfileUpdate(userId: string, body: string) {
   if (error) throw error;
 }
 
+/** Auto-posts a feed entry when someone changes their status message. */
+export async function postStatusChangeUpdate(userId: string, status: string) {
+  const text = status.trim();
+  if (!text) return;
+  await postProfileUpdate(userId, `Status update: “${text}”`);
+}
+
 export async function deleteProfileUpdate(id: string) {
   const { error } = await supabase.from("profile_updates").delete().eq("id", id);
   if (error) throw error;
