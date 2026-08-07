@@ -21,6 +21,14 @@ export type Room = {
   direct_key: string | null;
   radio_url: string | null;
   radio_name: string | null;
+  rating: RoomRating;
+};
+
+export type RoomRating = "G" | "R";
+
+export const ROOM_RATING_LABEL: Record<RoomRating, string> = {
+  G: "All ages",
+  R: "Adults only",
 };
 
 export type Message = {
