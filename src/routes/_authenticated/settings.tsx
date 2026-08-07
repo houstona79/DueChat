@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "@/components/messenger/Avatar";
 import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
+import { ProfileFeed } from "@/components/messenger/ProfileFeed";
 import { ImageCropper } from "@/components/messenger/ImageCropper";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { accentFor, normalizeWebsiteUrl, updateProfile, uploadAvatar } from "@/lib/chat";
@@ -370,6 +371,13 @@ function SettingsPage() {
         <ProfilePhotos userId={user.id} editable title="Your photos" />
         <p className="mt-2 text-[11px] text-muted-foreground">
           Photos show on your profile. Images up to 8 MB.
+        </p>
+      </div>
+
+      <div className="mt-8">
+        <ProfileFeed userId={user.id} title="Your updates" />
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          Updates you post here appear in your profile’s update feed.
         </p>
       </div>
     </main>
