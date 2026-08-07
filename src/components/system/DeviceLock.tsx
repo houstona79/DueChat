@@ -21,20 +21,27 @@ export function DeviceLock() {
     const enforce = async () => {
       const { data } = await supabase.auth.getSession();
       if (cancelled || !data.session) return;
-      if (await deviceClaimedByOther()) {
-        window.sessionStorage.setItem(
-          DEVICE_BLOCK_KEY,
-          "This browser is already linked to another DueChat account. Only one account may sign in from each browser.",
-        );
+      const bounce = async (message: string) => {
+        window.sessionStorage.setItem(DEVICE_BLOCK_KEY, message);
         await queryClient.cancelQueries();
         queryClient.clear();
         await supabase.auth.signOut().catch(() => {});
         await navigate({ to: "/auth", replace: true });
+      };
+      if (await deviceClaimedByOther()) {
+        await bounce(
+          "This browser is already linked to another DueChat account. Only one account may sign in from each browser.",
+        );
         return;
       }
       await claimDevice().catch(() => {});
-      // Log the connection IP for admin review.
-      await recordMyIp({ data: { deviceId: deviceId() } }).catch(() => {});
+      // Log the connection IP for admin review and block VPN/proxy connections.
+      const check = await recordMyIp({ data: { deviceId: deviceId() } }).catch(() => null);
+      if (check && "vpn" in check && check.vpn) {
+        await bounce(
+          "DueChat can't be used over a VPN or proxy. Please turn it off and sign in from your normal connection.",
+        );
+      }
     };
 
     void enforce();

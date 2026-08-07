@@ -6,6 +6,8 @@ export type IpRecord = {
   ip: string;
   device_id: string | null;
   user_agent: string | null;
+  is_vpn: boolean;
+  network: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -14,7 +16,7 @@ export type IpRecord = {
 export async function fetchIpLog(): Promise<IpRecord[]> {
   const { data, error } = await supabase
     .from("user_ip_log")
-    .select("id, user_id, ip, device_id, user_agent, created_at, updated_at")
+    .select("id, user_id, ip, device_id, user_agent, is_vpn, network, created_at, updated_at")
     .order("updated_at", { ascending: false })
     .limit(500);
   if (error) throw error;

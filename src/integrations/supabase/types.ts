@@ -760,28 +760,37 @@ export type Database = {
       }
       user_ip_log: {
         Row: {
+          checked_at: string | null
           created_at: string
           device_id: string | null
           id: string
           ip: string
+          is_vpn: boolean
+          network: string | null
           updated_at: string
           user_agent: string | null
           user_id: string
         }
         Insert: {
+          checked_at?: string | null
           created_at?: string
           device_id?: string | null
           id?: string
           ip: string
+          is_vpn?: boolean
+          network?: string | null
           updated_at?: string
           user_agent?: string | null
           user_id: string
         }
         Update: {
+          checked_at?: string | null
           created_at?: string
           device_id?: string | null
           id?: string
           ip?: string
+          is_vpn?: boolean
+          network?: string | null
           updated_at?: string
           user_agent?: string | null
           user_id?: string

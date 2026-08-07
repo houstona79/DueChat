@@ -564,7 +564,9 @@ function AdminPage() {
           <div className="rounded-2xl border border-border bg-card p-4">
             <p className="text-sm font-semibold">IP addresses</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Connection addresses recorded when members sign in. Visible to admins only.
+              Connection addresses recorded when members sign in, with VPN/proxy detection.
+              Members on a VPN are signed out automatically; admins and moderators are exempt.
+              Visible to admins only.
             </p>
           </div>
 
@@ -598,7 +600,11 @@ function AdminPage() {
                   <p className="truncate text-sm font-semibold">{nameOf(r.user_id)}</p>
                   <p className="truncate text-xs text-muted-foreground">
                     <span className="font-mono">{r.ip}</span> · {deviceLabel(r.user_agent)}
+                    {r.network ? ` · ${r.network}` : ""}
                   </p>
+                  {r.is_vpn && (
+                    <p className="text-xs font-semibold text-destructive">VPN / proxy</p>
+                  )}
                 </div>
                 <p className="shrink-0 text-xs text-muted-foreground">
                   {formatTime(r.updated_at)}
