@@ -133,6 +133,9 @@ function AuthPage() {
   return (
     <main className="grid min-h-screen place-items-center bg-background px-5 py-10">
       <div className="w-full max-w-sm">
+        <div className="mb-2 flex justify-end">
+          <ThemeToggle />
+        </div>
         <img
           src={duechatLogo.url}
           alt="DueChat"
