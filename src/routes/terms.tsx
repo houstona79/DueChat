@@ -148,6 +148,21 @@ function TermsPage() {
           </p>
 
           <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
+            8a. Radio Stations and Music Licensing
+          </h2>
+          <p>
+            Room owners and room admins may add an internet radio stream to a room. Any station you add
+            must be properly licensed for public broadcast in its territory (for example SoundExchange,
+            ASCAP, BMI, SESAC, PRS, or an equivalent performing-rights and streaming license). You may
+            only add streams you own or that you are permitted to rebroadcast — pirated, ripped, or
+            unlicensed feeds are prohibited. Explicit or adults-only stations may not be used in G-rated
+            rooms. You confirm licensing when you save a station, and you are responsible for that
+            confirmation. DueChat does not license the music played through third-party streams and may
+            remove any station, revoke radio privileges, or suspend accounts that violate this section
+            or that are the subject of a rights-holder complaint.
+          </p>
+
+          <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
             9. Privacy and Data
           </h2>
           <p>

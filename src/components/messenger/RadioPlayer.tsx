@@ -25,6 +25,7 @@ export function RadioPlayer({
   const [draftUrl, setDraftUrl] = useState(url ?? "");
   const [draftName, setDraftName] = useState(name ?? "");
   const [busy, setBusy] = useState(false);
+  const [licensed, setLicensed] = useState(false);
 
   const fetchNowPlaying = useServerFn(getNowPlaying);
   const { data: nowPlaying } = useQuery({
@@ -43,6 +44,7 @@ export function RadioPlayer({
     setDraftName(name ?? "");
     setPlaying(false);
     setError(null);
+    setLicensed(false);
   }, [url, name]);
 
   useEffect(() => {
@@ -84,6 +86,10 @@ export function RadioPlayer({
       setError("Enter a full https:// stream link.");
       return;
     }
+    if (nextUrl && !licensed) {
+      setError("Confirm the station is properly licensed before adding it.");
+      return;
+    }
     setBusy(true);
     try {
       await onSave({
@@ -91,6 +97,7 @@ export function RadioPlayer({
         name: nextUrl ? draftName.trim().slice(0, 60) || null : null,
       });
       setEditing(false);
+      setLicensed(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save the station.");
     } finally {
@@ -179,6 +186,15 @@ export function RadioPlayer({
 
       {editing && canEdit ? (
         <div className="mt-2 space-y-2">
+          <div className="rounded-xl bg-secondary/60 p-2.5 text-[11px] leading-relaxed text-muted-foreground">
+            <p className="font-semibold text-foreground">Station rules</p>
+            <ul className="mt-1 list-disc space-y-0.5 pl-4">
+              <li>The station must be properly licensed for public broadcast (e.g. SoundExchange, ASCAP/BMI/SESAC, PRS, or an equivalent).</li>
+              <li>Only add streams you own or have permission to rebroadcast — no pirated or unlicensed feeds.</li>
+              <li>Adults-only or explicit stations are not allowed in G-rated rooms.</li>
+              <li>Unlicensed stations may be removed and the room owner may lose radio privileges.</li>
+            </ul>
+          </div>
           <input
             value={draftUrl}
             onChange={(e) => setDraftUrl(e.target.value)}
@@ -196,6 +212,18 @@ export function RadioPlayer({
             className="w-full rounded-xl bg-secondary px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
             aria-label="Station name"
           />
+          <label className="flex items-start gap-2 text-[11px] text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={licensed}
+              onChange={(e) => setLicensed(e.target.checked)}
+              className="mt-0.5 size-4 accent-primary"
+            />
+            <span>
+              I confirm this station is properly licensed and I have the right to play it in this
+              room.
+            </span>
+          </label>
           <div className="flex gap-2">
             <button
               onClick={() => void save()}
