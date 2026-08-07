@@ -100,6 +100,33 @@ export type Database = {
           },
         ]
       }
+      profile_photos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          path: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          path: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          path?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           accepted_eula_at: string | null
