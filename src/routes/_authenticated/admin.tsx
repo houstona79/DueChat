@@ -361,6 +361,89 @@ function AdminPage() {
   );
 }
 
+function DmTab({
+  rooms,
+  nameOf,
+  openDm,
+  setOpenDm,
+  transcript,
+  onDelete,
+  deleting,
+}: {
+  rooms: { id: string; direct_key: string | null; created_at: string }[];
+  nameOf: (id: string) => string;
+  openDm: string | null;
+  setOpenDm: (id: string | null) => void;
+  transcript: { data?: import("@/lib/chat").Message[]; isLoading: boolean };
+  onDelete: (id: string) => void;
+  deleting: boolean;
+}) {
+  return (
+    <div className="mt-5 space-y-2">
+      <p className="text-xs text-muted-foreground">
+        Private conversations are visible to admins for moderation only.
+      </p>
+      {rooms.map((r) => {
+        const [a, b] = directParticipants(r);
+        const open = openDm === r.id;
+        return (
+          <div key={r.id} className="rounded-2xl border border-border bg-card px-3 py-2.5">
+            <button
+              onClick={() => setOpenDm(open ? null : r.id)}
+              className="flex w-full items-center gap-2 text-left"
+            >
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-semibold">
+                  {nameOf(a ?? "")} ↔ {nameOf(b ?? "")}
+                </span>
+                <span className="block text-xs text-muted-foreground">
+                  Started {formatTime(r.created_at)}
+                </span>
+              </span>
+              <ChevronDown
+                className={`size-4 shrink-0 text-muted-foreground transition-transform ${
+                  open ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            {open ? (
+              <div className="mt-3 space-y-2 border-t border-border pt-3">
+                {transcript.isLoading ? (
+                  <p className="text-xs text-muted-foreground">Loading conversation…</p>
+                ) : (transcript.data ?? []).length === 0 ? (
+                  <p className="text-xs text-muted-foreground">No messages in this conversation.</p>
+                ) : (
+                  (transcript.data ?? []).map((m) => (
+                    <div key={m.id} className="flex items-start gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[11px] text-muted-foreground">
+                          {nameOf(m.user_id)} · {formatTime(m.created_at)}
+                        </p>
+                        <p className="mt-0.5 break-words text-sm">{m.body}</p>
+                      </div>
+                      <button
+                        aria-label="Delete message"
+                        disabled={deleting}
+                        onClick={() => onDelete(m.id)}
+                        className="grid size-9 shrink-0 place-items-center rounded-xl text-destructive hover:bg-destructive/10 disabled:opacity-50"
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            ) : null}
+          </div>
+        );
+      })}
+      {rooms.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No direct conversations yet.</p>
+      ) : null}
+    </div>
+  );
+}
+
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main
