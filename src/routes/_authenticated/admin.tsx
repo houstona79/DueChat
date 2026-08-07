@@ -365,6 +365,19 @@ function AdminPage() {
               </li>
             ))}
           </ul>
+
+          {staffMulti.length > 0 && (
+            <div className="rounded-2xl border border-border bg-card p-3">
+              <p className="text-sm font-semibold">Staff with multiple sessions (allowed)</p>
+              <ul className="mt-2 space-y-1">
+                {staffMulti.map((f) => (
+                  <li key={f.userId} className="text-xs text-muted-foreground">
+                    {nameOf(f.userId)} · {f.sessions.length} sessions
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
 
