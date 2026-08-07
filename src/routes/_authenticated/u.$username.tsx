@@ -3,6 +3,7 @@ import { ArrowLeft, BadgeCheck, Globe, MapPin, MessageSquare, User } from "lucid
 import { genderLabel } from "@/lib/genders";
 import { Avatar } from "@/components/messenger/Avatar";
 import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
+import { ProfileFeed } from "@/components/messenger/ProfileFeed";
 import { useAuth } from "@/hooks/use-auth";
 import { useBuddies, useProfiles } from "@/hooks/use-chat";
 import { visibleGender, visiblePronouns } from "@/lib/field-visibility";
@@ -143,6 +144,7 @@ function ProfilePage() {
               <p className="text-xs text-muted-foreground">Verified 18+</p>
             ) : null}
             <ProfilePhotos userId={profile.id} />
+            <ProfileFeed userId={profile.id} />
           </div>
 
           {!isMe ? (
