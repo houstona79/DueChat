@@ -75,6 +75,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          accepted_eula_at: string | null
           avatar_url: string | null
           bio: string | null
           birth_date: string | null
@@ -90,6 +91,7 @@ export type Database = {
           website_url: string | null
         }
         Insert: {
+          accepted_eula_at?: string | null
           avatar_url?: string | null
           bio?: string | null
           birth_date?: string | null
@@ -105,6 +107,7 @@ export type Database = {
           website_url?: string | null
         }
         Update: {
+          accepted_eula_at?: string | null
           avatar_url?: string | null
           bio?: string | null
           birth_date?: string | null
