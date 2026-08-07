@@ -31,6 +31,7 @@ import {
   revokeRole,
   unbanUser,
 } from "@/lib/admin";
+import { fetchIpLog, sharedIps } from "@/lib/ip-log";
 import {
   clearSessions,
   deviceLabel,
@@ -57,6 +58,7 @@ type Tab =
   | "users"
   | "staff"
   | "sessions"
+  | "ips"
   | "bans"
   | "rooms"
   | "messages"
@@ -93,6 +95,12 @@ function AdminPage() {
     refetchInterval: 30_000,
   });
 
+  const ipLog = useQuery({
+    queryKey: ["admin-ip-log"],
+    queryFn: fetchIpLog,
+    enabled: !!user && tab === "ips",
+  });
+
   const clearSessionsMutation = useMutation({
     mutationFn: clearSessions,
     onSuccess: () => {
@@ -101,6 +109,8 @@ function AdminPage() {
     },
     onError: () => toast.error("Could not clear those sessions."),
   });
+
+  const ipShares = useMemo(() => sharedIps(ipLog.data ?? []), [ipLog.data]);
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["admin-snapshot"] });
 
@@ -192,6 +202,7 @@ function AdminPage() {
             "users",
             "staff",
             "sessions",
+            "ips",
             "bans",
             "rooms",
             "messages",
@@ -207,7 +218,7 @@ function AdminPage() {
               tab === t ? "bg-primary text-primary-foreground" : "text-muted-foreground"
             }`}
           >
-            {t === "dms" ? "DMs" : t}
+            {t === "dms" ? "DMs" : t === "ips" ? "IPs" : t}
           </button>
         ))}
       </div>
@@ -544,6 +555,60 @@ function AdminPage() {
                 ))}
               </ul>
             </div>
+          )}
+        </div>
+      )}
+
+      {tab === "ips" && (
+        <div className="mt-5 space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <p className="text-sm font-semibold">IP addresses</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Connection addresses recorded when members sign in. Visible to admins only.
+            </p>
+          </div>
+
+          {ipLog.isLoading && <p className="text-sm text-muted-foreground">Loading IP log…</p>}
+          {ipLog.error && (
+            <p className="text-sm text-destructive">Only admins can view IP addresses.</p>
+          )}
+
+          {ipShares.length > 0 && (
+            <div className="rounded-2xl border border-destructive/40 bg-card p-3">
+              <p className="text-sm font-semibold">Shared addresses</p>
+              <ul className="mt-2 space-y-1">
+                {ipShares.map((s) => (
+                  <li key={s.ip} className="text-xs text-muted-foreground">
+                    <span className="font-mono">{s.ip}</span> ·{" "}
+                    {s.userIds.map((id) => nameOf(id)).join(", ")}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <ul className="space-y-2">
+            {(ipLog.data ?? []).map((r) => (
+              <li
+                key={r.id}
+                className="flex items-center gap-3 rounded-2xl border border-border bg-card px-3 py-2.5"
+              >
+                <MonitorSmartphone className="size-4 shrink-0 text-muted-foreground" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold">{nameOf(r.user_id)}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    <span className="font-mono">{r.ip}</span> · {deviceLabel(r.user_agent)}
+                  </p>
+                </div>
+                <p className="shrink-0 text-xs text-muted-foreground">
+                  {formatTime(r.updated_at)}
+                </p>
+              </li>
+            ))}
+          </ul>
+
+          {!ipLog.isLoading && (ipLog.data ?? []).length === 0 && !ipLog.error && (
+            <p className="text-sm text-muted-foreground">No addresses recorded yet.</p>
           )}
         </div>
       )}
