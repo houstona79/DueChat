@@ -358,6 +358,18 @@ function AdminPage() {
           ))}
         </ul>
       )}
+
+      {tab === "dms" && (
+        <DmTab
+          rooms={data.rooms.filter((r) => r.is_direct)}
+          nameOf={nameOf}
+          openDm={openDm}
+          setOpenDm={setOpenDm}
+          transcript={transcript}
+          onDelete={(id) => messageMutation.mutate(id)}
+          deleting={messageMutation.isPending}
+        />
+      )}
     </Shell>
   );
 }
