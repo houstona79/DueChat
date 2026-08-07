@@ -140,6 +140,31 @@ function SettingsPage() {
         <Field label="Status" id="status" value={status} onChange={setStatus} placeholder="Working on something new" />
 
         <div>
+          <span className="block text-[11px] font-medium text-muted-foreground">Date of birth</span>
+          {me.birth_date ? (
+            <p className="mt-1 text-sm">
+              {me.birth_date}{" "}
+              <span className="text-[11px] text-muted-foreground">
+                · locked (used for age-restricted rooms)
+              </span>
+            </p>
+          ) : (
+            <>
+              <input
+                id="birth-date"
+                type="date"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-border bg-secondary px-3 py-2.5 text-sm outline-none"
+              />
+              <p className="mt-1 text-[11px] text-muted-foreground/80">
+                Required to enter R-rated (18+) rooms. You can only set this once.
+              </p>
+            </>
+          )}
+        </div>
+
+        <div>
           <span className="block text-[11px] font-medium text-muted-foreground">Name color</span>
           <p className="mt-1 text-[11px] text-muted-foreground/80">
             Red is reserved for admins.
