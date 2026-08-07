@@ -201,7 +201,7 @@ export function Sidebar({
             <h2 className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
               Direct messages
             </h2>
-            <nav>
+            <nav aria-label="Direct messages">
               {directs.map((room) => {
                 const partner = dmPartner(room);
                 return (
@@ -266,7 +266,7 @@ export function Sidebar({
           <span>{group.category}</span>
           <span className="font-normal normal-case">{group.rooms.length}</span>
         </h2>
-        <nav>
+        <nav aria-label={`${group.category} rooms`}>
           {group.rooms.map((room) => {
             const members = memberships.filter((m) => m.room_id === room.id);
             const joined = members.some((m) => m.user_id === me?.id);
@@ -308,7 +308,7 @@ export function Sidebar({
         </nav>
         </section>
         ))}
-        <nav>
+        <nav aria-label="Room results">
           {visible.length === 0 ? (
             <p className="px-4 py-8 text-center text-sm text-muted-foreground">
               {rooms.length === 0 ? "No rooms yet — create the first one." : "No matches."}
