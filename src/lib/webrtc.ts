@@ -24,6 +24,44 @@ export async function getMediaStream(constraints: MediaStreamConstraints) {
   );
 }
 
+/**
+ * Android WebViews/Chrome frequently reject exact-ish constraints
+ * (OverconstrainedError / NotReadableError) even when a camera exists.
+ * Try progressively simpler constraint sets before giving up.
+ */
+export async function getMediaStreamResilient(
+  constraints: MediaStreamConstraints,
+): Promise<MediaStream> {
+  const wantsVideo = Boolean(constraints.video);
+  const wantsAudio = Boolean(constraints.audio);
+  const attempts: MediaStreamConstraints[] = [constraints];
+
+  if (wantsVideo && typeof constraints.video === "object") {
+    attempts.push({ audio: constraints.audio ?? false, video: { facingMode: "user" } });
+    attempts.push({ audio: constraints.audio ?? false, video: true });
+  }
+  if (wantsVideo && wantsAudio) {
+    // Some devices only allow one device at a time — grab video alone last.
+    attempts.push({ audio: false, video: true });
+  }
+  if (wantsAudio && !wantsVideo) {
+    attempts.push({ audio: true, video: false });
+  }
+
+  let lastError: unknown = new Error("unsupported");
+  for (const attempt of attempts) {
+    try {
+      return await getMediaStream(attempt);
+    } catch (error) {
+      lastError = error;
+      const name = (error as { name?: string } | null)?.name;
+      // Permission denials won't be fixed by looser constraints.
+      if (name === "NotAllowedError" || name === "SecurityError") throw error;
+    }
+  }
+  throw lastError;
+}
+
 export function mediaErrorMessage(error: unknown) {
   const secure =
     typeof window === "undefined" ||
