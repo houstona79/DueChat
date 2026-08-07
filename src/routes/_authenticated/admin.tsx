@@ -154,12 +154,15 @@ function AdminPage() {
   }
 
   const groupRooms = data.rooms.filter((r) => !r.is_direct);
+  const liveSessions = sessions.data ?? [];
+  const flagged = multiSessionUsers(liveSessions);
   const onlineCount = data.profiles.filter(isOnline).length;
   const stats = [
     { label: "Members", value: data.profiles.length, icon: Users },
     { label: "Online now", value: onlineCount, icon: ShieldCheck },
     { label: "Rooms", value: groupRooms.length, icon: Hash },
     { label: "Recent messages", value: data.messages.length, icon: MessageSquare },
+    { label: "Multi-nick alerts", value: flagged.length, icon: MonitorSmartphone },
   ];
 
   return (
