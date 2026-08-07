@@ -14,6 +14,7 @@ import {
 import { toast } from "sonner";
 import { Avatar } from "@/components/messenger/Avatar";
 import { ReportQueue } from "@/components/messenger/ReportQueue";
+import { NotificationAudit } from "@/components/messenger/NotificationAudit";
 import { useAuth } from "@/hooks/use-auth";
 import { accentFor, formatTime, isOnline } from "@/lib/chat";
 import { banUser, deleteMessage, fetchAdminSnapshot, kickUser, unbanUser } from "@/lib/admin";
@@ -38,7 +39,7 @@ export const Route = createFileRoute("/_authenticated/moderator")({
   component: ModeratorPage,
 });
 
-type Tab = "members" | "sessions" | "messages" | "bans" | "reports";
+type Tab = "members" | "sessions" | "messages" | "bans" | "reports" | "notifications";
 
 const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
 
@@ -137,7 +138,7 @@ function ModeratorPage() {
       </p>
 
       <div className="flex gap-1 rounded-2xl bg-secondary p-1">
-        {(["members", "sessions", "messages", "bans", "reports"] as Tab[]).map((t) => (
+        {(["members", "sessions", "messages", "bans", "reports", "notifications"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -314,6 +315,8 @@ function ModeratorPage() {
       )}
 
       {tab === "reports" && <ReportQueue />}
+
+      {tab === "notifications" && <NotificationAudit />}
 
       <div className="mt-6 grid grid-cols-2 gap-3">
         <Stat label="Members" value={data.profiles.length} icon={Users} />
