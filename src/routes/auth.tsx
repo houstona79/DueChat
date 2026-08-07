@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { COUNTRIES } from "@/lib/countries";
+import { HumanCheck } from "@/components/auth/HumanCheck";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 
 
@@ -43,6 +44,7 @@ function AuthPage() {
   const [birthDate, setBirthDate] = useState("");
   const [country, setCountry] = useState("");
   const [eulaAccepted, setEulaAccepted] = useState(false);
+  const [human, setHuman] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -58,6 +60,10 @@ function AuthPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!human) {
+      setNotice("Please complete the human verification check.");
+      return;
+    }
     if (mode === "signup") {
       const age = ageFrom(birthDate);
       if (age === null) {
@@ -107,6 +113,7 @@ function AuthPage() {
       }
     } catch (err) {
       setNotice(err instanceof Error ? err.message : "Something went wrong.");
+      setHuman(false);
     } finally {
       setBusy(false);
     }
@@ -197,11 +204,13 @@ function AuthPage() {
           ) : null}
           <Input id="email" label="Email" type="email" value={email} onChange={setEmail} />
           <Input id="password" label="Password" type="password" value={password} onChange={setPassword} />
+          <HumanCheck verified={human} onVerifiedChange={setHuman} />
           {notice ? <p className="text-xs text-muted-foreground">{notice}</p> : null}
           <button
             type="submit"
             disabled={
               busy ||
+              !human ||
               !email ||
               password.length < 6 ||
               (mode === "signup" && (!birthDate || !country || !eulaAccepted))
@@ -213,7 +222,11 @@ function AuthPage() {
         </form>
 
         <button
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+          onClick={() => {
+            setMode(mode === "signin" ? "signup" : "signin");
+            setHuman(false);
+            setNotice(null);
+          }}
           className="mt-5 w-full text-sm text-muted-foreground hover:text-foreground"
         >
           {mode === "signin" ? "New here? Create an account" : "Already have an account? Sign in"}
