@@ -51,7 +51,7 @@ function useOpenProfileId() {
 export function ProfileViewer() {
   const userId = useOpenProfileId();
   const { user } = useAuth();
-  const { data: profiles = [] } = useProfiles();
+  const { data: profiles = [], isLoading: profilesLoading } = useProfiles();
   const { data: myBuddies = [] } = useBuddies(user?.id);
   const { data: roles } = useSiteRoles();
   const { open: openDirect, pending } = useOpenDirect(user?.id);
@@ -176,6 +176,8 @@ export function ProfileViewer() {
             <ProfilePhotos userId={profile.id} />
             <ProfileFeed userId={profile.id} />
           </div>
+        ) : profilesLoading ? (
+          <p className="mt-4 text-sm text-muted-foreground">Loading profile…</p>
         ) : (
           <p className="mt-4 text-sm text-muted-foreground">This profile isn’t available.</p>
         )}
