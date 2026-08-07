@@ -123,11 +123,23 @@ function TermsPage() {
             from an anonymizing or commercial hosting network. Attempting to evade a ban, device lock,
             or age gate by masking your network address is a violation of this Agreement and may result
             in permanent removal. Approved staff accounts may be exempt for administrative purposes. If
-            you believe your connection was blocked in error, contact us using the details in section 10.
+            you believe your connection was blocked in error, contact us using the details in section 11.
           </p>
 
           <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
-            7. Termination and Moderation
+            7. Single Browser Policy
+          </h2>
+          <p>
+            To reduce abuse, ban evasion, and account sharing, DueChat may bind a single account to a
+            browser or device identifier. Once a browser is linked to an account, you may not use it to
+            sign in to a different account unless you are an approved administrator or moderator. If you
+            attempt to sign in with a different account on a linked browser, you may be signed out and
+            redirected to the original account. You may contact support if you believe your browser was
+            linked in error. Approved staff accounts may be exempt for administrative purposes.
+          </p>
+
+          <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
+            8. Termination and Moderation
           </h2>
           <p>
             DueChat administrators and moderators may kick, ban, or remove users from rooms or the
@@ -136,7 +148,7 @@ function TermsPage() {
           </p>
 
           <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
-            8. Privacy and Data
+            9. Privacy and Data
           </h2>
           <p>
             Your use of DueChat is also governed by our Privacy Policy. We collect and process data as
@@ -146,14 +158,14 @@ function TermsPage() {
             administrators and is used for safety, ban enforcement, and abuse prevention.
           </p>
 
-          <h2 className="mt-6 font-display text-lg font-semibold text-foreground">9. Changes</h2>
+          <h2 className="mt-6 font-display text-lg font-semibold text-foreground">10. Changes</h2>
           <p>
             We may update this Agreement from time to time. Continued use of DueChat after changes
             means you accept the updated terms. Material changes will be communicated through the
             platform or by email when possible.
           </p>
 
-          <h2 className="mt-6 font-display text-lg font-semibold text-foreground">10. Contact</h2>
+          <h2 className="mt-6 font-display text-lg font-semibold text-foreground">11. Contact</h2>
           <p>
             If you have questions about this Agreement, contact the DueChat team through the platform or
             at the support channel listed on your account settings.
