@@ -60,7 +60,8 @@ type Tab =
   | "rooms"
   | "messages"
   | "dms"
-  | "reports";
+  | "reports"
+  | "notifications";
 
 /** The owner account keeps admin access permanently (also enforced in the database). */
 const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
@@ -195,6 +196,7 @@ function AdminPage() {
             "messages",
             "dms",
             "reports",
+            "notifications",
           ] as Tab[]
         ).map((t) => (
           <button
@@ -644,6 +646,8 @@ function AdminPage() {
       )}
 
       {tab === "reports" && <ReportQueue />}
+
+      {tab === "notifications" && <NotificationAudit />}
     </Shell>
   );
 }
