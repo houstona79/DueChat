@@ -109,7 +109,7 @@ export async function fetchRooms(): Promise<Room[]> {
     )
     .order("created_at", { ascending: true });
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []) as Room[];
 }
 
 export type Membership = { room_id: string; user_id: string };
