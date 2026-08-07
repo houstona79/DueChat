@@ -250,6 +250,8 @@ export type Database = {
           rating: string
           slug: string
           topic: string | null
+          youtube_title: string | null
+          youtube_url: string | null
         }
         Insert: {
           created_at?: string
@@ -263,6 +265,8 @@ export type Database = {
           rating?: string
           slug: string
           topic?: string | null
+          youtube_title?: string | null
+          youtube_url?: string | null
         }
         Update: {
           created_at?: string
@@ -276,6 +280,8 @@ export type Database = {
           rating?: string
           slug?: string
           topic?: string | null
+          youtube_title?: string | null
+          youtube_url?: string | null
         }
         Relationships: []
       }
