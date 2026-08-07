@@ -100,6 +100,27 @@ export type Database = {
           },
         ]
       }
+      moderation_settings: {
+        Row: {
+          auto_hide_threshold: number
+          created_at: string
+          id: boolean
+          updated_at: string
+        }
+        Insert: {
+          auto_hide_threshold?: number
+          created_at?: string
+          id?: boolean
+          updated_at?: string
+        }
+        Update: {
+          auto_hide_threshold?: number
+          created_at?: string
+          id?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           actor_id: string | null
@@ -207,6 +228,8 @@ export type Database = {
         Row: {
           body: string
           created_at: string
+          hidden_at: string | null
+          hidden_reason: string | null
           id: string
           pinned_at: string | null
           updated_at: string
@@ -215,6 +238,8 @@ export type Database = {
         Insert: {
           body: string
           created_at?: string
+          hidden_at?: string | null
+          hidden_reason?: string | null
           id?: string
           pinned_at?: string | null
           updated_at?: string
@@ -223,6 +248,8 @@ export type Database = {
         Update: {
           body?: string
           created_at?: string
+          hidden_at?: string | null
+          hidden_reason?: string | null
           id?: string
           pinned_at?: string | null
           updated_at?: string

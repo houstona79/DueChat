@@ -123,3 +123,22 @@ export async function deleteReportedUpdate(updateId: string) {
   const { error } = await supabase.from("profile_updates").delete().eq("id", updateId);
   if (error) throw error;
 }
+
+export async function fetchAutoHideThreshold() {
+  const { data, error } = await supabase
+    .from("moderation_settings")
+    .select("auto_hide_threshold")
+    .maybeSingle();
+  if (error) throw error;
+  return data?.auto_hide_threshold ?? 3;
+}
+
+export async function setAutoHideThreshold(value: number) {
+  const threshold = Math.min(100, Math.max(1, Math.round(value)));
+  const { error } = await supabase
+    .from("moderation_settings")
+    .update({ auto_hide_threshold: threshold })
+    .eq("id", true);
+  if (error) throw error;
+  return threshold;
+}

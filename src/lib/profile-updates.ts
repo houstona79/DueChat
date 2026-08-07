@@ -7,6 +7,8 @@ export type ProfileUpdate = {
   created_at: string;
   updated_at: string;
   pinned_at: string | null;
+  hidden_at: string | null;
+  hidden_reason: string | null;
 };
 
 export const MAX_UPDATE_LENGTH = 500;
@@ -50,7 +52,7 @@ export async function toggleProfileUpdateReaction(
 export async function fetchProfileUpdates(userId: string) {
   const { data, error } = await supabase
     .from("profile_updates")
-    .select("id,user_id,body,created_at,updated_at,pinned_at")
+    .select("id,user_id,body,created_at,updated_at,pinned_at,hidden_at,hidden_reason")
     .eq("user_id", userId)
     .order("pinned_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false })
