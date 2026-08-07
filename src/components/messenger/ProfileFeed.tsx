@@ -1,6 +1,18 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Megaphone, Pencil, Pin, PinOff, Send, SmilePlus, Trash2, X } from "lucide-react";
+import {
+  Check,
+  Flag,
+  Megaphone,
+  Pencil,
+  Pin,
+  PinOff,
+  Send,
+  SmilePlus,
+  Trash2,
+  X,
+} from "lucide-react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { siteRoleOf, useSiteRoles } from "@/hooks/use-roles";
@@ -16,6 +28,12 @@ import {
   setProfileUpdatePinned,
   toggleProfileUpdateReaction,
 } from "@/lib/profile-updates";
+import {
+  MAX_REPORT_DETAILS,
+  REPORT_REASONS,
+  fetchMyReportedUpdateIds,
+  reportProfileUpdate,
+} from "@/lib/update-reports";
 
 export function ProfileFeed({ userId, title = "Updates" }: { userId: string; title?: string }) {
   const queryClient = useQueryClient();
@@ -26,6 +44,9 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
   const [pickerFor, setPickerFor] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState("");
+  const [reportingId, setReportingId] = useState<string | null>(null);
+  const [reportReason, setReportReason] = useState<string>(REPORT_REASONS[0]);
+  const [reportDetails, setReportDetails] = useState("");
 
   const myRole = user ? siteRoleOf(roles, user.id) : null;
   const isStaff = myRole === "admin" || myRole === "moderator";
@@ -99,6 +120,31 @@ export function ProfileFeed({ userId, title = "Updates" }: { userId: string; tit
     mutationFn: ({ id, pinned }: { id: string; pinned: boolean }) =>
       setProfileUpdatePinned(userId, id, pinned),
     onSuccess: () => invalidate(),
+  });
+
+  const { data: reportedIds } = useQuery({
+    queryKey: ["my-update-reports", user?.id],
+    queryFn: () => fetchMyReportedUpdateIds(user!.id),
+    enabled: !!user,
+  });
+
+  const report = useMutation({
+    mutationFn: ({ id }: { id: string }) =>
+      reportProfileUpdate({
+        updateId: id,
+        reporterId: user!.id,
+        reason: reportReason,
+        details: reportDetails,
+      }),
+    onSuccess: () => {
+      setReportingId(null);
+      setReportDetails("");
+      setReportReason(REPORT_REASONS[0]);
+      toast.success("Thanks — our moderators will review this.");
+      return queryClient.invalidateQueries({ queryKey: ["my-update-reports", user?.id] });
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Couldn’t send that report."),
   });
 
   const react = useMutation({
