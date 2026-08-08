@@ -11,6 +11,7 @@ import { CallOverlay } from "./CallOverlay";
 import { MemberList } from "./MemberList";
 import { RoomFeed } from "./RoomFeed";
 import { RadioPlayer } from "./RadioPlayer";
+import { RoomBanner } from "./RoomBanner";
 import { RatingControl } from "./RoomRating";
 import { YouTubeEmbed } from "./YouTubeEmbed";
 import { useMessages, useRoomAdmins, useRoomBans, useRoomEvents } from "@/hooks/use-chat";
@@ -38,6 +39,7 @@ import {
   removeRoomAdmin,
   sendMessage,
   setRoomRadio,
+  setRoomBranding,
   setRoomRating,
   setRoomCategory,
   ROOM_CATEGORIES,
@@ -314,6 +316,20 @@ export function ChatPane({
 
       {!room.is_direct ? (
         <>
+          <RoomBanner
+            roomName={room.name}
+            branding={{
+              icon_url: room.icon_url,
+              banner_url: room.banner_url,
+              website_url: room.website_url,
+              website_label: room.website_label,
+            }}
+            canEdit={isOwner}
+            onSave={async (next) => {
+              await setRoomBranding(room.id, next);
+              await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+            }}
+          />
           <RadioPlayer
           url={room.radio_url}
           name={room.radio_name}
