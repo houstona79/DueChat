@@ -233,13 +233,13 @@ export function TalkBar({
 
       <button
         type="button"
-        onClick={() => setShowCams((v) => !v)}
+        onClick={() => onCamsOpenChange(!camsOpen)}
         aria-label="Show room cameras"
-        aria-pressed={showCams}
+        aria-pressed={camsOpen}
         title="Cams"
         className={cn(
           "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
-          showCams || camOn ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+          camsOpen || camOn ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
         )}
       >
         <Video className="size-4" />
@@ -285,8 +285,8 @@ export function TalkBar({
     </section>
 
     <CamPanel
-        open={showCams}
-        onClose={() => setShowCams(false)}
+        open={camsOpen}
+        onClose={() => onCamsOpenChange(false)}
         myName={myName}
         myStream={localStream}
         camOn={camOn}
