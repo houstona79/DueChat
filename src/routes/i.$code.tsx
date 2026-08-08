@@ -56,11 +56,7 @@ function InvitePage() {
         ) : owner ? (
           <>
             <div className="flex flex-col items-center gap-3">
-              <Avatar
-                url={owner.avatar_url}
-                name={owner.display_name}
-                size={64}
-              />
+              <Avatar url={owner.avatar_url} name={owner.display_name} size="lg" />
               <h1 className="font-display text-2xl font-semibold">
                 {owner.display_name} invited you to DueChat
               </h1>
