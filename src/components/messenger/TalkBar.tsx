@@ -29,7 +29,6 @@ export function TalkBar({
     if (typeof window === "undefined") return true;
     return window.localStorage.getItem("duechat:ptt") !== "false";
   });
-  const [openMic, setOpenMic] = useState(false);
   const [speaker, setSpeaker] = useState(true);
   const { mics, speakers, micId, speakerId, setMicId, setSpeakerId, refresh } = useAudioDevices();
 
