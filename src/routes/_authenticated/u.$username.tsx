@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, BadgeCheck, Globe, MapPin, MessageSquare, User } from "lucide-react";
 import { genderLabel } from "@/lib/genders";
+import { countryFlag } from "@/lib/country-flags";
 import { Avatar } from "@/components/messenger/Avatar";
 import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { ProfileFeed } from "@/components/messenger/ProfileFeed";
@@ -114,7 +115,13 @@ function ProfilePage() {
             ) : null}
             {profile.country ? (
               <p className="flex items-center gap-2 text-xs text-muted-foreground">
-                <MapPin className="size-3.5 shrink-0" aria-hidden />
+                {countryFlag(profile.country) ? (
+                  <span className="text-base leading-none" role="img" aria-label={`Flag of ${profile.country}`}>
+                    {countryFlag(profile.country)}
+                  </span>
+                ) : (
+                  <MapPin className="size-3.5 shrink-0" aria-hidden />
+                )}
                 {profile.country}
               </p>
             ) : null}
