@@ -43,6 +43,8 @@ export function TalkBar({
     micId,
   });
 
+  const micLevel = useMicLevel(localStream, true);
+
   // Labels only become readable once mic permission is granted.
   useEffect(() => {
     if (localStream) void refresh();
