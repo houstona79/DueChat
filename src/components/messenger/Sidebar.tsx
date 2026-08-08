@@ -11,6 +11,7 @@ import { WaterUpdates } from "./WaterUpdates";
 import { ThemeToggle } from "@/components/system/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { useOpenDirect } from "@/hooks/use-direct";
+import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import {
   siteRoleBadgeClass,
   siteRoleLabel,
