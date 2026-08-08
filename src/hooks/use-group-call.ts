@@ -206,6 +206,10 @@ export function useGroupCall({
           direction: "sendrecv",
           streams: local ? [local] : [],
         }).sender;
+        // Join muted: send nothing until the mic opens (Safari-safe).
+        if (mutedRef.current && ctx.audioSender) {
+          void ctx.audioSender.replaceTrack(null)?.catch?.(() => undefined);
+        }
       } catch {
         // Very old implementations: fall back to addTrack only.
         if (local) local.getTracks().forEach((t) => pc.addTrack(t, local));
