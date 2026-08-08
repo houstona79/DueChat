@@ -653,8 +653,27 @@ export function ChatPane({
               }
               const m = item.message;
               const mine = m.user_id === meId;
+              const liveNotice = liveNoticeOf(m.body);
+              if (liveNotice) {
+                const who = profileOf(m.user_id);
+                const name = mine ? "You" : (who?.display_name ?? "Someone");
+                return (
+                  <div key={m.id} className="mt-4 flex justify-center">
+                    <span className="flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-[11px] font-medium text-primary">
+                      <Video className="size-3" />
+                      {liveNotice === "on"
+                        ? `${name} ${mine ? "are" : "is"} live on camera`
+                        : `${name} stopped the camera`}{" "}
+                      · {formatTime(m.created_at)}
+                    </span>
+                  </div>
+                );
+              }
               const prev = timeline[i - 1];
-              const grouped = prev?.kind === "message" && prev.message.user_id === m.user_id;
+              const grouped =
+                prev?.kind === "message" &&
+                prev.message.user_id === m.user_id &&
+                !liveNoticeOf(prev.message.body);
               const author = profileOf(m.user_id);
               const authorName = author?.display_name ?? "Someone";
               return (
