@@ -40,6 +40,8 @@ export type Room = {
   website_url: string | null;
   website_label: string | null;
   trivia_enabled: boolean;
+  /** Staff-only rooms are hidden from regular members by database policy. */
+  staff_only: boolean;
 };
 
 export const ROOM_COLS =
