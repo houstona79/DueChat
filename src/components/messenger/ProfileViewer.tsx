@@ -1,6 +1,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { BadgeCheck, ExternalLink, Globe, MapPin, MessageSquare, User, X } from "lucide-react";
 import { genderLabel } from "@/lib/genders";
+import { countryFlag } from "@/lib/country-flags";
 import { visibleGender, visiblePronouns } from "@/lib/field-visibility";
 import { useBuddies } from "@/hooks/use-chat";
 import { Link } from "@tanstack/react-router";
