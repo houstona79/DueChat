@@ -241,7 +241,7 @@ export function ChatPane({
             </p>
           </div>
         </div>
-        <div className="-mx-1 flex items-center gap-1.5 overflow-x-auto px-1 pb-0.5 sm:contents">
+        <div className="-mx-1 flex flex-wrap items-center gap-1.5 px-1 pb-0.5 sm:mx-0 sm:justify-end sm:px-0">
         {!room.is_direct ? (
           isOwner ? (
             <select
@@ -279,6 +279,24 @@ export function ChatPane({
             }}
           />
         ) : null}
+        <button
+          onClick={() => {
+            setShowMembers(false);
+            setShowFeed(false);
+            setShowMedia(false);
+            setShowGames((v) => !v);
+          }}
+          className={cn(
+            "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
+            showGames ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+          )}
+          aria-label="Show games"
+          aria-pressed={showGames}
+          title="Games"
+        >
+          <Gamepad2 className="size-4" />
+          Games
+        </button>
         <button
           onClick={() => {
             setShowFeed(false);
@@ -337,23 +355,6 @@ export function ChatPane({
             <Radio className="size-4" />
           </button>
         ) : null}
-        <button
-          onClick={() => {
-            setShowMembers(false);
-            setShowFeed(false);
-            setShowMedia(false);
-            setShowGames((v) => !v);
-          }}
-          className={cn(
-            "grid size-10 shrink-0 place-items-center rounded-xl",
-            showGames ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
-          )}
-          aria-label="Show games"
-          aria-pressed={showGames}
-          title="Games"
-        >
-          <Gamepad2 className="size-4" />
-        </button>
         <button
           onClick={() => setCall("voice")}
           className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
