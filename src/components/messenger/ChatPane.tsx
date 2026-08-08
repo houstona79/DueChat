@@ -342,6 +342,7 @@ export function ChatPane({
       {!room.is_direct ? (
         <>
           <RoomBanner
+            roomId={room.id}
             roomName={room.name}
             branding={{
               icon_url: room.icon_url,
