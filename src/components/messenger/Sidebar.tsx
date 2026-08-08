@@ -315,6 +315,11 @@ export function Sidebar({
                     <span className="flex min-w-0 items-center gap-1.5">
                       <span className="truncate text-sm font-semibold">{room.name}</span>
                       <RatingBadge rating={room.rating} />
+                      {room.staff_only ? (
+                        <span className="shrink-0 rounded-full bg-staff/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-staff">
+                          Staff
+                        </span>
+                      ) : null}
                     </span>
                     {joined ? null : (
                       <span className="shrink-0 rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-medium text-primary">
