@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bell, Check, ChevronDown, ChevronRight, ExternalLink, MessageSquare, Send, Trash2, X } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { Bell, Check, ChevronDown, ChevronRight, ExternalLink, MailPlus, MessageSquare, Send, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "./Avatar";
 import { openProfile } from "./ProfileViewer";
 import { supabase } from "@/integrations/supabase/client";
+import { useMyRoomInvites } from "@/hooks/use-chat";
+import { acceptRoomInvite, dismissRoomInvite } from "@/lib/room-invites";
 import {
   clearNotifications,
   fetchNotifications,
@@ -35,10 +38,13 @@ export function NotificationsPanel({
   profiles: Profile[];
 }) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(true);
   const [openComments, setOpenComments] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [inviteBusy, setInviteBusy] = useState<string | null>(null);
+  const { data: myInvites = [] } = useMyRoomInvites(me?.id);
 
   const { data: items = [] } = useQuery({
     queryKey: ["notifications", me?.id],
@@ -67,6 +73,40 @@ export function NotificationsPanel({
       void supabase.removeChannel(channel);
     };
   }, [me?.id, queryClient]);
+
+  // Toast the moment a room invite arrives.
+  useEffect(() => {
+    if (!me?.id) return;
+    const channel = supabase
+      .channel(`room-invite-toast:${me.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `user_id=eq.${me.id}`,
+        },
+        (payload) => {
+          const row = payload.new as { kind?: string; preview?: string | null; room_id?: string | null };
+          if (row.kind !== "room_invite") return;
+          void queryClient.invalidateQueries({ queryKey: ["room-invites", me.id] });
+          setCollapsed(false);
+          toast(`You were invited to ${row.preview ?? "a room"}`, {
+            action: row.room_id
+              ? {
+                  label: "Open",
+                  onClick: () => void navigate({ to: "/chat/$roomId", params: { roomId: row.room_id! } }),
+                }
+              : undefined,
+          });
+        },
+      )
+      .subscribe();
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [me?.id, queryClient, navigate]);
 
   const unread = items.filter((n) => !n.read_at).length;
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["notifications", me?.id] });
