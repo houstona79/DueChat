@@ -35,7 +35,38 @@ export type Room = {
   youtube_title: string | null;
   rating: RoomRating;
   category: string;
+  icon_url: string | null;
+  banner_url: string | null;
+  website_url: string | null;
+  website_label: string | null;
 };
+
+export const ROOM_COLS =
+  "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label";
+
+export type RoomBranding = {
+  icon_url: string | null;
+  banner_url: string | null;
+  website_url: string | null;
+  website_label: string | null;
+};
+
+/** Only https image/site links are accepted (matches the database checks). */
+export function isHttpsUrl(url: string) {
+  const trimmed = url.trim();
+  if (!/^https:\/\/\S{3,500}$/i.test(trimmed)) return false;
+  try {
+    new URL(trimmed);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function setRoomBranding(roomId: string, branding: RoomBranding) {
+  const { error } = await supabase.from("rooms").update(branding).eq("id", roomId);
+  if (error) throw error;
+}
 
 export const ROOM_CATEGORIES = [
   "Help",
