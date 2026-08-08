@@ -83,6 +83,14 @@ export function TalkBar({
 
   const live = pushToTalk ? held : true;
 
+  // Older Safari (and some Mac keyboard layouts) report the space bar as
+  // "Spacebar" or only expose keyCode, so accept every known spelling.
+  const isSpaceKey = (e: KeyboardEvent | React.KeyboardEvent) =>
+    e.key === " " ||
+    e.key === "Spacebar" ||
+    (e as KeyboardEvent).code === "Space" ||
+    (e as KeyboardEvent).keyCode === 32;
+
   // Global keyboard shortcut: hold Space to talk. Ignore while typing in
   // editable fields so the chat input still works normally.
   useEffect(() => {
@@ -101,7 +109,7 @@ export function TalkBar({
     };
 
     const keyDown = (e: KeyboardEvent) => {
-      if (e.key !== " " || held) return;
+      if (!isSpaceKey(e) || held) return;
       if (isTyping()) return;
       e.preventDefault();
       unlockAudioPlayback();
@@ -109,7 +117,7 @@ export function TalkBar({
     };
 
     const keyUp = (e: KeyboardEvent) => {
-      if (e.key !== " ") return;
+      if (!isSpaceKey(e)) return;
       setHeld(false);
     };
 
@@ -146,9 +154,19 @@ export function TalkBar({
     const release = () => setHeld(false);
     window.addEventListener("pointerup", release);
     window.addEventListener("pointercancel", release);
+    // Older Safari on macOS has no Pointer Events — mouse events are the
+    // only reliable release signal there.
+    window.addEventListener("mouseup", release);
+    window.addEventListener("touchend", release);
+    window.addEventListener("touchcancel", release);
+    window.addEventListener("blur", release);
     return () => {
       window.removeEventListener("pointerup", release);
       window.removeEventListener("pointercancel", release);
+      window.removeEventListener("mouseup", release);
+      window.removeEventListener("touchend", release);
+      window.removeEventListener("touchcancel", release);
+      window.removeEventListener("blur", release);
     };
   }, [held]);
 
@@ -174,10 +192,10 @@ export function TalkBar({
         onMouseUp={() => setHeld(false)}
         onContextMenu={(e) => e.preventDefault()}
         onKeyDown={(e) => {
-          if (e.key === " " || e.key === "Enter") press();
+          if (isSpaceKey(e) || e.key === "Enter") press();
         }}
         onKeyUp={(e) => {
-          if (e.key === " " || e.key === "Enter") setHeld(false);
+          if (isSpaceKey(e) || e.key === "Enter") setHeld(false);
         }}
         aria-label={
           pushToTalk ? (live ? "Microphone open" : "Hold to talk") : "Microphone always open"
