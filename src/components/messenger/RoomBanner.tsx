@@ -5,6 +5,34 @@ import { cn } from "@/lib/utils";
 
 const hiddenKey = (roomId: string) => `duechat:banner-hidden:${roomId}`;
 
+/** In-memory fallback for browsers/embeds where web storage is unavailable. */
+const memoryHidden = new Map<string, boolean>();
+
+function readHidden(roomId: string) {
+  const key = hiddenKey(roomId);
+  try {
+    if (window.localStorage.getItem(key) === "1") return true;
+    if (window.sessionStorage.getItem(key) === "1") return true;
+  } catch {
+    /* storage unavailable */
+  }
+  return memoryHidden.get(roomId) === true;
+}
+
+function writeHidden(roomId: string, next: boolean) {
+  const key = hiddenKey(roomId);
+  memoryHidden.set(roomId, next);
+  for (const store of [() => window.localStorage, () => window.sessionStorage]) {
+    try {
+      const s = store();
+      if (next) s.setItem(key, "1");
+      else s.removeItem(key);
+    } catch {
+      /* storage unavailable */
+    }
+  }
+}
+
 export function RoomBanner({
   roomId,
   roomName,
@@ -35,22 +63,13 @@ export function RoomBanner({
   }, [branding.icon_url, branding.banner_url, branding.website_url, branding.website_label]);
 
   useEffect(() => {
-    try {
-      setHidden(window.localStorage.getItem(hiddenKey(roomId)) === "1");
-    } catch {
-      setHidden(false);
-    }
+    setHidden(readHidden(roomId));
   }, [roomId]);
 
   const setHiddenPersisted = (next: boolean) => {
     setHidden(next);
     if (next) setEditing(false);
-    try {
-      if (next) window.localStorage.setItem(hiddenKey(roomId), "1");
-      else window.localStorage.removeItem(hiddenKey(roomId));
-    } catch {
-      /* storage unavailable */
-    }
+    writeHidden(roomId, next);
   };
 
   const hasBranding = Boolean(branding.banner_url || branding.icon_url || branding.website_url);
