@@ -1,11 +1,14 @@
-import { Hand, Mic, MicOff, PhoneOff, Radio, Volume2, VolumeX } from "lucide-react";
+import { Hand, Mic, MicOff, PhoneOff, Radio, Video, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
 import { attachStream, playWithUnlock, unlockAudioPlayback } from "@/lib/webrtc";
 import { applySinkId, useAudioDevices } from "@/lib/audio-devices";
 import { useMicLevel } from "@/lib/use-mic-level";
 import { AudioDeviceMenu } from "./AudioDeviceMenu";
 import { MicLevelMeter } from "./MicLevelMeter";
+import { CamPanel } from "./CamPanel";
+import { sendMessage } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 
 /**
@@ -32,9 +35,12 @@ export function TalkBar({
     return window.localStorage.getItem("duechat:ptt") !== "false";
   });
   const [speaker, setSpeaker] = useState(true);
+  const [showCams, setShowCams] = useState(false);
   const { mics, speakers, micId, speakerId, setMicId, setSpeakerId, refresh } = useAudioDevices();
 
-  const { localStream, mediaError, participants, setMuted } = useGroupCall({
+  const queryClient = useQueryClient();
+
+  const { localStream, mediaError, participants, camOn, setCamOn, setMuted } = useGroupCall({
     roomId,
     userId: meId,
     name: myName,
@@ -42,6 +48,28 @@ export function TalkBar({
     enabled: true,
     micId,
   });
+
+  // Announce camera changes in the room timeline as a system-style notice.
+  const announcedRef = useRef<boolean | null>(null);
+  useEffect(() => {
+    if (announcedRef.current === camOn) return;
+    const first = announcedRef.current === null;
+    announcedRef.current = camOn;
+    if (first && !camOn) return;
+    void (async () => {
+      try {
+        await sendMessage(roomId, meId, camOn ? "::live::on" : "::live::off");
+        await queryClient.invalidateQueries({ queryKey: ["messages", roomId] });
+      } catch {
+        /* notice is best-effort */
+      }
+    })();
+  }, [camOn, roomId, meId, queryClient]);
+
+  const liveCams = participants.filter((p) => {
+    const tracks = p.stream?.getVideoTracks() ?? [];
+    return tracks.length > 0 && (p.camOn || tracks.some((t) => t.readyState === "live" && !t.muted));
+  }).length;
 
   const micLevel = useMicLevel(localStream, true);
 
@@ -201,6 +229,21 @@ export function TalkBar({
 
       <button
         type="button"
+        onClick={() => setShowCams((v) => !v)}
+        aria-label="Show room cameras"
+        aria-pressed={showCams}
+        title="Cams"
+        className={cn(
+          "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
+          showCams || camOn ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+        )}
+      >
+        <Video className="size-4" />
+        Cams{liveCams + (camOn ? 1 : 0) > 0 ? ` ${liveCams + (camOn ? 1 : 0)}` : ""}
+      </button>
+
+      <button
+        type="button"
         onClick={() => setSpeaker((v) => !v)}
         aria-label={speaker ? "Mute room sound" : "Unmute room sound"}
         aria-pressed={speaker}
@@ -235,6 +278,16 @@ export function TalkBar({
       {participants.map((peer) => (
         <PeerAudio key={peer.userId} peer={peer} speaker={speaker} speakerId={speakerId} />
       ))}
+
+      <CamPanel
+        open={showCams}
+        onClose={() => setShowCams(false)}
+        myName={myName}
+        myStream={localStream}
+        camOn={camOn}
+        onToggleCam={() => setCamOn((v) => !v)}
+        participants={participants}
+      />
     </section>
   );
 }
