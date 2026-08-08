@@ -19,6 +19,7 @@ import { ReportQueue } from "@/components/messenger/ReportQueue";
 import { ChatLogs } from "@/components/messenger/ChatLogs";
 import { NotificationAudit } from "@/components/messenger/NotificationAudit";
 import { AlertComposer } from "@/components/messenger/AlertComposer";
+import { AdminNav, TAB_META, type AdminTab } from "@/components/admin/AdminNav";
 import { useAuth } from "@/hooks/use-auth";
 import { accentFor, formatTime, isOnline } from "@/lib/chat";
 import {
@@ -55,20 +56,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-type Tab =
-  | "overview"
-  | "users"
-  | "staff"
-  | "sessions"
-  | "ips"
-  | "bans"
-  | "rooms"
-  | "messages"
-  | "logs"
-  | "dms"
-  | "reports"
-  | "notifications"
-  | "alerts";
+type Tab = AdminTab;
 
 /** The owner account keeps admin access permanently (also enforced in the database). */
 const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
@@ -79,6 +67,7 @@ function AdminPage() {
   const [tab, setTab] = useState<Tab>("overview");
   const [openDm, setOpenDm] = useState<string | null>(null);
   const [staffSearch, setStaffSearch] = useState("");
+  const [userSearch, setUserSearch] = useState("");
 
   const transcript = useQuery({
     queryKey: ["admin-transcript", openDm],
