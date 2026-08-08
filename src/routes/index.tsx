@@ -29,9 +29,11 @@ function Landing() {
         <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/15 text-primary">
           <MessagesSquare className="size-7" />
         </span>
-        <h1 className="mt-6 font-display text-4xl font-semibold tracking-tight sm:text-5xl">
-          DueChat
-        </h1>
+        <img
+          src={duechatLogo.url}
+          alt="DueChat"
+          className="mx-auto mt-6 h-14 w-auto object-contain sm:h-16"
+        />
         <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
           Chat rooms with real accounts, live online status and one-tap voice or video calls — synced
           across every device you sign in on.
