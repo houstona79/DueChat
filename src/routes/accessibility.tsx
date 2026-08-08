@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 
 export const Route = createFileRoute("/accessibility")({
