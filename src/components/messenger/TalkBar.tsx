@@ -24,7 +24,10 @@ export function TalkBar({
   onLeave: () => void;
 }) {
   const [held, setHeld] = useState(false);
-  const [pushToTalk, setPushToTalk] = useState(true);
+  const [pushToTalk, setPushToTalk] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return window.localStorage.getItem("duechat:ptt") !== "false";
+  });
   const [openMic, setOpenMic] = useState(false);
   const [speaker, setSpeaker] = useState(true);
   const { mics, speakers, micId, speakerId, setMicId, setSpeakerId, refresh } = useAudioDevices();
