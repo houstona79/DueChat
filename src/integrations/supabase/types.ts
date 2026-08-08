@@ -250,6 +250,7 @@ export type Database = {
           kind: string
           preview: string | null
           read_at: string | null
+          room_id: string | null
           update_id: string | null
           user_id: string
         }
@@ -261,6 +262,7 @@ export type Database = {
           kind: string
           preview?: string | null
           read_at?: string | null
+          room_id?: string | null
           update_id?: string | null
           user_id: string
         }
@@ -272,10 +274,18 @@ export type Database = {
           kind?: string
           preview?: string | null
           read_at?: string | null
+          room_id?: string | null
           update_id?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "notifications_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "notifications_update_id_fkey"
             columns: ["update_id"]
