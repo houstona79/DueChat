@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
+  Bot,
   Gamepad2,
   Newspaper,
   Phone,
