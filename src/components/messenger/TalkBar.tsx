@@ -1,4 +1,4 @@
-import { Mic, MicOff, PhoneOff, Radio, Volume2, VolumeX } from "lucide-react";
+import { Hand, Mic, MicOff, PhoneOff, Radio, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
 import { attachStream, playWithUnlock, unlockAudioPlayback } from "@/lib/webrtc";
