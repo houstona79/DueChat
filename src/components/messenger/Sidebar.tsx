@@ -11,6 +11,7 @@ import { WaterUpdates } from "./WaterUpdates";
 import { ThemeToggle } from "@/components/system/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { useOpenDirect } from "@/hooks/use-direct";
+import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import {
   siteRoleBadgeClass,
   siteRoleLabel,
@@ -96,7 +97,11 @@ export function Sidebar({
     <div className="flex h-full min-h-0 flex-col bg-sidebar">
       <header className="px-5 pb-3 pt-6">
         <div className="flex items-center justify-between gap-2">
-          <h1 className="text-2xl font-semibold">Rooms</h1>
+          <img
+            src={duechatLogo.url}
+            alt="DueChat"
+            className="h-8 w-auto object-contain"
+          />
           <div className="flex items-center gap-1">
             {isAdmin ? (
               <Link
