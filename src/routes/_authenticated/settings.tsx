@@ -174,6 +174,10 @@ function SettingsPage() {
       </Link>
       <h1 className="mt-6 text-2xl font-semibold">Your profile</h1>
 
+      <div id="accessibility" className="mt-6 scroll-mt-6">
+        <AccessibilitySettings />
+      </div>
+
       <div className="mt-6 flex items-center gap-4">
         <Avatar
           name={me.display_name}
@@ -390,10 +394,6 @@ function SettingsPage() {
 
       <div className="mt-8">
         <InviteCard userId={user.id} />
-      </div>
-
-      <div className="mt-8">
-        <AccessibilitySettings />
       </div>
 
       <div className="mt-8">
