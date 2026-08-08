@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bell, Check, ChevronDown, ChevronRight, ExternalLink, MessageSquare, Send, Trash2, X } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { Bell, Check, ChevronDown, ChevronRight, ExternalLink, MailPlus, MessageSquare, Send, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "./Avatar";
 import { openProfile } from "./ProfileViewer";
 import { supabase } from "@/integrations/supabase/client";
+import { useMyRoomInvites } from "@/hooks/use-chat";
+import { acceptRoomInvite, dismissRoomInvite } from "@/lib/room-invites";
 import {
   clearNotifications,
   fetchNotifications,
@@ -35,10 +38,13 @@ export function NotificationsPanel({
   profiles: Profile[];
 }) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(true);
   const [openComments, setOpenComments] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [inviteBusy, setInviteBusy] = useState<string | null>(null);
+  const { data: myInvites = [] } = useMyRoomInvites(me?.id);
 
   const { data: items = [] } = useQuery({
     queryKey: ["notifications", me?.id],
@@ -67,6 +73,40 @@ export function NotificationsPanel({
       void supabase.removeChannel(channel);
     };
   }, [me?.id, queryClient]);
+
+  // Toast the moment a room invite arrives.
+  useEffect(() => {
+    if (!me?.id) return;
+    const channel = supabase
+      .channel(`room-invite-toast:${me.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `user_id=eq.${me.id}`,
+        },
+        (payload) => {
+          const row = payload.new as { kind?: string; preview?: string | null; room_id?: string | null };
+          if (row.kind !== "room_invite") return;
+          void queryClient.invalidateQueries({ queryKey: ["room-invites", me.id] });
+          setCollapsed(false);
+          toast(`You were invited to ${row.preview ?? "a room"}`, {
+            action: row.room_id
+              ? {
+                  label: "Open",
+                  onClick: () => void navigate({ to: "/chat/$roomId", params: { roomId: row.room_id! } }),
+                }
+              : undefined,
+          });
+        },
+      )
+      .subscribe();
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [me?.id, queryClient, navigate]);
 
   const unread = items.filter((n) => !n.read_at).length;
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["notifications", me?.id] });
@@ -189,6 +229,7 @@ export function NotificationsPanel({
                         /* non-blocking */
                       }
                     }
+                    if (n.kind === "room_invite") return;
                     openProfile(n.actor_id ?? me.id);
                   }}
                   className={cn(
@@ -220,6 +261,56 @@ export function NotificationsPanel({
                     <span className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" aria-hidden />
                   ) : null}
                 </button>
+
+                {n.kind === "room_invite" && n.room_id ? (
+                  <div className="flex flex-wrap items-center gap-1.5 px-3 pb-2 pl-12">
+                    <button
+                      type="button"
+                      disabled={inviteBusy === n.id}
+                      onClick={async () => {
+                        setInviteBusy(n.id);
+                        try {
+                          const invite = myInvites.find((i) => i.room_id === n.room_id);
+                          if (invite) await acceptRoomInvite(invite, me.id);
+                          await markNotificationRead(n.id).catch(() => {});
+                          await queryClient.invalidateQueries({ queryKey: ["room-invites", me.id] });
+                          await queryClient.invalidateQueries({ queryKey: ["memberships"] });
+                          await refresh();
+                          await navigate({ to: "/chat/$roomId", params: { roomId: n.room_id! } });
+                        } catch {
+                          toast.error("Couldn’t join that room.");
+                        } finally {
+                          setInviteBusy(null);
+                        }
+                      }}
+                      className="flex min-h-8 items-center gap-1 rounded-full bg-primary px-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"
+                    >
+                      <MailPlus className="size-3" aria-hidden />
+                      Accept
+                    </button>
+                    <button
+                      type="button"
+                      disabled={inviteBusy === n.id}
+                      onClick={async () => {
+                        setInviteBusy(n.id);
+                        try {
+                          const invite = myInvites.find((i) => i.room_id === n.room_id);
+                          if (invite) await dismissRoomInvite(invite.id);
+                          await queryClient.invalidateQueries({ queryKey: ["room-invites", me.id] });
+                          await refresh();
+                        } catch {
+                          toast.error("Couldn’t decline that invite.");
+                        } finally {
+                          setInviteBusy(null);
+                        }
+                      }}
+                      className="flex min-h-8 items-center gap-1 rounded-full border border-border px-2.5 text-xs text-muted-foreground hover:border-primary/60 hover:text-foreground disabled:opacity-60"
+                    >
+                      <X className="size-3" aria-hidden />
+                      Decline
+                    </button>
+                  </div>
+                ) : null}
 
                 {n.update_id ? (
                   <div className="flex flex-wrap items-center gap-1 px-3 pb-2 pl-12">
