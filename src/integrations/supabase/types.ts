@@ -614,10 +614,12 @@ export type Database = {
       }
       rooms: {
         Row: {
+          banner_url: string | null
           category: string
           created_at: string
           created_by: string
           direct_key: string | null
+          icon_url: string | null
           id: string
           is_direct: boolean
           name: string
@@ -626,14 +628,18 @@ export type Database = {
           rating: string
           slug: string
           topic: string | null
+          website_label: string | null
+          website_url: string | null
           youtube_title: string | null
           youtube_url: string | null
         }
         Insert: {
+          banner_url?: string | null
           category?: string
           created_at?: string
           created_by: string
           direct_key?: string | null
+          icon_url?: string | null
           id?: string
           is_direct?: boolean
           name: string
@@ -642,14 +648,18 @@ export type Database = {
           rating?: string
           slug: string
           topic?: string | null
+          website_label?: string | null
+          website_url?: string | null
           youtube_title?: string | null
           youtube_url?: string | null
         }
         Update: {
+          banner_url?: string | null
           category?: string
           created_at?: string
           created_by?: string
           direct_key?: string | null
+          icon_url?: string | null
           id?: string
           is_direct?: boolean
           name?: string
@@ -658,6 +668,8 @@ export type Database = {
           rating?: string
           slug?: string
           topic?: string | null
+          website_label?: string | null
+          website_url?: string | null
           youtube_title?: string | null
           youtube_url?: string | null
         }
