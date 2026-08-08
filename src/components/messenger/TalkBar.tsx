@@ -1,4 +1,4 @@
-import { Mic, MicOff, PhoneOff, Radio, Volume2, VolumeX } from "lucide-react";
+import { Hand, Mic, MicOff, PhoneOff, Radio, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
 import { attachStream, playWithUnlock, unlockAudioPlayback } from "@/lib/webrtc";
@@ -7,10 +7,11 @@ import { AudioDeviceMenu } from "./AudioDeviceMenu";
 import { cn } from "@/lib/utils";
 
 /**
- * Always-on room audio with a push-to-talk button.
+ * Always-on room audio bar with a push-to-talk toggle.
  *
- * Everyone in the bar hears each other; the mic only opens while the Talk
- * button is held (or while "Open mic" is locked on).
+ * Tap the toggle to switch between "push-to-talk" (hold the talk button to
+ * speak) and "open mic" (microphone stays live). The chosen mode persists
+ * across visits in localStorage.
  */
 export function TalkBar({
   roomId,
@@ -24,7 +25,10 @@ export function TalkBar({
   onLeave: () => void;
 }) {
   const [held, setHeld] = useState(false);
-  const [openMic, setOpenMic] = useState(false);
+  const [pushToTalk, setPushToTalk] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return window.localStorage.getItem("duechat:ptt") !== "false";
+  });
   const [speaker, setSpeaker] = useState(true);
   const { mics, speakers, micId, speakerId, setMicId, setSpeakerId, refresh } = useAudioDevices();
 
@@ -42,7 +46,7 @@ export function TalkBar({
     if (localStream) void refresh();
   }, [localStream, refresh]);
 
-  const live = held || openMic;
+  const live = pushToTalk ? held : true;
 
   // iOS Safari: pointer events can be missing/unreliable on older versions, so
   // accept touch and mouse too, and unlock audio output inside the gesture.
@@ -50,6 +54,7 @@ export function TalkBar({
     unlockAudioPlayback();
     setHeld(true);
   };
+
   // Keep the real mic state in sync, including once media resolves.
   useEffect(() => {
     setMuted(!live);
@@ -93,34 +98,43 @@ export function TalkBar({
         onKeyUp={(e) => {
           if (e.key === " " || e.key === "Enter") setHeld(false);
         }}
-        aria-label={live ? "Microphone open" : "Hold to talk"}
+        aria-label={
+          pushToTalk ? (live ? "Microphone open" : "Hold to talk") : "Microphone always open"
+        }
         aria-pressed={live}
         className={cn(
           "flex h-11 touch-none select-none items-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors active:scale-95 [-webkit-touch-callout:none] [-webkit-user-select:none]",
           live
             ? "bg-primary text-primary-foreground"
             : "bg-secondary text-foreground hover:bg-secondary/80",
+          !pushToTalk && "cursor-default",
         )}
       >
         {live ? <Mic className="size-4" /> : <MicOff className="size-4" />}
-        {live ? "On air" : "Hold to talk"}
+        {live ? "On air" : pushToTalk ? "Hold to talk" : "Mic open"}
       </button>
 
       <button
         type="button"
         onClick={() => {
           unlockAudioPlayback();
-          setOpenMic((v) => !v);
+          setPushToTalk((v) => {
+            const next = !v;
+            if (typeof window !== "undefined") {
+              window.localStorage.setItem("duechat:ptt", String(next));
+            }
+            return next;
+          });
         }}
-        aria-label={openMic ? "Turn open mic off" : "Keep microphone open"}
-        aria-pressed={openMic}
+        aria-label={pushToTalk ? "Switch to open microphone" : "Switch to push-to-talk"}
+        aria-pressed={pushToTalk}
         className={cn(
           "grid size-10 place-items-center rounded-xl",
-          openMic ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+          pushToTalk ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
         )}
-        title="Open mic"
+        title={pushToTalk ? "Push-to-talk on" : "Open mic on"}
       >
-        <Radio className="size-4" />
+        {pushToTalk ? <Hand className="size-4" /> : <Radio className="size-4" />}
       </button>
 
       <AudioDeviceMenu
