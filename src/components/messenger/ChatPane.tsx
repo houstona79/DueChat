@@ -1,5 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Newspaper, Phone, Radio, SendHorizonal, Users, Video, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Gamepad2,
+  Newspaper,
+  Phone,
+  Radio,
+  SendHorizonal,
+  Users,
+  Video,
+  X,
+} from "lucide-react";
 import { EmojiPicker } from "./EmojiPicker";
 import { GifPicker } from "./GifPicker";
 
@@ -11,6 +21,7 @@ import { CallOverlay } from "./CallOverlay";
 import { MemberList } from "./MemberList";
 import { RoomFeed } from "./RoomFeed";
 import { RadioPlayer } from "./RadioPlayer";
+import { GamesPanel } from "./GamesPanel";
 import { RoomBanner } from "./RoomBanner";
 import { RatingControl } from "./RoomRating";
 import { YouTubeEmbed } from "./YouTubeEmbed";
@@ -95,6 +106,7 @@ export function ChatPane({
   const [showMembers, setShowMembers] = useState(false);
   const [showFeed, setShowFeed] = useState(false);
   const [showMedia, setShowMedia] = useState(false);
+  const [showGames, setShowGames] = useState(false);
 
   const [draft, setDraft] = useState("");
   const [call, setCall] = useState<"voice" | "video" | null>(null);
