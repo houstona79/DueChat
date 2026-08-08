@@ -2,6 +2,8 @@ import { Mic, MicOff, PhoneOff, Radio, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
 import { attachStream, playWithUnlock, unlockAudioPlayback } from "@/lib/webrtc";
+import { applySinkId, useAudioDevices } from "@/lib/audio-devices";
+import { AudioDeviceMenu } from "./AudioDeviceMenu";
 import { cn } from "@/lib/utils";
 
 /**
@@ -24,6 +26,7 @@ export function TalkBar({
   const [held, setHeld] = useState(false);
   const [openMic, setOpenMic] = useState(false);
   const [speaker, setSpeaker] = useState(true);
+  const { mics, speakers, micId, speakerId, setMicId, setSpeakerId, refresh } = useAudioDevices();
 
   const { localStream, mediaError, participants, setMuted } = useGroupCall({
     roomId,
@@ -31,7 +34,13 @@ export function TalkBar({
     name: myName,
     mode: "voice",
     enabled: true,
+    micId,
   });
+
+  // Labels only become readable once mic permission is granted.
+  useEffect(() => {
+    if (localStream) void refresh();
+  }, [localStream, refresh]);
 
   const live = held || openMic;
 
@@ -114,6 +123,16 @@ export function TalkBar({
         <Radio className="size-4" />
       </button>
 
+      <AudioDeviceMenu
+        mics={mics}
+        speakers={speakers}
+        micId={micId}
+        speakerId={speakerId}
+        onMicChange={setMicId}
+        onSpeakerChange={setSpeakerId}
+        onOpen={() => void refresh()}
+      />
+
       <button
         type="button"
         onClick={() => setSpeaker((v) => !v)}
@@ -148,18 +167,30 @@ export function TalkBar({
       </button>
 
       {participants.map((peer) => (
-        <PeerAudio key={peer.userId} peer={peer} speaker={speaker} />
+        <PeerAudio key={peer.userId} peer={peer} speaker={speaker} speakerId={speakerId} />
       ))}
     </section>
   );
 }
 
-function PeerAudio({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
+function PeerAudio({
+  peer,
+  speaker,
+  speakerId,
+}: {
+  peer: CallPeer;
+  speaker: boolean;
+  speakerId: string;
+}) {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     attachStream(audioRef.current, peer.stream);
   }, [peer.stream]);
+
+  useEffect(() => {
+    applySinkId(audioRef.current, speakerId);
+  }, [speakerId, peer.stream]);
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.muted = !speaker;

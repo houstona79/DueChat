@@ -61,12 +61,15 @@ export function useGroupCall({
   name,
   mode,
   enabled,
+  micId,
 }: {
   roomId: string;
   userId: string;
   name: string;
   mode: "voice" | "video";
   enabled: boolean;
+  /** Preferred microphone deviceId ("" = system default). */
+  micId?: string;
 }) {
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [mediaError, setMediaError] = useState<string | null>(null);
@@ -117,15 +120,32 @@ export function useGroupCall({
       }
       try {
         let stream: MediaStream;
+        const audioConstraint: MediaTrackConstraints | boolean = micId
+          ? { deviceId: { exact: micId } }
+          : true;
         try {
           stream = await getMediaStreamResilient({
-            audio: true,
+            audio: audioConstraint,
             video: mode === "video" ? { facingMode: "user" } : false,
           });
         } catch (error) {
           // Android: camera may be busy or unavailable — still join with audio.
-          if (mode !== "video") throw error;
-          stream = await getMediaStreamResilient({ audio: true, video: false });
+          // A chosen mic can also disappear — fall back to the default one.
+          if (mode !== "video") {
+            if (!micId) throw error;
+            stream = await getMediaStreamResilient({ audio: true, video: false });
+            setMediaError("That microphone wasn't available, so we used the default one.");
+            if (cancelled) {
+              stream.getTracks().forEach((t) => t.stop());
+              return;
+            }
+            localStreamRef.current = stream;
+            setLocalStream(stream);
+            const a = stream.getAudioTracks()[0] ?? null;
+            pcsRef.current.forEach((ctx) => void ctx.audioSender?.replaceTrack(a));
+            return;
+          }
+          stream = await getMediaStreamResilient({ audio: audioConstraint, video: false });
           setMediaError(
             "We couldn't reach your camera, so you joined with audio only. Close other camera apps and tap the camera button to retry.",
           );
@@ -157,7 +177,7 @@ export function useGroupCall({
       localStreamRef.current = null;
       setLocalStream(null);
     };
-  }, [enabled, mode]);
+  }, [enabled, mode, micId]);
 
   // 2. Signalling + mesh
   useEffect(() => {
