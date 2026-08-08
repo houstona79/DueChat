@@ -43,7 +43,7 @@ export type Room = {
 };
 
 export const ROOM_COLS =
-  "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label, trivia_enabled";
+  "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label, trivia_enabled, staff_only";
 
 export type RoomBranding = {
   icon_url: string | null;
