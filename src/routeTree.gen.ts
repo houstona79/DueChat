@@ -18,6 +18,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedModeratorRouteImport } from './routes/_authenticated/moderator'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as ICodeRouteImport } from './routes/i.$code'
 import { Route as AuthenticatedChatRoomIdRouteImport } from './routes/_authenticated/chat.$roomId'
 import { Route as AuthenticatedUUsernameRouteImport } from './routes/_authenticated/u.$username'
 
@@ -65,6 +66,11 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ICodeRoute = ICodeRouteImport.update({
+  id: '/i/$code',
+  path: '/i/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedChatRoomIdRoute = AuthenticatedChatRoomIdRouteImport.update({
   id: '/$roomId',
   path: '/$roomId',
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/chat': typeof AuthenticatedChatRouteWithChildren
   '/moderator': typeof AuthenticatedModeratorRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/i/$code': typeof ICodeRoute
   '/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
   '/u/$username': typeof AuthenticatedUUsernameRoute
 }
@@ -97,6 +104,7 @@ export interface FileRoutesByTo {
   '/chat': typeof AuthenticatedChatRouteWithChildren
   '/moderator': typeof AuthenticatedModeratorRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/i/$code': typeof ICodeRoute
   '/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
   '/u/$username': typeof AuthenticatedUUsernameRoute
 }
@@ -111,6 +119,7 @@ export interface FileRoutesById {
   '/_authenticated/chat': typeof AuthenticatedChatRouteWithChildren
   '/_authenticated/moderator': typeof AuthenticatedModeratorRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/i/$code': typeof ICodeRoute
   '/_authenticated/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
   '/_authenticated/u/$username': typeof AuthenticatedUUsernameRoute
 }
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/moderator'
     | '/settings'
+    | '/i/$code'
     | '/chat/$roomId'
     | '/u/$username'
   fileRoutesByTo: FileRoutesByTo
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/moderator'
     | '/settings'
+    | '/i/$code'
     | '/chat/$roomId'
     | '/u/$username'
   id:
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/_authenticated/chat'
     | '/_authenticated/moderator'
     | '/_authenticated/settings'
+    | '/i/$code'
     | '/_authenticated/chat/$roomId'
     | '/_authenticated/u/$username'
   fileRoutesById: FileRoutesById
@@ -160,6 +172,7 @@ export interface RootRouteChildren {
   AccessibilityRoute: typeof AccessibilityRoute
   AuthRoute: typeof AuthRoute
   TermsRoute: typeof TermsRoute
+  ICodeRoute: typeof ICodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -227,6 +240,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/i/$code': {
+      id: '/i/$code'
+      path: '/i/$code'
+      fullPath: '/i/$code'
+      preLoaderRoute: typeof ICodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/chat/$roomId': {
       id: '/_authenticated/chat/$roomId'
       path: '/$roomId'
@@ -280,17 +300,8 @@ const rootRouteChildren: RootRouteChildren = {
   AccessibilityRoute: AccessibilityRoute,
   AuthRoute: AuthRoute,
   TermsRoute: TermsRoute,
+  ICodeRoute: ICodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
