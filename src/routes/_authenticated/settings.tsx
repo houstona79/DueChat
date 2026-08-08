@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "@/components/messenger/Avatar";
 import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { ProfileFeed } from "@/components/messenger/ProfileFeed";
+import { InviteCard } from "@/components/messenger/InviteCard";
 import { ImageCropper } from "@/components/messenger/ImageCropper";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { accentFor, normalizeWebsiteUrl, updateProfile, uploadAvatar } from "@/lib/chat";
