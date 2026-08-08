@@ -6,6 +6,7 @@ import { Avatar } from "@/components/messenger/Avatar";
 import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { ProfileFeed } from "@/components/messenger/ProfileFeed";
 import { InviteCard } from "@/components/messenger/InviteCard";
+import { AccessibilitySettings } from "@/components/system/AccessibilitySettings";
 import { ImageCropper } from "@/components/messenger/ImageCropper";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { accentFor, normalizeWebsiteUrl, updateProfile, uploadAvatar } from "@/lib/chat";
@@ -389,6 +390,10 @@ function SettingsPage() {
 
       <div className="mt-8">
         <InviteCard userId={user.id} />
+      </div>
+
+      <div className="mt-8">
+        <AccessibilitySettings />
       </div>
 
       <div className="mt-8">
