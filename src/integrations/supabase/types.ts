@@ -95,6 +95,51 @@ export type Database = {
         }
         Relationships: []
       }
+      message_logs: {
+        Row: {
+          archived_at: string
+          body: string
+          display_name: string | null
+          id: string
+          is_direct: boolean
+          message_id: string | null
+          room_id: string | null
+          room_name: string | null
+          room_slug: string | null
+          sent_at: string
+          user_id: string | null
+          username: string | null
+        }
+        Insert: {
+          archived_at?: string
+          body: string
+          display_name?: string | null
+          id?: string
+          is_direct?: boolean
+          message_id?: string | null
+          room_id?: string | null
+          room_name?: string | null
+          room_slug?: string | null
+          sent_at: string
+          user_id?: string | null
+          username?: string | null
+        }
+        Update: {
+          archived_at?: string
+          body?: string
+          display_name?: string | null
+          id?: string
+          is_direct?: boolean
+          message_id?: string | null
+          room_id?: string | null
+          room_name?: string | null
+          room_slug?: string | null
+          sent_at?: string
+          user_id?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           body: string
@@ -885,6 +930,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      archive_and_clear_messages: { Args: never; Returns: number }
       claim_device: {
         Args: { _device_id: string; _user_agent: string }
         Returns: undefined
