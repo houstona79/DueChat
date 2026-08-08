@@ -388,8 +388,15 @@ export function useGroupCall({
   // 3. Local track toggles, broadcast so everyone's tiles stay accurate.
   useEffect(() => {
     const stream = localStreamRef.current;
+    const audioTrack = stream?.getAudioTracks()[0] ?? null;
     stream?.getAudioTracks().forEach((t) => (t.enabled = !muted));
     stream?.getVideoTracks().forEach((t) => (t.enabled = camOn));
+    // Safari/iOS ignores `track.enabled` flips on an already-negotiated sender
+    // (it keeps sending silence forever), so swap the sender's track instead.
+    pcsRef.current.forEach((ctx) => {
+      if (!ctx.audioSender) return;
+      void ctx.audioSender.replaceTrack(muted ? null : audioTrack)?.catch?.(() => undefined);
+    });
     void channelRef.current?.send({
       type: "broadcast",
       event: "state",
