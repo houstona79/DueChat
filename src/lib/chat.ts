@@ -65,7 +65,19 @@ export function isHttpsUrl(url: string) {
 
 export async function setRoomBranding(roomId: string, branding: RoomBranding) {
   const { error } = await supabase.from("rooms").update(branding).eq("id", roomId);
-  if (error) throw error;
+  if (!error) return;
+  const raw = `${error.message} ${error.details ?? ""}`;
+  if (/rooms_icon_url_https/.test(raw))
+    throw new Error("The room icon must be a direct https:// image link (no spaces).");
+  if (/rooms_banner_url_https/.test(raw))
+    throw new Error("The room banner must be a direct https:// image link (no spaces).");
+  if (/rooms_website_url_https/.test(raw))
+    throw new Error("The website link must be a full https:// URL with no spaces.");
+  if (/rooms_website_label_len/.test(raw))
+    throw new Error("The website link text must be 60 characters or fewer.");
+  if (/row-level security|permission|policy/i.test(raw))
+    throw new Error("Only the room owner or a site admin can change this room's branding.");
+  throw new Error(error.message || "Could not save the room branding.");
 }
 
 export const ROOM_CATEGORIES = [
