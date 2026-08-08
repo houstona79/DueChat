@@ -76,6 +76,8 @@ function isEmojiOnly(body: string) {
 
 function gifUrlOf(body: string) {
   const trimmed = body.trim();
+  if (trimmed === "::live::on" || trimmed === "::live::off") return null;
+  const trimmed = body.trim();
   if (!/^https:\/\/\S+$/i.test(trimmed) || /\s/.test(trimmed)) return null;
   try {
     const url = new URL(trimmed);
