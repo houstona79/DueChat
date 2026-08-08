@@ -1,0 +1,149 @@
+import { Mic, MicOff, PhoneOff, Radio, Volume2, VolumeX } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
+import { attachStream, playWithUnlock } from "@/lib/webrtc";
+import { cn } from "@/lib/utils";
+
+/**
+ * Always-on room audio with a push-to-talk button.
+ *
+ * Everyone in the bar hears each other; the mic only opens while the Talk
+ * button is held (or while "Open mic" is locked on).
+ */
+export function TalkBar({
+  roomId,
+  meId,
+  myName,
+  onLeave,
+}: {
+  roomId: string;
+  meId: string;
+  myName: string;
+  onLeave: () => void;
+}) {
+  const [held, setHeld] = useState(false);
+  const [openMic, setOpenMic] = useState(false);
+  const [speaker, setSpeaker] = useState(true);
+
+  const { localStream, mediaError, participants, setMuted } = useGroupCall({
+    roomId,
+    userId: meId,
+    name: myName,
+    mode: "voice",
+    enabled: true,
+  });
+
+  const live = held || openMic;
+  // Keep the real mic state in sync, including once media resolves.
+  useEffect(() => {
+    setMuted(!live);
+  }, [live, localStream, setMuted]);
+
+  // Releasing outside the button must still close the mic.
+  useEffect(() => {
+    if (!held) return;
+    const release = () => setHeld(false);
+    window.addEventListener("pointerup", release);
+    window.addEventListener("pointercancel", release);
+    return () => {
+      window.removeEventListener("pointerup", release);
+      window.removeEventListener("pointercancel", release);
+    };
+  }, [held]);
+
+  return (
+    <section
+      aria-label="Room voice"
+      className="flex shrink-0 flex-wrap items-center gap-2 border-b border-border bg-sidebar/70 px-3 py-2"
+    >
+      <button
+        type="button"
+        onPointerDown={() => setHeld(true)}
+        onKeyDown={(e) => {
+          if (e.key === " " || e.key === "Enter") setHeld(true);
+        }}
+        onKeyUp={(e) => {
+          if (e.key === " " || e.key === "Enter") setHeld(false);
+        }}
+        aria-label={live ? "Microphone open" : "Hold to talk"}
+        aria-pressed={live}
+        className={cn(
+          "flex h-11 select-none items-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors active:scale-95",
+          live
+            ? "bg-primary text-primary-foreground"
+            : "bg-secondary text-foreground hover:bg-secondary/80",
+        )}
+      >
+        {live ? <Mic className="size-4" /> : <MicOff className="size-4" />}
+        {live ? "On air" : "Hold to talk"}
+      </button>
+
+      <button
+        type="button"
+        onClick={() => setOpenMic((v) => !v)}
+        aria-label={openMic ? "Turn open mic off" : "Keep microphone open"}
+        aria-pressed={openMic}
+        className={cn(
+          "grid size-10 place-items-center rounded-xl",
+          openMic ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+        )}
+        title="Open mic"
+      >
+        <Radio className="size-4" />
+      </button>
+
+      <button
+        type="button"
+        onClick={() => setSpeaker((v) => !v)}
+        aria-label={speaker ? "Mute room sound" : "Unmute room sound"}
+        aria-pressed={speaker}
+        className="grid size-10 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+      >
+        {speaker ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
+      </button>
+
+      <p className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+        {mediaError ??
+          (participants.length === 0
+            ? "You're on the mic — waiting for others to join."
+            : `${participants.length + 1} on the mic${
+                participants.filter((p) => !p.muted).length > 0
+                  ? ` · ${participants
+                      .filter((p) => !p.muted)
+                      .map((p) => p.name)
+                      .join(", ")} talking`
+                  : ""
+              }`)}
+      </p>
+
+      <button
+        type="button"
+        onClick={onLeave}
+        aria-label="Leave room voice"
+        className="grid size-10 shrink-0 place-items-center rounded-xl bg-destructive text-destructive-foreground"
+      >
+        <PhoneOff className="size-4" />
+      </button>
+
+      {participants.map((peer) => (
+        <PeerAudio key={peer.userId} peer={peer} speaker={speaker} />
+      ))}
+    </section>
+  );
+}
+
+function PeerAudio({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    attachStream(audioRef.current, peer.stream);
+  }, [peer.stream]);
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.muted = !speaker;
+    if (!speaker) return;
+    playWithUnlock(audioRef.current);
+  }, [speaker, peer.stream]);
+
+  return <audio ref={audioRef} autoPlay className="hidden" />;
+}

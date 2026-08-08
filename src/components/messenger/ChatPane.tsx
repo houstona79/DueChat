@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   Bot,
   Gamepad2,
+  Mic,
   Newspaper,
   Phone,
   Radio,
@@ -19,6 +20,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { openProfile } from "./ProfileViewer";
 import { CallOverlay } from "./CallOverlay";
+import { TalkBar } from "./TalkBar";
 import { MemberList } from "./MemberList";
 import { MemberAvatars } from "./MemberAvatars";
 import { RoomFeed } from "./RoomFeed";
@@ -114,6 +116,7 @@ export function ChatPane({
 
   const [draft, setDraft] = useState("");
   const [call, setCall] = useState<"voice" | "video" | null>(null);
+  const [talking, setTalking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -405,6 +408,19 @@ export function ChatPane({
           <Phone className="size-4" />
         </button>
         <button
+          onClick={() => setTalking((v) => !v)}
+          className={cn(
+            "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
+            talking ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+          )}
+          aria-label={talking ? "Leave room voice" : "Join room voice with push to talk"}
+          aria-pressed={talking}
+          title="Talk"
+        >
+          <Mic className="size-4" />
+          Talk
+        </button>
+        <button
           onClick={() => setCall("video")}
           className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
           aria-label="Start video call"
@@ -413,6 +429,15 @@ export function ChatPane({
         </button>
         </div>
       </header>
+
+      {talking ? (
+        <TalkBar
+          roomId={room.id}
+          meId={meId}
+          myName={profileOf(meId)?.display_name ?? "You"}
+          onLeave={() => setTalking(false)}
+        />
+      ) : null}
 
       {!room.is_direct ? (
         <>
