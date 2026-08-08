@@ -97,7 +97,11 @@ export function Sidebar({
     <div className="flex h-full min-h-0 flex-col bg-sidebar">
       <header className="px-5 pb-3 pt-6">
         <div className="flex items-center justify-between gap-2">
-          <h1 className="text-2xl font-semibold">Rooms</h1>
+          <img
+            src={duechatLogo.url}
+            alt="DueChat"
+            className="h-8 w-auto object-contain"
+          />
           <div className="flex items-center gap-1">
             {isAdmin ? (
               <Link
