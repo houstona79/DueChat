@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
+  Bot,
   Gamepad2,
   Newspaper,
   Phone,
@@ -22,6 +23,7 @@ import { MemberList } from "./MemberList";
 import { RoomFeed } from "./RoomFeed";
 import { RadioPlayer } from "./RadioPlayer";
 import { GamesPanel } from "./GamesPanel";
+import { TriviaBot } from "./TriviaBot";
 import { RoomBanner } from "./RoomBanner";
 import { RatingControl } from "./RoomRating";
 import { YouTubeEmbed } from "./YouTubeEmbed";
@@ -107,6 +109,7 @@ export function ChatPane({
   const [showFeed, setShowFeed] = useState(false);
   const [showMedia, setShowMedia] = useState(false);
   const [showGames, setShowGames] = useState(false);
+  const [showTrivia, setShowTrivia] = useState(false);
 
   const [draft, setDraft] = useState("");
   const [call, setCall] = useState<"voice" | "video" | null>(null);
@@ -284,6 +287,7 @@ export function ChatPane({
             setShowMembers(false);
             setShowFeed(false);
             setShowMedia(false);
+            setShowTrivia(false);
             setShowGames((v) => !v);
           }}
           className={cn(
@@ -297,11 +301,33 @@ export function ChatPane({
           <Gamepad2 className="size-4" />
           Games
         </button>
+        {!room.is_direct ? (
+          <button
+            onClick={() => {
+              setShowMembers(false);
+              setShowFeed(false);
+              setShowMedia(false);
+              setShowGames(false);
+              setShowTrivia((v) => !v);
+            }}
+            className={cn(
+              "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
+              showTrivia ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+            )}
+            aria-label="Show trivia bot"
+            aria-pressed={showTrivia}
+            title="Trivia bot"
+          >
+            <Bot className="size-4" />
+            Trivia
+          </button>
+        ) : null}
         <button
           onClick={() => {
             setShowFeed(false);
             setShowMedia(false);
             setShowGames(false);
+            setShowTrivia(false);
             setShowMembers((v) => !v);
           }}
           className={cn(
@@ -323,6 +349,7 @@ export function ChatPane({
               setShowMembers(false);
               setShowMedia(false);
               setShowGames(false);
+              setShowTrivia(false);
               setShowFeed((v) => !v);
             }}
             className={cn(
@@ -342,6 +369,7 @@ export function ChatPane({
               setShowMembers(false);
               setShowFeed(false);
               setShowGames(false);
+              setShowTrivia(false);
               setShowMedia((v) => !v);
             }}
             className={cn(
@@ -460,6 +488,40 @@ export function ChatPane({
           {showGames ? <GamesPanel /> : null}
         </div>
       </section>
+
+      {!room.is_direct ? (
+        <section
+          className={cn(
+            "absolute inset-y-0 right-0 z-20 flex w-full max-w-[92%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl transition-transform duration-200 ease-out sm:max-w-sm",
+            showTrivia ? "translate-x-0" : "pointer-events-none translate-x-full",
+          )}
+          aria-hidden={!showTrivia}
+          role="region"
+          aria-label="Trivia bot"
+        >
+          <div className="flex items-center justify-between border-b border-border px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+            <h3 className="text-sm font-semibold">Trivia bot</h3>
+            <button
+              onClick={() => setShowTrivia(false)}
+              className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+              aria-label="Close trivia bot"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <TriviaBot
+              roomId={room.id}
+              roomName={room.name}
+              meId={meId}
+              enabled={room.trivia_enabled}
+              canManage={canModerate}
+              joined={joined}
+              profiles={profiles}
+            />
+          </div>
+        </section>
+      ) : null}
 
       {call ? (
         <CallOverlay

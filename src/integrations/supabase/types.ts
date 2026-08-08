@@ -628,6 +628,7 @@ export type Database = {
           rating: string
           slug: string
           topic: string | null
+          trivia_enabled: boolean
           website_label: string | null
           website_url: string | null
           youtube_title: string | null
@@ -648,6 +649,7 @@ export type Database = {
           rating?: string
           slug: string
           topic?: string | null
+          trivia_enabled?: boolean
           website_label?: string | null
           website_url?: string | null
           youtube_title?: string | null
@@ -668,6 +670,7 @@ export type Database = {
           rating?: string
           slug?: string
           topic?: string | null
+          trivia_enabled?: boolean
           website_label?: string | null
           website_url?: string | null
           youtube_title?: string | null
@@ -722,6 +725,53 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      trivia_rounds: {
+        Row: {
+          answer: string
+          answered_at: string | null
+          choices: string[]
+          created_at: string
+          id: string
+          question: string
+          room_id: string
+          started_by: string
+          updated_at: string
+          winner_id: string | null
+        }
+        Insert: {
+          answer: string
+          answered_at?: string | null
+          choices?: string[]
+          created_at?: string
+          id?: string
+          question: string
+          room_id: string
+          started_by: string
+          updated_at?: string
+          winner_id?: string | null
+        }
+        Update: {
+          answer?: string
+          answered_at?: string | null
+          choices?: string[]
+          created_at?: string
+          id?: string
+          question?: string
+          room_id?: string
+          started_by?: string
+          updated_at?: string
+          winner_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trivia_rounds_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       update_reports: {
         Row: {

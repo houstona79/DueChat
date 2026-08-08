@@ -39,10 +39,11 @@ export type Room = {
   banner_url: string | null;
   website_url: string | null;
   website_label: string | null;
+  trivia_enabled: boolean;
 };
 
 export const ROOM_COLS =
-  "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label";
+  "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label, trivia_enabled";
 
 export type RoomBranding = {
   icon_url: string | null;
