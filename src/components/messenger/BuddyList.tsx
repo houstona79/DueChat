@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, ChevronRight, MessageCircle, UserMinus, UserPlus, X } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "./Avatar";
+import { countryFlag } from "@/lib/country-flags";
 import { useBuddies } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
 import {
@@ -165,6 +166,16 @@ export function BuddyList({
                   />
                   <span className="min-w-0 flex-1">
                     <span className="flex min-w-0 items-center gap-1.5">
+                      {countryFlag(p.country) ? (
+                        <span
+                          className="shrink-0 text-sm leading-none"
+                          role="img"
+                          aria-label={`Flag of ${p.country}`}
+                          title={p.country ?? undefined}
+                        >
+                          {countryFlag(p.country)}
+                        </span>
+                      ) : null}
                       <span
                         className={cn(
                           "truncate text-sm font-medium",

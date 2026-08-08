@@ -1,6 +1,7 @@
 import { Ban, LogOut, MessageSquare, ShieldCheck, ShieldOff, UserMinus, X } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { openProfile } from "./ProfileViewer";
+import { countryFlag } from "@/lib/country-flags";
 import {
   siteRoleBadgeClass,
   siteRoleLabel,
@@ -97,6 +98,16 @@ export function MemberList({
                 />
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-1.5">
+                    {countryFlag(p.country) ? (
+                      <span
+                        className="shrink-0 text-sm leading-none"
+                        role="img"
+                        aria-label={`Flag of ${p.country}`}
+                        title={p.country ?? undefined}
+                      >
+                        {countryFlag(p.country)}
+                      </span>
+                    ) : null}
                     <span
                       className={cn("truncate text-sm font-medium", siteRoleTextClass(siteRole))}
                       style={nameColorStyle(siteRole, p.name_color)}
