@@ -125,6 +125,7 @@ export function ChatPane({
   const [draft, setDraft] = useState("");
   const [call, setCall] = useState<"voice" | "video" | null>(null);
   const [talking, setTalking] = useState(false);
+  const [showCams, setShowCams] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -429,6 +430,23 @@ export function ChatPane({
           Talk
         </button>
         <button
+          onClick={() => {
+            // Cams ride along on the room voice session, so make sure it's live.
+            setTalking(true);
+            setShowCams((v) => !v);
+          }}
+          className={cn(
+            "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
+            showCams ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+          )}
+          aria-label="Show room cameras"
+          aria-pressed={showCams}
+          title="Cams"
+        >
+          <Video className="size-4" />
+          Cams
+        </button>
+        <button
           onClick={() => setCall("video")}
           className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
           aria-label="Start video call"
@@ -443,7 +461,12 @@ export function ChatPane({
           roomId={room.id}
           meId={meId}
           myName={profileOf(meId)?.display_name ?? "You"}
-          onLeave={() => setTalking(false)}
+          onLeave={() => {
+            setTalking(false);
+            setShowCams(false);
+          }}
+          camsOpen={showCams}
+          onCamsOpenChange={setShowCams}
         />
       ) : null}
 
