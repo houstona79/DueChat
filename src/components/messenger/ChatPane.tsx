@@ -20,6 +20,7 @@ import { Avatar } from "./Avatar";
 import { openProfile } from "./ProfileViewer";
 import { CallOverlay } from "./CallOverlay";
 import { MemberList } from "./MemberList";
+import { MemberAvatars } from "./MemberAvatars";
 import { RoomFeed } from "./RoomFeed";
 import { RadioPlayer } from "./RadioPlayer";
 import { GamesPanel } from "./GamesPanel";
@@ -244,6 +245,19 @@ export function ChatPane({
             </p>
           </div>
         </div>
+        {!room.is_direct && members.length > 0 ? (
+          <MemberAvatars
+            members={members}
+            profiles={profiles}
+            onShowAll={() => {
+              setShowFeed(false);
+              setShowMedia(false);
+              setShowGames(false);
+              setShowTrivia(false);
+              setShowMembers(true);
+            }}
+          />
+        ) : null}
         <div className="-mx-1 flex flex-wrap items-center gap-1.5 px-1 pb-0.5 sm:mx-0 sm:justify-end sm:px-0">
         {!room.is_direct ? (
           isOwner ? (
