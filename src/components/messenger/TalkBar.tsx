@@ -24,6 +24,7 @@ export function TalkBar({
   onLeave: () => void;
 }) {
   const [held, setHeld] = useState(false);
+  const [pushToTalk, setPushToTalk] = useState(true);
   const [openMic, setOpenMic] = useState(false);
   const [speaker, setSpeaker] = useState(true);
   const { mics, speakers, micId, speakerId, setMicId, setSpeakerId, refresh } = useAudioDevices();
