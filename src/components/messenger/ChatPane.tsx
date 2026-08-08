@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   Bot,
   Gamepad2,
+  Mic,
   Newspaper,
   Phone,
   Radio,
