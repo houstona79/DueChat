@@ -356,9 +356,13 @@ export function ChatPane({
         </>
       ) : null}
 
-      {showMedia && !room.is_direct ? (
+      {!room.is_direct ? (
         <section
-          className="absolute inset-y-0 right-0 z-20 flex w-full max-w-[92%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl duration-200 animate-in slide-in-from-right sm:max-w-sm"
+          className={cn(
+            "absolute inset-y-0 right-0 z-20 flex w-full max-w-[92%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl transition-transform duration-200 ease-out sm:max-w-sm",
+            showMedia ? "translate-x-0" : "pointer-events-none translate-x-full",
+          )}
+          aria-hidden={!showMedia}
           role="region"
           aria-label="Radio and video players"
         >
