@@ -1,6 +1,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { BadgeCheck, ExternalLink, Globe, MapPin, MessageSquare, User, X } from "lucide-react";
 import { genderLabel } from "@/lib/genders";
+import { countryFlag } from "@/lib/country-flags";
 import { visibleGender, visiblePronouns } from "@/lib/field-visibility";
 import { useBuddies } from "@/hooks/use-chat";
 import { Link } from "@tanstack/react-router";
@@ -157,7 +158,13 @@ export function ProfileViewer() {
               ) : null}
               {profile.country ? (
                 <p className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <MapPin className="size-3.5 shrink-0" aria-hidden />
+                  {countryFlag(profile.country) ? (
+                    <span className="text-base leading-none" role="img" aria-label={`Flag of ${profile.country}`}>
+                      {countryFlag(profile.country)}
+                    </span>
+                  ) : (
+                    <MapPin className="size-3.5 shrink-0" aria-hidden />
+                  )}
                   {profile.country}
                 </p>
               ) : null}
