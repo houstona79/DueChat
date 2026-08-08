@@ -12,6 +12,7 @@ import {
   fetchRooms,
   touchPresence,
 } from "@/lib/chat";
+import { fetchMyRoomInvites, fetchSentRoomInvites } from "@/lib/room-invites";
 
 export function useRooms() {
   return useQuery({ queryKey: ["rooms"], queryFn: fetchRooms });
@@ -65,6 +66,24 @@ export function useBuddies(ownerId: string | undefined) {
   });
 }
 
+/** Room invites waiting for me. */
+export function useMyRoomInvites(userId: string | undefined) {
+  return useQuery({
+    queryKey: ["room-invites", userId],
+    queryFn: () => fetchMyRoomInvites(userId!),
+    enabled: !!userId,
+  });
+}
+
+/** Invites already sent for a room, so the panel can show "Invited". */
+export function useSentRoomInvites(roomId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["room-invites-sent", roomId],
+    queryFn: () => fetchSentRoomInvites(roomId),
+    enabled,
+  });
+}
+
 /** Keeps queries fresh from realtime table changes. */
 export function useChatRealtime() {
   const queryClient = useQueryClient();
@@ -105,6 +124,10 @@ export function useChatRealtime() {
       })
       .on("postgres_changes", { event: "*", schema: "public", table: "buddies" }, () => {
         void queryClient.invalidateQueries({ queryKey: ["buddies"] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "room_invites" }, () => {
+        void queryClient.invalidateQueries({ queryKey: ["room-invites"] });
+        void queryClient.invalidateQueries({ queryKey: ["room-invites-sent"] });
       })
       .subscribe();
 
