@@ -7,6 +7,7 @@ import { Avatar } from "./Avatar";
 import { BuddyList } from "./BuddyList";
 import { NewRoomForm } from "./NewRoomForm";
 import { NotificationsPanel } from "./NotificationsPanel";
+import { RoomInvites } from "./RoomInvites";
 import { WaterUpdates } from "./WaterUpdates";
 import { ThemeToggle } from "@/components/system/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
@@ -202,6 +203,7 @@ export function Sidebar({
       <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-6">
         <WaterUpdates />
         <NotificationsPanel me={me} profiles={profiles} />
+        <RoomInvites me={me} rooms={rooms} profiles={profiles} />
         <BuddyList profiles={profiles} me={me} />
         {directs.length > 0 ? (
           <section className="mb-2">

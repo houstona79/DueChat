@@ -9,6 +9,7 @@ import {
   Radio,
   SendHorizonal,
   Users,
+  UserPlus,
   Video,
   X,
 } from "lucide-react";
@@ -22,6 +23,7 @@ import { openProfile } from "./ProfileViewer";
 import { CallOverlay } from "./CallOverlay";
 import { TalkBar } from "./TalkBar";
 import { MemberList } from "./MemberList";
+import { InvitePanel } from "./InvitePanel";
 import { MemberAvatars } from "./MemberAvatars";
 import { RoomFeed } from "./RoomFeed";
 import { RadioPlayer } from "./RadioPlayer";
@@ -121,6 +123,7 @@ export function ChatPane({
   const [showMedia, setShowMedia] = useState(false);
   const [showGames, setShowGames] = useState(false);
   const [showTrivia, setShowTrivia] = useState(false);
+  const [showInvite, setShowInvite] = useState(false);
 
   const [draft, setDraft] = useState("");
   const [call, setCall] = useState<"voice" | "video" | null>(null);
@@ -354,6 +357,7 @@ export function ChatPane({
             setShowMedia(false);
             setShowGames(false);
             setShowTrivia(false);
+            setShowInvite(false);
             setShowMembers((v) => !v);
           }}
           className={cn(
@@ -369,6 +373,28 @@ export function ChatPane({
           <Users className="size-4" />
           {members.length}
         </button>
+        {!room.is_direct && joined ? (
+          <button
+            onClick={() => {
+              setShowMembers(false);
+              setShowFeed(false);
+              setShowMedia(false);
+              setShowGames(false);
+              setShowTrivia(false);
+              setShowInvite((v) => !v);
+            }}
+            className={cn(
+              "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
+              showInvite ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+            )}
+            aria-label="Invite people to this room"
+            aria-pressed={showInvite}
+            title="Invite people"
+          >
+            <UserPlus className="size-4" />
+            Invite
+          </button>
+        ) : null}
         {!room.is_direct && joined ? (
           <button
             onClick={() => {
@@ -639,6 +665,17 @@ export function ChatPane({
                   void leave();
                 }
           }
+        />
+      ) : null}
+
+      {showInvite && !room.is_direct ? (
+        <InvitePanel
+          roomId={room.id}
+          roomName={room.name}
+          memberships={members}
+          profiles={profiles}
+          meId={meId}
+          onClose={() => setShowInvite(false)}
         />
       ) : null}
 

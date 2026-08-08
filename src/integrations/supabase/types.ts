@@ -574,6 +574,38 @@ export type Database = {
           },
         ]
       }
+      room_invites: {
+        Row: {
+          created_at: string
+          id: string
+          invitee_id: string
+          inviter_id: string
+          room_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invitee_id: string
+          inviter_id: string
+          room_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invitee_id?: string
+          inviter_id?: string
+          room_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_invites_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       room_members: {
         Row: {
           id: string
