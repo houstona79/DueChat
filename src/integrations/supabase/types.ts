@@ -821,6 +821,7 @@ export type Database = {
           radio_url: string | null
           rating: string
           slug: string
+          staff_only: boolean
           topic: string | null
           trivia_enabled: boolean
           website_label: string | null
@@ -842,6 +843,7 @@ export type Database = {
           radio_url?: string | null
           rating?: string
           slug: string
+          staff_only?: boolean
           topic?: string | null
           trivia_enabled?: boolean
           website_label?: string | null
@@ -863,6 +865,7 @@ export type Database = {
           radio_url?: string | null
           rating?: string
           slug?: string
+          staff_only?: boolean
           topic?: string | null
           trivia_enabled?: boolean
           website_label?: string | null
@@ -1122,7 +1125,9 @@ export type Database = {
         Returns: boolean
       }
       is_site_banned: { Args: { _user_id: string }; Returns: boolean }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
       my_invite_code: { Args: never; Returns: string }
+      room_is_staff_only: { Args: { _room_id: string }; Returns: boolean }
       room_requires_adult: { Args: { _room_id: string }; Returns: boolean }
     }
     Enums: {
