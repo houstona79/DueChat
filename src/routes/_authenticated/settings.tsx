@@ -388,6 +388,10 @@ function SettingsPage() {
       </div>
 
       <div className="mt-8">
+        <InviteCard userId={user.id} />
+      </div>
+
+      <div className="mt-8">
         <ProfileFeed userId={user.id} title="Your updates" />
         <p className="mt-2 text-[11px] text-muted-foreground">
           Updates you post here appear in your profile’s update feed.
