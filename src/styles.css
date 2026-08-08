@@ -218,4 +218,47 @@ html.dark {
       scroll-behavior: auto !important;
     }
   }
+
+  /* Accessibility settings (per-device, set in Settings > Accessibility) */
+  html[data-a11y-motion="true"] *,
+  html[data-a11y-motion="true"] *::before,
+  html[data-a11y-motion="true"] *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html[data-a11y-links="true"] a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  html[data-a11y-targets="true"] button,
+  html[data-a11y-targets="true"] a[href],
+  html[data-a11y-targets="true"] [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  html[data-a11y-targets="true"] a.inline,
+  html[data-a11y-targets="true"] p a[href] {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  html[data-a11y-focus="true"] :focus-visible {
+    outline: 4px solid var(--color-ring);
+    outline-offset: 3px;
+  }
+
+  html[data-a11y-contrast="true"] {
+    --muted-foreground: var(--foreground);
+    --border: var(--foreground);
+    --input: var(--foreground);
+  }
+
+  html[data-a11y-contrast="true"] body {
+    font-weight: 500;
+  }
 }
