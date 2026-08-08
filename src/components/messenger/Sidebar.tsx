@@ -290,7 +290,24 @@ export function Sidebar({
                   room.id === activeRoomId ? "bg-accent" : "hover:bg-secondary",
                 )}
               >
-                <Avatar name={room.name} accent={accentFor(room.id)} online={onlineCount > 0} />
+                {room.icon_url ? (
+                  <span className="relative inline-flex shrink-0">
+                    <img
+                      src={room.icon_url}
+                      alt={`${room.name} icon`}
+                      loading="lazy"
+                      className="size-11 rounded-2xl object-cover"
+                    />
+                    {onlineCount > 0 ? (
+                      <span
+                        className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-card bg-online"
+                        aria-hidden
+                      />
+                    ) : null}
+                  </span>
+                ) : (
+                  <Avatar name={room.name} accent={accentFor(room.id)} online={onlineCount > 0} />
+                )}
                 <span className="min-w-0 flex-1">
                   <span className="flex items-baseline justify-between gap-2">
                     <span className="flex min-w-0 items-center gap-1.5">
