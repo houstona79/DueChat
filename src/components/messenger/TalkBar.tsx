@@ -48,6 +48,51 @@ export function TalkBar({
 
   const live = pushToTalk ? held : true;
 
+  // Global keyboard shortcut: hold Space to talk. Ignore while typing in
+  // editable fields so the chat input still works normally.
+  useEffect(() => {
+    if (!pushToTalk) return;
+
+    const isTyping = () => {
+      const active = document.activeElement;
+      if (!active) return false;
+      const htmlEl = active as HTMLElement;
+      return (
+        active.tagName === "INPUT" ||
+        active.tagName === "TEXTAREA" ||
+        active.getAttribute("contenteditable") === "true" ||
+        htmlEl.isContentEditable
+      );
+    };
+
+    const keyDown = (e: KeyboardEvent) => {
+      if (e.key !== " " || held) return;
+      if (isTyping()) return;
+      e.preventDefault();
+      unlockAudioPlayback();
+      setHeld(true);
+    };
+
+    const keyUp = (e: KeyboardEvent) => {
+      if (e.key !== " ") return;
+      setHeld(false);
+    };
+
+    const release = () => setHeld(false);
+
+    window.addEventListener("keydown", keyDown);
+    window.addEventListener("keyup", keyUp);
+    window.addEventListener("blur", release);
+    document.addEventListener("visibilitychange", release);
+
+    return () => {
+      window.removeEventListener("keydown", keyDown);
+      window.removeEventListener("keyup", keyUp);
+      window.removeEventListener("blur", release);
+      document.removeEventListener("visibilitychange", release);
+    };
+  }, [held, pushToTalk]);
+
   // iOS Safari: pointer events can be missing/unreliable on older versions, so
   // accept touch and mouse too, and unlock audio output inside the gesture.
   const press = () => {
@@ -102,6 +147,7 @@ export function TalkBar({
           pushToTalk ? (live ? "Microphone open" : "Hold to talk") : "Microphone always open"
         }
         aria-pressed={live}
+        title={pushToTalk ? "Hold Space or click to talk" : "Open microphone mode"}
         className={cn(
           "flex h-11 touch-none select-none items-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors active:scale-95 [-webkit-touch-callout:none] [-webkit-user-select:none]",
           live
