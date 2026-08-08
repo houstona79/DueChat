@@ -1,4 +1,5 @@
-import { Accessibility, RotateCcw } from "lucide-react";
+import { Accessibility, RotateCcw, X } from "lucide-react";
+import { useState } from "react";
 
 import { TEXT_SCALES, useA11y, type A11yPrefs } from "@/hooks/use-a11y";
 import { useTheme } from "@/hooks/use-theme";
@@ -121,5 +122,50 @@ export function AccessibilitySettings() {
         })}
       </ul>
     </section>
+  );
+}
+
+/** Sidebar/header button that opens the accessibility panel in an overlay. */
+export function AccessibilityButton({ className }: { className?: string }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label="Accessibility settings"
+        title="Accessibility settings"
+        className={
+          className ??
+          "grid size-9 min-h-9 min-w-9 place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        }
+      >
+        <Accessibility className="size-4" aria-hidden />
+      </button>
+
+      {open ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Accessibility settings"
+          className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-background/80 p-4 backdrop-blur-sm"
+        >
+          <div className="w-full max-w-lg">
+            <div className="mb-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Close accessibility settings"
+                className="grid size-9 min-h-9 min-w-9 place-items-center rounded-xl bg-secondary text-foreground"
+              >
+                <X className="size-4" aria-hidden />
+              </button>
+            </div>
+            <AccessibilitySettings />
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 }
