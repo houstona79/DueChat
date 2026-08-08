@@ -18,9 +18,14 @@ export function HumanCheck({
   verified: boolean;
   onVerifiedChange: (v: boolean) => void;
 }) {
-  const [puzzle, setPuzzle] = useState<Puzzle>(() => makePuzzle());
+  // Generated after mount so SSR and client markup match (Math.random differs).
+  const [puzzle, setPuzzle] = useState<Puzzle | null>(null);
   const [value, setValue] = useState("");
   const [error, setError] = useState(false);
+
+  useEffect(() => {
+    setPuzzle(makePuzzle());
+  }, []);
 
   const reset = useCallback(() => {
     setPuzzle(makePuzzle());
@@ -30,7 +35,7 @@ export function HumanCheck({
   }, [onVerifiedChange]);
 
   useEffect(() => {
-    if (verified) return;
+    if (verified || !puzzle) return;
     const trimmed = value.trim();
     const guess = Number(trimmed);
     if (trimmed === "" || Number.isNaN(guess)) {
@@ -71,7 +76,13 @@ export function HumanCheck({
       </div>
       <div className="mt-1.5 flex items-center gap-2">
         <span className="select-none font-display text-sm tabular-nums">
-          {puzzle.a} {puzzle.op === "+" ? "+" : "\u2212"} {puzzle.b} =
+          {puzzle ? (
+            <>
+              {puzzle.a} {puzzle.op === "+" ? "+" : "\u2212"} {puzzle.b} =
+            </>
+          ) : (
+            <>&nbsp;</>
+          )}
         </span>
         <input
           id="human-check"
@@ -79,6 +90,7 @@ export function HumanCheck({
           inputMode="numeric"
           autoComplete="off"
           value={value}
+          disabled={!puzzle}
           maxLength={3}
           onChange={(e) => setValue(e.target.value.replace(/[^\d-]/g, ""))}
           className="w-16 rounded-lg bg-background px-2.5 py-1.5 text-sm outline-none"
