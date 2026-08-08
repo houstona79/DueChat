@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+import { Sparkles, Star } from "lucide-react";
 import type { Profile } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 
@@ -27,13 +27,36 @@ export function membershipYears(joinedAt: string | null | undefined) {
   return Math.max(0, years);
 }
 
+/** Days a member is considered new. */
+const NEW_MEMBER_DAYS = 30;
+
+/** True while a member joined within the last 30 days. */
+export function isNewMember(joinedAt: string | null | undefined) {
+  if (!joinedAt) return false;
+  const joined = new Date(joinedAt);
+  if (Number.isNaN(joined.getTime())) return false;
+  const days = (Date.now() - joined.getTime()) / 86_400_000;
+  return days >= 0 && days < NEW_MEMBER_DAYS;
+}
+
 /** One colored badge for every full year a member has been on DueChat. */
 export function YearBadges({ profile }: { profile: Profile }) {
   const years = membershipYears(profile.created_at);
-  if (years < 1) return null;
+  const isNew = isNewMember(profile.created_at);
+  if (years < 1 && !isNew) return null;
 
   return (
-    <section aria-label="Membership anniversary badges" className="flex flex-wrap gap-1.5">
+    <section aria-label="Membership badges" className="flex flex-wrap gap-1.5">
+      {isNew && (
+        <span
+          title="New member — joined in the last 30 days"
+          className="inline-flex items-center gap-1 rounded-full bg-rose-500/15 px-2 py-0.5 text-[11px] font-semibold text-rose-500 ring-1 ring-rose-500/30"
+        >
+          <Sparkles className="size-3 fill-current" aria-hidden />
+          <span>New</span>
+          <span className="sr-only">New member, joined in the last 30 days</span>
+        </span>
+      )}
       {Array.from({ length: years }, (_, i) => {
         const tier = TIERS[i % TIERS.length]!;
         const label = `${i + 1} ${i === 0 ? "Year" : "Years"} on DueChat`;
