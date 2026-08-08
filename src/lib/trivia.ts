@@ -49,7 +49,10 @@ function shuffle<T>(items: T[]): T[] {
   const copy = [...items];
   for (let i = copy.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
+    const a = copy[i] as T;
+    const b = copy[j] as T;
+    copy[i] = b;
+    copy[j] = a;
   }
   return copy;
 }
@@ -57,7 +60,7 @@ function shuffle<T>(items: T[]): T[] {
 export function pickQuestion(avoid: string[] = []) {
   const pool = TRIVIA_QUESTIONS.filter((q) => !avoid.includes(q.q));
   const source = pool.length ? pool : TRIVIA_QUESTIONS;
-  const picked = source[Math.floor(Math.random() * source.length)];
+  const picked = source[Math.floor(Math.random() * source.length)] as Question;
   return { question: picked.q, answer: picked.a, choices: shuffle([picked.a, ...picked.wrong]) };
 }
 
