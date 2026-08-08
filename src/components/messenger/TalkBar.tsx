@@ -95,17 +95,24 @@ export function TalkBar({
         onKeyUp={(e) => {
           if (e.key === " " || e.key === "Enter") setHeld(false);
         }}
-        aria-label={live ? "Microphone open" : "Hold to talk"}
+        aria-label={
+          pushToTalk
+            ? live
+              ? "Microphone open"
+              : "Hold to talk"
+            : "Microphone always open"
+        }
         aria-pressed={live}
         className={cn(
           "flex h-11 touch-none select-none items-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors active:scale-95 [-webkit-touch-callout:none] [-webkit-user-select:none]",
           live
             ? "bg-primary text-primary-foreground"
             : "bg-secondary text-foreground hover:bg-secondary/80",
+          !pushToTalk && "cursor-default",
         )}
       >
         {live ? <Mic className="size-4" /> : <MicOff className="size-4" />}
-        {live ? "On air" : "Hold to talk"}
+        {live ? "On air" : pushToTalk ? "Hold to talk" : "Mic open"}
       </button>
 
       <button
