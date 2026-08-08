@@ -147,6 +147,7 @@ export function TalkBar({
           pushToTalk ? (live ? "Microphone open" : "Hold to talk") : "Microphone always open"
         }
         aria-pressed={live}
+        title={pushToTalk ? "Hold Space or click to talk" : "Open microphone mode"}
         className={cn(
           "flex h-11 touch-none select-none items-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors active:scale-95 [-webkit-touch-callout:none] [-webkit-user-select:none]",
           live
