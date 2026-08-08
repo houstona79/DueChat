@@ -229,6 +229,7 @@ export function NotificationsPanel({
                         /* non-blocking */
                       }
                     }
+                    if (n.kind === "room_invite") return;
                     openProfile(n.actor_id ?? me.id);
                   }}
                   className={cn(
@@ -260,6 +261,56 @@ export function NotificationsPanel({
                     <span className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" aria-hidden />
                   ) : null}
                 </button>
+
+                {n.kind === "room_invite" && n.room_id ? (
+                  <div className="flex flex-wrap items-center gap-1.5 px-3 pb-2 pl-12">
+                    <button
+                      type="button"
+                      disabled={inviteBusy === n.id}
+                      onClick={async () => {
+                        setInviteBusy(n.id);
+                        try {
+                          const invite = myInvites.find((i) => i.room_id === n.room_id);
+                          if (invite) await acceptRoomInvite(invite, me.id);
+                          await markNotificationRead(n.id).catch(() => {});
+                          await queryClient.invalidateQueries({ queryKey: ["room-invites", me.id] });
+                          await queryClient.invalidateQueries({ queryKey: ["memberships"] });
+                          await refresh();
+                          await navigate({ to: "/chat/$roomId", params: { roomId: n.room_id! } });
+                        } catch {
+                          toast.error("Couldn’t join that room.");
+                        } finally {
+                          setInviteBusy(null);
+                        }
+                      }}
+                      className="flex min-h-8 items-center gap-1 rounded-full bg-primary px-2.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"
+                    >
+                      <MailPlus className="size-3" aria-hidden />
+                      Accept
+                    </button>
+                    <button
+                      type="button"
+                      disabled={inviteBusy === n.id}
+                      onClick={async () => {
+                        setInviteBusy(n.id);
+                        try {
+                          const invite = myInvites.find((i) => i.room_id === n.room_id);
+                          if (invite) await dismissRoomInvite(invite.id);
+                          await queryClient.invalidateQueries({ queryKey: ["room-invites", me.id] });
+                          await refresh();
+                        } catch {
+                          toast.error("Couldn’t decline that invite.");
+                        } finally {
+                          setInviteBusy(null);
+                        }
+                      }}
+                      className="flex min-h-8 items-center gap-1 rounded-full border border-border px-2.5 text-xs text-muted-foreground hover:border-primary/60 hover:text-foreground disabled:opacity-60"
+                    >
+                      <X className="size-3" aria-hidden />
+                      Decline
+                    </button>
+                  </div>
+                ) : null}
 
                 {n.update_id ? (
                   <div className="flex flex-wrap items-center gap-1 px-3 pb-2 pl-12">
