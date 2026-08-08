@@ -3,7 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
 import { attachStream, playWithUnlock, unlockAudioPlayback } from "@/lib/webrtc";
 import { applySinkId, useAudioDevices } from "@/lib/audio-devices";
+import { useMicLevel } from "@/lib/use-mic-level";
 import { AudioDeviceMenu } from "./AudioDeviceMenu";
+import { MicLevelMeter } from "./MicLevelMeter";
 import { cn } from "@/lib/utils";
 
 /**
@@ -40,6 +42,8 @@ export function TalkBar({
     enabled: true,
     micId,
   });
+
+  const micLevel = useMicLevel(localStream, true);
 
   // Labels only become readable once mic permission is granted.
   useEffect(() => {
@@ -159,6 +163,8 @@ export function TalkBar({
         {live ? <Mic className="size-4" /> : <MicOff className="size-4" />}
         {live ? "On air" : pushToTalk ? "Hold to talk" : "Mic open"}
       </button>
+
+      <MicLevelMeter level={micLevel} active={live} />
 
       <button
         type="button"
