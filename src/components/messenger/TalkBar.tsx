@@ -23,11 +23,15 @@ export function TalkBar({
   meId,
   myName,
   onLeave,
+  camsOpen,
+  onCamsOpenChange,
 }: {
   roomId: string;
   meId: string;
   myName: string;
   onLeave: () => void;
+  camsOpen: boolean;
+  onCamsOpenChange: (open: boolean) => void;
 }) {
   const [held, setHeld] = useState(false);
   const [pushToTalk, setPushToTalk] = useState(() => {
@@ -35,7 +39,6 @@ export function TalkBar({
     return window.localStorage.getItem("duechat:ptt") !== "false";
   });
   const [speaker, setSpeaker] = useState(true);
-  const [showCams, setShowCams] = useState(false);
   const { mics, speakers, micId, speakerId, setMicId, setSpeakerId, refresh } = useAudioDevices();
 
   const queryClient = useQueryClient();
