@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Newspaper, Phone, SendHorizonal, Users, Video } from "lucide-react";
+import { ArrowLeft, Newspaper, Phone, Radio, SendHorizonal, Users, Video, X } from "lucide-react";
 import { EmojiPicker } from "./EmojiPicker";
 import { GifPicker } from "./GifPicker";
 
