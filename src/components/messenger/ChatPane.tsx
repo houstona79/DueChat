@@ -241,7 +241,7 @@ export function ChatPane({
             </p>
           </div>
         </div>
-        <div className="-mx-1 flex items-center gap-1.5 overflow-x-auto px-1 pb-0.5 sm:contents">
+        <div className="-mx-1 flex flex-wrap items-center gap-1.5 px-1 pb-0.5 sm:mx-0 sm:justify-end sm:px-0">
         {!room.is_direct ? (
           isOwner ? (
             <select
