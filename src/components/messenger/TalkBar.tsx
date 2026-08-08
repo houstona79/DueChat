@@ -61,7 +61,7 @@ export function TalkBar({
   return (
     <section
       aria-label="Room voice"
-      className="flex shrink-0 flex-wrap items-center gap-2 border-b border-border bg-sidebar/70 px-3 py-2"
+      className="relative flex shrink-0 flex-wrap items-center gap-2 border-b border-border bg-sidebar/70 px-3 py-2"
     >
       <button
         type="button"
