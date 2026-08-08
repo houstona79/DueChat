@@ -43,7 +43,7 @@ export function TalkBar({
     if (localStream) void refresh();
   }, [localStream, refresh]);
 
-  const live = held || openMic;
+  const live = pushToTalk ? held || openMic : true;
 
   // iOS Safari: pointer events can be missing/unreliable on older versions, so
   // accept touch and mouse too, and unlock audio output inside the gesture.
@@ -51,6 +51,7 @@ export function TalkBar({
     unlockAudioPlayback();
     setHeld(true);
   };
+
   // Keep the real mic state in sync, including once media resolves.
   useEffect(() => {
     setMuted(!live);
