@@ -3,7 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
 import { attachStream, playWithUnlock, unlockAudioPlayback } from "@/lib/webrtc";
 import { applySinkId, useAudioDevices } from "@/lib/audio-devices";
+import { useMicLevel } from "@/lib/use-mic-level";
 import { AudioDeviceMenu } from "./AudioDeviceMenu";
+import { MicLevelMeter } from "./MicLevelMeter";
 import { cn } from "@/lib/utils";
 
 /**
