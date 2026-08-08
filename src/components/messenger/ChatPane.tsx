@@ -9,6 +9,7 @@ import {
   Radio,
   SendHorizonal,
   Users,
+  UserPlus,
   Video,
   X,
 } from "lucide-react";
