@@ -122,7 +122,13 @@ export function TalkBar({
         type="button"
         onClick={() => {
           unlockAudioPlayback();
-          setPushToTalk((v) => !v);
+          setPushToTalk((v) => {
+            const next = !v;
+            if (typeof window !== "undefined") {
+              window.localStorage.setItem("duechat:ptt", String(next));
+            }
+            return next;
+          });
         }}
         aria-label={pushToTalk ? "Switch to open microphone" : "Switch to push-to-talk"}
         aria-pressed={pushToTalk}
