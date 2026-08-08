@@ -19,6 +19,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { openProfile } from "./ProfileViewer";
 import { CallOverlay } from "./CallOverlay";
+import { TalkBar } from "./TalkBar";
 import { MemberList } from "./MemberList";
 import { MemberAvatars } from "./MemberAvatars";
 import { RoomFeed } from "./RoomFeed";
