@@ -54,7 +54,7 @@ export function useMicLevel(stream: MediaStream | null | undefined, enabled: boo
     const tick = () => {
       analyser.getByteFrequencyData(data);
       let sum = 0;
-      for (let i = 0; i < data.length; i++) sum += data[i];
+      for (let i = 0; i < data.length; i++) sum += data[i] ?? 0;
       const average = data.length ? sum / data.length : 0;
       setLevel(average / 255);
       rafRef.current = requestAnimationFrame(tick);
