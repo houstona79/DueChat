@@ -60,12 +60,13 @@ export function useMicLevel(stream: MediaStream | null | undefined, enabled: boo
       rafRef.current = requestAnimationFrame(tick);
     };
 
-    ctx
-      .resume()
+    // Older Safari's webkitAudioContext has no resume(); just start the loop.
+    const started = typeof ctx.resume === "function" ? ctx.resume() : Promise.resolve();
+    void Promise.resolve(started)
+      .catch(() => undefined)
       .then(() => {
         rafRef.current = requestAnimationFrame(tick);
-      })
-      .catch(() => undefined);
+      });
 
     ctxRef.current = ctx;
 
