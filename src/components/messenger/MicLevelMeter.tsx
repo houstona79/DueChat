@@ -32,10 +32,10 @@ export function MicLevelMeter({
               "h-1.5 w-4 rounded-sm transition-colors duration-75",
               on
                 ? i >= segments - 2
-                  ? "bg-red-500"
+                  ? "bg-destructive"
                   : i >= segments - 4
-                    ? "bg-amber-400"
-                    : "bg-emerald-500"
+                    ? "bg-accent-3"
+                    : "bg-online"
                 : "bg-muted",
             )}
           />
