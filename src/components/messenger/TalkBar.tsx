@@ -119,17 +119,17 @@ export function TalkBar({
         type="button"
         onClick={() => {
           unlockAudioPlayback();
-          setOpenMic((v) => !v);
+          setPushToTalk((v) => !v);
         }}
-        aria-label={openMic ? "Turn open mic off" : "Keep microphone open"}
-        aria-pressed={openMic}
+        aria-label={pushToTalk ? "Switch to open microphone" : "Switch to push-to-talk"}
+        aria-pressed={pushToTalk}
         className={cn(
           "grid size-10 place-items-center rounded-xl",
-          openMic ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+          pushToTalk ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
         )}
-        title="Open mic"
+        title={pushToTalk ? "Push-to-talk on" : "Open mic on"}
       >
-        <Radio className="size-4" />
+        {pushToTalk ? <Hand className="size-4" /> : <Radio className="size-4" />}
       </button>
 
       <AudioDeviceMenu
