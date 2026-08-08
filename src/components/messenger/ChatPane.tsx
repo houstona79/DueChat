@@ -267,6 +267,7 @@ export function ChatPane({
         <button
           onClick={() => {
             setShowFeed(false);
+            setShowMedia(false);
             setShowMembers((v) => !v);
           }}
           className={cn(
@@ -286,6 +287,7 @@ export function ChatPane({
           <button
             onClick={() => {
               setShowMembers(false);
+              setShowMedia(false);
               setShowFeed((v) => !v);
             }}
             className={cn(
@@ -297,6 +299,24 @@ export function ChatPane({
             title="Room feed"
           >
             <Newspaper className="size-4" />
+          </button>
+        ) : null}
+        {!room.is_direct ? (
+          <button
+            onClick={() => {
+              setShowMembers(false);
+              setShowFeed(false);
+              setShowMedia((v) => !v);
+            }}
+            className={cn(
+              "grid size-10 shrink-0 place-items-center rounded-xl",
+              showMedia ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+            )}
+            aria-label="Show radio and video players"
+            aria-pressed={showMedia}
+            title="Radio & video"
+          >
+            <Radio className="size-4" />
           </button>
         ) : null}
         <button
@@ -333,25 +353,46 @@ export function ChatPane({
               );
             }}
           />
-          <RadioPlayer
-          url={room.radio_url}
-          name={room.radio_name}
-          canEdit={isOwner}
-          onSave={async (radio) => {
-            await setRoomRadio(room.id, radio);
-            await queryClient.invalidateQueries({ queryKey: ["rooms"] });
-          }}
-          />
-          <YouTubeEmbed
-            url={room.youtube_url}
-            title={room.youtube_title}
-            canEdit={canModerate}
-            onSave={async (video) => {
-              await setRoomYouTube(room.id, video);
-              await queryClient.invalidateQueries({ queryKey: ["rooms"] });
-            }}
-          />
         </>
+      ) : null}
+
+      {showMedia && !room.is_direct ? (
+        <section
+          className="absolute inset-y-0 right-0 z-20 flex w-full max-w-[92%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl duration-200 animate-in slide-in-from-right sm:max-w-sm"
+          role="region"
+          aria-label="Radio and video players"
+        >
+          <div className="flex items-center justify-between border-b border-border px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+            <h3 className="text-sm font-semibold">Radio &amp; video</h3>
+            <button
+              onClick={() => setShowMedia(false)}
+              className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+              aria-label="Close players"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <RadioPlayer
+              url={room.radio_url}
+              name={room.radio_name}
+              canEdit={isOwner}
+              onSave={async (radio) => {
+                await setRoomRadio(room.id, radio);
+                await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+              }}
+            />
+            <YouTubeEmbed
+              url={room.youtube_url}
+              title={room.youtube_title}
+              canEdit={canModerate}
+              onSave={async (video) => {
+                await setRoomYouTube(room.id, video);
+                await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+              }}
+            />
+          </div>
+        </section>
       ) : null}
 
       {call ? (
