@@ -10,6 +10,7 @@ import { NotificationsPanel } from "./NotificationsPanel";
 import { RoomInvites } from "./RoomInvites";
 import { WaterUpdates } from "./WaterUpdates";
 import { ThemeToggle } from "@/components/system/ThemeToggle";
+import { AccessibilityButton } from "@/components/system/AccessibilitySettings";
 import { supabase } from "@/integrations/supabase/client";
 import { useOpenDirect } from "@/hooks/use-direct";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
@@ -132,6 +133,7 @@ export function Sidebar({
               <Settings className="size-4" />
             </Link>
             <ThemeToggle />
+            <AccessibilityButton />
             <button
               onClick={signOut}
               aria-label="Sign out"
