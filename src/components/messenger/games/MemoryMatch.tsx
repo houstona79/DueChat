@@ -49,8 +49,9 @@ export function MemoryMatch() {
     setPicked(chosen);
     if (chosen.length < 2) return;
     setMoves((m) => m + 1);
-    const [a, b] = chosen;
-    if (next[a].face === next[b].face) {
+    const a = chosen[0]!;
+    const b = chosen[1]!;
+    if (next[a]!.face === next[b]!.face) {
       setCards(next.map((c, i) => (i === a || i === b ? { ...c, done: true } : c)));
       setPicked([]);
       return;
