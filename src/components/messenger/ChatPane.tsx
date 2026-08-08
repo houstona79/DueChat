@@ -1,5 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Newspaper, Phone, Radio, SendHorizonal, Users, Video, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Gamepad2,
+  Newspaper,
+  Phone,
+  Radio,
+  SendHorizonal,
+  Users,
+  Video,
+  X,
+} from "lucide-react";
 import { EmojiPicker } from "./EmojiPicker";
 import { GifPicker } from "./GifPicker";
 
@@ -11,6 +21,7 @@ import { CallOverlay } from "./CallOverlay";
 import { MemberList } from "./MemberList";
 import { RoomFeed } from "./RoomFeed";
 import { RadioPlayer } from "./RadioPlayer";
+import { GamesPanel } from "./GamesPanel";
 import { RoomBanner } from "./RoomBanner";
 import { RatingControl } from "./RoomRating";
 import { YouTubeEmbed } from "./YouTubeEmbed";
@@ -95,6 +106,7 @@ export function ChatPane({
   const [showMembers, setShowMembers] = useState(false);
   const [showFeed, setShowFeed] = useState(false);
   const [showMedia, setShowMedia] = useState(false);
+  const [showGames, setShowGames] = useState(false);
 
   const [draft, setDraft] = useState("");
   const [call, setCall] = useState<"voice" | "video" | null>(null);
@@ -271,6 +283,7 @@ export function ChatPane({
           onClick={() => {
             setShowFeed(false);
             setShowMedia(false);
+            setShowGames(false);
             setShowMembers((v) => !v);
           }}
           className={cn(
@@ -291,6 +304,7 @@ export function ChatPane({
             onClick={() => {
               setShowMembers(false);
               setShowMedia(false);
+              setShowGames(false);
               setShowFeed((v) => !v);
             }}
             className={cn(
@@ -309,6 +323,7 @@ export function ChatPane({
             onClick={() => {
               setShowMembers(false);
               setShowFeed(false);
+              setShowGames(false);
               setShowMedia((v) => !v);
             }}
             className={cn(
@@ -322,6 +337,23 @@ export function ChatPane({
             <Radio className="size-4" />
           </button>
         ) : null}
+        <button
+          onClick={() => {
+            setShowMembers(false);
+            setShowFeed(false);
+            setShowMedia(false);
+            setShowGames((v) => !v);
+          }}
+          className={cn(
+            "grid size-10 shrink-0 place-items-center rounded-xl",
+            showGames ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+          )}
+          aria-label="Show games"
+          aria-pressed={showGames}
+          title="Games"
+        >
+          <Gamepad2 className="size-4" />
+        </button>
         <button
           onClick={() => setCall("voice")}
           className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
@@ -403,6 +435,30 @@ export function ChatPane({
           </div>
         </section>
       ) : null}
+
+      <section
+        className={cn(
+          "absolute inset-y-0 right-0 z-20 flex w-full max-w-[92%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl transition-transform duration-200 ease-out sm:max-w-sm",
+          showGames ? "translate-x-0" : "pointer-events-none translate-x-full",
+        )}
+        aria-hidden={!showGames}
+        role="region"
+        aria-label="Games"
+      >
+        <div className="flex items-center justify-between border-b border-border px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+          <h3 className="text-sm font-semibold">Games</h3>
+          <button
+            onClick={() => setShowGames(false)}
+            className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+            aria-label="Close games"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          {showGames ? <GamesPanel /> : null}
+        </div>
+      </section>
 
       {call ? (
         <CallOverlay
