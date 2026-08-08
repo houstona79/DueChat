@@ -1,7 +1,7 @@
 import { Mic, MicOff, PhoneOff, Radio, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
-import { attachStream, playWithUnlock } from "@/lib/webrtc";
+import { attachStream, playWithUnlock, unlockAudioPlayback } from "@/lib/webrtc";
 import { cn } from "@/lib/utils";
 
 /**
@@ -34,6 +34,13 @@ export function TalkBar({
   });
 
   const live = held || openMic;
+
+  // iOS Safari: pointer events can be missing/unreliable on older versions, so
+  // accept touch and mouse too, and unlock audio output inside the gesture.
+  const press = () => {
+    unlockAudioPlayback();
+    setHeld(true);
+  };
   // Keep the real mic state in sync, including once media resolves.
   useEffect(() => {
     setMuted(!live);
@@ -58,9 +65,21 @@ export function TalkBar({
     >
       <button
         type="button"
-        onPointerDown={() => setHeld(true)}
+        onPointerDown={press}
+        onTouchStart={(e) => {
+          e.preventDefault();
+          press();
+        }}
+        onTouchEnd={(e) => {
+          e.preventDefault();
+          setHeld(false);
+        }}
+        onTouchCancel={() => setHeld(false)}
+        onMouseDown={press}
+        onMouseUp={() => setHeld(false)}
+        onContextMenu={(e) => e.preventDefault()}
         onKeyDown={(e) => {
-          if (e.key === " " || e.key === "Enter") setHeld(true);
+          if (e.key === " " || e.key === "Enter") press();
         }}
         onKeyUp={(e) => {
           if (e.key === " " || e.key === "Enter") setHeld(false);
@@ -68,7 +87,7 @@ export function TalkBar({
         aria-label={live ? "Microphone open" : "Hold to talk"}
         aria-pressed={live}
         className={cn(
-          "flex h-11 select-none items-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors active:scale-95",
+          "flex h-11 touch-none select-none items-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors active:scale-95 [-webkit-touch-callout:none] [-webkit-user-select:none]",
           live
             ? "bg-primary text-primary-foreground"
             : "bg-secondary text-foreground hover:bg-secondary/80",
@@ -80,7 +99,10 @@ export function TalkBar({
 
       <button
         type="button"
-        onClick={() => setOpenMic((v) => !v)}
+        onClick={() => {
+          unlockAudioPlayback();
+          setOpenMic((v) => !v);
+        }}
         aria-label={openMic ? "Turn open mic off" : "Keep microphone open"}
         aria-pressed={openMic}
         className={cn(
@@ -145,5 +167,14 @@ function PeerAudio({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
     playWithUnlock(audioRef.current);
   }, [speaker, peer.stream]);
 
-  return <audio ref={audioRef} autoPlay className="hidden" />;
+  // iOS Safari refuses to play audio from an element with display:none.
+  return (
+    <audio
+      ref={audioRef}
+      autoPlay
+      playsInline
+      className="pointer-events-none absolute size-px opacity-0"
+      aria-hidden="true"
+    />
+  );
 }
