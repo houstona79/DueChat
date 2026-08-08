@@ -6,6 +6,7 @@ import { COUNTRIES } from "@/lib/countries";
 import { GENDERS } from "@/lib/genders";
 import { HumanCheck } from "@/components/auth/HumanCheck";
 import { DEVICE_BLOCK_KEY } from "@/lib/devices";
+import { clearPendingInvite, pendingInvite } from "@/lib/invites";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { ThemeToggle } from "@/components/system/ThemeToggle";
 
@@ -52,12 +53,18 @@ function AuthPage() {
   const [human, setHuman] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [invite, setInvite] = useState<string | null>(null);
 
   useEffect(() => {
     const blocked = window.sessionStorage.getItem(DEVICE_BLOCK_KEY);
     if (blocked) {
       window.sessionStorage.removeItem(DEVICE_BLOCK_KEY);
       setNotice(blocked);
+    }
+    const code = pendingInvite();
+    if (code) {
+      setInvite(code);
+      setMode("signup");
     }
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       if (session) void navigate({ to: "/chat", replace: true });
@@ -111,10 +118,12 @@ function AuthPage() {
               gender,
               pronouns: pronouns.trim().slice(0, 40),
               accepted_eula_at: new Date().toISOString(),
+              ...(invite ? { invite_code: invite } : {}),
             },
           },
         });
         if (error) throw error;
+        clearPendingInvite();
         if (!data.session) setNotice("Check your email to confirm your account, then sign in.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -163,6 +172,12 @@ function AuthPage() {
             ? "Sign in to your rooms and see who's online."
             : "Pick a handle and start chatting in seconds."}
         </p>
+
+        {invite && mode === "signup" ? (
+          <p className="mt-3 rounded-xl bg-secondary px-3 py-2.5 text-xs text-muted-foreground">
+            You're joining with an invite — you'll be added to each other's buddy list.
+          </p>
+        ) : null}
 
         <button
           onClick={() => void google()}
