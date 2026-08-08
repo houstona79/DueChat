@@ -436,6 +436,30 @@ export function ChatPane({
         </section>
       ) : null}
 
+      <section
+        className={cn(
+          "absolute inset-y-0 right-0 z-20 flex w-full max-w-[92%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl transition-transform duration-200 ease-out sm:max-w-sm",
+          showGames ? "translate-x-0" : "pointer-events-none translate-x-full",
+        )}
+        aria-hidden={!showGames}
+        role="region"
+        aria-label="Games"
+      >
+        <div className="flex items-center justify-between border-b border-border px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+          <h3 className="text-sm font-semibold">Games</h3>
+          <button
+            onClick={() => setShowGames(false)}
+            className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+            aria-label="Close games"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          {showGames ? <GamesPanel /> : null}
+        </div>
+      </section>
+
       {call ? (
         <CallOverlay
           title={title}
