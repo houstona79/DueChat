@@ -1,6 +1,7 @@
 import { Ban, LogOut, MessageSquare, ShieldCheck, ShieldOff, UserMinus, X } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { openProfile } from "./ProfileViewer";
+import { countryFlag } from "@/lib/country-flags";
 import {
   siteRoleBadgeClass,
   siteRoleLabel,
