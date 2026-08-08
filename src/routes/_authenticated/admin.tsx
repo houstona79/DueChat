@@ -19,6 +19,7 @@ import { ReportQueue } from "@/components/messenger/ReportQueue";
 import { ChatLogs } from "@/components/messenger/ChatLogs";
 import { NotificationAudit } from "@/components/messenger/NotificationAudit";
 import { AlertComposer } from "@/components/messenger/AlertComposer";
+import { AdminNav, TAB_META, type AdminTab } from "@/components/admin/AdminNav";
 import { useAuth } from "@/hooks/use-auth";
 import { accentFor, formatTime, isOnline } from "@/lib/chat";
 import {
@@ -55,20 +56,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
-type Tab =
-  | "overview"
-  | "users"
-  | "staff"
-  | "sessions"
-  | "ips"
-  | "bans"
-  | "rooms"
-  | "messages"
-  | "logs"
-  | "dms"
-  | "reports"
-  | "notifications"
-  | "alerts";
+type Tab = AdminTab;
 
 /** The owner account keeps admin access permanently (also enforced in the database). */
 const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
@@ -79,6 +67,7 @@ function AdminPage() {
   const [tab, setTab] = useState<Tab>("overview");
   const [openDm, setOpenDm] = useState<string | null>(null);
   const [staffSearch, setStaffSearch] = useState("");
+  const [userSearch, setUserSearch] = useState("");
 
   const transcript = useQuery({
     queryKey: ["admin-transcript", openDm],
@@ -199,37 +188,28 @@ function AdminPage() {
 
   return (
     <Shell>
-      <div className="flex gap-1 overflow-x-auto rounded-2xl bg-secondary p-1">
-        {(
-          [
-            "overview",
-            "users",
-            "staff",
-            "sessions",
-            "ips",
-            "bans",
-            "rooms",
-            "messages",
-            "logs",
-            "dms",
-            "reports",
-            "notifications",
-            "alerts",
-          ] as Tab[]
-        ).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`flex-1 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium capitalize ${
-              tab === t ? "bg-primary text-primary-foreground" : "text-muted-foreground"
-            }`}
-          >
-            {t === "dms" ? "DMs" : t === "ips" ? "IPs" : t}
-          </button>
-        ))}
-      </div>
+      <AdminNav
+        tab={tab}
+        onChange={setTab}
+        counts={{
+          users: data.profiles.length,
+          bans: data.bans.length,
+          rooms: groupRooms.length,
+          sessions: flagged.length,
+        }}
+      />
+      {tab !== "overview" && (
+        <button
+          type="button"
+          onClick={() => setTab("overview")}
+          className="mt-3 text-xs font-semibold text-muted-foreground hover:text-foreground"
+        >
+          ← Back to overview
+        </button>
+      )}
 
       {tab === "overview" && (
+        <>
         <div className="mt-5 grid grid-cols-2 gap-3">
           {stats.map((s) => (
             <div key={s.label} className="rounded-2xl border border-border bg-card p-4">
@@ -245,11 +225,53 @@ function AdminPage() {
             </p>
           </div>
         </div>
+        <h2 className="mt-6 text-sm font-semibold">Jump to a task</h2>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          {(["users", "reports", "alerts", "bans", "sessions", "logs"] as Tab[]).map((t) => {
+            const m = TAB_META[t];
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setTab(t)}
+                className="flex items-center gap-3 rounded-2xl border border-border bg-card px-3 py-3 text-left hover:bg-secondary"
+              >
+                <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary">
+                  <m.icon className="size-4" aria-hidden />
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-semibold">{m.label}</span>
+                  <span className="block truncate text-xs text-muted-foreground">{m.hint}</span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+        </>
       )}
 
       {tab === "users" && (
-        <ul className="mt-5 space-y-2">
-          {data.profiles.map((p) => {
+        <>
+        <label htmlFor="admin-user-search" className="sr-only">
+          Search members
+        </label>
+        <input
+          id="admin-user-search"
+          value={userSearch}
+          onChange={(e) => setUserSearch(e.target.value)}
+          placeholder="Search members by name or @username"
+          className="mt-5 w-full rounded-xl border border-border bg-secondary px-3 py-2.5 text-sm outline-none focus:border-primary"
+        />
+        <ul className="mt-3 space-y-2">
+          {data.profiles
+            .filter((p) => {
+              const q = userSearch.trim().toLowerCase();
+              if (!q) return true;
+              return (
+                p.display_name.toLowerCase().includes(q) || p.username.toLowerCase().includes(q)
+              );
+            })
+            .map((p) => {
             const admin = data.roles.some((r) => r.user_id === p.id && r.role === "admin");
             const moderator = data.roles.some(
               (r) => r.user_id === p.id && r.role === "moderator",
@@ -347,6 +369,7 @@ function AdminPage() {
             );
           })}
         </ul>
+        </>
       )}
 
       {tab === "staff" && (
