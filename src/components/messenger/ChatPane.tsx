@@ -200,33 +200,36 @@ export function ChatPane({
       className="relative flex h-full min-h-0 flex-col bg-background"
       aria-label={`Conversation: ${title}`}
     >
-      <header className="flex items-center gap-2 border-b border-border px-3 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:gap-3 sm:px-4">
-        <Link
-          to="/chat"
-          className="-ml-1 grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary md:hidden"
-          aria-label="Back to rooms"
-        >
-          <ArrowLeft className="size-5" />
-        </Link>
-        <Avatar
-          name={title}
-          accent={accentFor(partner?.id ?? room.id)}
-          avatarPath={partner?.avatar_url ?? null}
-          online={partner ? isOnline(partner) : onlineCount > 0}
-          size="sm"
-        />
-        <div className="min-w-0 flex-1">
-          <h2 className="truncate text-sm font-semibold">{title}</h2>
-          <p className="truncate text-xs text-muted-foreground">
-            {room.is_direct
-              ? partner
-                ? `${isOnline(partner) ? "Online" : "Offline"} · @${partner.username}`
-                : "Private chat"
-              : `${room.category || "General"} · ${members.length} ${members.length === 1 ? "member" : "members"} · ${onlineCount} online${
-                  room.topic ? ` · ${room.topic}` : ""
-                }`}
-          </p>
+      <header className="flex flex-col gap-2 border-b border-border px-3 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:flex-row sm:items-center sm:gap-3 sm:px-4">
+        <div className="flex min-w-0 items-center gap-2 sm:flex-1 sm:gap-3">
+          <Link
+            to="/chat"
+            className="-ml-1 grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary md:hidden"
+            aria-label="Back to rooms"
+          >
+            <ArrowLeft className="size-5" />
+          </Link>
+          <Avatar
+            name={title}
+            accent={accentFor(partner?.id ?? room.id)}
+            avatarPath={partner?.avatar_url ?? null}
+            online={partner ? isOnline(partner) : onlineCount > 0}
+            size="sm"
+          />
+          <div className="min-w-0 flex-1">
+            <h2 className="truncate text-sm font-semibold">{title}</h2>
+            <p className="truncate text-xs text-muted-foreground">
+              {room.is_direct
+                ? partner
+                  ? `${isOnline(partner) ? "Online" : "Offline"} · @${partner.username}`
+                  : "Private chat"
+                : `${room.category || "General"} · ${members.length} ${members.length === 1 ? "member" : "members"} · ${onlineCount} online${
+                    room.topic ? ` · ${room.topic}` : ""
+                  }`}
+            </p>
+          </div>
         </div>
+        <div className="-mx-1 flex items-center gap-1.5 overflow-x-auto px-1 pb-0.5 sm:contents">
         {!room.is_direct ? (
           isOwner ? (
             <select
@@ -333,6 +336,7 @@ export function ChatPane({
         >
           <Video className="size-4" />
         </button>
+        </div>
       </header>
 
       {!room.is_direct ? (
