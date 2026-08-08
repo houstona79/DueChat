@@ -5,6 +5,7 @@ import { Avatar } from "@/components/messenger/Avatar";
 import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { ProfileFeed } from "@/components/messenger/ProfileFeed";
 import { SocialStatus } from "@/components/messenger/SocialStatus";
+import { YearBadges } from "@/components/messenger/YearBadges";
 import { useAuth } from "@/hooks/use-auth";
 import { useBuddies, useProfiles } from "@/hooks/use-chat";
 import { visibleGender, visiblePronouns } from "@/lib/field-visibility";
@@ -104,6 +105,7 @@ function ProfilePage() {
           </div>
 
           <div className="mt-5 space-y-3 text-sm">
+            <YearBadges profile={profile} />
             <SocialStatus profile={profile} />
             {profile.bio ? (
               <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">
