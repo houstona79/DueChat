@@ -15,6 +15,7 @@ import { KickWatcher } from "@/components/system/KickWatcher";
 import { SessionTracker } from "@/components/system/SessionTracker";
 import { AuthWatcher } from "@/components/system/AuthWatcher";
 import { DeviceLock } from "@/components/system/DeviceLock";
+import { SystemAlerts } from "@/components/system/SystemAlerts";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -155,6 +156,7 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <KickWatcher />
+      <SystemAlerts />
       <AuthWatcher />
       <DeviceLock />
       <SessionTracker />
