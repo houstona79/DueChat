@@ -95,6 +95,54 @@ export type Database = {
         }
         Relationships: []
       }
+      invite_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      invite_redemptions: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          invited_id: string
+          inviter_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          invited_id: string
+          inviter_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          invited_id?: string
+          inviter_id?: string
+        }
+        Relationships: []
+      }
       message_logs: {
         Row: {
           archived_at: string
@@ -939,12 +987,21 @@ export type Database = {
         Args: { _device_id: string }
         Returns: boolean
       }
+      generate_invite_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      invite_owner: {
+        Args: { _code: string }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          username: string
+        }[]
       }
       is_adult: { Args: { _user_id: string }; Returns: boolean }
       is_room_admin: {
@@ -964,6 +1021,7 @@ export type Database = {
         Returns: boolean
       }
       is_site_banned: { Args: { _user_id: string }; Returns: boolean }
+      my_invite_code: { Args: never; Returns: string }
       room_requires_adult: { Args: { _room_id: string }; Returns: boolean }
     }
     Enums: {
