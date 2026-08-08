@@ -369,6 +369,7 @@ function AdminPage() {
             );
           })}
         </ul>
+        </>
       )}
 
       {tab === "staff" && (
