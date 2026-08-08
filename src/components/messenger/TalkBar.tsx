@@ -7,10 +7,11 @@ import { AudioDeviceMenu } from "./AudioDeviceMenu";
 import { cn } from "@/lib/utils";
 
 /**
- * Always-on room audio with a push-to-talk button.
+ * Always-on room audio bar with a push-to-talk toggle.
  *
- * Everyone in the bar hears each other; the mic only opens while the Talk
- * button is held (or while "Open mic" is locked on).
+ * Tap the toggle to switch between "push-to-talk" (hold the talk button to
+ * speak) and "open mic" (microphone stays live). The chosen mode persists
+ * across visits in localStorage.
  */
 export function TalkBar({
   roomId,
