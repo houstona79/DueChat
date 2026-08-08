@@ -102,7 +102,7 @@ export function RoomBanner({
             Show room banner
           </button>
         </div>
-      ) : branding.banner_url || branding.icon_url ? (
+      ) : hasBranding ? (
         <div className="relative">
           {branding.banner_url ? (
             <img
@@ -111,9 +111,9 @@ export function RoomBanner({
               loading="lazy"
               className="h-24 w-full object-cover sm:h-32"
             />
-          ) : (
+          ) : branding.icon_url ? (
             <div className="h-16 w-full bg-secondary sm:h-20" />
-          )}
+          ) : null}
           <div className="flex items-end gap-3 px-3 pb-2 sm:px-4">
             {branding.icon_url ? (
               <img
@@ -148,11 +148,13 @@ export function RoomBanner({
               </button>
             ) : null}
             <button
+              type="button"
               onClick={() => setHiddenPersisted(true)}
-              className="mb-1 grid size-9 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+              className="relative z-10 mb-1 grid size-9 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
               aria-label="Hide this room banner for me"
+              title="Hide banner for me"
             >
-              <EyeOff className="size-4" />
+              <EyeOff className="size-4" aria-hidden />
             </button>
           </div>
         </div>
