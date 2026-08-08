@@ -150,6 +150,7 @@ export function TalkBar({
   }, [held]);
 
   return (
+    <>
     <section
       aria-label="Room voice"
       className="relative flex shrink-0 flex-wrap items-center gap-2 border-b border-border bg-sidebar/70 px-3 py-2"
@@ -278,8 +279,9 @@ export function TalkBar({
       {participants.map((peer) => (
         <PeerAudio key={peer.userId} peer={peer} speaker={speaker} speakerId={speakerId} />
       ))}
+    </section>
 
-      <CamPanel
+    <CamPanel
         open={showCams}
         onClose={() => setShowCams(false)}
         myName={myName}
@@ -288,7 +290,7 @@ export function TalkBar({
         onToggleCam={() => setCamOn((v) => !v)}
         participants={participants}
       />
-    </section>
+    </>
   );
 }
 
