@@ -169,11 +169,12 @@ export function RoomBanner({
             <button
               type="button"
               onClick={() => setHiddenPersisted(true)}
-              className="relative z-10 mb-1 grid size-9 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+              className="relative z-10 mb-1 inline-flex shrink-0 items-center gap-1 rounded-xl border border-border px-2 py-1.5 text-xs font-medium text-muted-foreground hover:bg-secondary"
               aria-label="Hide this room banner for me"
               title="Hide banner for me"
             >
               <EyeOff className="size-4" aria-hidden />
+              <span className="hidden sm:inline">Hide</span>
             </button>
           </div>
         </div>
