@@ -407,6 +407,19 @@ export function ChatPane({
           <Phone className="size-4" />
         </button>
         <button
+          onClick={() => setTalking((v) => !v)}
+          className={cn(
+            "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
+            talking ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+          )}
+          aria-label={talking ? "Leave room voice" : "Join room voice with push to talk"}
+          aria-pressed={talking}
+          title="Talk"
+        >
+          <Mic className="size-4" />
+          Talk
+        </button>
+        <button
           onClick={() => setCall("video")}
           className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
           aria-label="Start video call"
@@ -415,6 +428,15 @@ export function ChatPane({
         </button>
         </div>
       </header>
+
+      {talking ? (
+        <TalkBar
+          roomId={room.id}
+          meId={meId}
+          myName={profileOf(meId)?.display_name ?? "You"}
+          onLeave={() => setTalking(false)}
+        />
+      ) : null}
 
       {!room.is_direct ? (
         <>
