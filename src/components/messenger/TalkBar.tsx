@@ -56,11 +56,12 @@ export function TalkBar({
     const isTyping = () => {
       const active = document.activeElement;
       if (!active) return false;
+      const htmlEl = active as HTMLElement;
       return (
         active.tagName === "INPUT" ||
         active.tagName === "TEXTAREA" ||
         active.getAttribute("contenteditable") === "true" ||
-        active.isContentEditable
+        htmlEl.isContentEditable
       );
     };
 
