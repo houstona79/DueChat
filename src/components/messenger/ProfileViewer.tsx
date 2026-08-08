@@ -8,6 +8,7 @@ import { Avatar } from "./Avatar";
 import { ProfilePhotos } from "./ProfilePhotos";
 import { ProfileFeed } from "./ProfileFeed";
 import { SocialStatus } from "./SocialStatus";
+import { YearBadges } from "./YearBadges";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfiles } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
@@ -147,6 +148,7 @@ export function ProfileViewer() {
         <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-3">
           {profile ? (
             <div className="space-y-3 text-sm">
+              <YearBadges profile={profile} />
               <SocialStatus profile={profile} />
               {profile.bio ? (
                 <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">

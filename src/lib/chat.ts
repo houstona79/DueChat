@@ -17,6 +17,7 @@ export type Profile = {
   website_url: string | null;
   accepted_eula_at: string | null;
   last_seen_at: string;
+  created_at: string;
 };
 
 export type Room = {
@@ -112,7 +113,7 @@ export async function fetchProfiles(): Promise<Profile[]> {
   const { data, error } = await supabase
     .from("profiles")
     .select(
-      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, accepted_eula_at, last_seen_at",
+      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, accepted_eula_at, last_seen_at, created_at",
     )
     .order("last_seen_at", { ascending: false });
   if (error) throw error;
@@ -123,7 +124,7 @@ export async function fetchMyProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from("profiles")
     .select(
-      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, accepted_eula_at, last_seen_at",
+      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, accepted_eula_at, last_seen_at, created_at",
     )
     .eq("id", userId)
     .maybeSingle();
