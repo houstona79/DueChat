@@ -14,6 +14,8 @@ import { Avatar } from "./Avatar";
 import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
 import { accentFor } from "@/lib/chat";
 import { attachStream, playWithUnlock } from "@/lib/webrtc";
+import { applySinkId, useAudioDevices } from "@/lib/audio-devices";
+import { AudioDeviceMenu } from "./AudioDeviceMenu";
 import { cn } from "@/lib/utils";
 
 function formatDuration(s: number) {
@@ -42,6 +44,7 @@ export function CallOverlay({
   const [speaker, setSpeaker] = useState(true);
   const [minimized, setMinimized] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { mics, speakers, micId, speakerId, setMicId, setSpeakerId, refresh } = useAudioDevices();
 
   const { localStream, mediaError, participants, muted, camOn, setMuted, setCamOn } = useGroupCall({
     roomId,
@@ -49,11 +52,17 @@ export function CallOverlay({
     name: myName,
     mode,
     enabled: true,
+    micId,
   });
 
   useEffect(() => {
     attachStream(videoRef.current, localStream);
   }, [localStream, camOn, minimized]);
+
+  // Device labels only become readable once permission is granted.
+  useEffect(() => {
+    if (localStream) void refresh();
+  }, [localStream, refresh]);
 
   useEffect(() => {
     const i = window.setInterval(() => setSeconds((s) => s + 1), 1000);
@@ -103,7 +112,7 @@ export function CallOverlay({
           </button>
           <video ref={videoRef} autoPlay playsInline muted className="sr-only" />
           {participants.map((peer) => (
-            <PeerAudio key={peer.userId} peer={peer} speaker={speaker} />
+            <PeerAudio key={peer.userId} peer={peer} speaker={speaker} speakerId={speakerId} />
           ))}
         </div>
       </div>
@@ -149,7 +158,7 @@ export function CallOverlay({
             <video ref={videoRef} autoPlay playsInline muted className="size-full object-cover" />
           </Tile>
           {participants.map((peer) => (
-            <PeerTile key={peer.userId} peer={peer} speaker={speaker} />
+            <PeerTile key={peer.userId} peer={peer} speaker={speaker} speakerId={speakerId} />
           ))}
         </div>
       </div>
@@ -176,6 +185,15 @@ export function CallOverlay({
         >
           {speaker ? <Volume2 className="size-5" /> : <VolumeX className="size-5" />}
         </CallButton>
+        <AudioDeviceMenu
+          mics={mics}
+          speakers={speakers}
+          micId={micId}
+          speakerId={speakerId}
+          onMicChange={setMicId}
+          onSpeakerChange={setSpeakerId}
+          onOpen={() => void refresh()}
+        />
         <button
           onClick={onEnd}
           aria-label="Leave call"
@@ -188,7 +206,15 @@ export function CallOverlay({
   );
 }
 
-function PeerTile({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
+function PeerTile({
+  peer,
+  speaker,
+  speakerId,
+}: {
+  peer: CallPeer;
+  speaker: boolean;
+  speakerId: string;
+}) {
   const ref = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -198,6 +224,10 @@ function PeerTile({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
     // audio always goes through its own always-mounted <audio> element.
     attachStream(audioRef.current, peer.stream);
   }, [peer.stream]);
+
+  useEffect(() => {
+    applySinkId(audioRef.current, speakerId);
+  }, [speakerId, peer.stream]);
 
   useEffect(() => {
     if (ref.current) ref.current.muted = true;
@@ -220,12 +250,24 @@ function PeerTile({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
 }
 
 /** Audio-only playback used while the call is minimized. */
-function PeerAudio({ peer, speaker }: { peer: CallPeer; speaker: boolean }) {
+function PeerAudio({
+  peer,
+  speaker,
+  speakerId,
+}: {
+  peer: CallPeer;
+  speaker: boolean;
+  speakerId: string;
+}) {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     attachStream(audioRef.current, peer.stream);
   }, [peer.stream]);
+
+  useEffect(() => {
+    applySinkId(audioRef.current, speakerId);
+  }, [speakerId, peer.stream]);
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.muted = !speaker;
