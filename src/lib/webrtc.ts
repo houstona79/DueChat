@@ -115,3 +115,26 @@ export function playWithUnlock(el: HTMLMediaElement | null): void {
     document.addEventListener("touchend", retry, { once: true });
   });
 }
+
+type WebkitWindow = Window & { webkitAudioContext?: typeof AudioContext };
+let unlockedCtx: AudioContext | null = null;
+
+/**
+ * iOS/Safari keeps WebRTC audio output locked until an AudioContext has been
+ * resumed inside a real user gesture. Call this from a pointer/touch handler.
+ */
+export function unlockAudioPlayback(): void {
+  if (typeof window === "undefined") return;
+  const Ctor = window.AudioContext ?? (window as WebkitWindow).webkitAudioContext;
+  if (!Ctor) return;
+  try {
+    if (!unlockedCtx) unlockedCtx = new Ctor();
+    if (unlockedCtx.state === "suspended") void unlockedCtx.resume();
+    const source = unlockedCtx.createBufferSource();
+    source.buffer = unlockedCtx.createBuffer(1, 1, 22050);
+    source.connect(unlockedCtx.destination);
+    source.start(0);
+  } catch {
+    /* noop */
+  }
+}
