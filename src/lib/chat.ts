@@ -64,8 +64,16 @@ export function isHttpsUrl(url: string) {
 }
 
 export async function setRoomBranding(roomId: string, branding: RoomBranding) {
-  const { error } = await supabase.from("rooms").update(branding).eq("id", roomId);
-  if (!error) return;
+  const { data, error } = await supabase
+    .from("rooms")
+    .update(branding)
+    .eq("id", roomId)
+    .select("icon_url, banner_url, website_url, website_label")
+    .maybeSingle();
+  if (!error && data) return data as RoomBranding;
+  if (!error) {
+    throw new Error("This room could not be updated. Only its owner can change the branding.");
+  }
   const raw = `${error.message} ${error.details ?? ""}`;
   if (/rooms_icon_url_https/.test(raw))
     throw new Error("The room icon must be a direct https:// image link (no spaces).");

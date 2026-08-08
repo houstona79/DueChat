@@ -326,8 +326,10 @@ export function ChatPane({
             }}
             canEdit={isOwner}
             onSave={async (next) => {
-              await setRoomBranding(room.id, next);
-              await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+              const saved = await setRoomBranding(room.id, next);
+              queryClient.setQueryData<Room[]>(["rooms"], (rooms) =>
+                rooms?.map((item) => (item.id === room.id ? { ...item, ...saved } : item)),
+              );
             }}
           />
           <RadioPlayer

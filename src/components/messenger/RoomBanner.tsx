@@ -54,7 +54,13 @@ export function RoomBanner({
       });
       setEditing(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not save the room branding.");
+      const message =
+        err instanceof Error
+          ? err.message
+          : err && typeof err === "object" && "message" in err && typeof err.message === "string"
+            ? err.message
+            : "Could not save the room branding.";
+      setError(message);
     } finally {
       setSaving(false);
     }
