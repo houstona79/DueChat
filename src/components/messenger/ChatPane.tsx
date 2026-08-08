@@ -283,6 +283,7 @@ export function ChatPane({
           onClick={() => {
             setShowFeed(false);
             setShowMedia(false);
+            setShowGames(false);
             setShowMembers((v) => !v);
           }}
           className={cn(
@@ -303,6 +304,7 @@ export function ChatPane({
             onClick={() => {
               setShowMembers(false);
               setShowMedia(false);
+              setShowGames(false);
               setShowFeed((v) => !v);
             }}
             className={cn(
@@ -321,6 +323,7 @@ export function ChatPane({
             onClick={() => {
               setShowMembers(false);
               setShowFeed(false);
+              setShowGames(false);
               setShowMedia((v) => !v);
             }}
             className={cn(
@@ -334,6 +337,23 @@ export function ChatPane({
             <Radio className="size-4" />
           </button>
         ) : null}
+        <button
+          onClick={() => {
+            setShowMembers(false);
+            setShowFeed(false);
+            setShowMedia(false);
+            setShowGames((v) => !v);
+          }}
+          className={cn(
+            "grid size-10 shrink-0 place-items-center rounded-xl",
+            showGames ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+          )}
+          aria-label="Show games"
+          aria-pressed={showGames}
+          title="Games"
+        >
+          <Gamepad2 className="size-4" />
+        </button>
         <button
           onClick={() => setCall("voice")}
           className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
