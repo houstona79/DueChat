@@ -99,11 +99,7 @@ export function TalkBar({
           if (e.key === " " || e.key === "Enter") setHeld(false);
         }}
         aria-label={
-          pushToTalk
-            ? live
-              ? "Microphone open"
-              : "Hold to talk"
-            : "Microphone always open"
+          pushToTalk ? (live ? "Microphone open" : "Hold to talk") : "Microphone always open"
         }
         aria-pressed={live}
         className={cn(
