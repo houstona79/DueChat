@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import { Avatar } from "@/components/messenger/Avatar";
 import { ReportQueue } from "@/components/messenger/ReportQueue";
+import { ChatLogs } from "@/components/messenger/ChatLogs";
 import { NotificationAudit } from "@/components/messenger/NotificationAudit";
 import { useAuth } from "@/hooks/use-auth";
 import { accentFor, formatTime, isOnline } from "@/lib/chat";
@@ -62,6 +63,7 @@ type Tab =
   | "bans"
   | "rooms"
   | "messages"
+  | "logs"
   | "dms"
   | "reports"
   | "notifications";
@@ -206,6 +208,7 @@ function AdminPage() {
             "bans",
             "rooms",
             "messages",
+            "logs",
             "dms",
             "reports",
             "notifications",
@@ -718,6 +721,8 @@ function AdminPage() {
       )}
 
       {tab === "reports" && <ReportQueue />}
+
+      {tab === "logs" && <ChatLogs canClear />}
 
       {tab === "notifications" && <NotificationAudit />}
     </Shell>
