@@ -94,6 +94,7 @@ export function ChatPane({
   const { open: openDirect } = useOpenDirect(meId);
   const [showMembers, setShowMembers] = useState(false);
   const [showFeed, setShowFeed] = useState(false);
+  const [showMedia, setShowMedia] = useState(false);
 
   const [draft, setDraft] = useState("");
   const [call, setCall] = useState<"voice" | "video" | null>(null);
