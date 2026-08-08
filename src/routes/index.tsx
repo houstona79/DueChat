@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { MessagesSquare, Radio, Video } from "lucide-react";
+import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
