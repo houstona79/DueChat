@@ -18,6 +18,7 @@ import { Avatar } from "@/components/messenger/Avatar";
 import { ReportQueue } from "@/components/messenger/ReportQueue";
 import { ChatLogs } from "@/components/messenger/ChatLogs";
 import { NotificationAudit } from "@/components/messenger/NotificationAudit";
+import { AlertComposer } from "@/components/messenger/AlertComposer";
 import { useAuth } from "@/hooks/use-auth";
 import { accentFor, formatTime, isOnline } from "@/lib/chat";
 import {
@@ -66,7 +67,8 @@ type Tab =
   | "logs"
   | "dms"
   | "reports"
-  | "notifications";
+  | "notifications"
+  | "alerts";
 
 /** The owner account keeps admin access permanently (also enforced in the database). */
 const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
@@ -212,6 +214,7 @@ function AdminPage() {
             "dms",
             "reports",
             "notifications",
+            "alerts",
           ] as Tab[]
         ).map((t) => (
           <button
@@ -725,6 +728,15 @@ function AdminPage() {
       {tab === "logs" && <ChatLogs canClear />}
 
       {tab === "notifications" && <NotificationAudit />}
+
+      {tab === "alerts" &&
+        (isAdmin ? (
+          <AlertComposer />
+        ) : (
+          <p className="mt-5 text-sm text-muted-foreground">
+            Only admins can send system-wide alerts.
+          </p>
+        ))}
     </Shell>
   );
 }
