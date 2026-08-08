@@ -164,6 +164,8 @@ export function TalkBar({
         {live ? "On air" : pushToTalk ? "Hold to talk" : "Mic open"}
       </button>
 
+      <MicLevelMeter level={micLevel} active={live} />
+
       <button
         type="button"
         onClick={() => {
