@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { MessagesSquare, Radio, Video } from "lucide-react";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
+import peopleBg from "@/assets/landing-people-devices.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -24,8 +25,19 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   return (
-    <main id="main-content" className="mx-auto grid min-h-screen max-w-3xl place-items-center px-6 py-16 text-center">
-      <div>
+    <main id="main-content" className="relative grid min-h-screen place-items-center px-6 py-16 text-center">
+      <img
+        src={peopleBg.url}
+        alt="People chatting on laptops, tablets and phones"
+        width={1920}
+        height={1280}
+        className="pointer-events-none absolute inset-0 -z-20 size-full object-cover opacity-35"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background/85 via-background/75 to-background"
+      />
+      <div className="mx-auto max-w-3xl">
         <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/15 text-primary">
           <MessagesSquare className="size-7" />
         </span>
