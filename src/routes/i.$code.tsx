@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Avatar } from "@/components/messenger/Avatar";
 import { fetchInviteOwner, rememberInvite } from "@/lib/invites";
+import { accentFor } from "@/lib/chat";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { ThemeToggle } from "@/components/system/ThemeToggle";
 
@@ -56,7 +57,12 @@ function InvitePage() {
         ) : owner ? (
           <>
             <div className="flex flex-col items-center gap-3">
-              <Avatar url={owner.avatar_url} name={owner.display_name} size="lg" />
+              <Avatar
+                name={owner.display_name}
+                accent={accentFor(owner.username)}
+                avatarPath={owner.avatar_url}
+                size="lg"
+              />
               <h1 className="font-display text-2xl font-semibold">
                 {owner.display_name} invited you to DueChat
               </h1>
