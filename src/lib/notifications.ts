@@ -6,6 +6,7 @@ export type Notification = {
   actor_id: string | null;
   kind: string;
   update_id: string | null;
+  room_id: string | null;
   emoji: string | null;
   preview: string | null;
   read_at: string | null;
@@ -15,7 +16,7 @@ export type Notification = {
 export async function fetchNotifications(userId: string) {
   const { data, error } = await supabase
     .from("notifications")
-    .select("id,user_id,actor_id,kind,update_id,emoji,preview,read_at,created_at")
+    .select("id,user_id,actor_id,kind,update_id,room_id,emoji,preview,read_at,created_at")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(50);
@@ -49,5 +50,6 @@ export function notificationText(n: Notification) {
   if (n.kind === "reaction") return `reacted ${n.emoji ?? ""} to your update`;
   if (n.kind === "comment") return "replied to your update";
   if (n.kind === "update") return "posted a new update";
+  if (n.kind === "room_invite") return "invited you to a room";
   return "interacted with your update";
 }
