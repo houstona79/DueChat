@@ -1,20 +1,25 @@
 import { useEffect, useState } from "react";
-import { ExternalLink, ImagePlus, Pencil, X } from "lucide-react";
+import { Eye, EyeOff, ExternalLink, ImagePlus, Pencil, X } from "lucide-react";
 import { isHttpsUrl, type RoomBranding } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 
+const hiddenKey = (roomId: string) => `duechat:banner-hidden:${roomId}`;
+
 export function RoomBanner({
+  roomId,
   roomName,
   branding,
   canEdit,
   onSave,
 }: {
+  roomId: string;
   roomName: string;
   branding: RoomBranding;
   canEdit: boolean;
   onSave: (next: RoomBranding) => Promise<void>;
 }) {
   const [editing, setEditing] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [icon, setIcon] = useState(branding.icon_url ?? "");
   const [banner, setBanner] = useState(branding.banner_url ?? "");
   const [site, setSite] = useState(branding.website_url ?? "");
@@ -28,6 +33,25 @@ export function RoomBanner({
     setSite(branding.website_url ?? "");
     setLabel(branding.website_label ?? "");
   }, [branding.icon_url, branding.banner_url, branding.website_url, branding.website_label]);
+
+  useEffect(() => {
+    try {
+      setHidden(window.localStorage.getItem(hiddenKey(roomId)) === "1");
+    } catch {
+      setHidden(false);
+    }
+  }, [roomId]);
+
+  const setHiddenPersisted = (next: boolean) => {
+    setHidden(next);
+    if (next) setEditing(false);
+    try {
+      if (next) window.localStorage.setItem(hiddenKey(roomId), "1");
+      else window.localStorage.removeItem(hiddenKey(roomId));
+    } catch {
+      /* storage unavailable */
+    }
+  };
 
   const hasBranding = Boolean(branding.banner_url || branding.icon_url || branding.website_url);
   if (!hasBranding && !canEdit) return null;
@@ -68,7 +92,17 @@ export function RoomBanner({
 
   return (
     <section className="border-b border-border" aria-label={`${roomName} branding`}>
-      {branding.banner_url || branding.icon_url ? (
+      {hidden ? (
+        <div className="flex items-center gap-2 px-3 py-1.5 sm:px-4">
+          <button
+            onClick={() => setHiddenPersisted(false)}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:bg-secondary"
+          >
+            <Eye className="size-4" aria-hidden />
+            Show room banner
+          </button>
+        </div>
+      ) : branding.banner_url || branding.icon_url ? (
         <div className="relative">
           {branding.banner_url ? (
             <img
@@ -113,6 +147,13 @@ export function RoomBanner({
                 {editing ? <X className="size-4" /> : <Pencil className="size-4" />}
               </button>
             ) : null}
+            <button
+              onClick={() => setHiddenPersisted(true)}
+              className="mb-1 grid size-9 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+              aria-label="Hide this room banner for me"
+            >
+              <EyeOff className="size-4" />
+            </button>
           </div>
         </div>
       ) : canEdit ? (
@@ -128,7 +169,7 @@ export function RoomBanner({
         </div>
       ) : null}
 
-      {editing && canEdit ? (
+      {editing && canEdit && !hidden ? (
         <div className="grid gap-2 px-3 pb-3 sm:px-4">
           {(
             [
