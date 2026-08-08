@@ -668,6 +668,17 @@ export function ChatPane({
         />
       ) : null}
 
+      {showInvite && !room.is_direct ? (
+        <InvitePanel
+          roomId={room.id}
+          roomName={room.name}
+          memberships={members}
+          profiles={profiles}
+          meId={meId}
+          onClose={() => setShowInvite(false)}
+        />
+      ) : null}
+
       {joined ? (
         <>
           <div
