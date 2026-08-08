@@ -148,11 +148,13 @@ function AuthPage() {
         <div className="mb-2 flex justify-end">
           <ThemeToggle />
         </div>
-        <img
-          src={duechatLogo.url}
-          alt="DueChat"
-          className="mx-auto mb-6 h-16 w-auto object-contain"
-        />
+        <a href="https://www.duechat.com" aria-label="Go to DueChat" className="inline-block">
+          <img
+            src={duechatLogo.url}
+            alt="DueChat"
+            className="mx-auto mb-6 h-16 w-auto object-contain"
+          />
+        </a>
         <h1 className="font-display text-2xl font-semibold">
           {mode === "signin" ? "Welcome back" : "Create your account"}
         </h1>

@@ -27,13 +27,13 @@ function AccessibilityPage() {
   return (
     <main id="main-content" className="min-h-screen bg-background px-5 py-10">
       <div className="mx-auto w-full max-w-2xl">
-        <Link to="/auth">
+        <a href="https://www.duechat.com" aria-label="Go to DueChat" className="inline-block">
           <img
             src={duechatLogo.url}
             alt="DueChat"
             className="mx-auto mb-8 h-14 w-auto object-contain"
           />
-        </Link>
+        </a>
         <h1 className="font-display text-2xl font-semibold">Accessibility Statement</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Last updated: {new Date().toLocaleDateString()}

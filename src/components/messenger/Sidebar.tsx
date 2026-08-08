@@ -97,11 +97,13 @@ export function Sidebar({
     <div className="flex h-full min-h-0 flex-col bg-sidebar">
       <header className="px-5 pb-3 pt-6">
         <div className="flex items-center justify-between gap-2">
-          <img
-            src={duechatLogo.url}
-            alt="DueChat"
-            className="h-8 w-auto object-contain"
-          />
+          <a href="https://www.duechat.com" aria-label="Go to DueChat" className="inline-block">
+            <img
+              src={duechatLogo.url}
+              alt="DueChat"
+              className="h-8 w-auto object-contain"
+            />
+          </a>
           <div className="flex items-center gap-1">
             {isAdmin ? (
               <Link
