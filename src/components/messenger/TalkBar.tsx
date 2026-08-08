@@ -46,7 +46,7 @@ export function TalkBar({
     if (localStream) void refresh();
   }, [localStream, refresh]);
 
-  const live = pushToTalk ? held || openMic : true;
+  const live = pushToTalk ? held : true;
 
   // iOS Safari: pointer events can be missing/unreliable on older versions, so
   // accept touch and mouse too, and unlock audio output inside the gesture.
