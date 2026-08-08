@@ -336,6 +336,7 @@ export function ChatPane({
         >
           <Video className="size-4" />
         </button>
+        </div>
       </header>
 
       {!room.is_direct ? (
