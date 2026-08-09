@@ -13,7 +13,11 @@ import {
 } from "@/lib/water";
 import { cn } from "@/lib/utils";
 
-const DEFAULT_PLACE: WaterPlace = { name: "Charlotte, NC, US", latitude: 35.2271, longitude: -80.8431 };
+const DEFAULT_PLACE: WaterPlace = {
+  name: "Charlotte, NC, US",
+  latitude: 35.2271,
+  longitude: -80.8431,
+};
 
 function dayLabel(date: string) {
   const d = new Date(`${date}T12:00:00`);
@@ -107,7 +111,10 @@ export function WaterUpdates() {
           </span>
         </span>
         <ChevronDown
-          className={cn("size-4 shrink-0 text-muted-foreground transition-transform", open && "rotate-180")}
+          className={cn(
+            "size-4 shrink-0 text-muted-foreground transition-transform",
+            open && "rotate-180",
+          )}
           aria-hidden
         />
       </button>
@@ -194,7 +201,9 @@ export function WaterUpdates() {
                 <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <Waves className="size-3.5 shrink-0" aria-hidden />
                   {river.label} for nearby waterways
-                  {data.dischargeMean != null ? ` (normal ≈ ${data.dischargeMean.toFixed(1)} m³/s)` : ""}
+                  {data.dischargeMean != null
+                    ? ` (normal ≈ ${data.dischargeMean.toFixed(1)} m³/s)`
+                    : ""}
                 </p>
               ) : null}
 

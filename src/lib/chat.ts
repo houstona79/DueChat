@@ -16,6 +16,10 @@ export type Profile = {
   bio: string | null;
   website_url: string | null;
   accepted_eula_at: string | null;
+  /** Who may open this profile: everyone, buddies only, or nobody. */
+  profile_visibility: string;
+  /** Optional badge shown beside the name (diamond, star, flag…). */
+  decoration: string | null;
   last_seen_at: string;
   created_at: string;
 };
@@ -42,10 +46,15 @@ export type Room = {
   trivia_enabled: boolean;
   /** Staff-only rooms are hidden from regular members by database policy. */
   staff_only: boolean;
+  /** Short notice set by the owner or a room super admin. */
+  status_message: string | null;
 };
 
 export const ROOM_COLS =
-  "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label, trivia_enabled, staff_only";
+  "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label, trivia_enabled, staff_only, status_message";
+
+const PROFILE_COLS =
+  "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, accepted_eula_at, profile_visibility, decoration, last_seen_at, created_at";
 
 export type RoomBranding = {
   icon_url: string | null;
@@ -166,9 +175,7 @@ export function slugify(name: string) {
 export async function fetchProfiles(): Promise<Profile[]> {
   const { data, error } = await supabase
     .from("profiles")
-    .select(
-      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, accepted_eula_at, last_seen_at, created_at",
-    )
+    .select(PROFILE_COLS)
     .order("last_seen_at", { ascending: false });
   if (error) throw error;
   return data ?? [];
@@ -177,9 +184,7 @@ export async function fetchProfiles(): Promise<Profile[]> {
 export async function fetchMyProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from("profiles")
-    .select(
-      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, accepted_eula_at, last_seen_at, created_at",
-    )
+    .select(PROFILE_COLS)
     .eq("id", userId)
     .maybeSingle();
   if (error) throw error;
@@ -189,9 +194,7 @@ export async function fetchMyProfile(userId: string): Promise<Profile | null> {
 export async function fetchRooms(): Promise<Room[]> {
   const { data, error } = await supabase
     .from("rooms")
-    .select(
-      ROOM_COLS,
-    )
+    .select(ROOM_COLS)
     .order("created_at", { ascending: true });
   if (error) throw error;
   return (data ?? []) as Room[];
@@ -203,7 +206,7 @@ export type RoomEvent = {
   id: string;
   room_id: string;
   user_id: string;
-  kind: "join" | "leave";
+  kind: "join" | "leave" | "bounce";
   created_at: string;
 };
 
@@ -255,10 +258,14 @@ export async function createRoom(
 ) {
   const { data, error } = await supabase
     .from("rooms")
-    .insert({ name: name.trim(), slug: slugify(name), topic: topic.trim() || null, created_by: userId, category })
-    .select(
-      ROOM_COLS,
-    )
+    .insert({
+      name: name.trim(),
+      slug: slugify(name),
+      topic: topic.trim() || null,
+      created_by: userId,
+      category,
+    })
+    .select(ROOM_COLS)
     .single();
   if (error) throw error;
   const join = await supabase.from("room_members").insert({ room_id: data.id, user_id: userId });
@@ -302,15 +309,13 @@ export async function openDirectRoom(meId: string, otherId: string): Promise<Roo
     throw created.error;
   }
 
-  const members = await supabase
-    .from("room_members")
-    .upsert(
-      [
-        { room_id: created.data.id, user_id: meId },
-        { room_id: created.data.id, user_id: otherId },
-      ],
-      { onConflict: "room_id,user_id" },
-    );
+  const members = await supabase.from("room_members").upsert(
+    [
+      { room_id: created.data.id, user_id: meId },
+      { room_id: created.data.id, user_id: otherId },
+    ],
+    { onConflict: "room_id,user_id" },
+  );
   if (members.error) throw members.error;
   return created.data as Room;
 }
@@ -342,7 +347,10 @@ export async function leaveRoom(roomId: string, userId: string) {
 }
 
 export async function touchPresence(userId: string) {
-  await supabase.from("profiles").update({ last_seen_at: new Date().toISOString() }).eq("id", userId);
+  await supabase
+    .from("profiles")
+    .update({ last_seen_at: new Date().toISOString() })
+    .eq("id", userId);
 }
 
 /* ---------- room radio ---------- */
@@ -427,7 +435,15 @@ export async function setRoomRadio(
 
 /* ---------- room moderation ---------- */
 
-export type RoomAdmin = { room_id: string; user_id: string };
+/** Room admin tiers: super admins manage the room, admins moderate people. */
+export type RoomAdminTier = "super" | "admin";
+
+export type RoomAdmin = { room_id: string; user_id: string; tier: RoomAdminTier };
+
+export const ROOM_ADMIN_TIER_LABEL: Record<RoomAdminTier, string> = {
+  super: "Super admin",
+  admin: "Room admin",
+};
 
 export type Buddy = {
   id: string;
@@ -448,9 +464,7 @@ export async function fetchBuddies(ownerId: string): Promise<Buddy[]> {
 }
 
 export async function addBuddy(ownerId: string, buddyId: string) {
-  const { error } = await supabase
-    .from("buddies")
-    .insert({ owner_id: ownerId, buddy_id: buddyId });
+  const { error } = await supabase.from("buddies").insert({ owner_id: ownerId, buddy_id: buddyId });
   if (error && error.code !== "23505") throw error;
 }
 
@@ -469,31 +483,121 @@ export type RoomBan = {
   banned_by: string;
   reason: string | null;
   created_at: string;
+  /** null means the restriction never expires. */
+  expires_at: string | null;
 };
+
+export type RoomSilence = {
+  room_id: string;
+  user_id: string;
+  silenced_by: string;
+  reason: string | null;
+  created_at: string;
+  expires_at: string | null;
+};
+
+/** Ban / silence lengths offered in the room panels. */
+export const MODERATION_DURATIONS = [
+  { value: "60", label: "1 hour" },
+  { value: "360", label: "6 hours" },
+  { value: "1440", label: "1 day" },
+  { value: "10080", label: "1 week" },
+  { value: "0", label: "Until removed" },
+] as const;
+
+export function expiryFromMinutes(minutes: number): string | null {
+  return minutes > 0 ? new Date(Date.now() + minutes * 60_000).toISOString() : null;
+}
+
+/** A ban/silence row still in force right now. */
+export function isActive(row: { expires_at: string | null }) {
+  return !row.expires_at || new Date(row.expires_at).getTime() > Date.now();
+}
 
 export async function fetchRoomAdmins(roomId: string): Promise<RoomAdmin[]> {
   const { data, error } = await supabase
     .from("room_admins")
-    .select("room_id, user_id")
+    .select("room_id, user_id, tier")
     .eq("room_id", roomId);
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []) as RoomAdmin[];
 }
 
 export async function fetchRoomBans(roomId: string): Promise<RoomBan[]> {
   const { data, error } = await supabase
     .from("room_bans")
-    .select("room_id, user_id, banned_by, reason, created_at")
+    .select("room_id, user_id, banned_by, reason, created_at, expires_at")
     .eq("room_id", roomId)
     .order("created_at", { ascending: false });
   if (error) throw error;
   return data ?? [];
 }
 
-export async function addRoomAdmin(roomId: string, userId: string, grantedBy: string) {
+export async function fetchRoomSilences(roomId: string): Promise<RoomSilence[]> {
+  const { data, error } = await supabase
+    .from("room_silences")
+    .select("room_id, user_id, silenced_by, reason, created_at, expires_at")
+    .eq("room_id", roomId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+/** Silences ("dots") someone so they can read the room but not post. */
+export async function silenceMember(
+  roomId: string,
+  userId: string,
+  silencedBy: string,
+  expiresAt: string | null,
+) {
+  const { error } = await supabase
+    .from("room_silences")
+    .upsert(
+      { room_id: roomId, user_id: userId, silenced_by: silencedBy, expires_at: expiresAt },
+      { onConflict: "room_id,user_id" },
+    );
+  if (error) throw error;
+}
+
+export async function unsilenceMember(roomId: string, userId: string) {
+  const { error } = await supabase
+    .from("room_silences")
+    .delete()
+    .eq("room_id", roomId)
+    .eq("user_id", userId);
+  if (error) throw error;
+}
+
+/** Owner/super-admin only: the notice shown under the room name. */
+export async function setRoomStatusMessage(roomId: string, status: string | null) {
+  const { error } = await supabase
+    .from("rooms")
+    .update({ status_message: status })
+    .eq("id", roomId);
+  if (error) throw error;
+}
+
+export async function addRoomAdmin(
+  roomId: string,
+  userId: string,
+  grantedBy: string,
+  tier: RoomAdminTier = "admin",
+) {
   const { error } = await supabase
     .from("room_admins")
-    .insert({ room_id: roomId, user_id: userId, granted_by: grantedBy });
+    .upsert(
+      { room_id: roomId, user_id: userId, granted_by: grantedBy, tier },
+      { onConflict: "room_id,user_id" },
+    );
+  if (error) throw error;
+}
+
+export async function setRoomAdminTier(roomId: string, userId: string, tier: RoomAdminTier) {
+  const { error } = await supabase
+    .from("room_admins")
+    .update({ tier })
+    .eq("room_id", roomId)
+    .eq("user_id", userId);
   if (error) throw error;
 }
 
@@ -516,16 +620,27 @@ export async function kickMember(roomId: string, userId: string) {
   if (error) throw error;
 }
 
-/** Bans someone from the room and removes them from the roster. */
+/**
+ * Restricts someone from the room and removes them from the roster.
+ * `expiresAt` null keeps them out until they are removed from the list.
+ */
 export async function banMember(
   roomId: string,
   userId: string,
   bannedBy: string,
   reason?: string,
+  expiresAt: string | null = null,
 ) {
-  const { error } = await supabase
-    .from("room_bans")
-    .insert({ room_id: roomId, user_id: userId, banned_by: bannedBy, reason: reason ?? null });
+  const { error } = await supabase.from("room_bans").upsert(
+    {
+      room_id: roomId,
+      user_id: userId,
+      banned_by: bannedBy,
+      reason: reason ?? null,
+      expires_at: expiresAt,
+    },
+    { onConflict: "room_id,user_id" },
+  );
   if (error) throw error;
   await kickMember(roomId, userId);
 }
@@ -558,6 +673,8 @@ export async function updateProfile(
       | "bio"
       | "website_url"
       | "accepted_eula_at"
+      | "profile_visibility"
+      | "decoration"
     >
   >,
 ) {

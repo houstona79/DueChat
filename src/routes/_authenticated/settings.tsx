@@ -6,15 +6,18 @@ import { Avatar } from "@/components/messenger/Avatar";
 import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { ProfileFeed } from "@/components/messenger/ProfileFeed";
 import { InviteCard } from "@/components/messenger/InviteCard";
+import { BlockList } from "@/components/messenger/BlockList";
 import { AccessibilitySettings } from "@/components/system/AccessibilitySettings";
 import { ImageCropper } from "@/components/messenger/ImageCropper";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 import { accentFor, normalizeWebsiteUrl, updateProfile, uploadAvatar } from "@/lib/chat";
 import { isRedish, readableNameColor } from "@/hooks/use-roles";
 import { cn } from "@/lib/utils";
 import { COUNTRIES } from "@/lib/countries";
 import { GENDERS } from "@/lib/genders";
 import { FIELD_VISIBILITIES } from "@/lib/field-visibility";
+import { DECORATIONS } from "@/lib/decorations";
 import { postStatusChangeUpdate } from "@/lib/profile-updates";
 
 const NAME_COLORS = [
@@ -30,6 +33,12 @@ const NAME_COLORS = [
   { label: "Indigo", value: "#818cf8" },
   { label: "Slate", value: "#cbd5e1" },
 ];
+
+const PROFILE_VISIBILITIES = [
+  { value: "public", label: "Everyone" },
+  { value: "buddies", label: "Buddies only" },
+  { value: "private", label: "Private — nobody" },
+] as const;
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -62,6 +71,9 @@ function SettingsPage() {
   const [pronounsVisibility, setPronounsVisibility] = useState("public");
   const [bio, setBio] = useState("");
   const [website, setWebsite] = useState("");
+  const [profileVisibility, setProfileVisibility] = useState("public");
+  const [decoration, setDecoration] = useState("");
+  const [resetting, setResetting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -80,6 +92,8 @@ function SettingsPage() {
     setPronounsVisibility(me.pronouns_visibility ?? "public");
     setBio(me.bio ?? "");
     setWebsite(me.website_url ?? "");
+    setProfileVisibility(me.profile_visibility ?? "public");
+    setDecoration(me.decoration ?? "");
   }, [me]);
 
   if (!user || !me) return null;
@@ -104,7 +118,12 @@ function SettingsPage() {
       const statusChanged = nextStatus !== (me.status_message ?? null);
       await updateProfile(user.id, {
         display_name: displayName.trim().slice(0, 60) || me.display_name,
-        username: username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 24) || me.username,
+        username:
+          username
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9_]/g, "")
+            .slice(0, 24) || me.username,
         status_message: nextStatus,
         name_color: nameColor || null,
         country: country || null,
@@ -114,6 +133,8 @@ function SettingsPage() {
         pronouns_visibility: pronounsVisibility,
         bio: bio.trim().slice(0, 500) || null,
         website_url: websiteUrl,
+        profile_visibility: profileVisibility,
+        decoration: decoration || null,
         ...(me.birth_date ? {} : { birth_date: birthDate || null }),
       });
       if (statusChanged && nextStatus) {
@@ -127,7 +148,11 @@ function SettingsPage() {
       }
       await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
       await queryClient.invalidateQueries({ queryKey: ["profiles"] });
-      setMessage(statusChanged && nextStatus ? "Profile saved — status shared to your feed." : "Profile saved.");
+      setMessage(
+        statusChanged && nextStatus
+          ? "Profile saved — status shared to your feed."
+          : "Profile saved.",
+      );
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Could not save profile.");
     } finally {
@@ -165,7 +190,10 @@ function SettingsPage() {
   };
 
   return (
-    <main id="main-content" className="mx-auto min-h-screen min-w-0 max-w-3xl px-3 py-6 sm:px-5 sm:py-8">
+    <main
+      id="main-content"
+      className="mx-auto min-h-screen min-w-0 max-w-3xl px-3 py-6 sm:px-5 sm:py-8"
+    >
       <Link
         to="/chat"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -206,9 +234,20 @@ function SettingsPage() {
       ) : null}
 
       <form onSubmit={save} className="mt-6 space-y-4">
-        <Field label="Display name" id="display-name" value={displayName} onChange={setDisplayName} />
+        <Field
+          label="Display name"
+          id="display-name"
+          value={displayName}
+          onChange={setDisplayName}
+        />
         <Field label="Username" id="username" value={username} onChange={setUsername} />
-        <Field label="Status" id="status" value={status} onChange={setStatus} placeholder="Working on something new" />
+        <Field
+          label="Status"
+          id="status"
+          value={status}
+          onChange={setStatus}
+          placeholder="Working on something new"
+        />
 
         <div>
           <label htmlFor="bio" className="block text-[11px] font-medium text-muted-foreground">
@@ -295,7 +334,10 @@ function SettingsPage() {
               </option>
             ))}
           </select>
-          <label htmlFor="gender-visibility" className="mt-2 block text-[11px] font-medium text-muted-foreground">
+          <label
+            htmlFor="gender-visibility"
+            className="mt-2 block text-[11px] font-medium text-muted-foreground"
+          >
             Who can see my gender
           </label>
           <select
@@ -324,7 +366,10 @@ function SettingsPage() {
             placeholder="she/her, he/him, they/them…"
             className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none"
           />
-          <label htmlFor="pronouns-visibility" className="mt-2 block text-[11px] font-medium text-muted-foreground">
+          <label
+            htmlFor="pronouns-visibility"
+            className="mt-2 block text-[11px] font-medium text-muted-foreground"
+          >
             Who can see my pronouns
           </label>
           <select
@@ -342,10 +387,68 @@ function SettingsPage() {
         </div>
 
         <div>
-          <span className="block text-[11px] font-medium text-muted-foreground">Name color</span>
+          <label
+            htmlFor="profile-visibility"
+            className="block text-[11px] font-medium text-muted-foreground"
+          >
+            Who can view my profile
+          </label>
+          <select
+            id="profile-visibility"
+            value={profileVisibility}
+            onChange={(e) => setProfileVisibility(e.target.value)}
+            className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none"
+          >
+            {PROFILE_VISIBILITIES.map((v) => (
+              <option key={v.value} value={v.value}>
+                {v.label}
+              </option>
+            ))}
+          </select>
           <p className="mt-1 text-[11px] text-muted-foreground">
-            Red is reserved for admins.
+            Private hides your bio, photos and updates from everyone but you and staff.
           </p>
+        </div>
+
+        <div>
+          <span className="block text-[11px] font-medium text-muted-foreground">
+            Badge beside your name
+          </span>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setDecoration("")}
+              aria-pressed={decoration === ""}
+              className={cn(
+                "rounded-xl border-2 bg-secondary px-3 py-1.5 text-xs font-medium",
+                decoration === "" ? "border-primary" : "border-transparent",
+              )}
+            >
+              None
+            </button>
+            {DECORATIONS.map((d) => (
+              <button
+                key={d.value}
+                type="button"
+                onClick={() => setDecoration(d.value)}
+                aria-label={d.label}
+                aria-pressed={decoration === d.value}
+                className={cn(
+                  "grid size-10 place-items-center rounded-xl border-2 bg-secondary text-base",
+                  decoration === d.value ? "border-primary" : "border-transparent",
+                )}
+              >
+                <span role="img" aria-hidden>
+                  {d.glyph}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <span className="block text-[11px] font-medium text-muted-foreground">Name color</span>
+          <p className="mt-1 text-[11px] text-muted-foreground">Red is reserved for admins.</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {NAME_COLORS.map((c) => (
               <button
@@ -395,6 +498,33 @@ function SettingsPage() {
       <div className="mt-8">
         <InviteCard userId={user.id} />
       </div>
+
+      <div className="mt-8">
+        <BlockList meId={user.id} />
+      </div>
+
+      <section className="mt-8 rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-sm font-semibold">Password</h2>
+        <p className="mt-1 text-[11px] text-muted-foreground">
+          We'll email {user.email ?? "your address"} a link to choose a new password.
+        </p>
+        <button
+          type="button"
+          disabled={resetting || !user.email}
+          onClick={async () => {
+            if (!user.email) return;
+            setResetting(true);
+            const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+              redirectTo: `${window.location.origin}/reset-password`,
+            });
+            setResetting(false);
+            setMessage(error ? error.message : "Password reset email sent — check your inbox.");
+          }}
+          className="mt-3 rounded-xl bg-secondary px-4 py-2 text-sm font-medium disabled:opacity-50"
+        >
+          {resetting ? "Sending…" : "Send password reset email"}
+        </button>
+      </section>
 
       <div className="mt-8">
         <ProfileFeed userId={user.id} title="Your updates" />

@@ -27,7 +27,10 @@ export function IncomingCallWatcher({
   const [dismissed, setDismissed] = useState<string[]>([]);
 
   const directRooms = rooms.filter((r) => r.is_direct && r.direct_key?.includes(meId));
-  const directKeys = directRooms.map((r) => r.id).sort().join(",");
+  const directKeys = directRooms
+    .map((r) => r.id)
+    .sort()
+    .join(",");
 
   useEffect(() => {
     if (!meId || !directKeys) return;

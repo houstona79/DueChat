@@ -26,7 +26,9 @@ export async function uploadProfilePhoto(userId: string, file: File, caption?: s
   if (file.size > MAX_BYTES) throw new Error("That image is larger than 8 MB.");
   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
   const path = `${userId}/photos/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: false });
+  const { error: upErr } = await supabase.storage
+    .from("avatars")
+    .upload(path, file, { upsert: false });
   if (upErr) throw upErr;
   const { error } = await supabase
     .from("profile_photos")

@@ -1,7 +1,22 @@
-import { Ban, LogOut, MessageSquare, ShieldCheck, ShieldOff, UserMinus, X } from "lucide-react";
+import { useState } from "react";
+import {
+  Ban,
+  LogOut,
+  MessageSquare,
+  MicOff,
+  Mic,
+  ShieldCheck,
+  ShieldOff,
+  ShieldPlus,
+  UserMinus,
+  UserX,
+  X,
+} from "lucide-react";
 import { Avatar } from "./Avatar";
 import { openProfile } from "./ProfileViewer";
 import { countryFlag } from "@/lib/country-flags";
+import { decorationGlyph, decorationLabel } from "@/lib/decorations";
+import { isBlocked, type Block } from "@/lib/blocks";
 import {
   siteRoleBadgeClass,
   siteRoleLabel,
@@ -10,60 +25,119 @@ import {
   nameColorStyle,
   useSiteRoles,
 } from "@/hooks/use-roles";
-import { accentFor, isOnline, type Membership, type Profile, type RoomBan } from "@/lib/chat";
+import {
+  accentFor,
+  expiryFromMinutes,
+  isActive,
+  isOnline,
+  MODERATION_DURATIONS,
+  ROOM_ADMIN_TIER_LABEL,
+  type Membership,
+  type Profile,
+  type RoomAdmin,
+  type RoomAdminTier,
+  type RoomBan,
+  type RoomSilence,
+} from "@/lib/chat";
 import { cn } from "@/lib/utils";
+
+const actionClass =
+  "inline-flex items-center gap-1 rounded-lg bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70";
+
+function expiryLabel(expiresAt: string | null) {
+  if (!expiresAt) return "until removed";
+  const mins = Math.round((new Date(expiresAt).getTime() - Date.now()) / 60_000);
+  if (mins <= 0) return "expired";
+  if (mins < 60) return `${mins} min left`;
+  const hours = Math.round(mins / 60);
+  return hours < 48 ? `${hours} hr left` : `${Math.round(hours / 24)} days left`;
+}
 
 export function MemberList({
   memberships,
   profiles,
   meId,
   ownerId,
-  roomAdminIds,
+  roomAdmins,
   bans,
+  silences,
+  blocks,
   canModerate,
-  isOwner,
+  isSuper,
   onClose,
   onMessage,
   onLeave,
-  onPromote,
-  onDemote,
-  onKick,
-  onBan,
-  onUnban,
+  onSetTier,
+  onRemoveAdmin,
+  onBounce,
+  onRestrict,
+  onUnrestrict,
+  onSilence,
+  onUnsilence,
+  onBlock,
+  onUnblock,
 }: {
   memberships: Membership[];
   profiles: Profile[];
   meId: string;
   ownerId?: string | undefined;
-  roomAdminIds?: string[] | undefined;
+  roomAdmins?: RoomAdmin[] | undefined;
   bans?: RoomBan[] | undefined;
+  silences?: RoomSilence[] | undefined;
+  blocks?: Block[] | undefined;
   canModerate?: boolean | undefined;
-  isOwner?: boolean | undefined;
+  isSuper?: boolean | undefined;
   onClose: () => void;
   onMessage: (userId: string) => void;
   onLeave?: (() => void) | undefined;
-  onPromote?: ((userId: string) => void) | undefined;
-  onDemote?: ((userId: string) => void) | undefined;
-  onKick?: ((userId: string) => void) | undefined;
-  onBan?: ((userId: string) => void) | undefined;
-  onUnban?: ((userId: string) => void) | undefined;
+  onSetTier?: ((userId: string, tier: RoomAdminTier) => void) | undefined;
+  onRemoveAdmin?: ((userId: string) => void) | undefined;
+  onBounce?: ((userId: string) => void) | undefined;
+  onRestrict?: ((userId: string, expiresAt: string | null) => void) | undefined;
+  onUnrestrict?: ((userId: string) => void) | undefined;
+  onSilence?: ((userId: string, expiresAt: string | null) => void) | undefined;
+  onUnsilence?: ((userId: string) => void) | undefined;
+  onBlock?: ((userId: string) => void) | undefined;
+  onUnblock?: ((userId: string) => void) | undefined;
 }) {
-  const adminIds = new Set(roomAdminIds ?? []);
+  const admins = roomAdmins ?? [];
+  const tierOf = (id: string): RoomAdminTier | null =>
+    id === ownerId ? "super" : (admins.find((a) => a.user_id === id)?.tier ?? null);
+  const isListedAdmin = (id: string) => admins.some((a) => a.user_id === id);
   const { data: siteRoles } = useSiteRoles();
+  const [durations, setDurations] = useState<Record<string, string>>({});
+  const durationOf = (id: string) => durations[id] ?? "1440";
+
   const members = memberships
     .map((m) => profiles.find((p) => p.id === m.user_id))
     .filter((p): p is Profile => Boolean(p))
     .sort((a, b) => Number(isOnline(b)) - Number(isOnline(a)));
 
+  const silenceOf = (id: string) =>
+    (silences ?? []).find((s) => s.user_id === id && isActive(s)) ?? null;
+
   const banList = (bans ?? [])
+    .filter(isActive)
     .map((b) => ({ ban: b, profile: profiles.find((p) => p.id === b.user_id) }))
     .filter((x): x is { ban: RoomBan; profile: Profile } => Boolean(x.profile));
 
-  const roleLabel = (id: string) =>
-    id === ownerId ? "Owner" : adminIds.has(id) ? "Room admin" : null;
+  const silenceList = (silences ?? [])
+    .filter(isActive)
+    .map((s) => ({ silence: s, profile: profiles.find((p) => p.id === s.user_id) }))
+    .filter((x): x is { silence: RoomSilence; profile: Profile } => Boolean(x.profile));
+
+  const roleLabel = (id: string) => {
+    if (id === ownerId) return "Owner";
+    const tier = tierOf(id);
+    return tier ? ROOM_ADMIN_TIER_LABEL[tier] : null;
+  };
 
   return (
-    <section className="absolute inset-y-0 right-0 z-20 flex w-full max-w-[85%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl sm:max-w-xs" role="region" aria-label="Room members">
+    <section
+      className="absolute inset-y-0 right-0 z-20 flex w-full max-w-[85%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl sm:max-w-xs"
+      role="region"
+      aria-label="Room members"
+    >
       <header className="flex items-center justify-between px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <h3 className="text-sm font-semibold">Members · {members.length}</h3>
         <button
@@ -80,6 +154,9 @@ export function MemberList({
           const siteRole = siteRoleOf(siteRoles, p.id);
           const isTargetProtected = p.id === ownerId || p.id === meId;
           const canActOn = Boolean(canModerate) && !isTargetProtected;
+          const silenced = silenceOf(p.id);
+          const blocked = isBlocked(blocks, p.id);
+          const glyph = decorationGlyph(p.decoration);
           return (
             <li key={p.id} className="rounded-2xl px-2 py-2">
               <div className="flex items-center gap-3">
@@ -89,56 +166,71 @@ export function MemberList({
                   aria-label={`View ${p.display_name}'s profile`}
                   className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl text-left hover:opacity-80"
                 >
-                <Avatar
-                  name={p.display_name}
-                  accent={accentFor(p.id)}
-                  avatarPath={p.avatar_url}
-                  online={isOnline(p)}
-                  size="sm"
-                />
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-1.5">
-                    {countryFlag(p.country) ? (
+                  <Avatar
+                    name={p.display_name}
+                    accent={accentFor(p.id)}
+                    avatarPath={p.avatar_url}
+                    online={isOnline(p)}
+                    size="sm"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-1.5">
+                      {countryFlag(p.country) ? (
+                        <span
+                          className="shrink-0 text-sm leading-none"
+                          role="img"
+                          aria-label={`Flag of ${p.country}`}
+                          title={p.country ?? undefined}
+                        >
+                          {countryFlag(p.country)}
+                        </span>
+                      ) : null}
                       <span
-                        className="shrink-0 text-sm leading-none"
-                        role="img"
-                        aria-label={`Flag of ${p.country}`}
-                        title={p.country ?? undefined}
+                        className={cn("truncate text-sm font-medium", siteRoleTextClass(siteRole))}
+                        style={nameColorStyle(siteRole, p.name_color)}
                       >
-                        {countryFlag(p.country)}
+                        {p.display_name}
+                        {p.id === meId ? " (you)" : ""}
                       </span>
-                    ) : null}
-                    <span
-                      className={cn("truncate text-sm font-medium", siteRoleTextClass(siteRole))}
-                      style={nameColorStyle(siteRole, p.name_color)}
-                    >
-                      {p.display_name}
-                      {p.id === meId ? " (you)" : ""}
+                      {glyph ? (
+                        <span
+                          className="shrink-0 text-sm leading-none"
+                          role="img"
+                          aria-label={decorationLabel(p.decoration) ?? undefined}
+                          title={decorationLabel(p.decoration) ?? undefined}
+                        >
+                          {glyph}
+                        </span>
+                      ) : null}
+                      {siteRoleLabel(siteRole) ? (
+                        <span
+                          className={cn(
+                            "shrink-0 rounded-md px-1.5 py-0.5 text-[11px] font-semibold",
+                            siteRoleBadgeClass(siteRole),
+                          )}
+                        >
+                          {siteRoleLabel(siteRole)}
+                        </span>
+                      ) : null}
+                      {role ? (
+                        <span className="shrink-0 rounded-md bg-primary/15 px-1.5 py-0.5 text-[11px] font-semibold text-primary">
+                          {role}
+                        </span>
+                      ) : null}
+                      {silenced ? (
+                        <span className="shrink-0 rounded-md bg-destructive/15 px-1.5 py-0.5 text-[11px] font-semibold text-destructive">
+                          Silenced
+                        </span>
+                      ) : null}
                     </span>
-                    {siteRoleLabel(siteRole) ? (
-                      <span
-                        className={cn(
-                          "shrink-0 rounded-md px-1.5 py-0.5 text-[11px] font-semibold",
-                          siteRoleBadgeClass(siteRole),
-                        )}
-                      >
-                        {siteRoleLabel(siteRole)}
+                    <span className="block truncate text-xs text-muted-foreground">
+                      <span className={isOnline(p) ? "text-primary" : undefined}>
+                        {isOnline(p) ? "Online" : "Offline"}
                       </span>
-                    ) : null}
-                    {role ? (
-                      <span className="shrink-0 rounded-md bg-primary/15 px-1.5 py-0.5 text-[11px] font-semibold text-primary">
-                        {role}
-                      </span>
-                    ) : null}
-                  </span>
-                  <span className="block truncate text-xs text-muted-foreground">
-                    <span className={isOnline(p) ? "text-primary" : undefined}>
-                      {isOnline(p) ? "Online" : "Offline"}
+                      {" · "}
+                      {p.status_message || `@${p.username}`}
                     </span>
-                    {" · "}
-                    {p.status_message || `@${p.username}`}
                   </span>
-                </span>
                 </button>
                 {p.id === meId ? null : (
                   <button
@@ -154,7 +246,9 @@ export function MemberList({
               {p.bio || p.website_url ? (
                 <div className="mt-1 space-y-1 pl-11">
                   {p.bio ? (
-                    <p className="whitespace-pre-line text-xs leading-relaxed text-muted-foreground">{p.bio}</p>
+                    <p className="whitespace-pre-line text-xs leading-relaxed text-muted-foreground">
+                      {p.bio}
+                    </p>
                   ) : null}
                   {p.website_url ? (
                     <a
@@ -169,45 +263,119 @@ export function MemberList({
                 </div>
               ) : null}
 
+              {p.id !== meId && (onBlock || onUnblock) ? (
+                <div className="mt-1.5 pl-11">
+                  {blocked ? (
+                    <button onClick={() => onUnblock?.(p.id)} className={actionClass}>
+                      <UserX className="size-3" />
+                      Unblock
+                    </button>
+                  ) : (
+                    <button onClick={() => onBlock?.(p.id)} className={actionClass}>
+                      <UserX className="size-3" />
+                      Block
+                    </button>
+                  )}
+                </div>
+              ) : null}
+
               {canActOn ? (
-                <div className="mt-1.5 flex flex-wrap gap-1.5 pl-11">
-                  {isOwner && onPromote && onDemote ? (
-                    adminIds.has(p.id) ? (
-                      <button
-                        onClick={() => onDemote(p.id)}
-                        className="inline-flex items-center gap-1 rounded-lg bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70"
-                      >
-                        <ShieldOff className="size-3" />
-                        Remove admin
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => onPromote(p.id)}
-                        className="inline-flex items-center gap-1 rounded-lg bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70"
-                      >
-                        <ShieldCheck className="size-3" />
-                        Make admin
-                      </button>
-                    )
+                <div className="mt-1.5 space-y-1.5 pl-11">
+                  {isSuper && onSetTier && onRemoveAdmin ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      {isListedAdmin(p.id) ? (
+                        <>
+                          {tierOf(p.id) === "super" ? (
+                            <button
+                              onClick={() => onSetTier(p.id, "admin")}
+                              className={actionClass}
+                            >
+                              <ShieldCheck className="size-3" />
+                              Make room admin
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => onSetTier(p.id, "super")}
+                              className={actionClass}
+                            >
+                              <ShieldPlus className="size-3" />
+                              Make super admin
+                            </button>
+                          )}
+                          <button onClick={() => onRemoveAdmin(p.id)} className={actionClass}>
+                            <ShieldOff className="size-3" />
+                            Remove admin
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button onClick={() => onSetTier(p.id, "admin")} className={actionClass}>
+                            <ShieldCheck className="size-3" />
+                            Make room admin
+                          </button>
+                          <button onClick={() => onSetTier(p.id, "super")} className={actionClass}>
+                            <ShieldPlus className="size-3" />
+                            Make super admin
+                          </button>
+                        </>
+                      )}
+                    </div>
                   ) : null}
-                  {onKick ? (
-                    <button
-                      onClick={() => onKick(p.id)}
-                      className="inline-flex items-center gap-1 rounded-lg bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70"
+
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <label className="sr-only" htmlFor={`dur-${p.id}`}>
+                      Length for {p.display_name}
+                    </label>
+                    <select
+                      id={`dur-${p.id}`}
+                      value={durationOf(p.id)}
+                      onChange={(e) =>
+                        setDurations((prev) => ({ ...prev, [p.id]: e.target.value }))
+                      }
+                      className="shrink-0 rounded-lg bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground outline-none"
                     >
-                      <UserMinus className="size-3" />
-                      Kick
-                    </button>
-                  ) : null}
-                  {onBan ? (
-                    <button
-                      onClick={() => onBan(p.id)}
-                      className="inline-flex items-center gap-1 rounded-lg bg-destructive/15 px-2 py-1 text-[11px] font-medium text-destructive hover:bg-destructive/25"
-                    >
-                      <Ban className="size-3" />
-                      Ban
-                    </button>
-                  ) : null}
+                      {MODERATION_DURATIONS.map((d) => (
+                        <option key={d.value} value={d.value}>
+                          {d.label}
+                        </option>
+                      ))}
+                    </select>
+                    {silenced
+                      ? onUnsilence && (
+                          <button onClick={() => onUnsilence(p.id)} className={actionClass}>
+                            <Mic className="size-3" />
+                            Let them type
+                          </button>
+                        )
+                      : onSilence && (
+                          <button
+                            onClick={() =>
+                              onSilence(p.id, expiryFromMinutes(Number(durationOf(p.id))))
+                            }
+                            className={actionClass}
+                          >
+                            <MicOff className="size-3" />
+                            Silence
+                          </button>
+                        )}
+                    {onBounce ? (
+                      <button onClick={() => onBounce(p.id)} className={actionClass}>
+                        <UserMinus className="size-3" />
+                        Bounce
+                      </button>
+                    ) : null}
+                    {onRestrict ? (
+                      <button
+                        onClick={() =>
+                          onRestrict(p.id, expiryFromMinutes(Number(durationOf(p.id))))
+                        }
+                        className="inline-flex items-center gap-1 rounded-lg bg-destructive/15 px-2 py-1 text-[11px] font-medium text-destructive hover:bg-destructive/25"
+                      >
+                        <Ban className="size-3" />
+                        Restrict
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
               ) : null}
             </li>
@@ -217,24 +385,43 @@ export function MemberList({
           <li className="px-3 py-6 text-center text-xs text-muted-foreground">No members yet.</li>
         ) : null}
 
+        {canModerate && silenceList.length > 0 ? (
+          <li className="mt-3 border-t border-border px-2 pt-3">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Silenced · {silenceList.length}
+            </p>
+            <ul className="space-y-1.5">
+              {silenceList.map(({ silence, profile }) => (
+                <li key={silence.user_id} className="flex items-center gap-2">
+                  <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+                    {profile.display_name} · {expiryLabel(silence.expires_at)}
+                  </span>
+                  {onUnsilence ? (
+                    <button onClick={() => onUnsilence(silence.user_id)} className={actionClass}>
+                      Un-silence
+                    </button>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </li>
+        ) : null}
+
         {canModerate && banList.length > 0 ? (
           <li className="mt-3 border-t border-border px-2 pt-3">
             <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Banned · {banList.length}
+              Restricted · {banList.length}
             </p>
             <ul className="space-y-1.5">
               {banList.map(({ ban, profile }) => (
                 <li key={ban.user_id} className="flex items-center gap-2">
                   <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
-                    {profile.display_name}
+                    {profile.display_name} · {expiryLabel(ban.expires_at)}
                     {ban.reason ? ` · ${ban.reason}` : ""}
                   </span>
-                  {onUnban ? (
-                    <button
-                      onClick={() => onUnban(ban.user_id)}
-                      className="shrink-0 rounded-lg bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70"
-                    >
-                      Unban
+                  {onUnrestrict ? (
+                    <button onClick={() => onUnrestrict(ban.user_id)} className={actionClass}>
+                      Remove
                     </button>
                   ) : null}
                 </li>

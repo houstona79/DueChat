@@ -17,7 +17,8 @@ export async function fetchMyInviteCode(): Promise<string> {
 
 /** Full shareable URL for an invite code. */
 export function inviteUrl(code: string): string {
-  const origin = typeof window === "undefined" ? "https://duechat.lovable.app" : window.location.origin;
+  const origin =
+    typeof window === "undefined" ? "https://duechat.lovable.app" : window.location.origin;
   return `${origin}/i/${code}`;
 }
 

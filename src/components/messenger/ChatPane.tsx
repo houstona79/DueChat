@@ -32,8 +32,16 @@ import { TriviaBot } from "./TriviaBot";
 import { RoomBanner } from "./RoomBanner";
 import { RatingControl } from "./RoomRating";
 import { YouTubeEmbed } from "./YouTubeEmbed";
-import { useMessages, useRoomAdmins, useRoomBans, useRoomEvents } from "@/hooks/use-chat";
+import {
+  useBlocks,
+  useMessages,
+  useRoomAdmins,
+  useRoomBans,
+  useRoomEvents,
+  useRoomSilences,
+} from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
+import { blockUser, isBlocked, unblockUser } from "@/lib/blocks";
 import { takePendingCall } from "@/lib/call-invites";
 import {
   siteRoleBadgeClass,
@@ -49,6 +57,7 @@ import {
   banMember,
   counterpartId,
   formatTime,
+  isActive,
   isAdultProfile,
   isOnline,
   joinRoom,
@@ -56,16 +65,21 @@ import {
   leaveRoom,
   removeRoomAdmin,
   sendMessage,
+  setRoomAdminTier,
+  setRoomStatusMessage,
   setRoomRadio,
   setRoomBranding,
   setRoomRating,
   setRoomCategory,
   ROOM_CATEGORIES,
   setRoomYouTube,
+  silenceMember,
   unbanMember,
+  unsilenceMember,
   type Membership,
   type Profile,
   type Room,
+  type RoomAdminTier,
 } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 import { MessageVideo, videoEmbedOf } from "./MessageVideo";
@@ -124,6 +138,7 @@ export function ChatPane({
   const [showGames, setShowGames] = useState(false);
   const [showTrivia, setShowTrivia] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
+  const [statusDraft, setStatusDraft] = useState<string | null>(null);
 
   const [draft, setDraft] = useState("");
   const [call, setCall] = useState<"voice" | "video" | null>(null);
@@ -137,8 +152,13 @@ export function ChatPane({
   const { data: roomEvents = [] } = useRoomEvents(room.id, joined && !room.is_direct);
   const { data: roomAdmins = [] } = useRoomAdmins(room.id, joined && !room.is_direct);
   const isOwner = room.created_by === meId;
-  const canModerate = !room.is_direct && (isOwner || roomAdmins.some((a) => a.user_id === meId));
+  const myTier = roomAdmins.find((a) => a.user_id === meId)?.tier ?? null;
+  const canModerate = !room.is_direct && (isOwner || myTier !== null);
+  const isSuper = !room.is_direct && (isOwner || myTier === "super");
   const { data: bans = [] } = useRoomBans(room.id, canModerate);
+  const { data: silences = [] } = useRoomSilences(room.id, joined && !room.is_direct);
+  const { data: blocks = [] } = useBlocks(meId);
+  const mySilence = silences.find((s) => s.user_id === meId && isActive(s)) ?? null;
   const { data: siteRoles } = useSiteRoles();
   const myProfile = profileOf(meId);
   const adultsOnly = room.rating === "R" && !room.is_direct;
@@ -146,10 +166,18 @@ export function ChatPane({
 
   type TimelineItem =
     | { kind: "message"; id: string; at: string; message: (typeof messages)[number] }
-    | { kind: "event"; id: string; at: string; userId: string; action: "join" | "leave" };
+    | {
+        kind: "event";
+        id: string;
+        at: string;
+        userId: string;
+        action: "join" | "leave" | "bounce";
+      };
 
   const timeline: TimelineItem[] = [
-    ...messages.map((m) => ({ kind: "message" as const, id: m.id, at: m.created_at, message: m })),
+    ...messages
+      .filter((m) => m.user_id === meId || !isBlocked(blocks, m.user_id))
+      .map((m) => ({ kind: "message" as const, id: m.id, at: m.created_at, message: m })),
     ...roomEvents.map((e) => ({
       kind: "event" as const,
       id: e.id,
@@ -179,6 +207,10 @@ export function ChatPane({
     if (!text) return;
     if (ageBlocked) {
       setError("This room is rated R — you must be 18 or older to post here.");
+      return;
+    }
+    if (mySilence) {
+      setError("A room admin has silenced you here, so you can read but not post.");
       return;
     }
     setDraft("");
@@ -258,6 +290,11 @@ export function ChatPane({
                     room.topic ? ` · ${room.topic}` : ""
                   }`}
             </p>
+            {!room.is_direct && room.status_message ? (
+              <p className="truncate text-xs font-medium text-primary" title={room.status_message}>
+                {room.status_message}
+              </p>
+            ) : null}
           </div>
         </div>
         {!room.is_direct && members.length > 0 ? (
@@ -274,213 +311,271 @@ export function ChatPane({
           />
         ) : null}
         <div className="-mx-1 flex flex-wrap items-center gap-1.5 px-1 pb-0.5 sm:mx-0 sm:justify-end sm:px-0">
-        {!room.is_direct ? (
-          isOwner ? (
-            <select
-              aria-label="Room category"
-              value={room.category || "General"}
-              onChange={async (e) => {
+          {!room.is_direct && isSuper ? (
+            <button
+              onClick={() => setStatusDraft(room.status_message ?? "")}
+              className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70"
+            >
+              Room status
+            </button>
+          ) : null}
+          {!room.is_direct ? (
+            isOwner ? (
+              <select
+                aria-label="Room category"
+                value={room.category || "General"}
+                onChange={async (e) => {
+                  try {
+                    await setRoomCategory(room.id, e.target.value);
+                    await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+                  } catch (err) {
+                    setError(err instanceof Error ? err.message : "Could not change the category.");
+                  }
+                }}
+                className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground outline-none"
+              >
+                {[...new Set([...ROOM_CATEGORIES, room.category || "General"])].map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            ) : null
+          ) : null}
+          {!room.is_direct ? (
+            <RatingControl
+              rating={room.rating}
+              canEdit={isOwner}
+              onChange={async (next) => {
                 try {
-                  await setRoomCategory(room.id, e.target.value);
+                  await setRoomRating(room.id, next);
                   await queryClient.invalidateQueries({ queryKey: ["rooms"] });
                 } catch (err) {
-                  setError(err instanceof Error ? err.message : "Could not change the category.");
+                  setError(
+                    err instanceof Error ? err.message : "Could not change the room rating.",
+                  );
                 }
               }}
-              className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground outline-none"
+            />
+          ) : null}
+          <button
+            onClick={() => {
+              setShowMembers(false);
+              setShowFeed(false);
+              setShowMedia(false);
+              setShowTrivia(false);
+              setShowGames((v) => !v);
+            }}
+            className={cn(
+              "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
+              showGames ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+            )}
+            aria-label="Show games"
+            aria-pressed={showGames}
+            title="Games"
+          >
+            <Gamepad2 className="size-4" />
+            Games
+          </button>
+          {!room.is_direct ? (
+            <button
+              onClick={() => {
+                setShowMembers(false);
+                setShowFeed(false);
+                setShowMedia(false);
+                setShowGames(false);
+                setShowTrivia((v) => !v);
+              }}
+              className={cn(
+                "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
+                showTrivia
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:bg-secondary",
+              )}
+              aria-label="Show trivia bot"
+              aria-pressed={showTrivia}
+              title="Trivia bot"
             >
-              {[...new Set([...ROOM_CATEGORIES, room.category || "General"])].map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          ) : null
-        ) : null}
-        {!room.is_direct ? (
-          <RatingControl
-            rating={room.rating}
-            canEdit={isOwner}
-            onChange={async (next) => {
-              try {
-                await setRoomRating(room.id, next);
-                await queryClient.invalidateQueries({ queryKey: ["rooms"] });
-              } catch (err) {
-                setError(err instanceof Error ? err.message : "Could not change the room rating.");
-              }
-            }}
-          />
-        ) : null}
-        <button
-          onClick={() => {
-            setShowMembers(false);
-            setShowFeed(false);
-            setShowMedia(false);
-            setShowTrivia(false);
-            setShowGames((v) => !v);
-          }}
-          className={cn(
-            "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
-            showGames ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
-          )}
-          aria-label="Show games"
-          aria-pressed={showGames}
-          title="Games"
-        >
-          <Gamepad2 className="size-4" />
-          Games
-        </button>
-        {!room.is_direct ? (
+              <Bot className="size-4" />
+              Trivia
+            </button>
+          ) : null}
           <button
             onClick={() => {
-              setShowMembers(false);
               setShowFeed(false);
               setShowMedia(false);
               setShowGames(false);
-              setShowTrivia((v) => !v);
+              setShowTrivia(false);
+              setShowInvite(false);
+              setShowMembers((v) => !v);
             }}
             className={cn(
               "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
-              showTrivia ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+              showMembers
+                ? "bg-primary/15 text-primary"
+                : "text-muted-foreground hover:bg-secondary",
             )}
-            aria-label="Show trivia bot"
-            aria-pressed={showTrivia}
-            title="Trivia bot"
+            aria-label="Show members"
+            aria-pressed={showMembers}
+            title="Show members"
           >
-            <Bot className="size-4" />
-            Trivia
+            <Users className="size-4" />
+            {members.length}
           </button>
-        ) : null}
-        <button
-          onClick={() => {
-            setShowFeed(false);
-            setShowMedia(false);
-            setShowGames(false);
-            setShowTrivia(false);
-            setShowInvite(false);
-            setShowMembers((v) => !v);
-          }}
-          className={cn(
-            "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
-            showMembers
-              ? "bg-primary/15 text-primary"
-              : "text-muted-foreground hover:bg-secondary",
-          )}
-          aria-label="Show members"
-          aria-pressed={showMembers}
-          title="Show members"
-        >
-          <Users className="size-4" />
-          {members.length}
-        </button>
-        {!room.is_direct && joined ? (
+          {!room.is_direct && joined ? (
+            <button
+              onClick={() => {
+                setShowMembers(false);
+                setShowFeed(false);
+                setShowMedia(false);
+                setShowGames(false);
+                setShowTrivia(false);
+                setShowInvite((v) => !v);
+              }}
+              className={cn(
+                "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
+                showInvite
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:bg-secondary",
+              )}
+              aria-label="Invite people to this room"
+              aria-pressed={showInvite}
+              title="Invite people"
+            >
+              <UserPlus className="size-4" />
+              Invite
+            </button>
+          ) : null}
+          {!room.is_direct && joined ? (
+            <button
+              onClick={() => {
+                setShowMembers(false);
+                setShowMedia(false);
+                setShowGames(false);
+                setShowTrivia(false);
+                setShowFeed((v) => !v);
+              }}
+              className={cn(
+                "grid size-10 shrink-0 place-items-center rounded-xl",
+                showFeed
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:bg-secondary",
+              )}
+              aria-label="Show room feed"
+              aria-pressed={showFeed}
+              title="Room feed"
+            >
+              <Newspaper className="size-4" />
+            </button>
+          ) : null}
+          {!room.is_direct ? (
+            <button
+              onClick={() => {
+                setShowMembers(false);
+                setShowFeed(false);
+                setShowGames(false);
+                setShowTrivia(false);
+                setShowMedia((v) => !v);
+              }}
+              className={cn(
+                "grid size-10 shrink-0 place-items-center rounded-xl",
+                showMedia
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:bg-secondary",
+              )}
+              aria-label="Show radio and video players"
+              aria-pressed={showMedia}
+              title="Radio & video"
+            >
+              <Radio className="size-4" />
+            </button>
+          ) : null}
+          <button
+            onClick={() => setCall("voice")}
+            className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+            aria-label="Start voice call"
+          >
+            <Phone className="size-4" />
+          </button>
+          <button
+            onClick={() => setTalking((v) => !v)}
+            className={cn(
+              "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
+              talking ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+            )}
+            aria-label={talking ? "Leave room voice" : "Join room voice with push to talk"}
+            aria-pressed={talking}
+            title="Talk"
+          >
+            <Mic className="size-4" />
+            Talk
+          </button>
           <button
             onClick={() => {
-              setShowMembers(false);
-              setShowFeed(false);
-              setShowMedia(false);
-              setShowGames(false);
-              setShowTrivia(false);
-              setShowInvite((v) => !v);
+              // Cams ride along on the room voice session, so make sure it's live.
+              setTalking(true);
+              setShowCams((v) => !v);
             }}
             className={cn(
-              "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
-              showInvite ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+              "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
+              showCams ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
             )}
-            aria-label="Invite people to this room"
-            aria-pressed={showInvite}
-            title="Invite people"
+            aria-label="Show room cameras"
+            aria-pressed={showCams}
+            title="Cams"
           >
-            <UserPlus className="size-4" />
-            Invite
+            <Video className="size-4" />
+            Cams
           </button>
-        ) : null}
-        {!room.is_direct && joined ? (
           <button
-            onClick={() => {
-              setShowMembers(false);
-              setShowMedia(false);
-              setShowGames(false);
-              setShowTrivia(false);
-              setShowFeed((v) => !v);
-            }}
-            className={cn(
-              "grid size-10 shrink-0 place-items-center rounded-xl",
-              showFeed ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
-            )}
-            aria-label="Show room feed"
-            aria-pressed={showFeed}
-            title="Room feed"
+            onClick={() => setCall("video")}
+            className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+            aria-label="Start video call"
           >
-            <Newspaper className="size-4" />
+            <Video className="size-4" />
           </button>
-        ) : null}
-        {!room.is_direct ? (
-          <button
-            onClick={() => {
-              setShowMembers(false);
-              setShowFeed(false);
-              setShowGames(false);
-              setShowTrivia(false);
-              setShowMedia((v) => !v);
-            }}
-            className={cn(
-              "grid size-10 shrink-0 place-items-center rounded-xl",
-              showMedia ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
-            )}
-            aria-label="Show radio and video players"
-            aria-pressed={showMedia}
-            title="Radio & video"
-          >
-            <Radio className="size-4" />
-          </button>
-        ) : null}
-        <button
-          onClick={() => setCall("voice")}
-          className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
-          aria-label="Start voice call"
-        >
-          <Phone className="size-4" />
-        </button>
-        <button
-          onClick={() => setTalking((v) => !v)}
-          className={cn(
-            "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
-            talking ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
-          )}
-          aria-label={talking ? "Leave room voice" : "Join room voice with push to talk"}
-          aria-pressed={talking}
-          title="Talk"
-        >
-          <Mic className="size-4" />
-          Talk
-        </button>
-        <button
-          onClick={() => {
-            // Cams ride along on the room voice session, so make sure it's live.
-            setTalking(true);
-            setShowCams((v) => !v);
-          }}
-          className={cn(
-            "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
-            showCams ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
-          )}
-          aria-label="Show room cameras"
-          aria-pressed={showCams}
-          title="Cams"
-        >
-          <Video className="size-4" />
-          Cams
-        </button>
-        <button
-          onClick={() => setCall("video")}
-          className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
-          aria-label="Start video call"
-        >
-          <Video className="size-4" />
-        </button>
         </div>
       </header>
+
+      {statusDraft !== null ? (
+        <form
+          className="flex items-center gap-2 border-b border-border bg-secondary/40 px-3 py-2"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const next = statusDraft.trim();
+            try {
+              await setRoomStatusMessage(room.id, next || null);
+              await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+              setStatusDraft(null);
+            } catch (err) {
+              setError(err instanceof Error ? err.message : "Could not save the room status.");
+            }
+          }}
+        >
+          <input
+            value={statusDraft}
+            onChange={(e) => setStatusDraft(e.target.value)}
+            maxLength={200}
+            autoFocus
+            aria-label="Room status message"
+            placeholder="Room status shown to everyone (leave empty to clear)"
+            className="min-w-0 flex-1 rounded-xl bg-background px-3 py-1.5 text-xs outline-none placeholder:text-muted-foreground"
+          />
+          <button
+            type="submit"
+            className="shrink-0 rounded-xl bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusDraft(null)}
+            className="shrink-0 rounded-xl bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground"
+          >
+            Cancel
+          </button>
+        </form>
+      ) : null}
 
       {talking ? (
         <TalkBar
@@ -580,9 +675,7 @@ export function ChatPane({
             <X className="size-4" />
           </button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto">
-          {showGames ? <GamesPanel /> : null}
-        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto">{showGames ? <GamesPanel /> : null}</div>
       </section>
 
       {!room.is_direct ? (
@@ -637,21 +730,55 @@ export function ChatPane({
           profiles={profiles}
           meId={meId}
           ownerId={room.is_direct ? undefined : room.created_by}
-          roomAdminIds={roomAdmins.map((a) => a.user_id)}
+          roomAdmins={roomAdmins}
           bans={bans}
+          silences={silences}
+          blocks={blocks}
           canModerate={canModerate}
-          isOwner={isOwner}
-          onPromote={(userId) =>
-            void runModeration(() => addRoomAdmin(room.id, userId, meId), ["room-admins"])
+          isSuper={isSuper}
+          onSetTier={(userId: string, tier: RoomAdminTier) =>
+            void runModeration(
+              () =>
+                roomAdmins.some((a) => a.user_id === userId)
+                  ? setRoomAdminTier(room.id, userId, tier)
+                  : addRoomAdmin(room.id, userId, meId, tier),
+              ["room-admins"],
+            )
           }
-          onDemote={(userId) =>
+          onRemoveAdmin={(userId: string) =>
             void runModeration(() => removeRoomAdmin(room.id, userId), ["room-admins"])
           }
-          onKick={(userId) => void runModeration(() => kickMember(room.id, userId), [])}
-          onBan={(userId) =>
-            void runModeration(() => banMember(room.id, userId, meId), ["room-bans"])
+          onBounce={(userId: string) => void runModeration(() => kickMember(room.id, userId), [])}
+          onRestrict={(userId: string, expiresAt: string | null) =>
+            void runModeration(
+              () => banMember(room.id, userId, meId, undefined, expiresAt),
+              ["room-bans"],
+            )
           }
-          onUnban={(userId) => void runModeration(() => unbanMember(room.id, userId), ["room-bans"])}
+          onUnrestrict={(userId: string) =>
+            void runModeration(() => unbanMember(room.id, userId), ["room-bans"])
+          }
+          onSilence={(userId: string, expiresAt: string | null) =>
+            void runModeration(
+              () => silenceMember(room.id, userId, meId, expiresAt),
+              ["room-silences"],
+            )
+          }
+          onUnsilence={(userId: string) =>
+            void runModeration(() => unsilenceMember(room.id, userId), ["room-silences"])
+          }
+          onBlock={(userId: string) =>
+            void runModeration(async () => {
+              await blockUser(meId, userId);
+              await queryClient.invalidateQueries({ queryKey: ["blocks"] });
+            }, [])
+          }
+          onUnblock={(userId: string) =>
+            void runModeration(async () => {
+              await unblockUser(meId, userId);
+              await queryClient.invalidateQueries({ queryKey: ["blocks"] });
+            }, [])
+          }
           onClose={() => setShowMembers(false)}
           onMessage={(userId) => {
             setShowMembers(false);
@@ -705,8 +832,13 @@ export function ChatPane({
                 return (
                   <div key={item.id} className="mt-4 flex justify-center">
                     <span className="rounded-full bg-secondary px-3 py-1 text-[11px] text-muted-foreground">
-                      {name} {item.action === "join" ? "joined" : "left"} the room ·{" "}
-                      {formatTime(item.at)}
+                      {name}{" "}
+                      {item.action === "join"
+                        ? "joined"
+                        : item.action === "bounce"
+                          ? "was bounced from"
+                          : "left"}{" "}
+                      the room · {formatTime(item.at)}
                     </span>
                   </div>
                 );
@@ -806,7 +938,8 @@ export function ChatPane({
                           mine
                             ? "rounded-3xl rounded-br-md bg-bubble-me text-bubble-me-foreground"
                             : "rounded-3xl rounded-bl-md bg-bubble-them text-bubble-them-foreground",
-                          isEmojiOnly(m.body) && "bg-transparent px-1 py-0.5 text-3xl leading-tight",
+                          isEmojiOnly(m.body) &&
+                            "bg-transparent px-1 py-0.5 text-3xl leading-tight",
                         )}
                       >
                         {m.body}
@@ -877,19 +1010,24 @@ export function ChatPane({
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 maxLength={2000}
+                disabled={Boolean(mySilence)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
                     void submit();
                   }
                 }}
-                placeholder={`Message ${room.name}`}
+                placeholder={
+                  mySilence
+                    ? "You are silenced in this room — you can still read along."
+                    : `Message ${room.name}`
+                }
                 aria-label="Message"
-                className="max-h-32 min-h-9 w-full resize-none bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted-foreground"
+                className="max-h-32 min-h-9 w-full resize-none bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted-foreground disabled:opacity-70"
               />
               <button
                 onClick={() => void submit()}
-                disabled={draft.trim().length === 0}
+                disabled={draft.trim().length === 0 || Boolean(mySilence)}
                 aria-label="Send message"
                 className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40"
               >
@@ -921,16 +1059,16 @@ export function ChatPane({
               </>
             ) : (
               <>
-              <h3 className="text-lg font-semibold">Join {title}</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Messages in this room are only visible to members.
-            </p>
-            <button
-              onClick={() => void join()}
-              className="mt-5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-            >
-              Join room
-            </button>
+                <h3 className="text-lg font-semibold">Join {title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Messages in this room are only visible to members.
+                </p>
+                <button
+                  onClick={() => void join()}
+                  className="mt-5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                >
+                  Join room
+                </button>
               </>
             )}
           </div>

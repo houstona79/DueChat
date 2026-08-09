@@ -19,12 +19,7 @@ import { NotificationAudit } from "@/components/messenger/NotificationAudit";
 import { useAuth } from "@/hooks/use-auth";
 import { accentFor, formatTime, isOnline } from "@/lib/chat";
 import { banUser, deleteMessage, fetchAdminSnapshot, kickUser, unbanUser } from "@/lib/admin";
-import {
-  clearSessions,
-  deviceLabel,
-  fetchActiveSessions,
-  multiSessionUsers,
-} from "@/lib/sessions";
+import { clearSessions, deviceLabel, fetchActiveSessions, multiSessionUsers } from "@/lib/sessions";
 
 export const Route = createFileRoute("/_authenticated/moderator")({
   head: () => ({
@@ -104,15 +99,22 @@ function ModeratorPage() {
   const isStaff = myRole === "moderator" || myRole === "admin";
 
   const roleOf = (id: string) => data?.roles.find((r) => r.user_id === id)?.role ?? null;
-  const nameOf = (id: string) =>
-    data?.profiles.find((p) => p.id === id)?.display_name ?? "Unknown";
+  const nameOf = (id: string) => data?.profiles.find((p) => p.id === id)?.display_name ?? "Unknown";
 
   if (isLoading) {
-    return <Shell><p className="text-sm text-muted-foreground">Loading…</p></Shell>;
+    return (
+      <Shell>
+        <p className="text-sm text-muted-foreground">Loading…</p>
+      </Shell>
+    );
   }
 
   if (error || !data) {
-    return <Shell><p className="text-sm text-destructive">Could not load moderation data.</p></Shell>;
+    return (
+      <Shell>
+        <p className="text-sm text-destructive">Could not load moderation data.</p>
+      </Shell>
+    );
   }
 
   if (!isStaff) {
@@ -139,7 +141,9 @@ function ModeratorPage() {
       </p>
 
       <div className="flex gap-1 rounded-2xl bg-secondary p-1">
-        {(["members", "sessions", "messages", "logs", "bans", "reports", "notifications"] as Tab[]).map((t) => (
+        {(
+          ["members", "sessions", "messages", "logs", "bans", "reports", "notifications"] as Tab[]
+        ).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -158,7 +162,10 @@ function ModeratorPage() {
             const role = roleOf(p.id);
             const banned = data.bans.some((b) => b.user_id === p.id);
             const protectedUser =
-              p.id === OWNER_USER_ID || p.id === user?.id || role === "admin" || role === "moderator";
+              p.id === OWNER_USER_ID ||
+              p.id === user?.id ||
+              role === "admin" ||
+              role === "moderator";
             return (
               <li
                 key={p.id}
@@ -206,19 +213,14 @@ function ModeratorPage() {
             </p>
           </div>
           {(() => {
-            const flagged = multiSessionUsers(sessions.data ?? []).filter(
-              (f) => !roleOf(f.userId),
-            );
+            const flagged = multiSessionUsers(sessions.data ?? []).filter((f) => !roleOf(f.userId));
             if (flagged.length === 0) {
               return (
                 <p className="text-sm text-muted-foreground">No duplicate sign-ins right now.</p>
               );
             }
             return flagged.map((f) => (
-              <div
-                key={f.userId}
-                className="rounded-2xl border border-destructive/40 bg-card p-4"
-              >
+              <div key={f.userId} className="rounded-2xl border border-destructive/40 bg-card p-4">
                 <div className="flex flex-wrap items-center gap-2">
                   <MonitorSmartphone className="size-4 shrink-0 text-destructive" />
                   <p className="min-w-0 flex-1 basis-32 truncate text-sm font-semibold">
@@ -329,15 +331,7 @@ function ModeratorPage() {
   );
 }
 
-function Stat({
-  label,
-  value,
-  icon: Icon,
-}: {
-  label: string;
-  value: number;
-  icon: typeof Users;
-}) {
+function Stat({ label, value, icon: Icon }: { label: string; value: number; icon: typeof Users }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4">
       <Icon className="size-4 text-muted-foreground" />

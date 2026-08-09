@@ -49,12 +49,32 @@ export const TAB_META: Record<AdminTab, Meta> = {
   },
   ips: { label: "IP addresses", icon: Wifi, hint: "Shared IPs and VPN flags", group: "Security" },
   rooms: { label: "Rooms", icon: Hash, hint: "Every chat room", group: "Content" },
-  messages: { label: "Messages", icon: MessageSquare, hint: "Latest room messages", group: "Content" },
-  dms: { label: "Direct messages", icon: MessageSquare, hint: "Read 1:1 conversations", group: "Content" },
+  messages: {
+    label: "Messages",
+    icon: MessageSquare,
+    hint: "Latest room messages",
+    group: "Content",
+  },
+  dms: {
+    label: "Direct messages",
+    icon: MessageSquare,
+    hint: "Read 1:1 conversations",
+    group: "Content",
+  },
   logs: { label: "Chat logs", icon: ScrollText, hint: "Nightly archives", group: "Content" },
   reports: { label: "Reports", icon: Flag, hint: "Abuse reports queue", group: "Moderation" },
-  notifications: { label: "Notifications", icon: Bell, hint: "Audit member alerts", group: "Moderation" },
-  alerts: { label: "System alerts", icon: AlertTriangle, hint: "Broadcast to everyone", group: "Moderation" },
+  notifications: {
+    label: "Notifications",
+    icon: Bell,
+    hint: "Audit member alerts",
+    group: "Moderation",
+  },
+  alerts: {
+    label: "System alerts",
+    icon: AlertTriangle,
+    hint: "Broadcast to everyone",
+    group: "Moderation",
+  },
 };
 
 const GROUPS: { name: string; tabs: AdminTab[] }[] = [

@@ -7,7 +7,10 @@ import { searchGifs } from "@/lib/gifs.functions";
 
 type Media = "gifs" | "stickers";
 
-const COPY: Record<Media, { label: string; placeholder: string; empty: string; unavailable: string }> = {
+const COPY: Record<
+  Media,
+  { label: string; placeholder: string; empty: string; unavailable: string }
+> = {
   gifs: {
     label: "Insert GIF",
     placeholder: "Search GIFs",
@@ -40,7 +43,11 @@ export function GifPicker({
     return () => window.clearTimeout(id);
   }, [term]);
 
-  const { data: gifs = [], isFetching, isError } = useQuery({
+  const {
+    data: gifs = [],
+    isFetching,
+    isError,
+  } = useQuery({
     queryKey: [media, query],
     queryFn: () => fetchGifs({ data: { query, media } }),
     enabled: open,
@@ -58,11 +65,7 @@ export function GifPicker({
           {media === "stickers" ? <Sticker className="size-5" /> : <ImagePlay className="size-5" />}
         </button>
       </PopoverTrigger>
-      <PopoverContent
-        align="start"
-        side="top"
-        className="w-[min(22rem,calc(100vw-2rem))] p-3"
-      >
+      <PopoverContent align="start" side="top" className="w-[min(22rem,calc(100vw-2rem))] p-3">
         <div className="mb-2 flex items-center gap-2 rounded-xl bg-secondary px-2.5 py-1.5">
           <Search className="size-4 shrink-0 text-muted-foreground" />
           <input
@@ -72,12 +75,12 @@ export function GifPicker({
             aria-label={copy.placeholder}
             className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
-          {isFetching ? <Loader2 className="size-4 shrink-0 animate-spin text-muted-foreground" /> : null}
+          {isFetching ? (
+            <Loader2 className="size-4 shrink-0 animate-spin text-muted-foreground" />
+          ) : null}
         </div>
         {isError ? (
-          <p className="py-6 text-center text-xs text-muted-foreground">
-            {copy.unavailable}
-          </p>
+          <p className="py-6 text-center text-xs text-muted-foreground">{copy.unavailable}</p>
         ) : null}
         <div className="grid max-h-64 grid-cols-2 gap-2 overflow-y-auto">
           {gifs.map((gif) => (
@@ -94,7 +97,11 @@ export function GifPicker({
                 src={gif.url}
                 alt={gif.title}
                 loading="lazy"
-                className={media === "stickers" ? "h-24 w-full object-contain p-1" : "h-24 w-full object-cover"}
+                className={
+                  media === "stickers"
+                    ? "h-24 w-full object-contain p-1"
+                    : "h-24 w-full object-cover"
+                }
               />
             </button>
           ))}

@@ -107,23 +107,20 @@ export function Game2048() {
     setBest(readBest("2048"));
   }, [restart]);
 
-  const push = useCallback(
-    (dir: Dir) => {
-      setGrid((prev) => {
-        const result = move(prev, dir);
-        if (!result.moved) return prev;
-        const next = addTile(result.grid);
-        setScore((s) => {
-          const total = s + result.gained;
-          setBest(saveBest("2048", total));
-          return total;
-        });
-        setOver(stuck(next));
-        return next;
+  const push = useCallback((dir: Dir) => {
+    setGrid((prev) => {
+      const result = move(prev, dir);
+      if (!result.moved) return prev;
+      const next = addTile(result.grid);
+      setScore((s) => {
+        const total = s + result.gained;
+        setBest(saveBest("2048", total));
+        return total;
       });
-    },
-    [],
-  );
+      setOver(stuck(next));
+      return next;
+    });
+  }, []);
 
   return (
     <div>

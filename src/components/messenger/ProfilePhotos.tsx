@@ -31,10 +31,7 @@ function PhotoThumb({
     <button
       type="button"
       onClick={() => url && onOpen(url)}
-      className={cn(
-        "relative aspect-square overflow-hidden rounded-2xl bg-secondary",
-        className,
-      )}
+      className={cn("relative aspect-square overflow-hidden rounded-2xl bg-secondary", className)}
       aria-label={photo.caption ?? "Open photo"}
     >
       {url ? (
@@ -78,8 +75,7 @@ export function ProfilePhotos({
     queryFn: () => fetchProfilePhotos(userId),
   });
 
-  const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: ["profile-photos", userId] });
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["profile-photos", userId] });
 
   const upload = useMutation({
     mutationFn: (file: File) => uploadProfilePhoto(userId, file),

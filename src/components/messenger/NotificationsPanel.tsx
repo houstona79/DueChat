@@ -1,7 +1,18 @@
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { Bell, Check, ChevronDown, ChevronRight, ExternalLink, MailPlus, MessageSquare, Send, Trash2, X } from "lucide-react";
+import {
+  Bell,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  ExternalLink,
+  MailPlus,
+  MessageSquare,
+  Send,
+  Trash2,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "./Avatar";
 import { openProfile } from "./ProfileViewer";
@@ -88,7 +99,11 @@ export function NotificationsPanel({
           filter: `user_id=eq.${me.id}`,
         },
         (payload) => {
-          const row = payload.new as { kind?: string; preview?: string | null; room_id?: string | null };
+          const row = payload.new as {
+            kind?: string;
+            preview?: string | null;
+            room_id?: string | null;
+          };
           if (row.kind !== "room_invite") return;
           void queryClient.invalidateQueries({ queryKey: ["room-invites", me.id] });
           setCollapsed(false);
@@ -96,7 +111,8 @@ export function NotificationsPanel({
             action: row.room_id
               ? {
                   label: "Open",
-                  onClick: () => void navigate({ to: "/chat/$roomId", params: { roomId: row.room_id! } }),
+                  onClick: () =>
+                    void navigate({ to: "/chat/$roomId", params: { roomId: row.room_id! } }),
                 }
               : undefined,
           });
@@ -273,7 +289,9 @@ export function NotificationsPanel({
                           const invite = myInvites.find((i) => i.room_id === n.room_id);
                           if (invite) await acceptRoomInvite(invite, me.id);
                           await markNotificationRead(n.id).catch(() => {});
-                          await queryClient.invalidateQueries({ queryKey: ["room-invites", me.id] });
+                          await queryClient.invalidateQueries({
+                            queryKey: ["room-invites", me.id],
+                          });
                           await queryClient.invalidateQueries({ queryKey: ["memberships"] });
                           await refresh();
                           await navigate({ to: "/chat/$roomId", params: { roomId: n.room_id! } });
@@ -296,7 +314,9 @@ export function NotificationsPanel({
                         try {
                           const invite = myInvites.find((i) => i.room_id === n.room_id);
                           if (invite) await dismissRoomInvite(invite.id);
-                          await queryClient.invalidateQueries({ queryKey: ["room-invites", me.id] });
+                          await queryClient.invalidateQueries({
+                            queryKey: ["room-invites", me.id],
+                          });
                           await refresh();
                         } catch {
                           toast.error("Couldn’t decline that invite.");
@@ -316,7 +336,8 @@ export function NotificationsPanel({
                   <div className="flex flex-wrap items-center gap-1 px-3 pb-2 pl-12">
                     {REACTION_EMOJIS.slice(0, 4).map((emoji) => {
                       const mine = reactions.some(
-                        (r) => r.update_id === n.update_id && r.emoji === emoji && r.user_id === me.id,
+                        (r) =>
+                          r.update_id === n.update_id && r.emoji === emoji && r.user_id === me.id,
                       );
                       const count = reactions.filter(
                         (r) => r.update_id === n.update_id && r.emoji === emoji,
@@ -345,7 +366,10 @@ export function NotificationsPanel({
                     <button
                       type="button"
                       onClick={() =>
-                        openProfile(n.kind === "update" ? (n.actor_id ?? me.id) : me.id, n.update_id!)
+                        openProfile(
+                          n.kind === "update" ? (n.actor_id ?? me.id) : me.id,
+                          n.update_id!,
+                        )
                       }
                       className="flex min-h-8 items-center gap-1 rounded-full border border-border px-2 text-xs text-muted-foreground hover:border-primary/60 hover:text-foreground"
                     >

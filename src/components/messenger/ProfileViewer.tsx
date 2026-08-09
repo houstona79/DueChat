@@ -3,6 +3,7 @@ import { BadgeCheck, ExternalLink, Globe, MapPin, MessageSquare, User, X } from 
 import { genderLabel } from "@/lib/genders";
 import { countryFlag } from "@/lib/country-flags";
 import { visibleGender, visiblePronouns } from "@/lib/field-visibility";
+import { decorationGlyph, decorationLabel } from "@/lib/decorations";
 import { useBuddies } from "@/hooks/use-chat";
 import { Link } from "@tanstack/react-router";
 import { Avatar } from "./Avatar";
@@ -88,6 +89,12 @@ export function ProfileViewer() {
   const role = siteRoleOf(roles, userId);
   const online = profile ? isOnline(profile) : false;
   const isMe = user?.id === userId;
+  const viewerRole = siteRoleOf(roles, user?.id ?? "");
+  const isStaffViewer = viewerRole === "admin" || viewerRole === "moderator";
+  const visibility = profile?.profile_visibility ?? "public";
+  const isMyBuddy = myBuddies.some((b) => b.buddy_id === userId);
+  const canViewDetails =
+    isMe || isStaffViewer || visibility === "public" || (visibility === "buddies" && isMyBuddy);
 
   return (
     <div
@@ -118,6 +125,16 @@ export function ProfileViewer() {
                 >
                   {profile?.display_name ?? "Unknown member"}
                 </h2>
+                {decorationGlyph(profile?.decoration) ? (
+                  <span
+                    className="text-base leading-none"
+                    role="img"
+                    aria-label={decorationLabel(profile?.decoration) ?? undefined}
+                    title={decorationLabel(profile?.decoration) ?? undefined}
+                  >
+                    {decorationGlyph(profile?.decoration)}
+                  </span>
+                ) : null}
                 {siteRoleLabel(role) ? (
                   <span
                     className={cn(
@@ -147,7 +164,13 @@ export function ProfileViewer() {
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-3">
-          {profile ? (
+          {profile && !canViewDetails ? (
+            <p className="text-sm text-muted-foreground">
+              {visibility === "private"
+                ? "This profile is private."
+                : "This profile is only visible to their buddies."}
+            </p>
+          ) : profile ? (
             <div className="space-y-3 text-sm">
               <YearBadges profile={profile} />
               <SocialStatus profile={profile} />
@@ -159,7 +182,11 @@ export function ProfileViewer() {
               {profile.country ? (
                 <p className="flex items-center gap-2 text-xs text-muted-foreground">
                   {countryFlag(profile.country) ? (
-                    <span className="text-base leading-none" role="img" aria-label={`Flag of ${profile.country}`}>
+                    <span
+                      className="text-base leading-none"
+                      role="img"
+                      aria-label={`Flag of ${profile.country}`}
+                    >
                       {countryFlag(profile.country)}
                     </span>
                   ) : (
@@ -188,7 +215,9 @@ export function ProfileViewer() {
                   className="flex items-center gap-2 text-xs text-primary hover:underline"
                 >
                   <Globe className="size-3.5 shrink-0" aria-hidden />
-                  <span className="truncate">{profile.website_url.replace(/^https?:\/\//, "")}</span>
+                  <span className="truncate">
+                    {profile.website_url.replace(/^https?:\/\//, "")}
+                  </span>
                 </a>
               ) : null}
               {isAdultProfile(profile) ? (

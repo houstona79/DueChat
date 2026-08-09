@@ -29,7 +29,9 @@ export function CamPanel({
 }) {
   const livePeers = participants.filter((p) => {
     const tracks = p.stream?.getVideoTracks() ?? [];
-    return tracks.length > 0 && (p.camOn || tracks.some((t) => t.readyState === "live" && !t.muted));
+    return (
+      tracks.length > 0 && (p.camOn || tracks.some((t) => t.readyState === "live" && !t.muted))
+    );
   });
 
   return (
@@ -86,15 +88,7 @@ export function CamPanel({
   );
 }
 
-function CamTile({
-  name,
-  id,
-  stream,
-}: {
-  name: string;
-  id: string;
-  stream: MediaStream | null;
-}) {
+function CamTile({ name, id, stream }: { name: string; id: string; stream: MediaStream | null }) {
   const ref = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {

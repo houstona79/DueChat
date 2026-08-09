@@ -10,7 +10,6 @@ import { clearPendingInvite, pendingInvite } from "@/lib/invites";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { ThemeToggle } from "@/components/system/ThemeToggle";
 
-
 function ageFrom(value: string): number | null {
   if (!value) return null;
   const dob = new Date(value + "T00:00:00");
@@ -111,7 +110,10 @@ function AuthPage() {
             emailRedirectTo: window.location.origin,
             data: {
               display_name: displayName.trim(),
-              username: username.trim().toLowerCase().replace(/[^a-z0-9_]/g, ""),
+              username: username
+                .trim()
+                .toLowerCase()
+                .replace(/[^a-z0-9_]/g, ""),
               status_message: status.trim(),
               birth_date: birthDate,
               country,
@@ -152,7 +154,10 @@ function AuthPage() {
   };
 
   return (
-    <main id="main-content" className="grid min-h-screen place-items-center bg-background px-5 py-10">
+    <main
+      id="main-content"
+      className="grid min-h-screen place-items-center bg-background px-5 py-10"
+    >
       <div className="w-full max-w-sm">
         <div className="mb-2 flex justify-end">
           <ThemeToggle />
@@ -193,12 +198,38 @@ function AuthPage() {
         <form onSubmit={submit} className="space-y-3">
           {mode === "signup" ? (
             <>
-              <Input id="display-name" label="Display name" value={displayName} onChange={setDisplayName} />
-              <Input id="username" label="Username" value={username} onChange={setUsername} placeholder="mira" />
-              <Input id="status" label="Status (optional)" value={status} onChange={setStatus} placeholder="Building things" />
-              <Input id="birth-date" label="Date of birth" type="date" value={birthDate} onChange={setBirthDate} />
+              <Input
+                id="display-name"
+                label="Display name"
+                value={displayName}
+                onChange={setDisplayName}
+              />
+              <Input
+                id="username"
+                label="Username"
+                value={username}
+                onChange={setUsername}
+                placeholder="mira"
+              />
+              <Input
+                id="status"
+                label="Status (optional)"
+                value={status}
+                onChange={setStatus}
+                placeholder="Building things"
+              />
+              <Input
+                id="birth-date"
+                label="Date of birth"
+                type="date"
+                value={birthDate}
+                onChange={setBirthDate}
+              />
               <div>
-                <label htmlFor="country" className="block text-[11px] font-medium text-muted-foreground">
+                <label
+                  htmlFor="country"
+                  className="block text-[11px] font-medium text-muted-foreground"
+                >
                   Country
                 </label>
                 <select
@@ -216,7 +247,10 @@ function AuthPage() {
                 </select>
               </div>
               <div>
-                <label htmlFor="gender" className="block text-[11px] font-medium text-muted-foreground">
+                <label
+                  htmlFor="gender"
+                  className="block text-[11px] font-medium text-muted-foreground"
+                >
                   Gender (optional)
                 </label>
                 <select
@@ -234,7 +268,10 @@ function AuthPage() {
                 </select>
               </div>
               <div>
-                <label htmlFor="pronouns" className="block text-[11px] font-medium text-muted-foreground">
+                <label
+                  htmlFor="pronouns"
+                  className="block text-[11px] font-medium text-muted-foreground"
+                >
                   Pronouns (optional)
                 </label>
                 <input
@@ -246,7 +283,9 @@ function AuthPage() {
                   className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none"
                 />
               </div>
-              <p className="text-xs text-muted-foreground">You must be 16 or older to join DueChat.</p>
+              <p className="text-xs text-muted-foreground">
+                You must be 16 or older to join DueChat.
+              </p>
               <label className="flex items-start gap-3 rounded-xl bg-secondary px-3 py-2.5">
                 <input
                   id="eula"
@@ -266,7 +305,13 @@ function AuthPage() {
             </>
           ) : null}
           <Input id="email" label="Email" type="email" value={email} onChange={setEmail} />
-          <Input id="password" label="Password" type="password" value={password} onChange={setPassword} />
+          <Input
+            id="password"
+            label="Password"
+            type="password"
+            value={password}
+            onChange={setPassword}
+          />
           <HumanCheck verified={human} onVerifiedChange={setHuman} />
           {notice ? <p className="text-xs text-muted-foreground">{notice}</p> : null}
           <button
@@ -283,6 +328,25 @@ function AuthPage() {
             {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
           </button>
         </form>
+
+        {mode === "signin" ? (
+          <button
+            type="button"
+            onClick={async () => {
+              if (!email.trim()) {
+                setNotice("Enter your email above first, then tap reset.");
+                return;
+              }
+              const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+                redirectTo: `${window.location.origin}/reset-password`,
+              });
+              setNotice(error ? error.message : "Password reset email sent — check your inbox.");
+            }}
+            className="mt-4 w-full text-sm text-muted-foreground underline hover:text-foreground"
+          >
+            Forgot your password?
+          </button>
+        ) : null}
 
         <button
           onClick={() => {

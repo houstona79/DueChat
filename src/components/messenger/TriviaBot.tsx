@@ -78,7 +78,11 @@ export function TriviaBot({
     setBusy(true);
     setError(null);
     try {
-      await startTriviaRound(roomId, meId, rounds.map((r) => r.question));
+      await startTriviaRound(
+        roomId,
+        meId,
+        rounds.map((r) => r.question),
+      );
       await refresh();
     } catch {
       setError("Could not start a new question.");
@@ -106,9 +110,7 @@ export function TriviaBot({
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold">Trivia bot</p>
           <p className="text-xs text-muted-foreground">
-            {enabled
-              ? `Answering questions in ${roomName}.`
-              : "Turned off for this room."}
+            {enabled ? `Answering questions in ${roomName}.` : "Turned off for this room."}
           </p>
         </div>
         {canManage ? (
@@ -187,7 +189,9 @@ export function TriviaBot({
               </p>
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground">No question yet — start the first round.</p>
+            <p className="text-xs text-muted-foreground">
+              No question yet — start the first round.
+            </p>
           )}
 
           <button

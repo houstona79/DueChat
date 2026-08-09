@@ -53,7 +53,10 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
         placeholder="Design crit"
         className="mt-1 w-full rounded-xl bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
       />
-      <label className="mt-2 block text-[11px] font-medium text-muted-foreground" htmlFor="room-topic">
+      <label
+        className="mt-2 block text-[11px] font-medium text-muted-foreground"
+        htmlFor="room-topic"
+      >
         Topic (optional)
       </label>
       <input

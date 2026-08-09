@@ -189,10 +189,18 @@ export function RadioPlayer({
           <div className="rounded-xl bg-secondary/60 p-2.5 text-[11px] leading-relaxed text-muted-foreground">
             <p className="font-semibold text-foreground">Station rules</p>
             <ul className="mt-1 list-disc space-y-0.5 pl-4">
-              <li>The station must be properly licensed for public broadcast (e.g. SoundExchange, ASCAP/BMI/SESAC, PRS, or an equivalent).</li>
-              <li>Only add streams you own or have permission to rebroadcast — no pirated or unlicensed feeds.</li>
+              <li>
+                The station must be properly licensed for public broadcast (e.g. SoundExchange,
+                ASCAP/BMI/SESAC, PRS, or an equivalent).
+              </li>
+              <li>
+                Only add streams you own or have permission to rebroadcast — no pirated or
+                unlicensed feeds.
+              </li>
               <li>Adults-only or explicit stations are not allowed in G-rated rooms.</li>
-              <li>Unlicensed stations may be removed and the room owner may lose radio privileges.</li>
+              <li>
+                Unlicensed stations may be removed and the room owner may lose radio privileges.
+              </li>
             </ul>
           </div>
           <input

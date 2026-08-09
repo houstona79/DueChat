@@ -46,8 +46,10 @@ export function ReportQueue() {
   useEffect(() => {
     const channel = supabase
       .channel("update-reports-queue")
-      .on("postgres_changes", { event: "*", schema: "public", table: "update_reports" }, () =>
-        void invalidate(),
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "update_reports" },
+        () => void invalidate(),
       )
       .subscribe();
     return () => {
@@ -126,9 +128,7 @@ export function ReportQueue() {
 
       <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2.5 text-sm">
         <EyeOff className="size-4 text-muted-foreground" aria-hidden />
-        <span className="text-muted-foreground">
-          Auto-hide updates once they reach
-        </span>
+        <span className="text-muted-foreground">Auto-hide updates once they reach</span>
         {isAdmin ? (
           <>
             <input
@@ -202,12 +202,14 @@ export function ReportQueue() {
               </p>
 
               <p className="mt-2 text-xs text-muted-foreground">
-                By <span className="font-medium text-foreground">{r.author_name ?? "unknown"}</span> ·
-                reported by{" "}
+                By <span className="font-medium text-foreground">{r.author_name ?? "unknown"}</span>{" "}
+                · reported by{" "}
                 <span className="font-medium text-foreground">{r.reporter_name ?? "unknown"}</span>
               </p>
               {r.details ? (
-                <p className="mt-1 break-words text-xs italic text-muted-foreground">“{r.details}”</p>
+                <p className="mt-1 break-words text-xs italic text-muted-foreground">
+                  “{r.details}”
+                </p>
               ) : null}
 
               {r.status === "pending" ? (

@@ -66,23 +66,29 @@ function TermsPage() {
         <section className="mt-6 space-y-4 text-sm leading-relaxed text-muted-foreground">
           <p>
             Welcome to DueChat. This End User Agreement (“Agreement”) governs your access to and use
-            of the DueChat platform, including chat rooms, direct messaging, voice and video calls, and
-            any other features we make available.
+            of the DueChat platform, including chat rooms, direct messaging, voice and video calls,
+            and any other features we make available.
           </p>
 
-          <h2 className="mt-6 font-display text-lg font-semibold text-foreground">1. Eligibility</h2>
+          <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
+            1. Eligibility
+          </h2>
           <p>
-            You must be at least 16 years old to create an account. Some rooms and content are marked
-            as adults-only (18+) and are restricted to users who meet that age requirement. You are
-            responsible for providing accurate information about your age, country, and identity.
+            You must be at least 16 years old to create an account. Some rooms and content are
+            marked as adults-only (18+) and are restricted to users who meet that age requirement.
+            You are responsible for providing accurate information about your age, country, and
+            identity.
           </p>
 
-          <h2 className="mt-6 font-display text-lg font-semibold text-foreground">2. Acceptable Use</h2>
+          <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
+            2. Acceptable Use
+          </h2>
           <p>
-            You agree to use DueChat lawfully and respectfully. You may not use the platform to harass,
-            abuse, threaten, spam, or impersonate others; share illegal, hateful, or sexually explicit
-            content involving minors; distribute malware; scrape data; or attempt to bypass security
-            controls. Room owners and moderators may remove users who violate these rules.
+            You agree to use DueChat lawfully and respectfully. You may not use the platform to
+            harass, abuse, threaten, spam, or impersonate others; share illegal, hateful, or
+            sexually explicit content involving minors; distribute malware; scrape data; or attempt
+            to bypass security controls. Room owners and moderators may remove users who violate
+            these rules.
           </p>
 
           <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
@@ -100,8 +106,8 @@ function TermsPage() {
           </h2>
           <p>
             Voice and video calls are peer-to-peer or relayed by standard WebRTC infrastructure. You
-            must not record or broadcast other users without their consent. Camera and microphone access
-            is optional and can be revoked through your browser or device settings.
+            must not record or broadcast other users without their consent. Camera and microphone
+            access is optional and can be revoked through your browser or device settings.
           </p>
 
           <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
@@ -117,25 +123,27 @@ function TermsPage() {
             6. VPN, Proxy, and Anonymizing Networks
           </h2>
           <p>
-            Access to DueChat through VPNs, proxies, Tor, relays, or hosting/datacenter networks is not
-            permitted. To keep the community safe and enforce bans and age restrictions, we check the
-            network address used at sign-in and may block or sign out connections that appear to come
-            from an anonymizing or commercial hosting network. Attempting to evade a ban, device lock,
-            or age gate by masking your network address is a violation of this Agreement and may result
-            in permanent removal. Approved staff accounts may be exempt for administrative purposes. If
-            you believe your connection was blocked in error, contact us using the details in section 11.
+            Access to DueChat through VPNs, proxies, Tor, relays, or hosting/datacenter networks is
+            not permitted. To keep the community safe and enforce bans and age restrictions, we
+            check the network address used at sign-in and may block or sign out connections that
+            appear to come from an anonymizing or commercial hosting network. Attempting to evade a
+            ban, device lock, or age gate by masking your network address is a violation of this
+            Agreement and may result in permanent removal. Approved staff accounts may be exempt for
+            administrative purposes. If you believe your connection was blocked in error, contact us
+            using the details in section 11.
           </p>
 
           <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
             7. Single Browser Policy
           </h2>
           <p>
-            To reduce abuse, ban evasion, and account sharing, DueChat may bind a single account to a
-            browser or device identifier. Once a browser is linked to an account, you may not use it to
-            sign in to a different account unless you are an approved administrator or moderator. If you
-            attempt to sign in with a different account on a linked browser, you may be signed out and
-            redirected to the original account. You may contact support if you believe your browser was
-            linked in error. Approved staff accounts may be exempt for administrative purposes.
+            To reduce abuse, ban evasion, and account sharing, DueChat may bind a single account to
+            a browser or device identifier. Once a browser is linked to an account, you may not use
+            it to sign in to a different account unless you are an approved administrator or
+            moderator. If you attempt to sign in with a different account on a linked browser, you
+            may be signed out and redirected to the original account. You may contact support if you
+            believe your browser was linked in error. Approved staff accounts may be exempt for
+            administrative purposes.
           </p>
 
           <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
@@ -143,32 +151,32 @@ function TermsPage() {
           </h2>
           <p>
             DueChat administrators and moderators may kick, ban, or remove users from rooms or the
-            platform for violations of this Agreement. We may also terminate or suspend accounts at our
-            discretion.
+            platform for violations of this Agreement. We may also terminate or suspend accounts at
+            our discretion.
           </p>
 
           <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
             8a. Radio Stations and Music Licensing
           </h2>
           <p>
-            Room owners and room admins may add an internet radio stream to a room. Any station you add
-            must be properly licensed for public broadcast in its territory (for example SoundExchange,
-            ASCAP, BMI, SESAC, PRS, or an equivalent performing-rights and streaming license). You may
-            only add streams you own or that you are permitted to rebroadcast — pirated, ripped, or
-            unlicensed feeds are prohibited. Explicit or adults-only stations may not be used in G-rated
-            rooms. You confirm licensing when you save a station, and you are responsible for that
-            confirmation. DueChat does not license the music played through third-party streams and may
-            remove any station, revoke radio privileges, or suspend accounts that violate this section
-            or that are the subject of a rights-holder complaint.
+            Room owners and room admins may add an internet radio stream to a room. Any station you
+            add must be properly licensed for public broadcast in its territory (for example
+            SoundExchange, ASCAP, BMI, SESAC, PRS, or an equivalent performing-rights and streaming
+            license). You may only add streams you own or that you are permitted to rebroadcast —
+            pirated, ripped, or unlicensed feeds are prohibited. Explicit or adults-only stations
+            may not be used in G-rated rooms. You confirm licensing when you save a station, and you
+            are responsible for that confirmation. DueChat does not license the music played through
+            third-party streams and may remove any station, revoke radio privileges, or suspend
+            accounts that violate this section or that are the subject of a rights-holder complaint.
           </p>
 
           <h2 className="mt-6 font-display text-lg font-semibold text-foreground">
             9. Privacy and Data
           </h2>
           <p>
-            Your use of DueChat is also governed by our Privacy Policy. We collect and process data as
-            described there, including account information, messages, profile data, usage logs, and
-            connection details such as your network address, browser identifier, and whether the
+            Your use of DueChat is also governed by our Privacy Policy. We collect and process data
+            as described there, including account information, messages, profile data, usage logs,
+            and connection details such as your network address, browser identifier, and whether the
             connection was detected as a VPN or proxy. This information is visible only to
             administrators and is used for safety, ban enforcement, and abuse prevention.
           </p>
@@ -182,8 +190,8 @@ function TermsPage() {
 
           <h2 className="mt-6 font-display text-lg font-semibold text-foreground">11. Contact</h2>
           <p>
-            If you have questions about this Agreement, contact the DueChat team through the platform or
-            at the support channel listed on your account settings.
+            If you have questions about this Agreement, contact the DueChat team through the
+            platform or at the support channel listed on your account settings.
           </p>
         </section>
 

@@ -1,7 +1,11 @@
 /** Cross-browser WebRTC/media helpers (Chrome, Safari/iOS, Firefox, Edge). */
 
 type LegacyNavigator = Navigator & {
-  getUserMedia?: (c: MediaStreamConstraints, s: (s: MediaStream) => void, e: (e: unknown) => void) => void;
+  getUserMedia?: (
+    c: MediaStreamConstraints,
+    s: (s: MediaStream) => void,
+    e: (e: unknown) => void,
+  ) => void;
   webkitGetUserMedia?: LegacyNavigator["getUserMedia"];
   mozGetUserMedia?: LegacyNavigator["getUserMedia"];
 };
@@ -79,10 +83,7 @@ export function mediaErrorMessage(error: unknown) {
 }
 
 /** Attach a stream to a media element with the legacy-Safari fallback and autoplay retry. */
-export function attachStream(
-  el: HTMLMediaElement | null,
-  stream: MediaStream | null,
-): void {
+export function attachStream(el: HTMLMediaElement | null, stream: MediaStream | null): void {
   if (!el) return;
   const legacy = el as HTMLMediaElement & { srcObject?: MediaStream | null; src?: string };
   try {

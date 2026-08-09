@@ -84,7 +84,9 @@ export function InvitePanel({
       <ul className="min-h-0 flex-1 overflow-y-auto px-2 pb-4">
         {candidates.length === 0 ? (
           <li className="px-3 py-6 text-center text-sm text-muted-foreground">
-            {profiles.length <= 1 ? "No one else to invite yet." : "Everyone here is already in the room."}
+            {profiles.length <= 1
+              ? "No one else to invite yet."
+              : "Everyone here is already in the room."}
           </li>
         ) : null}
         {candidates.map((p) => {
@@ -106,7 +108,9 @@ export function InvitePanel({
                 type="button"
                 onClick={() => void invite(p.id)}
                 disabled={invited || pending === p.id}
-                aria-label={invited ? `${p.display_name} already invited` : `Invite ${p.display_name}`}
+                aria-label={
+                  invited ? `${p.display_name} already invited` : `Invite ${p.display_name}`
+                }
                 className={cn(
                   "flex h-9 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
                   invited

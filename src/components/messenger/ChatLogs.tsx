@@ -106,8 +106,7 @@ export function ChatLogs({ canClear }: { canClear: boolean }) {
                     {r.entries.map((e) => (
                       <li key={e.id} className="text-sm">
                         <span className="text-xs text-muted-foreground">
-                          {formatTime(e.sent_at)} ·{" "}
-                          {e.display_name ?? e.username ?? "unknown user"}
+                          {formatTime(e.sent_at)} · {e.display_name ?? e.username ?? "unknown user"}
                         </span>
                         <p className="break-words">{e.body}</p>
                       </li>
