@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
+import { MessagesSquare } from "lucide-react";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
-import { ProfileViewer } from "@/components/messenger/ProfileViewer";
+import { Sidebar } from "@/components/messenger/Sidebar";
 import { IncomingCallWatcher } from "@/components/messenger/IncomingCallWatcher";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import {
