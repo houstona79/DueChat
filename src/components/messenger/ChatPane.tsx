@@ -1002,19 +1002,24 @@ export function ChatPane({
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 maxLength={2000}
+                disabled={Boolean(mySilence)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
                     void submit();
                   }
                 }}
-                placeholder={`Message ${room.name}`}
+                placeholder={
+                  mySilence
+                    ? "You are silenced in this room — you can still read along."
+                    : `Message ${room.name}`
+                }
                 aria-label="Message"
-                className="max-h-32 min-h-9 w-full resize-none bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted-foreground"
+                className="max-h-32 min-h-9 w-full resize-none bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted-foreground disabled:opacity-70"
               />
               <button
                 onClick={() => void submit()}
-                disabled={draft.trim().length === 0}
+                disabled={draft.trim().length === 0 || Boolean(mySilence)}
                 aria-label="Send message"
                 className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40"
               >
