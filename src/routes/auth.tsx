@@ -7,6 +7,7 @@ import { GENDERS } from "@/lib/genders";
 import { HumanCheck } from "@/components/auth/HumanCheck";
 import { DEVICE_BLOCK_KEY } from "@/lib/devices";
 import { clearPendingInvite, pendingInvite } from "@/lib/invites";
+import { isRecoveryUrl } from "@/lib/recovery";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { ThemeToggle } from "@/components/system/ThemeToggle";
 
@@ -65,7 +66,15 @@ function AuthPage() {
       setInvite(code);
       setMode("signup");
     }
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+    if (isRecoveryUrl()) {
+      void navigate({ to: "/reset-password", replace: true });
+      return;
+    }
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        void navigate({ to: "/reset-password", replace: true });
+        return;
+      }
       if (session) void navigate({ to: "/chat", replace: true });
     });
     void supabase.auth.getSession().then(({ data }) => {

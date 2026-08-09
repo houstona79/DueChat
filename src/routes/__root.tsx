@@ -14,6 +14,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { KickWatcher } from "@/components/system/KickWatcher";
 import { SessionTracker } from "@/components/system/SessionTracker";
 import { AuthWatcher } from "@/components/system/AuthWatcher";
+import { RecoveryGate } from "@/components/system/RecoveryGate";
 import { DeviceLock } from "@/components/system/DeviceLock";
 import { SystemAlerts } from "@/components/system/SystemAlerts";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -158,6 +159,7 @@ function RootComponent() {
       <KickWatcher />
       <SystemAlerts />
       <AuthWatcher />
+      <RecoveryGate />
       <DeviceLock />
       <SessionTracker />
       <Toaster />
