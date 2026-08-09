@@ -824,7 +824,13 @@ export function ChatPane({
                 return (
                   <div key={item.id} className="mt-4 flex justify-center">
                     <span className="rounded-full bg-secondary px-3 py-1 text-[11px] text-muted-foreground">
-                      {name} {item.action === "join" ? "joined" : "left"} the room ·{" "}
+                      {name}{" "}
+                      {item.action === "join"
+                        ? "joined"
+                        : item.action === "bounce"
+                          ? "was bounced from"
+                          : "left"}{" "}
+                      the room ·{" "}
                       {formatTime(item.at)}
                     </span>
                   </div>
