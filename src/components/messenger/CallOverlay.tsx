@@ -139,7 +139,7 @@ export function CallOverlay({
           <ChevronDown className="size-4" />
           Back to chat
         </button>
-        <div className="text-center">
+        <div className="shrink-0 text-center">
           <h2 className="font-display text-lg font-semibold sm:text-xl">{title}</h2>
           <p className="mt-1 text-xs text-muted-foreground">
             {mode === "video" ? "Group video call" : "Group voice call"} · {participants.length + 1}{" "}
@@ -170,7 +170,7 @@ export function CallOverlay({
         ) : null}
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-3 px-4 pb-10 sm:gap-4">
+      <div className="flex shrink-0 flex-wrap items-center justify-center gap-3 px-4 pb-6 sm:gap-4">
         <CallButton
           label={muted ? "Unmute microphone" : "Mute microphone"}
           active={!muted}
