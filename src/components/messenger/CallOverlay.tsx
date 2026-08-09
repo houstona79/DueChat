@@ -127,7 +127,7 @@ export function CallOverlay({
       role="dialog"
       aria-modal="true"
       aria-label={`${mode === "video" ? "Video" : "Voice"} call in ${title}`}
-      className="absolute inset-0 z-30 flex flex-col bg-sidebar/95 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex flex-col overscroll-none bg-sidebar pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]"
     >
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden px-4 py-4 sm:flex-row">
       <div className="min-h-0 flex-1 overflow-y-auto">
