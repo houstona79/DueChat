@@ -4,6 +4,26 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMessages, useProfiles } from "@/hooks/use-chat";
 import { accentFor, formatTime, sendMessage } from "@/lib/chat";
 import { Avatar } from "./Avatar";
+import { EmojiPicker } from "./EmojiPicker";
+import { GifPicker } from "./GifPicker";
+
+function isEmojiOnly(body: string) {
+  const trimmed = body.trim();
+  if (!trimmed || trimmed.length > 12) return false;
+  return /^[\p{Extended_Pictographic}\uFE0F\u200D\s\u{1F3FB}-\u{1F3FF}\u{20E3}]+$/u.test(trimmed);
+}
+
+function gifUrlOf(body: string) {
+  const trimmed = body.trim();
+  if (!/^https:\/\/\S+$/i.test(trimmed) || /\s/.test(trimmed)) return null;
+  try {
+    const url = new URL(trimmed);
+    if (!url.hostname.endsWith("klipy.com") && !url.hostname.endsWith("klipy.co")) return null;
+    return trimmed;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Compact chat transcript + composer shown as an overlay panel during a
@@ -22,6 +42,7 @@ export function CallChat({
   const { data: profiles = [] } = useProfiles();
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
@@ -46,6 +67,17 @@ export function CallChat({
     } finally {
       setSending(false);
     }
+  };
+
+  const sendMedia = (url: string) => {
+    void (async () => {
+      try {
+        await sendMessage(roomId, meId, url);
+        await queryClient.invalidateQueries({ queryKey: ["messages", roomId] });
+      } catch {
+        /* ignore — transcript stays unchanged on failure */
+      }
+    })();
   };
 
   return (
@@ -81,7 +113,24 @@ export function CallChat({
                   </span>
                   {formatTime(m.created_at)}
                 </p>
-                <p className="break-words text-xs leading-relaxed">{m.body}</p>
+                {gifUrlOf(m.body) ? (
+                  <img
+                    src={gifUrlOf(m.body)!}
+                    alt={`GIF sent by ${m.user_id === meId ? "you" : nameFor(m.user_id)}`}
+                    loading="lazy"
+                    className="mt-1 max-h-40 w-auto max-w-full rounded-xl border border-border object-contain"
+                  />
+                ) : (
+                  <p
+                    className={
+                      isEmojiOnly(m.body)
+                        ? "break-words text-2xl leading-tight"
+                        : "break-words text-xs leading-relaxed"
+                    }
+                  >
+                    {m.body}
+                  </p>
+                )}
               </div>
             </div>
           ))
@@ -89,8 +138,29 @@ export function CallChat({
         <div ref={endRef} />
       </div>
 
-      <form onSubmit={submit} className="flex shrink-0 items-center gap-2 border-t border-border p-2">
+      <form onSubmit={submit} className="flex shrink-0 items-center gap-1 border-t border-border p-2">
+        <EmojiPicker
+          onSelect={(emoji) => {
+            const el = inputRef.current;
+            if (!el) {
+              setDraft((d) => d + emoji);
+              return;
+            }
+            const start = el.selectionStart ?? el.value.length;
+            const end = el.selectionEnd ?? start;
+            const next = el.value.slice(0, start) + emoji + el.value.slice(end);
+            setDraft(next.slice(0, 2000));
+            requestAnimationFrame(() => {
+              el.focus();
+              const caret = start + emoji.length;
+              el.setSelectionRange(caret, caret);
+            });
+          }}
+        />
+        <GifPicker onSelect={sendMedia} />
+        <GifPicker media="stickers" onSelect={sendMedia} />
         <input
+          ref={inputRef}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Message the room…"
