@@ -151,8 +151,13 @@ export function ChatPane({
   const { data: roomEvents = [] } = useRoomEvents(room.id, joined && !room.is_direct);
   const { data: roomAdmins = [] } = useRoomAdmins(room.id, joined && !room.is_direct);
   const isOwner = room.created_by === meId;
-  const canModerate = !room.is_direct && (isOwner || roomAdmins.some((a) => a.user_id === meId));
+  const myTier = roomAdmins.find((a) => a.user_id === meId)?.tier ?? null;
+  const canModerate = !room.is_direct && (isOwner || myTier !== null);
+  const isSuper = !room.is_direct && (isOwner || myTier === "super");
   const { data: bans = [] } = useRoomBans(room.id, canModerate);
+  const { data: silences = [] } = useRoomSilences(room.id, joined && !room.is_direct);
+  const { data: blocks = [] } = useBlocks(meId);
+  const mySilence = silences.find((s) => s.user_id === meId && isActive(s)) ?? null;
   const { data: siteRoles } = useSiteRoles();
   const myProfile = profileOf(meId);
   const adultsOnly = room.rating === "R" && !room.is_direct;
@@ -160,10 +165,18 @@ export function ChatPane({
 
   type TimelineItem =
     | { kind: "message"; id: string; at: string; message: (typeof messages)[number] }
-    | { kind: "event"; id: string; at: string; userId: string; action: "join" | "leave" };
+    | {
+        kind: "event";
+        id: string;
+        at: string;
+        userId: string;
+        action: "join" | "leave" | "bounce";
+      };
 
   const timeline: TimelineItem[] = [
-    ...messages.map((m) => ({ kind: "message" as const, id: m.id, at: m.created_at, message: m })),
+    ...messages
+      .filter((m) => m.user_id === meId || !isBlocked(blocks, m.user_id))
+      .map((m) => ({ kind: "message" as const, id: m.id, at: m.created_at, message: m })),
     ...roomEvents.map((e) => ({
       kind: "event" as const,
       id: e.id,
@@ -193,6 +206,10 @@ export function ChatPane({
     if (!text) return;
     if (ageBlocked) {
       setError("This room is rated R — you must be 18 or older to post here.");
+      return;
+    }
+    if (mySilence) {
+      setError("A room admin has silenced you here, so you can read but not post.");
       return;
     }
     setDraft("");
