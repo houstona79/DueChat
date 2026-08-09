@@ -16,6 +16,10 @@ export type Profile = {
   bio: string | null;
   website_url: string | null;
   accepted_eula_at: string | null;
+  /** Who may open this profile: everyone, buddies only, or nobody. */
+  profile_visibility: string;
+  /** Optional badge shown beside the name (diamond, star, flag…). */
+  decoration: string | null;
   last_seen_at: string;
   created_at: string;
 };
@@ -42,10 +46,15 @@ export type Room = {
   trivia_enabled: boolean;
   /** Staff-only rooms are hidden from regular members by database policy. */
   staff_only: boolean;
+  /** Short notice set by the owner or a room super admin. */
+  status_message: string | null;
 };
 
 export const ROOM_COLS =
-  "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label, trivia_enabled, staff_only";
+  "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label, trivia_enabled, staff_only, status_message";
+
+const PROFILE_COLS =
+  "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, accepted_eula_at, profile_visibility, decoration, last_seen_at, created_at";
 
 export type RoomBranding = {
   icon_url: string | null;
@@ -166,9 +175,7 @@ export function slugify(name: string) {
 export async function fetchProfiles(): Promise<Profile[]> {
   const { data, error } = await supabase
     .from("profiles")
-    .select(
-      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, accepted_eula_at, last_seen_at, created_at",
-    )
+    .select(PROFILE_COLS)
     .order("last_seen_at", { ascending: false });
   if (error) throw error;
   return data ?? [];
@@ -177,9 +184,7 @@ export async function fetchProfiles(): Promise<Profile[]> {
 export async function fetchMyProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from("profiles")
-    .select(
-      "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, accepted_eula_at, last_seen_at, created_at",
-    )
+    .select(PROFILE_COLS)
     .eq("id", userId)
     .maybeSingle();
   if (error) throw error;
@@ -203,7 +208,7 @@ export type RoomEvent = {
   id: string;
   room_id: string;
   user_id: string;
-  kind: "join" | "leave";
+  kind: "join" | "leave" | "bounce";
   created_at: string;
 };
 
