@@ -614,6 +614,296 @@ export function ChatPane({
             </>
           ) : null}
 
+        {showInvite && !room.is_direct ? (
+          <InvitePanel
+            roomId={room.id}
+            roomName={room.name}
+            memberships={members}
+            profiles={profiles}
+            meId={meId}
+            onClose={() => setShowInvite(false)}
+          />
+        ) : null}
+
+        {showFeed && !room.is_direct ? (
+          <RoomFeed
+            roomId={room.id}
+            meId={meId}
+            profiles={profiles}
+            canModerate={canModerate}
+            onClose={() => setShowFeed(false)}
+          />
+        ) : null}
+
+        {joined ? (
+          <>
+            <div
+              ref={scroller}
+              className="min-h-0 flex-1 overflow-y-auto px-4 py-5"
+              role="log"
+              aria-live="polite"
+              aria-relevant="additions text"
+              aria-label="Messages"
+              tabIndex={0}
+            >
+              {isLoading ? (
+                <p className="text-center text-sm text-muted-foreground">Loading messages…</p>
+              ) : null}
+              {!isLoading && messages.length === 0 ? (
+                <p className="text-center text-sm text-muted-foreground">
+                  No messages yet — say hello.
+                </p>
+              ) : null}
+              {timeline.map((item, i) => {
+                if (item.kind === "event") {
+                  const who = profileOf(item.userId);
+                  const name = item.userId === meId ? "You" : (who?.display_name ?? "Someone");
+                  return (
+                    <div key={item.id} className="mt-4 flex justify-center">
+                      <span className="rounded-full bg-secondary px-3 py-1 text-[11px] text-muted-foreground">
+                        {name}{" "}
+                        {item.action === "join"
+                          ? "joined"
+                          : item.action === "bounce"
+                            ? "was bounced from"
+                            : "left"}{" "}
+                        the room · {formatTime(item.at)}
+                      </span>
+                    </div>
+                  );
+                }
+                const m = item.message;
+                const mine = m.user_id === meId;
+                const liveNotice = liveNoticeOf(m.body);
+                if (liveNotice) {
+                  const who = profileOf(m.user_id);
+                  const name = mine ? "You" : (who?.display_name ?? "Someone");
+                  return (
+                    <div key={m.id} className="mt-4 flex justify-center">
+                      <span className="flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-[11px] font-medium text-primary">
+                        <Video className="size-3" />
+                        {liveNotice === "on"
+                          ? `${name} ${mine ? "are" : "is"} live on camera`
+                          : `${name} stopped the camera`}{" "}
+                        · {formatTime(m.created_at)}
+                      </span>
+                    </div>
+                  );
+                }
+                const prev = timeline[i - 1];
+                const grouped =
+                  prev?.kind === "message" &&
+                  prev.message.user_id === m.user_id &&
+                  !liveNoticeOf(prev.message.body);
+                const author = profileOf(m.user_id);
+                const authorName = author?.display_name ?? "Someone";
+                return (
+                  <div
+                    key={m.id}
+                    className={cn(
+                      "flex items-end gap-2",
+                      mine ? "flex-row-reverse" : "flex-row",
+                      grouped ? "mt-0.5" : "mt-4",
+                    )}
+                  >
+                    {grouped ? (
+                      <span className="size-9 shrink-0" aria-hidden="true" />
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => openProfile(m.user_id)}
+                        aria-label={`View ${authorName}'s profile`}
+                        className="shrink-0 rounded-2xl hover:opacity-80"
+                      >
+                        <Avatar
+                          name={authorName}
+                          accent={accentFor(m.user_id)}
+                          avatarPath={author?.avatar_url ?? null}
+                          online={author ? isOnline(author) : false}
+                          size="sm"
+                        />
+                      </button>
+                    )}
+                    <div className={cn("flex min-w-0 flex-col", mine ? "items-end" : "items-start")}>
+                      {!mine && !grouped ? (
+                        <span className="mb-1 flex items-center gap-1.5 px-1 text-[11px] font-medium">
+                          <span
+                            className={
+                              siteRoleTextClass(siteRoleOf(siteRoles, m.user_id)) ??
+                              "text-muted-foreground"
+                            }
+                            style={nameColorStyle(
+                              siteRoleOf(siteRoles, m.user_id),
+                              author?.name_color,
+                            )}
+                          >
+                            {authorName}
+                          </span>
+                          {siteRoleLabel(siteRoleOf(siteRoles, m.user_id)) ? (
+                            <span
+                              className={cn(
+                                "rounded-md px-1 py-0.5 text-[11px] font-semibold uppercase tracking-wide",
+                                siteRoleBadgeClass(siteRoleOf(siteRoles, m.user_id)),
+                              )}
+                            >
+                              {siteRoleLabel(siteRoleOf(siteRoles, m.user_id))}
+                            </span>
+                          ) : null}
+                        </span>
+                      ) : null}
+                      {gifUrlOf(m.body) ? (
+                        <img
+                          src={gifUrlOf(m.body)!}
+                          alt={`GIF sent by ${authorName}`}
+                          loading="lazy"
+                          className="max-h-56 max-w-[78%] rounded-2xl border border-border object-cover"
+                        />
+                      ) : videoEmbedOf(m.body) ? (
+                        <MessageVideo video={videoEmbedOf(m.body)!} />
+                      ) : (
+                        <div
+                          className={cn(
+                            "max-w-[78%] px-4 py-2.5 text-sm leading-relaxed",
+                            mine
+                              ? "rounded-3xl rounded-br-md bg-bubble-me text-bubble-me-foreground"
+                              : "rounded-3xl rounded-bl-md bg-bubble-them text-bubble-them-foreground",
+                            isEmojiOnly(m.body) &&
+                              "bg-transparent px-1 py-0.5 text-3xl leading-tight",
+                          )}
+                        >
+                          {m.body}
+                        </div>
+                      )}
+                      <span className="mt-1 px-1 text-[11px] text-muted-foreground">
+                        {formatTime(m.created_at)}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <footer className="border-t border-border px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+              {error ? (
+                <p role="alert" className="px-2 pb-2 text-xs text-destructive">
+                  {error}
+                </p>
+              ) : null}
+              <div className="flex items-end gap-2 rounded-2xl bg-secondary p-2">
+                <EmojiPicker
+                  onSelect={(emoji) => {
+                    const el = inputRef.current;
+                    if (!el) {
+                      setDraft((d) => d + emoji);
+                      return;
+                    }
+                    const start = el.selectionStart ?? el.value.length;
+                    const end = el.selectionEnd ?? start;
+                    const next = el.value.slice(0, start) + emoji + el.value.slice(end);
+                    setDraft(next.slice(0, 2000));
+                    requestAnimationFrame(() => {
+                      el.focus();
+                      const caret = start + emoji.length;
+                      el.setSelectionRange(caret, caret);
+                    });
+                  }}
+                />
+                <GifPicker
+                  onSelect={(url) => {
+                    void (async () => {
+                      try {
+                        await sendMessage(room.id, meId, url);
+                        await queryClient.invalidateQueries({ queryKey: ["messages", room.id] });
+                      } catch (err) {
+                        setError(err instanceof Error ? err.message : "GIF failed to send.");
+                      }
+                    })();
+                  }}
+                />
+                <GifPicker
+                  media="stickers"
+                  onSelect={(url) => {
+                    void (async () => {
+                      try {
+                        await sendMessage(room.id, meId, url);
+                        await queryClient.invalidateQueries({ queryKey: ["messages", room.id] });
+                      } catch (err) {
+                        setError(err instanceof Error ? err.message : "Sticker failed to send.");
+                      }
+                    })();
+                  }}
+                />
+                <textarea
+                  ref={inputRef}
+                  rows={1}
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  maxLength={2000}
+                  disabled={Boolean(mySilence)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      void submit();
+                    }
+                  }}
+                  placeholder={
+                    mySilence
+                      ? "You are silenced in this room — you can still read along."
+                      : `Message ${room.name}`
+                  }
+                  aria-label="Message"
+                  className="max-h-32 min-h-9 w-full resize-none bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted-foreground disabled:opacity-70"
+                />
+                <button
+                  onClick={() => void submit()}
+                  disabled={draft.trim().length === 0 || Boolean(mySilence)}
+                  aria-label="Send message"
+                  className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40"
+                >
+                  <SendHorizonal className="size-4" />
+                </button>
+              </div>
+            </footer>
+          </>
+        ) : (
+          <div className="grid min-h-0 flex-1 place-items-center px-6 text-center">
+            <div className="max-w-sm">
+              {ageBlocked ? (
+                <>
+                  <h3 className="text-lg font-semibold">Adults only</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    “{title}” is rated R. You must be 18 or older to join.
+                    {myProfile?.birth_date
+                      ? ""
+                      : " Add your date of birth in Settings to confirm your age."}
+                  </p>
+                  {myProfile?.birth_date ? null : (
+                    <Link
+                      to="/settings"
+                      className="mt-5 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                    >
+                      Open settings
+                    </Link>
+                  )}
+                </>
+              ) : (
+                <>
+                  <h3 className="text-lg font-semibold">Join {title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Messages in this room are only visible to members.
+                  </p>
+                  <button
+                    onClick={() => void join()}
+                    className="mt-5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                  >
+                    Join room
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
           {!room.is_direct ? (
             <section
               className={cn(
