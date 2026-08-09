@@ -473,6 +473,35 @@ function SettingsPage() {
       </div>
 
       <div className="mt-8">
+        <BlockList meId={user.id} />
+      </div>
+
+      <section className="mt-8 rounded-2xl border border-border bg-card p-4">
+        <h2 className="text-sm font-semibold">Password</h2>
+        <p className="mt-1 text-[11px] text-muted-foreground">
+          We'll email {user.email ?? "your address"} a link to choose a new password.
+        </p>
+        <button
+          type="button"
+          disabled={resetting || !user.email}
+          onClick={async () => {
+            if (!user.email) return;
+            setResetting(true);
+            const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+              redirectTo: `${window.location.origin}/reset-password`,
+            });
+            setResetting(false);
+            setMessage(
+              error ? error.message : "Password reset email sent — check your inbox.",
+            );
+          }}
+          className="mt-3 rounded-xl bg-secondary px-4 py-2 text-sm font-medium disabled:opacity-50"
+        >
+          {resetting ? "Sending…" : "Send password reset email"}
+        </button>
+      </section>
+
+      <div className="mt-8">
         <ProfileFeed userId={user.id} title="Your updates" />
         <p className="mt-2 text-[11px] text-muted-foreground">
           Updates you post here appear in your profile’s update feed.
