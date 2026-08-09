@@ -537,7 +537,7 @@ export function ChatPane({
         </div>
       </header>
       <div className="flex min-h-0 flex-1">
-        <div className="relative flex min-w-0 flex-1 flex-col">
+        <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
           {statusDraft !== null ? (
             <form
               className="flex items-center gap-2 border-b border-border bg-secondary/40 px-3 py-2"
