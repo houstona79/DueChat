@@ -28,6 +28,7 @@ import {
 import {
   accentFor,
   expiryFromMinutes,
+  formatTime,
   isActive,
   isOnline,
   MODERATION_DURATIONS,
@@ -62,6 +63,7 @@ export function MemberList({
   bans,
   silences,
   blocks,
+  events,
   canModerate,
   isSuper,
   onClose,
@@ -85,6 +87,9 @@ export function MemberList({
   bans?: RoomBan[] | undefined;
   silences?: RoomSilence[] | undefined;
   blocks?: Block[] | undefined;
+  events?:
+    | { id: string; userId: string; action: "join" | "leave" | "bounce"; at: string }[]
+    | undefined;
   canModerate?: boolean | undefined;
   isSuper?: boolean | undefined;
   onClose: () => void;
@@ -131,6 +136,11 @@ export function MemberList({
     const tier = tierOf(id);
     return tier ? ROOM_ADMIN_TIER_LABEL[tier] : null;
   };
+
+  const activity = (events ?? []).slice(-20).reverse();
+  const nameOf = (id: string) => profiles.find((p) => p.id === id)?.display_name ?? "Someone";
+  const actionLabel = (action: "join" | "leave" | "bounce") =>
+    action === "join" ? "came in" : action === "leave" ? "left" : "was bounced";
 
   return (
     <section
@@ -383,6 +393,38 @@ export function MemberList({
         })}
         {members.length === 0 ? (
           <li className="px-3 py-6 text-center text-xs text-muted-foreground">No members yet.</li>
+        ) : null}
+
+        {events ? (
+          <li className="mt-3 border-t border-border px-2 pt-3">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Coming &amp; going
+            </p>
+            {activity.length === 0 ? (
+              <p className="text-xs text-muted-foreground">No arrivals or exits yet.</p>
+            ) : (
+              <ul className="space-y-1" aria-live="polite">
+                {activity.map((e) => (
+                  <li key={e.id} className="flex items-center gap-2 text-xs">
+                    <span
+                      className={cn(
+                        "size-1.5 shrink-0 rounded-full",
+                        e.action === "join" ? "bg-primary" : "bg-muted-foreground/60",
+                      )}
+                      aria-hidden
+                    />
+                    <span className="min-w-0 flex-1 truncate text-muted-foreground">
+                      <span className="font-medium text-foreground">{nameOf(e.userId)}</span>{" "}
+                      {actionLabel(e.action)}
+                    </span>
+                    <span className="shrink-0 text-[11px] text-muted-foreground">
+                      {formatTime(e.at)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
         ) : null}
 
         {canModerate && silenceList.length > 0 ? (

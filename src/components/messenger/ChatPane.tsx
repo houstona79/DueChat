@@ -734,6 +734,16 @@ export function ChatPane({
           bans={bans}
           silences={silences}
           blocks={blocks}
+          events={
+            room.is_direct
+              ? undefined
+              : roomEvents.map((e) => ({
+                  id: e.id,
+                  userId: e.user_id,
+                  action: e.kind,
+                  at: e.created_at,
+                }))
+          }
           canModerate={canModerate}
           isSuper={isSuper}
           onSetTier={(userId: string, tier: RoomAdminTier) =>
