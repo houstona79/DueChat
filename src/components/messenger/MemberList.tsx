@@ -88,8 +88,7 @@ export function MemberList({
   silences?: RoomSilence[] | undefined;
   blocks?: Block[] | undefined;
   events?:
-    | { id: string; userId: string; action: "join" | "leave" | "bounce"; at: string }[]
-    | undefined;
+    { id: string; userId: string; action: "join" | "leave" | "bounce"; at: string }[] | undefined;
   canModerate?: boolean | undefined;
   isSuper?: boolean | undefined;
   onClose: () => void;
@@ -150,15 +149,15 @@ export function MemberList({
 
   return (
     <section
-      className="absolute inset-y-0 right-0 z-20 flex w-full max-w-[85%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl sm:max-w-xs"
+      className="flex h-full w-full flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] md:w-[260px] lg:w-[300px]"
       role="region"
       aria-label="Room members"
     >
-      <header className="flex items-center justify-between px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+      <header className="flex items-center justify-between px-4 py-3">
         <h3 className="text-sm font-semibold">Members · {members.length}</h3>
         <button
           onClick={onClose}
-          aria-label="Close members"
+          aria-label="Hide members"
           className="grid size-10 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
         >
           <X className="size-4" />
@@ -186,7 +185,9 @@ export function MemberList({
           </button>
         </div>
       ) : null}
-      <ul className={cn("min-h-0 flex-1 overflow-y-auto px-2 pb-4", tab === "activity" && "hidden")}>
+      <ul
+        className={cn("min-h-0 flex-1 overflow-y-auto px-2 pb-4", tab === "activity" && "hidden")}
+      >
         {members.map((p) => {
           const role = roleLabel(p.id);
           const siteRole = siteRoleOf(siteRoles, p.id);

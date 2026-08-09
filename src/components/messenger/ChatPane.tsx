@@ -260,7 +260,7 @@ export function ChatPane({
 
   return (
     <section
-      className="relative flex h-full min-h-0 flex-col bg-background"
+      className="flex h-full min-h-0 flex-col bg-background"
       aria-label={`Conversation: ${title}`}
     >
       <header className="flex flex-col gap-2 border-b border-border px-3 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] lg:flex-row lg:items-center lg:gap-3 lg:px-4">
@@ -536,554 +536,278 @@ export function ChatPane({
           </button>
         </div>
       </header>
-
-      {statusDraft !== null ? (
-        <form
-          className="flex items-center gap-2 border-b border-border bg-secondary/40 px-3 py-2"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            const next = statusDraft.trim();
-            try {
-              await setRoomStatusMessage(room.id, next || null);
-              await queryClient.invalidateQueries({ queryKey: ["rooms"] });
-              setStatusDraft(null);
-            } catch (err) {
-              setError(err instanceof Error ? err.message : "Could not save the room status.");
-            }
-          }}
-        >
-          <input
-            value={statusDraft}
-            onChange={(e) => setStatusDraft(e.target.value)}
-            maxLength={200}
-            autoFocus
-            aria-label="Room status message"
-            placeholder="Room status shown to everyone (leave empty to clear)"
-            className="min-w-0 flex-1 rounded-xl bg-background px-3 py-1.5 text-xs outline-none placeholder:text-muted-foreground"
-          />
-          <button
-            type="submit"
-            className="shrink-0 rounded-xl bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground"
-          >
-            Save
-          </button>
-          <button
-            type="button"
-            onClick={() => setStatusDraft(null)}
-            className="shrink-0 rounded-xl bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground"
-          >
-            Cancel
-          </button>
-        </form>
-      ) : null}
-
-      {talking ? (
-        <TalkBar
-          roomId={room.id}
-          meId={meId}
-          myName={profileOf(meId)?.display_name ?? "You"}
-          onLeave={() => {
-            setTalking(false);
-            setShowCams(false);
-          }}
-          camsOpen={showCams}
-          onCamsOpenChange={setShowCams}
-        />
-      ) : null}
-
-      {!room.is_direct ? (
-        <>
-          <RoomBanner
-            roomId={room.id}
-            roomName={room.name}
-            branding={{
-              icon_url: room.icon_url,
-              banner_url: room.banner_url,
-              website_url: room.website_url,
-              website_label: room.website_label,
-            }}
-            canEdit={isOwner}
-            onSave={async (next) => {
-              const saved = await setRoomBranding(room.id, next);
-              queryClient.setQueryData<Room[]>(["rooms"], (rooms) =>
-                rooms?.map((item) => (item.id === room.id ? { ...item, ...saved } : item)),
-              );
-            }}
-          />
-        </>
-      ) : null}
-
-      {!room.is_direct ? (
-        <section
-          className={cn(
-            "absolute inset-y-0 right-0 z-20 flex w-full max-w-[92%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl transition-transform duration-200 ease-out sm:max-w-sm",
-            showMedia ? "translate-x-0" : "pointer-events-none translate-x-full",
-          )}
-          aria-hidden={!showMedia}
-          role="region"
-          aria-label="Radio and video players"
-        >
-          <div className="flex items-center justify-between border-b border-border px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
-            <h3 className="text-sm font-semibold">Radio &amp; video</h3>
-            <button
-              onClick={() => setShowMedia(false)}
-              className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
-              aria-label="Close players"
-            >
-              <X className="size-4" />
-            </button>
-          </div>
-          <div className="min-h-0 flex-1 overflow-y-auto">
-            <RadioPlayer
-              url={room.radio_url}
-              name={room.radio_name}
-              canEdit={isOwner}
-              onSave={async (radio) => {
-                await setRoomRadio(room.id, radio);
-                await queryClient.invalidateQueries({ queryKey: ["rooms"] });
-              }}
-            />
-            <YouTubeEmbed
-              url={room.youtube_url}
-              title={room.youtube_title}
-              canEdit={canModerate}
-              onSave={async (video) => {
-                await setRoomYouTube(room.id, video);
-                await queryClient.invalidateQueries({ queryKey: ["rooms"] });
-              }}
-            />
-          </div>
-        </section>
-      ) : null}
-
-      <section
-        className={cn(
-          "absolute inset-y-0 right-0 z-20 flex w-full max-w-[92%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl transition-transform duration-200 ease-out sm:max-w-sm",
-          showGames ? "translate-x-0" : "pointer-events-none translate-x-full",
-        )}
-        aria-hidden={!showGames}
-        role="region"
-        aria-label="Games"
-      >
-        <div className="flex items-center justify-between border-b border-border px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
-          <h3 className="text-sm font-semibold">Games</h3>
-          <button
-            onClick={() => setShowGames(false)}
-            className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
-            aria-label="Close games"
-          >
-            <X className="size-4" />
-          </button>
-        </div>
-        <div className="min-h-0 flex-1 overflow-y-auto">{showGames ? <GamesPanel /> : null}</div>
-      </section>
-
-      {!room.is_direct ? (
-        <section
-          className={cn(
-            "absolute inset-y-0 right-0 z-20 flex w-full max-w-[92%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl transition-transform duration-200 ease-out sm:max-w-sm",
-            showTrivia ? "translate-x-0" : "pointer-events-none translate-x-full",
-          )}
-          aria-hidden={!showTrivia}
-          role="region"
-          aria-label="Trivia bot"
-        >
-          <div className="flex items-center justify-between border-b border-border px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
-            <h3 className="text-sm font-semibold">Trivia bot</h3>
-            <button
-              onClick={() => setShowTrivia(false)}
-              className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
-              aria-label="Close trivia bot"
-            >
-              <X className="size-4" />
-            </button>
-          </div>
-          <div className="min-h-0 flex-1 overflow-y-auto">
-            <TriviaBot
-              roomId={room.id}
-              roomName={room.name}
-              meId={meId}
-              enabled={room.trivia_enabled}
-              canManage={canModerate}
-              joined={joined}
-              profiles={profiles}
-            />
-          </div>
-        </section>
-      ) : null}
-
-      {call ? (
-        <CallOverlay
-          title={title}
-          accent={accentFor(partner?.id ?? room.id)}
-          mode={call}
-          roomId={room.id}
-          meId={meId}
-          myName={profileOf(meId)?.display_name ?? "You"}
-          onEnd={() => setCall(null)}
-        />
-      ) : null}
-
-      {showMembers ? (
-        <MemberList
-          memberships={members}
-          profiles={profiles}
-          meId={meId}
-          ownerId={room.is_direct ? undefined : room.created_by}
-          roomAdmins={roomAdmins}
-          bans={bans}
-          silences={silences}
-          blocks={blocks}
-          events={
-            room.is_direct
-              ? undefined
-              : roomEvents.map((e) => ({
-                  id: e.id,
-                  userId: e.user_id,
-                  action: e.kind,
-                  at: e.created_at,
-                }))
-          }
-          canModerate={canModerate}
-          isSuper={isSuper}
-          onSetTier={(userId: string, tier: RoomAdminTier) =>
-            void runModeration(
-              () =>
-                roomAdmins.some((a) => a.user_id === userId)
-                  ? setRoomAdminTier(room.id, userId, tier)
-                  : addRoomAdmin(room.id, userId, meId, tier),
-              ["room-admins"],
-            )
-          }
-          onRemoveAdmin={(userId: string) =>
-            void runModeration(() => removeRoomAdmin(room.id, userId), ["room-admins"])
-          }
-          onBounce={(userId: string) => void runModeration(() => kickMember(room.id, userId), [])}
-          onRestrict={(userId: string, expiresAt: string | null) =>
-            void runModeration(
-              () => banMember(room.id, userId, meId, undefined, expiresAt),
-              ["room-bans"],
-            )
-          }
-          onUnrestrict={(userId: string) =>
-            void runModeration(() => unbanMember(room.id, userId), ["room-bans"])
-          }
-          onSilence={(userId: string, expiresAt: string | null) =>
-            void runModeration(
-              () => silenceMember(room.id, userId, meId, expiresAt),
-              ["room-silences"],
-            )
-          }
-          onUnsilence={(userId: string) =>
-            void runModeration(() => unsilenceMember(room.id, userId), ["room-silences"])
-          }
-          onBlock={(userId: string) =>
-            void runModeration(async () => {
-              await blockUser(meId, userId);
-              await queryClient.invalidateQueries({ queryKey: ["blocks"] });
-            }, [])
-          }
-          onUnblock={(userId: string) =>
-            void runModeration(async () => {
-              await unblockUser(meId, userId);
-              await queryClient.invalidateQueries({ queryKey: ["blocks"] });
-            }, [])
-          }
-          onClose={() => setShowMembers(false)}
-          onMessage={(userId) => {
-            setShowMembers(false);
-            void openDirect(userId);
-          }}
-          onLeave={
-            room.is_direct
-              ? undefined
-              : () => {
-                  setShowMembers(false);
-                  void leave();
+      <div className="flex min-h-0 flex-1">
+        <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
+          {statusDraft !== null ? (
+            <form
+              className="flex items-center gap-2 border-b border-border bg-secondary/40 px-3 py-2"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const next = statusDraft.trim();
+                try {
+                  await setRoomStatusMessage(room.id, next || null);
+                  await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+                  setStatusDraft(null);
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : "Could not save the room status.");
                 }
-          }
-        />
-      ) : null}
-
-      {showInvite && !room.is_direct ? (
-        <InvitePanel
-          roomId={room.id}
-          roomName={room.name}
-          memberships={members}
-          profiles={profiles}
-          meId={meId}
-          onClose={() => setShowInvite(false)}
-        />
-      ) : null}
-
-      {joined ? (
-        <>
-          <div
-            ref={scroller}
-            className="min-h-0 flex-1 overflow-y-auto px-4 py-5"
-            role="log"
-            aria-live="polite"
-            aria-relevant="additions text"
-            aria-label="Messages"
-            tabIndex={0}
-          >
-            {isLoading ? (
-              <p className="text-center text-sm text-muted-foreground">Loading messages…</p>
-            ) : null}
-            {!isLoading && messages.length === 0 ? (
-              <p className="text-center text-sm text-muted-foreground">
-                No messages yet — say hello.
-              </p>
-            ) : null}
-            {timeline.map((item, i) => {
-              if (item.kind === "event") {
-                const who = profileOf(item.userId);
-                const name = item.userId === meId ? "You" : (who?.display_name ?? "Someone");
-                return (
-                  <div key={item.id} className="mt-4 flex justify-center">
-                    <span className="rounded-full bg-secondary px-3 py-1 text-[11px] text-muted-foreground">
-                      {name}{" "}
-                      {item.action === "join"
-                        ? "joined"
-                        : item.action === "bounce"
-                          ? "was bounced from"
-                          : "left"}{" "}
-                      the room · {formatTime(item.at)}
-                    </span>
-                  </div>
-                );
-              }
-              const m = item.message;
-              const mine = m.user_id === meId;
-              const liveNotice = liveNoticeOf(m.body);
-              if (liveNotice) {
-                const who = profileOf(m.user_id);
-                const name = mine ? "You" : (who?.display_name ?? "Someone");
-                return (
-                  <div key={m.id} className="mt-4 flex justify-center">
-                    <span className="flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-[11px] font-medium text-primary">
-                      <Video className="size-3" />
-                      {liveNotice === "on"
-                        ? `${name} ${mine ? "are" : "is"} live on camera`
-                        : `${name} stopped the camera`}{" "}
-                      · {formatTime(m.created_at)}
-                    </span>
-                  </div>
-                );
-              }
-              const prev = timeline[i - 1];
-              const grouped =
-                prev?.kind === "message" &&
-                prev.message.user_id === m.user_id &&
-                !liveNoticeOf(prev.message.body);
-              const author = profileOf(m.user_id);
-              const authorName = author?.display_name ?? "Someone";
-              return (
-                <div
-                  key={m.id}
-                  className={cn(
-                    "flex items-end gap-2",
-                    mine ? "flex-row-reverse" : "flex-row",
-                    grouped ? "mt-0.5" : "mt-4",
-                  )}
-                >
-                  {grouped ? (
-                    <span className="size-9 shrink-0" aria-hidden="true" />
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => openProfile(m.user_id)}
-                      aria-label={`View ${authorName}'s profile`}
-                      className="shrink-0 rounded-2xl hover:opacity-80"
-                    >
-                      <Avatar
-                        name={authorName}
-                        accent={accentFor(m.user_id)}
-                        avatarPath={author?.avatar_url ?? null}
-                        online={author ? isOnline(author) : false}
-                        size="sm"
-                      />
-                    </button>
-                  )}
-                  <div className={cn("flex min-w-0 flex-col", mine ? "items-end" : "items-start")}>
-                    {!mine && !grouped ? (
-                      <span className="mb-1 flex items-center gap-1.5 px-1 text-[11px] font-medium">
-                        <span
-                          className={
-                            siteRoleTextClass(siteRoleOf(siteRoles, m.user_id)) ??
-                            "text-muted-foreground"
-                          }
-                          style={nameColorStyle(
-                            siteRoleOf(siteRoles, m.user_id),
-                            author?.name_color,
-                          )}
-                        >
-                          {authorName}
-                        </span>
-                        {siteRoleLabel(siteRoleOf(siteRoles, m.user_id)) ? (
-                          <span
-                            className={cn(
-                              "rounded-md px-1 py-0.5 text-[11px] font-semibold uppercase tracking-wide",
-                              siteRoleBadgeClass(siteRoleOf(siteRoles, m.user_id)),
-                            )}
-                          >
-                            {siteRoleLabel(siteRoleOf(siteRoles, m.user_id))}
-                          </span>
-                        ) : null}
-                      </span>
-                    ) : null}
-                    {gifUrlOf(m.body) ? (
-                      <img
-                        src={gifUrlOf(m.body)!}
-                        alt={`GIF sent by ${authorName}`}
-                        loading="lazy"
-                        className="max-h-56 max-w-[78%] rounded-2xl border border-border object-cover"
-                      />
-                    ) : videoEmbedOf(m.body) ? (
-                      <MessageVideo video={videoEmbedOf(m.body)!} />
-                    ) : (
-                      <div
-                        className={cn(
-                          "max-w-[78%] px-4 py-2.5 text-sm leading-relaxed",
-                          mine
-                            ? "rounded-3xl rounded-br-md bg-bubble-me text-bubble-me-foreground"
-                            : "rounded-3xl rounded-bl-md bg-bubble-them text-bubble-them-foreground",
-                          isEmojiOnly(m.body) &&
-                            "bg-transparent px-1 py-0.5 text-3xl leading-tight",
-                        )}
-                      >
-                        {m.body}
-                      </div>
-                    )}
-                    <span className="mt-1 px-1 text-[11px] text-muted-foreground">
-                      {formatTime(m.created_at)}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <footer className="border-t border-border px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-            {error ? (
-              <p role="alert" className="px-2 pb-2 text-xs text-destructive">
-                {error}
-              </p>
-            ) : null}
-            <div className="flex items-end gap-2 rounded-2xl bg-secondary p-2">
-              <EmojiPicker
-                onSelect={(emoji) => {
-                  const el = inputRef.current;
-                  if (!el) {
-                    setDraft((d) => d + emoji);
-                    return;
-                  }
-                  const start = el.selectionStart ?? el.value.length;
-                  const end = el.selectionEnd ?? start;
-                  const next = el.value.slice(0, start) + emoji + el.value.slice(end);
-                  setDraft(next.slice(0, 2000));
-                  requestAnimationFrame(() => {
-                    el.focus();
-                    const caret = start + emoji.length;
-                    el.setSelectionRange(caret, caret);
-                  });
-                }}
-              />
-              <GifPicker
-                onSelect={(url) => {
-                  void (async () => {
-                    try {
-                      await sendMessage(room.id, meId, url);
-                      await queryClient.invalidateQueries({ queryKey: ["messages", room.id] });
-                    } catch (err) {
-                      setError(err instanceof Error ? err.message : "GIF failed to send.");
-                    }
-                  })();
-                }}
-              />
-              <GifPicker
-                media="stickers"
-                onSelect={(url) => {
-                  void (async () => {
-                    try {
-                      await sendMessage(room.id, meId, url);
-                      await queryClient.invalidateQueries({ queryKey: ["messages", room.id] });
-                    } catch (err) {
-                      setError(err instanceof Error ? err.message : "Sticker failed to send.");
-                    }
-                  })();
-                }}
-              />
-              <textarea
-                ref={inputRef}
-                rows={1}
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                maxLength={2000}
-                disabled={Boolean(mySilence)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    void submit();
-                  }
-                }}
-                placeholder={
-                  mySilence
-                    ? "You are silenced in this room — you can still read along."
-                    : `Message ${room.name}`
-                }
-                aria-label="Message"
-                className="max-h-32 min-h-9 w-full resize-none bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted-foreground disabled:opacity-70"
+              }}
+            >
+              <input
+                value={statusDraft}
+                onChange={(e) => setStatusDraft(e.target.value)}
+                maxLength={200}
+                autoFocus
+                aria-label="Room status message"
+                placeholder="Room status shown to everyone (leave empty to clear)"
+                className="min-w-0 flex-1 rounded-xl bg-background px-3 py-1.5 text-xs outline-none placeholder:text-muted-foreground"
               />
               <button
-                onClick={() => void submit()}
-                disabled={draft.trim().length === 0 || Boolean(mySilence)}
-                aria-label="Send message"
-                className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40"
+                type="submit"
+                className="shrink-0 rounded-xl bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground"
               >
-                <SendHorizonal className="size-4" />
+                Save
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatusDraft(null)}
+                className="shrink-0 rounded-xl bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground"
+              >
+                Cancel
+              </button>
+            </form>
+          ) : null}
+
+          {talking ? (
+            <TalkBar
+              roomId={room.id}
+              meId={meId}
+              myName={profileOf(meId)?.display_name ?? "You"}
+              onLeave={() => {
+                setTalking(false);
+                setShowCams(false);
+              }}
+              camsOpen={showCams}
+              onCamsOpenChange={setShowCams}
+            />
+          ) : null}
+
+          {!room.is_direct ? (
+            <>
+              <RoomBanner
+                roomId={room.id}
+                roomName={room.name}
+                branding={{
+                  icon_url: room.icon_url,
+                  banner_url: room.banner_url,
+                  website_url: room.website_url,
+                  website_label: room.website_label,
+                }}
+                canEdit={isOwner}
+                onSave={async (next) => {
+                  const saved = await setRoomBranding(room.id, next);
+                  queryClient.setQueryData<Room[]>(["rooms"], (rooms) =>
+                    rooms?.map((item) => (item.id === room.id ? { ...item, ...saved } : item)),
+                  );
+                }}
+              />
+            </>
+          ) : null}
+
+          {!room.is_direct ? (
+            <section
+              className={cn(
+                "absolute inset-y-0 right-0 z-20 flex w-full max-w-[92%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl transition-transform duration-200 ease-out sm:max-w-sm",
+                showMedia ? "translate-x-0" : "pointer-events-none translate-x-full",
+              )}
+              aria-hidden={!showMedia}
+              role="region"
+              aria-label="Radio and video players"
+            >
+              <div className="flex items-center justify-between border-b border-border px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+                <h3 className="text-sm font-semibold">Radio &amp; video</h3>
+                <button
+                  onClick={() => setShowMedia(false)}
+                  className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+                  aria-label="Close players"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                <RadioPlayer
+                  url={room.radio_url}
+                  name={room.radio_name}
+                  canEdit={isOwner}
+                  onSave={async (radio) => {
+                    await setRoomRadio(room.id, radio);
+                    await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+                  }}
+                />
+                <YouTubeEmbed
+                  url={room.youtube_url}
+                  title={room.youtube_title}
+                  canEdit={canModerate}
+                  onSave={async (video) => {
+                    await setRoomYouTube(room.id, video);
+                    await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+                  }}
+                />
+              </div>
+            </section>
+          ) : null}
+
+          <section
+            className={cn(
+              "absolute inset-y-0 right-0 z-20 flex w-full max-w-[92%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl transition-transform duration-200 ease-out sm:max-w-sm",
+              showGames ? "translate-x-0" : "pointer-events-none translate-x-full",
+            )}
+            aria-hidden={!showGames}
+            role="region"
+            aria-label="Games"
+          >
+            <div className="flex items-center justify-between border-b border-border px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+              <h3 className="text-sm font-semibold">Games</h3>
+              <button
+                onClick={() => setShowGames(false)}
+                className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+                aria-label="Close games"
+              >
+                <X className="size-4" />
               </button>
             </div>
-          </footer>
-        </>
-      ) : (
-        <div className="grid min-h-0 flex-1 place-items-center px-6 text-center">
-          <div className="max-w-sm">
-            {ageBlocked ? (
-              <>
-                <h3 className="text-lg font-semibold">Adults only</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  “{title}” is rated R. You must be 18 or older to join.
-                  {myProfile?.birth_date
-                    ? ""
-                    : " Add your date of birth in Settings to confirm your age."}
-                </p>
-                {myProfile?.birth_date ? null : (
-                  <Link
-                    to="/settings"
-                    className="mt-5 inline-flex rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-                  >
-                    Open settings
-                  </Link>
-                )}
-              </>
-            ) : (
-              <>
-                <h3 className="text-lg font-semibold">Join {title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Messages in this room are only visible to members.
-                </p>
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              {showGames ? <GamesPanel /> : null}
+            </div>
+          </section>
+
+          {!room.is_direct ? (
+            <section
+              className={cn(
+                "absolute inset-y-0 right-0 z-20 flex w-full max-w-[92%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl transition-transform duration-200 ease-out sm:max-w-sm",
+                showTrivia ? "translate-x-0" : "pointer-events-none translate-x-full",
+              )}
+              aria-hidden={!showTrivia}
+              role="region"
+              aria-label="Trivia bot"
+            >
+              <div className="flex items-center justify-between border-b border-border px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+                <h3 className="text-sm font-semibold">Trivia bot</h3>
                 <button
-                  onClick={() => void join()}
-                  className="mt-5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                  onClick={() => setShowTrivia(false)}
+                  className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+                  aria-label="Close trivia bot"
                 >
-                  Join room
+                  <X className="size-4" />
                 </button>
-              </>
-            )}
-          </div>
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                <TriviaBot
+                  roomId={room.id}
+                  roomName={room.name}
+                  meId={meId}
+                  enabled={room.trivia_enabled}
+                  canManage={canModerate}
+                  joined={joined}
+                  profiles={profiles}
+                />
+              </div>
+            </section>
+          ) : null}
+
+          {call ? (
+            <CallOverlay
+              title={title}
+              accent={accentFor(partner?.id ?? room.id)}
+              mode={call}
+              roomId={room.id}
+              meId={meId}
+              myName={profileOf(meId)?.display_name ?? "You"}
+              onEnd={() => setCall(null)}
+            />
+          ) : null}
         </div>
-      )}
+        {showMembers ? (
+          <MemberList
+            memberships={members}
+            profiles={profiles}
+            meId={meId}
+            ownerId={room.is_direct ? undefined : room.created_by}
+            roomAdmins={roomAdmins}
+            bans={bans}
+            silences={silences}
+            blocks={blocks}
+            events={
+              room.is_direct
+                ? undefined
+                : roomEvents.map((e) => ({
+                    id: e.id,
+                    userId: e.user_id,
+                    action: e.kind,
+                    at: e.created_at,
+                  }))
+            }
+            canModerate={canModerate}
+            isSuper={isSuper}
+            onSetTier={(userId: string, tier: RoomAdminTier) =>
+              void runModeration(
+                () =>
+                  roomAdmins.some((a) => a.user_id === userId)
+                    ? setRoomAdminTier(room.id, userId, tier)
+                    : addRoomAdmin(room.id, userId, meId, tier),
+                ["room-admins"],
+              )
+            }
+            onRemoveAdmin={(userId: string) =>
+              void runModeration(() => removeRoomAdmin(room.id, userId), ["room-admins"])
+            }
+            onBounce={(userId: string) => void runModeration(() => kickMember(room.id, userId), [])}
+            onRestrict={(userId: string, expiresAt: string | null) =>
+              void runModeration(
+                () => banMember(room.id, userId, meId, undefined, expiresAt),
+                ["room-bans"],
+              )
+            }
+            onUnrestrict={(userId: string) =>
+              void runModeration(() => unbanMember(room.id, userId), ["room-bans"])
+            }
+            onSilence={(userId: string, expiresAt: string | null) =>
+              void runModeration(
+                () => silenceMember(room.id, userId, meId, expiresAt),
+                ["room-silences"],
+              )
+            }
+            onUnsilence={(userId: string) =>
+              void runModeration(() => unsilenceMember(room.id, userId), ["room-silences"])
+            }
+            onBlock={(userId: string) =>
+              void runModeration(async () => {
+                await blockUser(meId, userId);
+                await queryClient.invalidateQueries({ queryKey: ["blocks"] });
+              }, [])
+            }
+            onUnblock={(userId: string) =>
+              void runModeration(async () => {
+                await unblockUser(meId, userId);
+                await queryClient.invalidateQueries({ queryKey: ["blocks"] });
+              }, [])
+            }
+            onClose={() => setShowMembers(false)}
+            onMessage={(userId) => {
+              setShowMembers(false);
+              void openDirect(userId);
+            }}
+            onLeave={
+              room.is_direct
+                ? undefined
+                : () => {
+                    setShowMembers(false);
+                    void leave();
+                  }
+            }
+          />
+        ) : null}
+      </div>
     </section>
   );
 }
