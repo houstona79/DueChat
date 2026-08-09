@@ -32,8 +32,16 @@ import { TriviaBot } from "./TriviaBot";
 import { RoomBanner } from "./RoomBanner";
 import { RatingControl } from "./RoomRating";
 import { YouTubeEmbed } from "./YouTubeEmbed";
-import { useMessages, useRoomAdmins, useRoomBans, useRoomEvents } from "@/hooks/use-chat";
+import {
+  useBlocks,
+  useMessages,
+  useRoomAdmins,
+  useRoomBans,
+  useRoomEvents,
+  useRoomSilences,
+} from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
+import { blockUser, isBlocked, unblockUser } from "@/lib/blocks";
 import { takePendingCall } from "@/lib/call-invites";
 import {
   siteRoleBadgeClass,
@@ -49,6 +57,7 @@ import {
   banMember,
   counterpartId,
   formatTime,
+  isActive,
   isAdultProfile,
   isOnline,
   joinRoom,
@@ -56,16 +65,21 @@ import {
   leaveRoom,
   removeRoomAdmin,
   sendMessage,
+  setRoomAdminTier,
+  setRoomStatusMessage,
   setRoomRadio,
   setRoomBranding,
   setRoomRating,
   setRoomCategory,
   ROOM_CATEGORIES,
   setRoomYouTube,
+  silenceMember,
   unbanMember,
+  unsilenceMember,
   type Membership,
   type Profile,
   type Room,
+  type RoomAdminTier,
 } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 import { MessageVideo, videoEmbedOf } from "./MessageVideo";
