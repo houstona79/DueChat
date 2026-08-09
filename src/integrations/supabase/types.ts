@@ -489,12 +489,14 @@ export type Database = {
           birth_date: string | null
           country: string | null
           created_at: string
+          decoration: string | null
           display_name: string
           gender: string | null
           gender_visibility: string
           id: string
           last_seen_at: string
           name_color: string | null
+          profile_visibility: string
           pronouns: string | null
           pronouns_visibility: string
           status_message: string | null
@@ -509,12 +511,14 @@ export type Database = {
           birth_date?: string | null
           country?: string | null
           created_at?: string
+          decoration?: string | null
           display_name: string
           gender?: string | null
           gender_visibility?: string
           id: string
           last_seen_at?: string
           name_color?: string | null
+          profile_visibility?: string
           pronouns?: string | null
           pronouns_visibility?: string
           status_message?: string | null
@@ -529,12 +533,14 @@ export type Database = {
           birth_date?: string | null
           country?: string | null
           created_at?: string
+          decoration?: string | null
           display_name?: string
           gender?: string | null
           gender_visibility?: string
           id?: string
           last_seen_at?: string
           name_color?: string | null
+          profile_visibility?: string
           pronouns?: string | null
           pronouns_visibility?: string
           status_message?: string | null
@@ -550,6 +556,7 @@ export type Database = {
           granted_by: string
           id: string
           room_id: string
+          tier: string
           user_id: string
         }
         Insert: {
@@ -557,6 +564,7 @@ export type Database = {
           granted_by: string
           id?: string
           room_id: string
+          tier?: string
           user_id: string
         }
         Update: {
@@ -564,6 +572,7 @@ export type Database = {
           granted_by?: string
           id?: string
           room_id?: string
+          tier?: string
           user_id?: string
         }
         Relationships: [
@@ -580,6 +589,7 @@ export type Database = {
         Row: {
           banned_by: string
           created_at: string
+          expires_at: string | null
           id: string
           reason: string | null
           room_id: string
@@ -588,6 +598,7 @@ export type Database = {
         Insert: {
           banned_by: string
           created_at?: string
+          expires_at?: string | null
           id?: string
           reason?: string | null
           room_id: string
@@ -596,6 +607,7 @@ export type Database = {
         Update: {
           banned_by?: string
           created_at?: string
+          expires_at?: string | null
           id?: string
           reason?: string | null
           room_id?: string
@@ -806,6 +818,47 @@ export type Database = {
           },
         ]
       }
+      room_silences: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          reason: string | null
+          room_id: string
+          silenced_by: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          reason?: string | null
+          room_id: string
+          silenced_by: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          reason?: string | null
+          room_id?: string
+          silenced_by?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_silences_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rooms: {
         Row: {
           banner_url: string | null
@@ -822,6 +875,7 @@ export type Database = {
           rating: string
           slug: string
           staff_only: boolean
+          status_message: string | null
           topic: string | null
           trivia_enabled: boolean
           website_label: string | null
@@ -844,6 +898,7 @@ export type Database = {
           rating?: string
           slug: string
           staff_only?: boolean
+          status_message?: string | null
           topic?: string | null
           trivia_enabled?: boolean
           website_label?: string | null
@@ -866,6 +921,7 @@ export type Database = {
           rating?: string
           slug?: string
           staff_only?: boolean
+          status_message?: string | null
           topic?: string | null
           trivia_enabled?: boolean
           website_label?: string | null
@@ -1017,6 +1073,27 @@ export type Database = {
           },
         ]
       }
+      user_blocks: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
       user_ip_log: {
         Row: {
           checked_at: string | null
@@ -1121,6 +1198,14 @@ export type Database = {
         Returns: boolean
       }
       is_room_owner: {
+        Args: { _room_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_room_silenced: {
+        Args: { _room_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_room_super_admin: {
         Args: { _room_id: string; _user_id: string }
         Returns: boolean
       }
