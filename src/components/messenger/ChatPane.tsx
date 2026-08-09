@@ -138,6 +138,7 @@ export function ChatPane({
   const [showGames, setShowGames] = useState(false);
   const [showTrivia, setShowTrivia] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
+  const [statusDraft, setStatusDraft] = useState<string | null>(null);
 
   const [draft, setDraft] = useState("");
   const [call, setCall] = useState<"voice" | "video" | null>(null);
@@ -289,6 +290,11 @@ export function ChatPane({
                     room.topic ? ` · ${room.topic}` : ""
                   }`}
             </p>
+            {!room.is_direct && room.status_message ? (
+              <p className="truncate text-xs font-medium text-primary" title={room.status_message}>
+                {room.status_message}
+              </p>
+            ) : null}
           </div>
         </div>
         {!room.is_direct && members.length > 0 ? (
