@@ -28,6 +28,7 @@ import {
 import {
   accentFor,
   expiryFromMinutes,
+  formatTime,
   isActive,
   isOnline,
   MODERATION_DURATIONS,
@@ -62,6 +63,7 @@ export function MemberList({
   bans,
   silences,
   blocks,
+  events,
   canModerate,
   isSuper,
   onClose,
@@ -85,6 +87,9 @@ export function MemberList({
   bans?: RoomBan[] | undefined;
   silences?: RoomSilence[] | undefined;
   blocks?: Block[] | undefined;
+  events?:
+    | { id: string; userId: string; action: "join" | "leave" | "bounce"; at: string }[]
+    | undefined;
   canModerate?: boolean | undefined;
   isSuper?: boolean | undefined;
   onClose: () => void;
@@ -131,6 +136,11 @@ export function MemberList({
     const tier = tierOf(id);
     return tier ? ROOM_ADMIN_TIER_LABEL[tier] : null;
   };
+
+  const activity = (events ?? []).slice(-20).reverse();
+  const nameOf = (id: string) => profiles.find((p) => p.id === id)?.display_name ?? "Someone";
+  const actionLabel = (action: "join" | "leave" | "bounce") =>
+    action === "join" ? "came in" : action === "leave" ? "left" : "was bounced";
 
   return (
     <section
