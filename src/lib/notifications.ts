@@ -51,5 +51,6 @@ export function notificationText(n: Notification) {
   if (n.kind === "comment") return "replied to your update";
   if (n.kind === "update") return "posted a new update";
   if (n.kind === "room_invite") return "invited you to a room";
+  if (n.kind === "support") return `needs help in live support: ${n.preview ?? ""}`;
   return "interacted with your update";
 }

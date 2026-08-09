@@ -17,6 +17,7 @@ import { AuthWatcher } from "@/components/system/AuthWatcher";
 import { RecoveryGate } from "@/components/system/RecoveryGate";
 import { DeviceLock } from "@/components/system/DeviceLock";
 import { SystemAlerts } from "@/components/system/SystemAlerts";
+import { SupportAlerts } from "@/components/support/SupportAlerts";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -158,6 +159,7 @@ function RootComponent() {
       <Outlet />
       <KickWatcher />
       <SystemAlerts />
+      <SupportAlerts />
       <AuthWatcher />
       <RecoveryGate />
       <DeviceLock />
