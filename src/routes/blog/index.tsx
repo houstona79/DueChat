@@ -3,6 +3,7 @@ import { NotebookPen } from "lucide-react";
 import { listPublicBlogs } from "@/lib/blogs.functions";
 import { BlogCover } from "@/components/blogs/BlogCover";
 import { relativeTime } from "@/lib/profile-updates";
+import type { PublishedBlogSummary } from "@/lib/blog-types";
 
 export const Route = createFileRoute("/blog/")({
   loader: () => listPublicBlogs({ data: { limit: 30 } }),
@@ -63,7 +64,7 @@ function BlogFeed() {
         <p className="text-sm text-muted-foreground">No blogs published yet.</p>
       ) : (
         <ul className="space-y-5">
-          {posts.map((post) => (
+          {posts.map((post: PublishedBlogSummary) => (
             <li key={post.id}>
               <Link
                 to="/blog/$username/$slug"
