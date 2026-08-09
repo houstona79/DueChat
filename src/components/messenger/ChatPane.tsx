@@ -311,6 +311,14 @@ export function ChatPane({
           />
         ) : null}
         <div className="-mx-1 flex flex-wrap items-center gap-1.5 px-1 pb-0.5 sm:mx-0 sm:justify-end sm:px-0">
+        {!room.is_direct && isSuper ? (
+          <button
+            onClick={() => setStatusDraft(room.status_message ?? "")}
+            className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70"
+          >
+            Room status
+          </button>
+        ) : null}
         {!room.is_direct ? (
           isOwner ? (
             <select
