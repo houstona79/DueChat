@@ -284,6 +284,27 @@ function AuthPage() {
           </button>
         </form>
 
+        {mode === "signin" ? (
+          <button
+            type="button"
+            onClick={async () => {
+              if (!email.trim()) {
+                setNotice("Enter your email above first, then tap reset.");
+                return;
+              }
+              const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+                redirectTo: `${window.location.origin}/reset-password`,
+              });
+              setNotice(
+                error ? error.message : "Password reset email sent — check your inbox.",
+              );
+            }}
+            className="mt-4 w-full text-sm text-muted-foreground underline hover:text-foreground"
+          >
+            Forgot your password?
+          </button>
+        ) : null}
+
         <button
           onClick={() => {
             setMode(mode === "signin" ? "signup" : "signin");
