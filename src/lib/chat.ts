@@ -432,7 +432,15 @@ export async function setRoomRadio(
 
 /* ---------- room moderation ---------- */
 
-export type RoomAdmin = { room_id: string; user_id: string };
+/** Room admin tiers: super admins manage the room, admins moderate people. */
+export type RoomAdminTier = "super" | "admin";
+
+export type RoomAdmin = { room_id: string; user_id: string; tier: RoomAdminTier };
+
+export const ROOM_ADMIN_TIER_LABEL: Record<RoomAdminTier, string> = {
+  super: "Super admin",
+  admin: "Room admin",
+};
 
 export type Buddy = {
   id: string;
@@ -474,31 +482,121 @@ export type RoomBan = {
   banned_by: string;
   reason: string | null;
   created_at: string;
+  /** null means the restriction never expires. */
+  expires_at: string | null;
 };
+
+export type RoomSilence = {
+  room_id: string;
+  user_id: string;
+  silenced_by: string;
+  reason: string | null;
+  created_at: string;
+  expires_at: string | null;
+};
+
+/** Ban / silence lengths offered in the room panels. */
+export const MODERATION_DURATIONS = [
+  { value: "60", label: "1 hour" },
+  { value: "360", label: "6 hours" },
+  { value: "1440", label: "1 day" },
+  { value: "10080", label: "1 week" },
+  { value: "0", label: "Until removed" },
+] as const;
+
+export function expiryFromMinutes(minutes: number): string | null {
+  return minutes > 0 ? new Date(Date.now() + minutes * 60_000).toISOString() : null;
+}
+
+/** A ban/silence row still in force right now. */
+export function isActive(row: { expires_at: string | null }) {
+  return !row.expires_at || new Date(row.expires_at).getTime() > Date.now();
+}
 
 export async function fetchRoomAdmins(roomId: string): Promise<RoomAdmin[]> {
   const { data, error } = await supabase
     .from("room_admins")
-    .select("room_id, user_id")
+    .select("room_id, user_id, tier")
     .eq("room_id", roomId);
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []) as RoomAdmin[];
 }
 
 export async function fetchRoomBans(roomId: string): Promise<RoomBan[]> {
   const { data, error } = await supabase
     .from("room_bans")
-    .select("room_id, user_id, banned_by, reason, created_at")
+    .select("room_id, user_id, banned_by, reason, created_at, expires_at")
     .eq("room_id", roomId)
     .order("created_at", { ascending: false });
   if (error) throw error;
   return data ?? [];
 }
 
-export async function addRoomAdmin(roomId: string, userId: string, grantedBy: string) {
+export async function fetchRoomSilences(roomId: string): Promise<RoomSilence[]> {
+  const { data, error } = await supabase
+    .from("room_silences")
+    .select("room_id, user_id, silenced_by, reason, created_at, expires_at")
+    .eq("room_id", roomId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+/** Silences ("dots") someone so they can read the room but not post. */
+export async function silenceMember(
+  roomId: string,
+  userId: string,
+  silencedBy: string,
+  expiresAt: string | null,
+) {
+  const { error } = await supabase
+    .from("room_silences")
+    .upsert(
+      { room_id: roomId, user_id: userId, silenced_by: silencedBy, expires_at: expiresAt },
+      { onConflict: "room_id,user_id" },
+    );
+  if (error) throw error;
+}
+
+export async function unsilenceMember(roomId: string, userId: string) {
+  const { error } = await supabase
+    .from("room_silences")
+    .delete()
+    .eq("room_id", roomId)
+    .eq("user_id", userId);
+  if (error) throw error;
+}
+
+/** Owner/super-admin only: the notice shown under the room name. */
+export async function setRoomStatusMessage(roomId: string, status: string | null) {
+  const { error } = await supabase
+    .from("rooms")
+    .update({ status_message: status })
+    .eq("id", roomId);
+  if (error) throw error;
+}
+
+export async function addRoomAdmin(
+  roomId: string,
+  userId: string,
+  grantedBy: string,
+  tier: RoomAdminTier = "admin",
+) {
   const { error } = await supabase
     .from("room_admins")
-    .insert({ room_id: roomId, user_id: userId, granted_by: grantedBy });
+    .upsert(
+      { room_id: roomId, user_id: userId, granted_by: grantedBy, tier },
+      { onConflict: "room_id,user_id" },
+    );
+  if (error) throw error;
+}
+
+export async function setRoomAdminTier(roomId: string, userId: string, tier: RoomAdminTier) {
+  const { error } = await supabase
+    .from("room_admins")
+    .update({ tier })
+    .eq("room_id", roomId)
+    .eq("user_id", userId);
   if (error) throw error;
 }
 
