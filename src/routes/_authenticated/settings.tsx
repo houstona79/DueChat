@@ -358,6 +358,66 @@ function SettingsPage() {
         </div>
 
         <div>
+          <label
+            htmlFor="profile-visibility"
+            className="block text-[11px] font-medium text-muted-foreground"
+          >
+            Who can view my profile
+          </label>
+          <select
+            id="profile-visibility"
+            value={profileVisibility}
+            onChange={(e) => setProfileVisibility(e.target.value)}
+            className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none"
+          >
+            {PROFILE_VISIBILITIES.map((v) => (
+              <option key={v.value} value={v.value}>
+                {v.label}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            Private hides your bio, photos and updates from everyone but you and staff.
+          </p>
+        </div>
+
+        <div>
+          <span className="block text-[11px] font-medium text-muted-foreground">
+            Badge beside your name
+          </span>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setDecoration("")}
+              aria-pressed={decoration === ""}
+              className={cn(
+                "rounded-xl border-2 bg-secondary px-3 py-1.5 text-xs font-medium",
+                decoration === "" ? "border-primary" : "border-transparent",
+              )}
+            >
+              None
+            </button>
+            {DECORATIONS.map((d) => (
+              <button
+                key={d.value}
+                type="button"
+                onClick={() => setDecoration(d.value)}
+                aria-label={d.label}
+                aria-pressed={decoration === d.value}
+                className={cn(
+                  "grid size-10 place-items-center rounded-xl border-2 bg-secondary text-base",
+                  decoration === d.value ? "border-primary" : "border-transparent",
+                )}
+              >
+                <span role="img" aria-hidden>
+                  {d.glyph}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
           <span className="block text-[11px] font-medium text-muted-foreground">Name color</span>
           <p className="mt-1 text-[11px] text-muted-foreground">
             Red is reserved for admins.
