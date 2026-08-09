@@ -108,6 +108,16 @@ function ProfilePage() {
                 ) : null}
               </div>
               <p className="truncate text-xs text-muted-foreground">@{profile.username}</p>
+              {decorationGlyph(profile.decoration) ? (
+                <p
+                  className="text-base leading-none"
+                  role="img"
+                  aria-label={decorationLabel(profile.decoration) ?? undefined}
+                  title={decorationLabel(profile.decoration) ?? undefined}
+                >
+                  {decorationGlyph(profile.decoration)}
+                </p>
+              ) : null}
               <p className={cn("text-xs", online ? "text-primary" : "text-muted-foreground")}>
                 {online ? "Online now" : "Offline"}
               </p>
