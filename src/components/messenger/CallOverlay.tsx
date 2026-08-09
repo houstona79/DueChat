@@ -130,7 +130,7 @@ export function CallOverlay({
       className="fixed inset-0 z-[100] flex flex-col overscroll-none bg-sidebar pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]"
     >
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden px-4 py-4 sm:flex-row">
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <button
           onClick={() => setMinimized(true)}
           aria-label="Minimize call and keep chatting"
@@ -153,7 +153,7 @@ export function CallOverlay({
 
         <div
           className={cn(
-            "mx-auto mt-4 grid max-w-3xl gap-3",
+            "mx-auto mt-4 grid min-h-0 w-full max-w-3xl flex-1 gap-3 overflow-hidden",
             participants.length === 0 ? "max-w-sm grid-cols-1" : "grid-cols-2 lg:grid-cols-3",
           )}
         >
