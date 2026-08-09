@@ -312,6 +312,13 @@ export function ChatPane({
           />
         ) : null}
         <div className="scroll-rail -mx-3 flex items-center gap-1.5 overflow-x-auto px-3 pb-0.5 lg:mx-0 lg:flex-wrap lg:justify-end lg:overflow-visible lg:px-0">
+          <a href="https://www.duechat.com" aria-label="DueChat" className="shrink-0">
+            <img
+              src={duechatLogo.url}
+              alt="DueChat"
+              className="h-6 w-auto object-contain opacity-80 hover:opacity-100"
+            />
+          </a>
           {!room.is_direct && isSuper ? (
             <button
               onClick={() => setStatusDraft(room.status_message ?? "")}
