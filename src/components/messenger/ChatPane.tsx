@@ -13,6 +13,7 @@ import {
   Video,
   X,
 } from "lucide-react";
+import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { EmojiPicker } from "./EmojiPicker";
 import { GifPicker } from "./GifPicker";
 
