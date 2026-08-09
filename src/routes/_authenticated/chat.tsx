@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
 import { MessagesSquare } from "lucide-react";
+import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { Sidebar } from "@/components/messenger/Sidebar";
 import { ProfileViewer } from "@/components/messenger/ProfileViewer";
 import { IncomingCallWatcher } from "@/components/messenger/IncomingCallWatcher";
@@ -69,7 +70,12 @@ function ChatLayout() {
           ) : (
             <div className="grid h-full place-items-center bg-background px-6 text-center">
               <div className="max-w-sm">
-                <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/15 text-primary">
+                <img
+                  src={duechatLogo.url}
+                  alt="DueChat"
+                  className="mx-auto h-16 w-auto object-contain"
+                />
+                <span className="mx-auto mt-4 grid size-14 place-items-center rounded-2xl bg-primary/15 text-primary">
                   <MessagesSquare className="size-7" />
                 </span>
                 <h2 className="mt-5 text-xl font-semibold">Pick a room</h2>
