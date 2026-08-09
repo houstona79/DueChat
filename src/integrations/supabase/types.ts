@@ -1082,6 +1082,80 @@ export type Database = {
         }
         Relationships: []
       }
+      support_messages: {
+        Row: {
+          body: string
+          created_at: string
+          from_staff: boolean
+          id: string
+          sender_id: string | null
+          ticket_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          from_staff?: boolean
+          id?: string
+          sender_id?: string | null
+          ticket_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          from_staff?: boolean
+          id?: string
+          sender_id?: string | null
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_tickets: {
+        Row: {
+          created_at: string
+          guest_email: string | null
+          guest_name: string | null
+          guest_token: string
+          id: string
+          last_message_at: string
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_token?: string
+          id?: string
+          last_message_at?: string
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_token?: string
+          id?: string
+          last_message_at?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       trivia_rounds: {
         Row: {
           answer: string
