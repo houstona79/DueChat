@@ -263,8 +263,8 @@ export function ChatPane({
       className="relative flex h-full min-h-0 flex-col bg-background"
       aria-label={`Conversation: ${title}`}
     >
-      <header className="flex flex-col gap-2 border-b border-border px-3 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:flex-row sm:items-center sm:gap-3 sm:px-4">
-        <div className="flex min-w-0 items-center gap-2 sm:flex-1 sm:gap-3">
+      <header className="flex flex-col gap-2 border-b border-border px-3 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] lg:flex-row lg:items-center lg:gap-3 lg:px-4">
+        <div className="flex min-w-0 items-center gap-2 lg:flex-1 lg:gap-3">
           <Link
             to="/chat"
             className="-ml-1 grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary md:hidden"
@@ -310,7 +310,7 @@ export function ChatPane({
             }}
           />
         ) : null}
-        <div className="scroll-rail -mx-3 flex items-center gap-1.5 overflow-x-auto px-3 pb-0.5 sm:mx-0 sm:flex-wrap sm:justify-end sm:overflow-visible sm:px-0">
+        <div className="scroll-rail -mx-3 flex items-center gap-1.5 overflow-x-auto px-3 pb-0.5 lg:mx-0 lg:flex-wrap lg:justify-end lg:overflow-visible lg:px-0">
           {!room.is_direct && isSuper ? (
             <button
               onClick={() => setStatusDraft(room.status_message ?? "")}
