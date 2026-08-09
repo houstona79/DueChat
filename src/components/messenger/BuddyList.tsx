@@ -151,7 +151,16 @@ export function BuddyList({
 
       {!collapsed ? (
         <ul className="space-y-0.5">
-          {buddyProfiles.map((p) => {
+          {groups.flatMap((g) => [
+            g.people.length > 0 ? (
+              <li
+                key={g.key}
+                className="px-3 pb-0.5 pt-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground"
+              >
+                {g.label} · {g.people.length}
+              </li>
+            ) : null,
+            ...g.people.map((p) => {
             const role = siteRoleOf(roles, p.id);
             const online = isOnline(p);
             return (
@@ -190,6 +199,16 @@ export function BuddyList({
                       >
                         {p.display_name}
                       </span>
+                      {decorationGlyph(p.decoration) ? (
+                        <span
+                          className="shrink-0 text-sm leading-none"
+                          role="img"
+                          aria-label={decorationLabel(p.decoration) ?? undefined}
+                          title={decorationLabel(p.decoration) ?? undefined}
+                        >
+                          {decorationGlyph(p.decoration)}
+                        </span>
+                      ) : null}
                       {siteRoleLabel(role) ? (
                         <span
                           className={cn(
@@ -220,7 +239,8 @@ export function BuddyList({
                 </button>
               </li>
             );
-          })}
+            }),
+          ])}
           {buddyProfiles.length === 0 ? (
             <li className="px-3 py-2 text-xs text-muted-foreground">
               No buddies yet — tap the add icon to build your list.
