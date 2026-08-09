@@ -10,8 +10,10 @@ import {
   fetchRoomBans,
   fetchRoomEvents,
   fetchRooms,
+  fetchRoomSilences,
   touchPresence,
 } from "@/lib/chat";
+import { fetchBlocks } from "@/lib/blocks";
 import { fetchMyRoomInvites, fetchSentRoomInvites } from "@/lib/room-invites";
 
 export function useRooms() {
@@ -63,6 +65,24 @@ export function useBuddies(ownerId: string | undefined) {
     queryKey: ["buddies", ownerId],
     queryFn: () => fetchBuddies(ownerId!),
     enabled: !!ownerId,
+  });
+}
+
+/** Silence ("dot") list for a room. */
+export function useRoomSilences(roomId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["room-silences", roomId],
+    queryFn: () => fetchRoomSilences(roomId),
+    enabled,
+  });
+}
+
+/** My personal block list. */
+export function useBlocks(userId: string | undefined) {
+  return useQuery({
+    queryKey: ["blocks", userId],
+    queryFn: () => fetchBlocks(userId!),
+    enabled: !!userId,
   });
 }
 
@@ -124,6 +144,15 @@ export function useChatRealtime() {
       })
       .on("postgres_changes", { event: "*", schema: "public", table: "buddies" }, () => {
         void queryClient.invalidateQueries({ queryKey: ["buddies"] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "user_blocks" }, () => {
+        void queryClient.invalidateQueries({ queryKey: ["blocks"] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "room_silences" }, (payload) => {
+        const roomId =
+          (payload.new as { room_id?: string } | null)?.room_id ??
+          (payload.old as { room_id?: string } | null)?.room_id;
+        if (roomId) void queryClient.invalidateQueries({ queryKey: ["room-silences", roomId] });
       })
       .on("postgres_changes", { event: "*", schema: "public", table: "room_invites" }, () => {
         void queryClient.invalidateQueries({ queryKey: ["room-invites"] });
