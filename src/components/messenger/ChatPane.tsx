@@ -625,6 +625,16 @@ export function ChatPane({
           />
         ) : null}
 
+        {showFeed && !room.is_direct ? (
+          <RoomFeed
+            roomId={room.id}
+            meId={meId}
+            profiles={profiles}
+            canModerate={canModerate}
+            onClose={() => setShowFeed(false)}
+          />
+        ) : null}
+
         {joined ? (
           <>
             <div
