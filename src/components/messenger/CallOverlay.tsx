@@ -1,6 +1,7 @@
 import {
   ChevronDown,
   Maximize2,
+  MessageSquare,
   Mic,
   MicOff,
   PhoneOff,
@@ -11,6 +12,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Avatar } from "./Avatar";
+import { CallChat } from "./CallChat";
 import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
 import { accentFor } from "@/lib/chat";
 import { attachStream, playWithUnlock } from "@/lib/webrtc";
@@ -43,6 +45,7 @@ export function CallOverlay({
   const [seconds, setSeconds] = useState(0);
   const [speaker, setSpeaker] = useState(true);
   const [minimized, setMinimized] = useState(false);
+  const [chatOpen, setChatOpen] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { mics, speakers, micId, speakerId, setMicId, setSpeakerId, refresh } = useAudioDevices();
 
@@ -126,7 +129,8 @@ export function CallOverlay({
       aria-label={`${mode === "video" ? "Video" : "Voice"} call in ${title}`}
       className="absolute inset-0 z-30 flex flex-col bg-sidebar/95 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] backdrop-blur-sm"
     >
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden px-4 py-4 sm:flex-row">
+      <div className="min-h-0 flex-1 overflow-y-auto">
         <button
           onClick={() => setMinimized(true)}
           aria-label="Minimize call and keep chatting"
@@ -161,6 +165,10 @@ export function CallOverlay({
           ))}
         </div>
       </div>
+        {chatOpen ? (
+          <CallChat roomId={roomId} meId={meId} onClose={() => setChatOpen(false)} />
+        ) : null}
+      </div>
 
       <div className="flex flex-wrap items-center justify-center gap-3 px-4 pb-10 sm:gap-4">
         <CallButton
@@ -183,6 +191,13 @@ export function CallOverlay({
           onClick={() => setSpeaker((v) => !v)}
         >
           {speaker ? <Volume2 className="size-5" /> : <VolumeX className="size-5" />}
+        </CallButton>
+        <CallButton
+          label={chatOpen ? "Hide call chat" : "Show call chat"}
+          active={chatOpen}
+          onClick={() => setChatOpen((v) => !v)}
+        >
+          <MessageSquare className="size-5" />
         </CallButton>
         <AudioDeviceMenu
           mics={mics}
