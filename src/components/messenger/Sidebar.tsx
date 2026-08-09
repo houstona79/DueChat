@@ -196,7 +196,7 @@ export function Sidebar({
         {creating && me ? <NewRoomForm userId={me.id} onDone={() => setCreating(false)} /> : null}
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-6">
+      <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
         <WaterUpdates />
         <NotificationsPanel me={me} profiles={profiles} />
         <RoomInvites me={me} rooms={rooms} profiles={profiles} />
