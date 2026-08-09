@@ -38,7 +38,10 @@ export function AccessibilitySettings() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <section aria-labelledby="a11y-heading" className="rounded-2xl border border-border bg-card p-4">
+    <section
+      aria-labelledby="a11y-heading"
+      className="rounded-2xl border border-border bg-card p-4"
+    >
       <div className="flex items-start gap-3">
         <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary">
           <Accessibility className="size-5" aria-hidden />

@@ -1,6 +1,4 @@
-type VideoKind =
-  | { kind: "file"; src: string }
-  | { kind: "embed"; src: string; title: string };
+type VideoKind = { kind: "file"; src: string } | { kind: "embed"; src: string; title: string };
 
 export function videoEmbedOf(body: string): VideoKind | null {
   const trimmed = body.trim();

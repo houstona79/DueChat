@@ -32,7 +32,10 @@ export async function fetchSentRoomInvites(roomId: string): Promise<RoomInvite[]
 export async function inviteToRoom(roomId: string, inviterId: string, inviteeId: string) {
   const { error } = await supabase
     .from("room_invites")
-    .upsert({ room_id: roomId, inviter_id: inviterId, invitee_id: inviteeId }, { onConflict: "room_id,invitee_id" });
+    .upsert(
+      { room_id: roomId, inviter_id: inviterId, invitee_id: inviteeId },
+      { onConflict: "room_id,invitee_id" },
+    );
   if (error) throw error;
 }
 

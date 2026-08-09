@@ -42,7 +42,10 @@ function InvitePage() {
   }, [owner, code]);
 
   return (
-    <main id="main-content" className="grid min-h-screen place-items-center bg-background px-5 py-10">
+    <main
+      id="main-content"
+      className="grid min-h-screen place-items-center bg-background px-5 py-10"
+    >
       <div className="w-full max-w-sm text-center">
         <div className="mb-2 flex justify-end">
           <ThemeToggle />

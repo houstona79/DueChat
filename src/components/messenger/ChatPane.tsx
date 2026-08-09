@@ -311,219 +311,229 @@ export function ChatPane({
           />
         ) : null}
         <div className="-mx-1 flex flex-wrap items-center gap-1.5 px-1 pb-0.5 sm:mx-0 sm:justify-end sm:px-0">
-        {!room.is_direct && isSuper ? (
-          <button
-            onClick={() => setStatusDraft(room.status_message ?? "")}
-            className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70"
-          >
-            Room status
-          </button>
-        ) : null}
-        {!room.is_direct ? (
-          isOwner ? (
-            <select
-              aria-label="Room category"
-              value={room.category || "General"}
-              onChange={async (e) => {
+          {!room.is_direct && isSuper ? (
+            <button
+              onClick={() => setStatusDraft(room.status_message ?? "")}
+              className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70"
+            >
+              Room status
+            </button>
+          ) : null}
+          {!room.is_direct ? (
+            isOwner ? (
+              <select
+                aria-label="Room category"
+                value={room.category || "General"}
+                onChange={async (e) => {
+                  try {
+                    await setRoomCategory(room.id, e.target.value);
+                    await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+                  } catch (err) {
+                    setError(err instanceof Error ? err.message : "Could not change the category.");
+                  }
+                }}
+                className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground outline-none"
+              >
+                {[...new Set([...ROOM_CATEGORIES, room.category || "General"])].map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            ) : null
+          ) : null}
+          {!room.is_direct ? (
+            <RatingControl
+              rating={room.rating}
+              canEdit={isOwner}
+              onChange={async (next) => {
                 try {
-                  await setRoomCategory(room.id, e.target.value);
+                  await setRoomRating(room.id, next);
                   await queryClient.invalidateQueries({ queryKey: ["rooms"] });
                 } catch (err) {
-                  setError(err instanceof Error ? err.message : "Could not change the category.");
+                  setError(
+                    err instanceof Error ? err.message : "Could not change the room rating.",
+                  );
                 }
               }}
-              className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground outline-none"
+            />
+          ) : null}
+          <button
+            onClick={() => {
+              setShowMembers(false);
+              setShowFeed(false);
+              setShowMedia(false);
+              setShowTrivia(false);
+              setShowGames((v) => !v);
+            }}
+            className={cn(
+              "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
+              showGames ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+            )}
+            aria-label="Show games"
+            aria-pressed={showGames}
+            title="Games"
+          >
+            <Gamepad2 className="size-4" />
+            Games
+          </button>
+          {!room.is_direct ? (
+            <button
+              onClick={() => {
+                setShowMembers(false);
+                setShowFeed(false);
+                setShowMedia(false);
+                setShowGames(false);
+                setShowTrivia((v) => !v);
+              }}
+              className={cn(
+                "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
+                showTrivia
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:bg-secondary",
+              )}
+              aria-label="Show trivia bot"
+              aria-pressed={showTrivia}
+              title="Trivia bot"
             >
-              {[...new Set([...ROOM_CATEGORIES, room.category || "General"])].map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          ) : null
-        ) : null}
-        {!room.is_direct ? (
-          <RatingControl
-            rating={room.rating}
-            canEdit={isOwner}
-            onChange={async (next) => {
-              try {
-                await setRoomRating(room.id, next);
-                await queryClient.invalidateQueries({ queryKey: ["rooms"] });
-              } catch (err) {
-                setError(err instanceof Error ? err.message : "Could not change the room rating.");
-              }
-            }}
-          />
-        ) : null}
-        <button
-          onClick={() => {
-            setShowMembers(false);
-            setShowFeed(false);
-            setShowMedia(false);
-            setShowTrivia(false);
-            setShowGames((v) => !v);
-          }}
-          className={cn(
-            "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
-            showGames ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
-          )}
-          aria-label="Show games"
-          aria-pressed={showGames}
-          title="Games"
-        >
-          <Gamepad2 className="size-4" />
-          Games
-        </button>
-        {!room.is_direct ? (
+              <Bot className="size-4" />
+              Trivia
+            </button>
+          ) : null}
           <button
             onClick={() => {
-              setShowMembers(false);
               setShowFeed(false);
               setShowMedia(false);
               setShowGames(false);
-              setShowTrivia((v) => !v);
+              setShowTrivia(false);
+              setShowInvite(false);
+              setShowMembers((v) => !v);
             }}
             className={cn(
               "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
-              showTrivia ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+              showMembers
+                ? "bg-primary/15 text-primary"
+                : "text-muted-foreground hover:bg-secondary",
             )}
-            aria-label="Show trivia bot"
-            aria-pressed={showTrivia}
-            title="Trivia bot"
+            aria-label="Show members"
+            aria-pressed={showMembers}
+            title="Show members"
           >
-            <Bot className="size-4" />
-            Trivia
+            <Users className="size-4" />
+            {members.length}
           </button>
-        ) : null}
-        <button
-          onClick={() => {
-            setShowFeed(false);
-            setShowMedia(false);
-            setShowGames(false);
-            setShowTrivia(false);
-            setShowInvite(false);
-            setShowMembers((v) => !v);
-          }}
-          className={cn(
-            "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
-            showMembers
-              ? "bg-primary/15 text-primary"
-              : "text-muted-foreground hover:bg-secondary",
-          )}
-          aria-label="Show members"
-          aria-pressed={showMembers}
-          title="Show members"
-        >
-          <Users className="size-4" />
-          {members.length}
-        </button>
-        {!room.is_direct && joined ? (
+          {!room.is_direct && joined ? (
+            <button
+              onClick={() => {
+                setShowMembers(false);
+                setShowFeed(false);
+                setShowMedia(false);
+                setShowGames(false);
+                setShowTrivia(false);
+                setShowInvite((v) => !v);
+              }}
+              className={cn(
+                "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
+                showInvite
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:bg-secondary",
+              )}
+              aria-label="Invite people to this room"
+              aria-pressed={showInvite}
+              title="Invite people"
+            >
+              <UserPlus className="size-4" />
+              Invite
+            </button>
+          ) : null}
+          {!room.is_direct && joined ? (
+            <button
+              onClick={() => {
+                setShowMembers(false);
+                setShowMedia(false);
+                setShowGames(false);
+                setShowTrivia(false);
+                setShowFeed((v) => !v);
+              }}
+              className={cn(
+                "grid size-10 shrink-0 place-items-center rounded-xl",
+                showFeed
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:bg-secondary",
+              )}
+              aria-label="Show room feed"
+              aria-pressed={showFeed}
+              title="Room feed"
+            >
+              <Newspaper className="size-4" />
+            </button>
+          ) : null}
+          {!room.is_direct ? (
+            <button
+              onClick={() => {
+                setShowMembers(false);
+                setShowFeed(false);
+                setShowGames(false);
+                setShowTrivia(false);
+                setShowMedia((v) => !v);
+              }}
+              className={cn(
+                "grid size-10 shrink-0 place-items-center rounded-xl",
+                showMedia
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:bg-secondary",
+              )}
+              aria-label="Show radio and video players"
+              aria-pressed={showMedia}
+              title="Radio & video"
+            >
+              <Radio className="size-4" />
+            </button>
+          ) : null}
+          <button
+            onClick={() => setCall("voice")}
+            className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+            aria-label="Start voice call"
+          >
+            <Phone className="size-4" />
+          </button>
+          <button
+            onClick={() => setTalking((v) => !v)}
+            className={cn(
+              "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
+              talking ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+            )}
+            aria-label={talking ? "Leave room voice" : "Join room voice with push to talk"}
+            aria-pressed={talking}
+            title="Talk"
+          >
+            <Mic className="size-4" />
+            Talk
+          </button>
           <button
             onClick={() => {
-              setShowMembers(false);
-              setShowFeed(false);
-              setShowMedia(false);
-              setShowGames(false);
-              setShowTrivia(false);
-              setShowInvite((v) => !v);
+              // Cams ride along on the room voice session, so make sure it's live.
+              setTalking(true);
+              setShowCams((v) => !v);
             }}
             className={cn(
-              "flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium",
-              showInvite ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+              "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
+              showCams ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
             )}
-            aria-label="Invite people to this room"
-            aria-pressed={showInvite}
-            title="Invite people"
+            aria-label="Show room cameras"
+            aria-pressed={showCams}
+            title="Cams"
           >
-            <UserPlus className="size-4" />
-            Invite
+            <Video className="size-4" />
+            Cams
           </button>
-        ) : null}
-        {!room.is_direct && joined ? (
           <button
-            onClick={() => {
-              setShowMembers(false);
-              setShowMedia(false);
-              setShowGames(false);
-              setShowTrivia(false);
-              setShowFeed((v) => !v);
-            }}
-            className={cn(
-              "grid size-10 shrink-0 place-items-center rounded-xl",
-              showFeed ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
-            )}
-            aria-label="Show room feed"
-            aria-pressed={showFeed}
-            title="Room feed"
+            onClick={() => setCall("video")}
+            className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+            aria-label="Start video call"
           >
-            <Newspaper className="size-4" />
+            <Video className="size-4" />
           </button>
-        ) : null}
-        {!room.is_direct ? (
-          <button
-            onClick={() => {
-              setShowMembers(false);
-              setShowFeed(false);
-              setShowGames(false);
-              setShowTrivia(false);
-              setShowMedia((v) => !v);
-            }}
-            className={cn(
-              "grid size-10 shrink-0 place-items-center rounded-xl",
-              showMedia ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
-            )}
-            aria-label="Show radio and video players"
-            aria-pressed={showMedia}
-            title="Radio & video"
-          >
-            <Radio className="size-4" />
-          </button>
-        ) : null}
-        <button
-          onClick={() => setCall("voice")}
-          className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
-          aria-label="Start voice call"
-        >
-          <Phone className="size-4" />
-        </button>
-        <button
-          onClick={() => setTalking((v) => !v)}
-          className={cn(
-            "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
-            talking ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
-          )}
-          aria-label={talking ? "Leave room voice" : "Join room voice with push to talk"}
-          aria-pressed={talking}
-          title="Talk"
-        >
-          <Mic className="size-4" />
-          Talk
-        </button>
-        <button
-          onClick={() => {
-            // Cams ride along on the room voice session, so make sure it's live.
-            setTalking(true);
-            setShowCams((v) => !v);
-          }}
-          className={cn(
-            "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
-            showCams ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
-          )}
-          aria-label="Show room cameras"
-          aria-pressed={showCams}
-          title="Cams"
-        >
-          <Video className="size-4" />
-          Cams
-        </button>
-        <button
-          onClick={() => setCall("video")}
-          className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
-          aria-label="Start video call"
-        >
-          <Video className="size-4" />
-        </button>
         </div>
       </header>
 
@@ -665,9 +675,7 @@ export function ChatPane({
             <X className="size-4" />
           </button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto">
-          {showGames ? <GamesPanel /> : null}
-        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto">{showGames ? <GamesPanel /> : null}</div>
       </section>
 
       {!room.is_direct ? (
@@ -830,8 +838,7 @@ export function ChatPane({
                         : item.action === "bounce"
                           ? "was bounced from"
                           : "left"}{" "}
-                      the room ·{" "}
-                      {formatTime(item.at)}
+                      the room · {formatTime(item.at)}
                     </span>
                   </div>
                 );
@@ -931,7 +938,8 @@ export function ChatPane({
                           mine
                             ? "rounded-3xl rounded-br-md bg-bubble-me text-bubble-me-foreground"
                             : "rounded-3xl rounded-bl-md bg-bubble-them text-bubble-them-foreground",
-                          isEmojiOnly(m.body) && "bg-transparent px-1 py-0.5 text-3xl leading-tight",
+                          isEmojiOnly(m.body) &&
+                            "bg-transparent px-1 py-0.5 text-3xl leading-tight",
                         )}
                       >
                         {m.body}
@@ -1051,16 +1059,16 @@ export function ChatPane({
               </>
             ) : (
               <>
-              <h3 className="text-lg font-semibold">Join {title}</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Messages in this room are only visible to members.
-            </p>
-            <button
-              onClick={() => void join()}
-              className="mt-5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-            >
-              Join room
-            </button>
+                <h3 className="text-lg font-semibold">Join {title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Messages in this room are only visible to members.
+                </p>
+                <button
+                  onClick={() => void join()}
+                  className="mt-5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                >
+                  Join room
+                </button>
               </>
             )}
           </div>

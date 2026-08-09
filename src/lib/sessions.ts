@@ -31,8 +31,7 @@ export async function touchSession(userId: string) {
     {
       user_id: userId,
       session_key: localSessionKey(),
-      user_agent:
-        typeof navigator === "undefined" ? null : navigator.userAgent.slice(0, 300),
+      user_agent: typeof navigator === "undefined" ? null : navigator.userAgent.slice(0, 300),
       updated_at: new Date().toISOString(),
     },
     { onConflict: "user_id,session_key" },

@@ -50,7 +50,11 @@ function luminance(rgb: number[]) {
 
 function toHex(rgb: number[]) {
   return `#${rgb
-    .map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0"))
+    .map((v) =>
+      Math.max(0, Math.min(255, Math.round(v)))
+        .toString(16)
+        .padStart(2, "0"),
+    )
     .join("")}`;
 }
 
@@ -72,7 +76,8 @@ export function readableNameColor(hex: string) {
   let light = [...rgb];
   for (let i = 0; i < 40 && luminance(light) > 0.17; i++) light = light.map((v) => v * 0.94);
   let dark = [...rgb];
-  for (let i = 0; i < 40 && luminance(dark) < 0.36; i++) dark = dark.map((v) => v + (255 - v) * 0.07);
+  for (let i = 0; i < 40 && luminance(dark) < 0.36; i++)
+    dark = dark.map((v) => v + (255 - v) * 0.07);
   return `light-dark(${toHex(light)}, ${toHex(dark)})`;
 }
 

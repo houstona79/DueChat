@@ -44,42 +44,45 @@ function ChatLayout() {
 
   return (
     <>
-    <main id="main-content" className="grid h-dvh grid-cols-1 overflow-hidden md:grid-cols-[280px_1fr] lg:grid-cols-[340px_1fr]">
-      <div
-        className={
-          activeRoomId
-            ? "hidden min-h-0 border-r border-border md:block"
-            : "min-h-0 border-r border-border"
-        }
+      <main
+        id="main-content"
+        className="grid h-dvh grid-cols-1 overflow-hidden md:grid-cols-[280px_1fr] lg:grid-cols-[340px_1fr]"
       >
-        <Sidebar
-          rooms={rooms}
-          memberships={memberships}
-          profiles={profiles}
-          me={me}
-          activeRoomId={activeRoomId}
-        />
-      </div>
-      <div className={activeRoomId ? "min-h-0" : "hidden min-h-0 md:block"}>
-        {activeRoomId ? (
-          <Outlet />
-        ) : (
-          <div className="grid h-full place-items-center bg-background px-6 text-center">
-            <div className="max-w-sm">
-              <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/15 text-primary">
-                <MessagesSquare className="size-7" />
-              </span>
-              <h2 className="mt-5 text-xl font-semibold">Pick a room</h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Choose a room on the left, or create a new one to start talking.
-              </p>
+        <div
+          className={
+            activeRoomId
+              ? "hidden min-h-0 border-r border-border md:block"
+              : "min-h-0 border-r border-border"
+          }
+        >
+          <Sidebar
+            rooms={rooms}
+            memberships={memberships}
+            profiles={profiles}
+            me={me}
+            activeRoomId={activeRoomId}
+          />
+        </div>
+        <div className={activeRoomId ? "min-h-0" : "hidden min-h-0 md:block"}>
+          {activeRoomId ? (
+            <Outlet />
+          ) : (
+            <div className="grid h-full place-items-center bg-background px-6 text-center">
+              <div className="max-w-sm">
+                <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/15 text-primary">
+                  <MessagesSquare className="size-7" />
+                </span>
+                <h2 className="mt-5 text-xl font-semibold">Pick a room</h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Choose a room on the left, or create a new one to start talking.
+                </p>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
-    </main>
-    <ProfileViewer />
-    {user?.id ? <IncomingCallWatcher rooms={rooms} profiles={profiles} meId={user.id} /> : null}
+          )}
+        </div>
+      </main>
+      <ProfileViewer />
+      {user?.id ? <IncomingCallWatcher rooms={rooms} profiles={profiles} meId={user.id} /> : null}
     </>
   );
 }

@@ -97,7 +97,9 @@ export function HumanCheck({
         />
       </div>
       {error ? (
-        <p className="mt-1.5 text-xs text-destructive">That&apos;s not quite right &mdash; try again.</p>
+        <p className="mt-1.5 text-xs text-destructive">
+          That&apos;s not quite right &mdash; try again.
+        </p>
       ) : null}
     </div>
   );

@@ -118,7 +118,12 @@ function SettingsPage() {
       const statusChanged = nextStatus !== (me.status_message ?? null);
       await updateProfile(user.id, {
         display_name: displayName.trim().slice(0, 60) || me.display_name,
-        username: username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 24) || me.username,
+        username:
+          username
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9_]/g, "")
+            .slice(0, 24) || me.username,
         status_message: nextStatus,
         name_color: nameColor || null,
         country: country || null,
@@ -143,7 +148,11 @@ function SettingsPage() {
       }
       await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
       await queryClient.invalidateQueries({ queryKey: ["profiles"] });
-      setMessage(statusChanged && nextStatus ? "Profile saved — status shared to your feed." : "Profile saved.");
+      setMessage(
+        statusChanged && nextStatus
+          ? "Profile saved — status shared to your feed."
+          : "Profile saved.",
+      );
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Could not save profile.");
     } finally {
@@ -181,7 +190,10 @@ function SettingsPage() {
   };
 
   return (
-    <main id="main-content" className="mx-auto min-h-screen min-w-0 max-w-3xl px-3 py-6 sm:px-5 sm:py-8">
+    <main
+      id="main-content"
+      className="mx-auto min-h-screen min-w-0 max-w-3xl px-3 py-6 sm:px-5 sm:py-8"
+    >
       <Link
         to="/chat"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -222,9 +234,20 @@ function SettingsPage() {
       ) : null}
 
       <form onSubmit={save} className="mt-6 space-y-4">
-        <Field label="Display name" id="display-name" value={displayName} onChange={setDisplayName} />
+        <Field
+          label="Display name"
+          id="display-name"
+          value={displayName}
+          onChange={setDisplayName}
+        />
         <Field label="Username" id="username" value={username} onChange={setUsername} />
-        <Field label="Status" id="status" value={status} onChange={setStatus} placeholder="Working on something new" />
+        <Field
+          label="Status"
+          id="status"
+          value={status}
+          onChange={setStatus}
+          placeholder="Working on something new"
+        />
 
         <div>
           <label htmlFor="bio" className="block text-[11px] font-medium text-muted-foreground">
@@ -311,7 +334,10 @@ function SettingsPage() {
               </option>
             ))}
           </select>
-          <label htmlFor="gender-visibility" className="mt-2 block text-[11px] font-medium text-muted-foreground">
+          <label
+            htmlFor="gender-visibility"
+            className="mt-2 block text-[11px] font-medium text-muted-foreground"
+          >
             Who can see my gender
           </label>
           <select
@@ -340,7 +366,10 @@ function SettingsPage() {
             placeholder="she/her, he/him, they/them…"
             className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none"
           />
-          <label htmlFor="pronouns-visibility" className="mt-2 block text-[11px] font-medium text-muted-foreground">
+          <label
+            htmlFor="pronouns-visibility"
+            className="mt-2 block text-[11px] font-medium text-muted-foreground"
+          >
             Who can see my pronouns
           </label>
           <select
@@ -419,9 +448,7 @@ function SettingsPage() {
 
         <div>
           <span className="block text-[11px] font-medium text-muted-foreground">Name color</span>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            Red is reserved for admins.
-          </p>
+          <p className="mt-1 text-[11px] text-muted-foreground">Red is reserved for admins.</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {NAME_COLORS.map((c) => (
               <button
@@ -491,9 +518,7 @@ function SettingsPage() {
               redirectTo: `${window.location.origin}/reset-password`,
             });
             setResetting(false);
-            setMessage(
-              error ? error.message : "Password reset email sent — check your inbox.",
-            );
+            setMessage(error ? error.message : "Password reset email sent — check your inbox.");
           }}
           className="mt-3 rounded-xl bg-secondary px-4 py-2 text-sm font-medium disabled:opacity-50"
         >

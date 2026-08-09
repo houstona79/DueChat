@@ -63,8 +63,8 @@ function AccessibilityPage() {
               timeline and notifications.
             </li>
             <li>
-              Color contrast: text and interactive elements meet AA contrast ratios in both light and
-              dark themes.
+              Color contrast: text and interactive elements meet AA contrast ratios in both light
+              and dark themes.
             </li>
             <li>
               Reduced motion: we respect the system “prefers reduced motion” setting to limit
@@ -81,9 +81,9 @@ function AccessibilityPage() {
           </h2>
           <p>
             Some content shared by users — such as uploaded images, videos, GIFs, or third-party
-            embeds — may not include captions or descriptions by default. We encourage the
-            community to add alt text and transcripts when possible. If you encounter an
-            accessibility barrier, please let us know.
+            embeds — may not include captions or descriptions by default. We encourage the community
+            to add alt text and transcripts when possible. If you encounter an accessibility
+            barrier, please let us know.
           </p>
 
           <h2 className="mt-6 font-display text-lg font-semibold text-foreground">Feedback</h2>

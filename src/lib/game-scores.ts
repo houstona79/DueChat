@@ -28,8 +28,7 @@ export function readBest(game: string): number | null {
 /** Saves the score when it beats the stored best. `lower` treats smaller as better. */
 export function saveBest(game: string, score: number, lower = false): number {
   const current = readBest(game);
-  const better =
-    current === null ? true : lower ? score < current : score > current;
+  const better = current === null ? true : lower ? score < current : score > current;
   const next = better ? score : current;
   if (better) {
     memory.set(game, score);

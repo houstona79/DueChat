@@ -4,9 +4,30 @@ import { cn } from "@/lib/utils";
 import { readBest, saveBest } from "@/lib/game-scores";
 
 const WORDS = [
-  "chats", "rooms", "music", "voice", "video", "party", "smile", "night",
-  "cloud", "spark", "river", "green", "tiger", "pixel", "beach", "lemon",
-  "candy", "storm", "piano", "robot", "happy", "brave", "juice", "flame",
+  "chats",
+  "rooms",
+  "music",
+  "voice",
+  "video",
+  "party",
+  "smile",
+  "night",
+  "cloud",
+  "spark",
+  "river",
+  "green",
+  "tiger",
+  "pixel",
+  "beach",
+  "lemon",
+  "candy",
+  "storm",
+  "piano",
+  "robot",
+  "happy",
+  "brave",
+  "juice",
+  "flame",
 ];
 
 const MAX_TRIES = 6;

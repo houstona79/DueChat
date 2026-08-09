@@ -194,9 +194,7 @@ export async function fetchMyProfile(userId: string): Promise<Profile | null> {
 export async function fetchRooms(): Promise<Room[]> {
   const { data, error } = await supabase
     .from("rooms")
-    .select(
-      ROOM_COLS,
-    )
+    .select(ROOM_COLS)
     .order("created_at", { ascending: true });
   if (error) throw error;
   return (data ?? []) as Room[];
@@ -260,10 +258,14 @@ export async function createRoom(
 ) {
   const { data, error } = await supabase
     .from("rooms")
-    .insert({ name: name.trim(), slug: slugify(name), topic: topic.trim() || null, created_by: userId, category })
-    .select(
-      ROOM_COLS,
-    )
+    .insert({
+      name: name.trim(),
+      slug: slugify(name),
+      topic: topic.trim() || null,
+      created_by: userId,
+      category,
+    })
+    .select(ROOM_COLS)
     .single();
   if (error) throw error;
   const join = await supabase.from("room_members").insert({ room_id: data.id, user_id: userId });
@@ -307,15 +309,13 @@ export async function openDirectRoom(meId: string, otherId: string): Promise<Roo
     throw created.error;
   }
 
-  const members = await supabase
-    .from("room_members")
-    .upsert(
-      [
-        { room_id: created.data.id, user_id: meId },
-        { room_id: created.data.id, user_id: otherId },
-      ],
-      { onConflict: "room_id,user_id" },
-    );
+  const members = await supabase.from("room_members").upsert(
+    [
+      { room_id: created.data.id, user_id: meId },
+      { room_id: created.data.id, user_id: otherId },
+    ],
+    { onConflict: "room_id,user_id" },
+  );
   if (members.error) throw members.error;
   return created.data as Room;
 }
@@ -347,7 +347,10 @@ export async function leaveRoom(roomId: string, userId: string) {
 }
 
 export async function touchPresence(userId: string) {
-  await supabase.from("profiles").update({ last_seen_at: new Date().toISOString() }).eq("id", userId);
+  await supabase
+    .from("profiles")
+    .update({ last_seen_at: new Date().toISOString() })
+    .eq("id", userId);
 }
 
 /* ---------- room radio ---------- */
@@ -461,9 +464,7 @@ export async function fetchBuddies(ownerId: string): Promise<Buddy[]> {
 }
 
 export async function addBuddy(ownerId: string, buddyId: string) {
-  const { error } = await supabase
-    .from("buddies")
-    .insert({ owner_id: ownerId, buddy_id: buddyId });
+  const { error } = await supabase.from("buddies").insert({ owner_id: ownerId, buddy_id: buddyId });
   if (error && error.code !== "23505") throw error;
 }
 
@@ -630,18 +631,16 @@ export async function banMember(
   reason?: string,
   expiresAt: string | null = null,
 ) {
-  const { error } = await supabase
-    .from("room_bans")
-    .upsert(
-      {
-        room_id: roomId,
-        user_id: userId,
-        banned_by: bannedBy,
-        reason: reason ?? null,
-        expires_at: expiresAt,
-      },
-      { onConflict: "room_id,user_id" },
-    );
+  const { error } = await supabase.from("room_bans").upsert(
+    {
+      room_id: roomId,
+      user_id: userId,
+      banned_by: bannedBy,
+      reason: reason ?? null,
+      expires_at: expiresAt,
+    },
+    { onConflict: "room_id,user_id" },
+  );
   if (error) throw error;
   await kickMember(roomId, userId);
 }

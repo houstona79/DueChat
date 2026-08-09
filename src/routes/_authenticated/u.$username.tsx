@@ -63,7 +63,10 @@ function ProfilePage() {
     (visibility === "buddies" && myBuddies.some((b) => b.buddy_id === profile?.id));
 
   return (
-    <main id="main-content" className="mx-auto min-w-0 w-full max-w-3xl px-3 py-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-5 sm:py-8">
+    <main
+      id="main-content"
+      className="mx-auto min-w-0 w-full max-w-3xl px-3 py-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-5 sm:py-8"
+    >
       <Link
         to="/chat"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -131,55 +134,61 @@ function ProfilePage() {
                 : "This profile is only visible to their buddies."}
             </p>
           ) : (
-          <div className="mt-5 space-y-3 text-sm">
-            <YearBadges profile={profile} />
-            <SocialStatus profile={profile} />
-            {profile.bio ? (
-              <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">
-                {profile.bio}
-              </p>
-            ) : null}
-            {profile.country ? (
-              <p className="flex items-center gap-2 text-xs text-muted-foreground">
-                {countryFlag(profile.country) ? (
-                  <span className="text-base leading-none" role="img" aria-label={`Flag of ${profile.country}`}>
-                    {countryFlag(profile.country)}
+            <div className="mt-5 space-y-3 text-sm">
+              <YearBadges profile={profile} />
+              <SocialStatus profile={profile} />
+              {profile.bio ? (
+                <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">
+                  {profile.bio}
+                </p>
+              ) : null}
+              {profile.country ? (
+                <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                  {countryFlag(profile.country) ? (
+                    <span
+                      className="text-base leading-none"
+                      role="img"
+                      aria-label={`Flag of ${profile.country}`}
+                    >
+                      {countryFlag(profile.country)}
+                    </span>
+                  ) : (
+                    <MapPin className="size-3.5 shrink-0" aria-hidden />
+                  )}
+                  {profile.country}
+                </p>
+              ) : null}
+              {genderLabel(visibleGender(profile, user?.id, myBuddies)) ? (
+                <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <User className="size-3.5 shrink-0" aria-hidden />
+                  {genderLabel(visibleGender(profile, user?.id, myBuddies))}
+                </p>
+              ) : null}
+              {visiblePronouns(profile, user?.id, myBuddies) ? (
+                <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <BadgeCheck className="size-3.5 shrink-0" aria-hidden />
+                  {visiblePronouns(profile, user?.id, myBuddies)}
+                </p>
+              ) : null}
+              {profile.website_url ? (
+                <a
+                  href={profile.website_url}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow ugc"
+                  className="flex items-center gap-2 text-xs text-primary hover:underline"
+                >
+                  <Globe className="size-3.5 shrink-0" aria-hidden />
+                  <span className="truncate">
+                    {profile.website_url.replace(/^https?:\/\//, "")}
                   </span>
-                ) : (
-                  <MapPin className="size-3.5 shrink-0" aria-hidden />
-                )}
-                {profile.country}
-              </p>
-            ) : null}
-            {genderLabel(visibleGender(profile, user?.id, myBuddies)) ? (
-              <p className="flex items-center gap-2 text-xs text-muted-foreground">
-                <User className="size-3.5 shrink-0" aria-hidden />
-                {genderLabel(visibleGender(profile, user?.id, myBuddies))}
-              </p>
-            ) : null}
-            {visiblePronouns(profile, user?.id, myBuddies) ? (
-              <p className="flex items-center gap-2 text-xs text-muted-foreground">
-                <BadgeCheck className="size-3.5 shrink-0" aria-hidden />
-                {visiblePronouns(profile, user?.id, myBuddies)}
-              </p>
-            ) : null}
-            {profile.website_url ? (
-              <a
-                href={profile.website_url}
-                target="_blank"
-                rel="noopener noreferrer nofollow ugc"
-                className="flex items-center gap-2 text-xs text-primary hover:underline"
-              >
-                <Globe className="size-3.5 shrink-0" aria-hidden />
-                <span className="truncate">{profile.website_url.replace(/^https?:\/\//, "")}</span>
-              </a>
-            ) : null}
-            {isAdultProfile(profile) ? (
-              <p className="text-xs text-muted-foreground">Verified 18+</p>
-            ) : null}
-            <ProfilePhotos userId={profile.id} />
-            <ProfileFeed userId={profile.id} />
-          </div>
+                </a>
+              ) : null}
+              {isAdultProfile(profile) ? (
+                <p className="text-xs text-muted-foreground">Verified 18+</p>
+              ) : null}
+              <ProfilePhotos userId={profile.id} />
+              <ProfileFeed userId={profile.id} />
+            </div>
           )}
 
           {!isMe ? (

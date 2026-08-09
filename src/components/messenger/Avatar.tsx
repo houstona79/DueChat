@@ -29,7 +29,8 @@ export function Avatar({
     staleTime: 50 * 60_000,
   });
 
-  const dims = size === "lg" ? "size-16 text-lg" : size === "md" ? "size-11 text-sm" : "size-9 text-xs";
+  const dims =
+    size === "lg" ? "size-16 text-lg" : size === "md" ? "size-11 text-sm" : "size-9 text-xs";
 
   return (
     <span className="relative inline-flex shrink-0">

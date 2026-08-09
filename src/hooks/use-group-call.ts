@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  getMediaStreamResilient,
-  isWebRTCSupported,
-  mediaErrorMessage,
-} from "@/lib/webrtc";
+import { getMediaStreamResilient, isWebRTCSupported, mediaErrorMessage } from "@/lib/webrtc";
 
 export type CallPeer = {
   userId: string;
@@ -115,7 +111,9 @@ export function useGroupCall({
     let cancelled = false;
     const start = async () => {
       if (!isWebRTCSupported()) {
-        setMediaError("This browser doesn't support live calls. Try Chrome, Safari, Firefox or Edge.");
+        setMediaError(
+          "This browser doesn't support live calls. Try Chrome, Safari, Firefox or Edge.",
+        );
         return;
       }
       try {
@@ -305,7 +303,11 @@ export function useGroupCall({
         ctx.makingOffer = true;
         const offer = await ctx.pc.createOffer();
         await ctx.pc.setLocalDescription(offer);
-        await send({ from: userId, to: peerId, description: ctx.pc.localDescription?.toJSON() ?? offer });
+        await send({
+          from: userId,
+          to: peerId,
+          description: ctx.pc.localDescription?.toJSON() ?? offer,
+        });
       } catch {
         /* noop */
       } finally {
@@ -327,9 +329,9 @@ export function useGroupCall({
           if (ctx.ignoreOffer) return;
           if (offerCollision) {
             await Promise.all([
-              pc.setLocalDescription({ type: "rollback" } as RTCSessionDescriptionInit).catch(
-                () => undefined,
-              ),
+              pc
+                .setLocalDescription({ type: "rollback" } as RTCSessionDescriptionInit)
+                .catch(() => undefined),
               pc.setRemoteDescription(new RTCSessionDescription(signal.description)),
             ]);
           } else {

@@ -138,9 +138,8 @@ export function CallOverlay({
         <div className="text-center">
           <h2 className="font-display text-lg font-semibold sm:text-xl">{title}</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            {mode === "video" ? "Group video call" : "Group voice call"} ·{" "}
-            {participants.length + 1} {participants.length === 0 ? "person" : "people"} ·{" "}
-            {formatDuration(seconds)}
+            {mode === "video" ? "Group video call" : "Group voice call"} · {participants.length + 1}{" "}
+            {participants.length === 0 ? "person" : "people"} · {formatDuration(seconds)}
             {participants.length === 0 ? " · waiting for others…" : ""}
           </p>
           {mediaError ? (

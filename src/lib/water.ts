@@ -34,7 +34,13 @@ export async function searchPlaces(query: string): Promise<WaterPlace[]> {
   const res = await fetch(url);
   if (!res.ok) throw new Error("Could not look up that place.");
   const json = (await res.json()) as {
-    results?: { name: string; admin1?: string; country_code?: string; latitude: number; longitude: number }[];
+    results?: {
+      name: string;
+      admin1?: string;
+      country_code?: string;
+      latitude: number;
+      longitude: number;
+    }[];
   };
   return (json.results ?? []).map((r) => ({
     name: [r.name, r.admin1, r.country_code].filter(Boolean).join(", "),
@@ -49,8 +55,14 @@ export async function reverseGeocode(latitude: number, longitude: number): Promi
       `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
     );
     if (res.ok) {
-      const json = (await res.json()) as { city?: string; locality?: string; principalSubdivision?: string };
-      const label = [json.city || json.locality, json.principalSubdivision].filter(Boolean).join(", ");
+      const json = (await res.json()) as {
+        city?: string;
+        locality?: string;
+        principalSubdivision?: string;
+      };
+      const label = [json.city || json.locality, json.principalSubdivision]
+        .filter(Boolean)
+        .join(", ");
       if (label) return { name: label, latitude, longitude };
     }
   } catch {
@@ -73,11 +85,19 @@ export async function fetchWaterUpdate(place: WaterPlace): Promise<WaterUpdate> 
   if (!forecastRes.ok) throw new Error("Water data is unavailable right now.");
   const forecast = (await forecastRes.json()) as {
     current?: { precipitation?: number; rain?: number; temperature_2m?: number };
-    daily?: { time: string[]; precipitation_sum: (number | null)[]; precipitation_probability_max: (number | null)[] };
+    daily?: {
+      time: string[];
+      precipitation_sum: (number | null)[];
+      precipitation_probability_max: (number | null)[];
+    };
   };
   const flood = floodRes.ok
     ? ((await floodRes.json()) as {
-        daily?: { time: string[]; river_discharge: (number | null)[]; river_discharge_mean: (number | null)[] };
+        daily?: {
+          time: string[];
+          river_discharge: (number | null)[];
+          river_discharge_mean: (number | null)[];
+        };
       })
     : {};
 

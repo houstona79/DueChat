@@ -148,12 +148,16 @@ export function useChatRealtime() {
       .on("postgres_changes", { event: "*", schema: "public", table: "user_blocks" }, () => {
         void queryClient.invalidateQueries({ queryKey: ["blocks"] });
       })
-      .on("postgres_changes", { event: "*", schema: "public", table: "room_silences" }, (payload) => {
-        const roomId =
-          (payload.new as { room_id?: string } | null)?.room_id ??
-          (payload.old as { room_id?: string } | null)?.room_id;
-        if (roomId) void queryClient.invalidateQueries({ queryKey: ["room-silences", roomId] });
-      })
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "room_silences" },
+        (payload) => {
+          const roomId =
+            (payload.new as { room_id?: string } | null)?.room_id ??
+            (payload.old as { room_id?: string } | null)?.room_id;
+          if (roomId) void queryClient.invalidateQueries({ queryKey: ["room-silences", roomId] });
+        },
+      )
       .on("postgres_changes", { event: "*", schema: "public", table: "room_invites" }, () => {
         void queryClient.invalidateQueries({ queryKey: ["room-invites"] });
         void queryClient.invalidateQueries({ queryKey: ["room-invites-sent"] });

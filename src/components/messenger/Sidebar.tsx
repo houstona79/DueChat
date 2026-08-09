@@ -63,9 +63,7 @@ export function Sidebar({
 
   const matches = (r: Room) =>
     (roomLabel(r) + (r.topic ?? "")).toLowerCase().includes(query.toLowerCase());
-  const myRoomIds = new Set(
-    memberships.filter((m) => m.user_id === me?.id).map((m) => m.room_id),
-  );
+  const myRoomIds = new Set(memberships.filter((m) => m.user_id === me?.id).map((m) => m.room_id));
   const filtered = rooms.filter((r) => !r.is_direct && matches(r));
   const categoryOf = (r: Room) => r.category || "General";
   const usedCategories = [...ROOM_CATEGORIES, "General"].filter(
@@ -100,11 +98,7 @@ export function Sidebar({
       <header className="px-5 pb-3 pt-6">
         <div className="flex items-center justify-between gap-2">
           <a href="https://www.duechat.com" aria-label="Go to DueChat" className="inline-block">
-            <img
-              src={duechatLogo.url}
-              alt="DueChat"
-              className="h-8 w-auto object-contain"
-            />
+            <img src={duechatLogo.url} alt="DueChat" className="h-8 w-auto object-contain" />
           </a>
           <div className="flex items-center gap-1">
             {isAdmin ? (
@@ -252,7 +246,9 @@ export function Sidebar({
             onClick={() => setCategory(null)}
             className={cn(
               "rounded-full px-2.5 py-1 text-[11px] font-medium",
-              category === null ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground",
+              category === null
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-muted-foreground",
             )}
           >
             All
@@ -263,7 +259,9 @@ export function Sidebar({
               onClick={() => setCategory(c === category ? null : c)}
               className={cn(
                 "rounded-full px-2.5 py-1 text-[11px] font-medium",
-                category === c ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground",
+                category === c
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-muted-foreground",
               )}
             >
               {c}
@@ -272,74 +270,78 @@ export function Sidebar({
         </div>
 
         {groups.map((group) => (
-        <section key={group.category}>
-        <h2 className="flex items-center justify-between px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-          <span>{group.category}</span>
-          <span className="font-normal normal-case">{group.rooms.length}</span>
-        </h2>
-        <nav aria-label={`${group.category} rooms`}>
-          {group.rooms.map((room) => {
-            const members = memberships.filter((m) => m.room_id === room.id);
-            const joined = members.some((m) => m.user_id === me?.id);
-            const onlineCount = members.filter((m) =>
-              profiles.some((p) => p.id === m.user_id && isOnline(p)),
-            ).length;
-            return (
-              <Link
-                key={room.id}
-                to="/chat/$roomId"
-                params={{ roomId: room.id }}
-                className={cn(
-                  "flex items-center gap-3 rounded-2xl px-3 py-3 transition-colors",
-                  room.id === activeRoomId ? "bg-accent" : "hover:bg-secondary",
-                )}
-              >
-                {room.icon_url ? (
-                  <span className="relative inline-flex shrink-0">
-                    <img
-                      src={room.icon_url}
-                      alt={`${room.name} icon`}
-                      loading="lazy"
-                      className="size-11 rounded-2xl object-cover"
-                    />
-                    {onlineCount > 0 ? (
-                      <span
-                        className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-card bg-online"
-                        aria-hidden
-                      />
-                    ) : null}
-                  </span>
-                ) : (
-                  <Avatar name={room.name} accent={accentFor(room.id)} online={onlineCount > 0} />
-                )}
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-baseline justify-between gap-2">
-                    <span className="flex min-w-0 items-center gap-1.5">
-                      <span className="truncate text-sm font-semibold">{room.name}</span>
-                      <RatingBadge rating={room.rating} />
-                      {room.staff_only ? (
-                        <span className="shrink-0 rounded-full bg-staff/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-staff">
-                          Staff
-                        </span>
-                      ) : null}
-                    </span>
-                    {joined ? null : (
-                      <span className="shrink-0 rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-medium text-primary">
-                        Join
-                      </span>
+          <section key={group.category}>
+            <h2 className="flex items-center justify-between px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <span>{group.category}</span>
+              <span className="font-normal normal-case">{group.rooms.length}</span>
+            </h2>
+            <nav aria-label={`${group.category} rooms`}>
+              {group.rooms.map((room) => {
+                const members = memberships.filter((m) => m.room_id === room.id);
+                const joined = members.some((m) => m.user_id === me?.id);
+                const onlineCount = members.filter((m) =>
+                  profiles.some((p) => p.id === m.user_id && isOnline(p)),
+                ).length;
+                return (
+                  <Link
+                    key={room.id}
+                    to="/chat/$roomId"
+                    params={{ roomId: room.id }}
+                    className={cn(
+                      "flex items-center gap-3 rounded-2xl px-3 py-3 transition-colors",
+                      room.id === activeRoomId ? "bg-accent" : "hover:bg-secondary",
                     )}
-                  </span>
-                  <span className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
-                    <Users className="size-3" aria-hidden />
-                    {members.length} {members.length === 1 ? "member" : "members"}
-                    {onlineCount > 0 ? ` · ${onlineCount} online` : ""}
-                  </span>
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
-        </section>
+                  >
+                    {room.icon_url ? (
+                      <span className="relative inline-flex shrink-0">
+                        <img
+                          src={room.icon_url}
+                          alt={`${room.name} icon`}
+                          loading="lazy"
+                          className="size-11 rounded-2xl object-cover"
+                        />
+                        {onlineCount > 0 ? (
+                          <span
+                            className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-card bg-online"
+                            aria-hidden
+                          />
+                        ) : null}
+                      </span>
+                    ) : (
+                      <Avatar
+                        name={room.name}
+                        accent={accentFor(room.id)}
+                        online={onlineCount > 0}
+                      />
+                    )}
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-baseline justify-between gap-2">
+                        <span className="flex min-w-0 items-center gap-1.5">
+                          <span className="truncate text-sm font-semibold">{room.name}</span>
+                          <RatingBadge rating={room.rating} />
+                          {room.staff_only ? (
+                            <span className="shrink-0 rounded-full bg-staff/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-staff">
+                              Staff
+                            </span>
+                          ) : null}
+                        </span>
+                        {joined ? null : (
+                          <span className="shrink-0 rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-medium text-primary">
+                            Join
+                          </span>
+                        )}
+                      </span>
+                      <span className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
+                        <Users className="size-3" aria-hidden />
+                        {members.length} {members.length === 1 ? "member" : "members"}
+                        {onlineCount > 0 ? ` · ${onlineCount} online` : ""}
+                      </span>
+                    </span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </section>
         ))}
         <nav aria-label="Room results">
           {visible.length === 0 ? (
@@ -357,51 +359,53 @@ export function Sidebar({
             {onlineOthers.map((p) => {
               const pRole = siteRoleOf(roles, p.id);
               return (
-              <li key={p.id}>
-                <button
-                  onClick={() => void openDirect(p.id)}
-                  disabled={dmPending === p.id}
-                  aria-label={`Message ${p.display_name}`}
-                  className="flex w-full items-center gap-3 rounded-2xl px-1 py-1.5 text-left hover:bg-secondary disabled:opacity-60"
-                >
-                  <Avatar
-                    name={p.display_name}
-                    accent={accentFor(p.id)}
-                    avatarPath={p.avatar_url}
-                    online
-                    size="sm"
-                  />
-                  <span className="min-w-0">
-                    <span className="flex min-w-0 items-center gap-1.5">
-                      <span
-                        className={cn("truncate text-sm", siteRoleTextClass(pRole))}
-                        style={nameColorStyle(pRole, p.name_color)}
-                      >
-                        {p.display_name}
-                      </span>
-                      {siteRoleLabel(pRole) ? (
+                <li key={p.id}>
+                  <button
+                    onClick={() => void openDirect(p.id)}
+                    disabled={dmPending === p.id}
+                    aria-label={`Message ${p.display_name}`}
+                    className="flex w-full items-center gap-3 rounded-2xl px-1 py-1.5 text-left hover:bg-secondary disabled:opacity-60"
+                  >
+                    <Avatar
+                      name={p.display_name}
+                      accent={accentFor(p.id)}
+                      avatarPath={p.avatar_url}
+                      online
+                      size="sm"
+                    />
+                    <span className="min-w-0">
+                      <span className="flex min-w-0 items-center gap-1.5">
                         <span
-                          className={cn(
-                            "shrink-0 rounded-full px-1.5 py-px text-[11px] font-semibold uppercase tracking-wide",
-                            siteRoleBadgeClass(pRole),
-                          )}
+                          className={cn("truncate text-sm", siteRoleTextClass(pRole))}
+                          style={nameColorStyle(pRole, p.name_color)}
                         >
-                          {siteRoleLabel(pRole)}
+                          {p.display_name}
                         </span>
-                      ) : null}
+                        {siteRoleLabel(pRole) ? (
+                          <span
+                            className={cn(
+                              "shrink-0 rounded-full px-1.5 py-px text-[11px] font-semibold uppercase tracking-wide",
+                              siteRoleBadgeClass(pRole),
+                            )}
+                          >
+                            {siteRoleLabel(pRole)}
+                          </span>
+                        ) : null}
+                      </span>
+                      <span className="block truncate text-xs text-muted-foreground">
+                        {dmPending === p.id
+                          ? "Opening chat…"
+                          : p.status_message || `@${p.username}`}
+                      </span>
                     </span>
-                    <span className="block truncate text-xs text-muted-foreground">
-                      {dmPending === p.id
-                        ? "Opening chat…"
-                        : p.status_message || `@${p.username}`}
-                    </span>
-                  </span>
-                </button>
-              </li>
+                  </button>
+                </li>
               );
             })}
             {onlineOthers.length === 0 ? (
-              <li className="py-2 text-xs text-muted-foreground">Nobody else is online right now.</li>
+              <li className="py-2 text-xs text-muted-foreground">
+                Nobody else is online right now.
+              </li>
             ) : null}
           </ul>
         </section>

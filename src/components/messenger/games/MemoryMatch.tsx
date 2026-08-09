@@ -58,9 +58,7 @@ export function MemoryMatch() {
     }
     setLock(true);
     window.setTimeout(() => {
-      setCards((prev) =>
-        prev.map((c, i) => (i === a || i === b ? { ...c, flipped: false } : c)),
-      );
+      setCards((prev) => prev.map((c, i) => (i === a || i === b ? { ...c, flipped: false } : c)));
       setPicked([]);
       setLock(false);
     }, 700);

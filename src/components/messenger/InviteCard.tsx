@@ -67,7 +67,11 @@ export function InviteCard({ userId }: { userId: string }) {
           disabled={!url}
           className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2.5 text-sm font-medium disabled:opacity-50"
         >
-          {copied ? <Check className="size-4" aria-hidden /> : <Copy className="size-4" aria-hidden />}
+          {copied ? (
+            <Check className="size-4" aria-hidden />
+          ) : (
+            <Copy className="size-4" aria-hidden />
+          )}
           {copied ? "Copied" : "Copy"}
         </button>
         <button
@@ -81,7 +85,9 @@ export function InviteCard({ userId }: { userId: string }) {
         </button>
       </div>
       <p className="mt-2 text-[11px] text-muted-foreground" aria-live="polite">
-        {joined === 1 ? "1 person has joined from your link." : `${joined} people have joined from your link.`}
+        {joined === 1
+          ? "1 person has joined from your link."
+          : `${joined} people have joined from your link.`}
       </p>
     </section>
   );

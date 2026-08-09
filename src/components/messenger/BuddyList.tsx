@@ -56,9 +56,7 @@ export function BuddyList({
     const term = search.trim().toLowerCase();
     return profiles
       .filter((p) => p.id !== me?.id && !buddyIds.has(p.id))
-      .filter((p) =>
-        term ? (p.display_name + p.username).toLowerCase().includes(term) : true,
-      )
+      .filter((p) => (term ? (p.display_name + p.username).toLowerCase().includes(term) : true))
       .slice(0, 8);
   }, [profiles, buddyIds, me?.id, search]);
 
@@ -161,84 +159,84 @@ export function BuddyList({
               </li>
             ) : null,
             ...g.people.map((p) => {
-            const role = siteRoleOf(roles, p.id);
-            const online = isOnline(p);
-            return (
-              <li key={p.id} className="group flex items-center gap-1 pr-2">
-                <button
-                  onClick={() => void openDirect(p.id)}
-                  disabled={dmPending === p.id}
-                  aria-label={`Message ${p.display_name}`}
-                  className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl px-3 py-2 text-left hover:bg-secondary disabled:opacity-60"
-                >
-                  <Avatar
-                    name={p.display_name}
-                    accent={accentFor(p.id)}
-                    avatarPath={p.avatar_url}
-                    online={online}
-                    size="sm"
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="flex min-w-0 items-center gap-1.5">
-                      {countryFlag(p.country) ? (
-                        <span
-                          className="shrink-0 text-sm leading-none"
-                          role="img"
-                          aria-label={`Flag of ${p.country}`}
-                          title={p.country ?? undefined}
-                        >
-                          {countryFlag(p.country)}
-                        </span>
-                      ) : null}
-                      <span
-                        className={cn(
-                          "truncate text-sm font-medium",
-                          online ? siteRoleTextClass(role) : "text-muted-foreground",
-                        )}
-                        style={online ? nameColorStyle(role, p.name_color) : undefined}
-                      >
-                        {p.display_name}
-                      </span>
-                      {decorationGlyph(p.decoration) ? (
-                        <span
-                          className="shrink-0 text-sm leading-none"
-                          role="img"
-                          aria-label={decorationLabel(p.decoration) ?? undefined}
-                          title={decorationLabel(p.decoration) ?? undefined}
-                        >
-                          {decorationGlyph(p.decoration)}
-                        </span>
-                      ) : null}
-                      {siteRoleLabel(role) ? (
+              const role = siteRoleOf(roles, p.id);
+              const online = isOnline(p);
+              return (
+                <li key={p.id} className="group flex items-center gap-1 pr-2">
+                  <button
+                    onClick={() => void openDirect(p.id)}
+                    disabled={dmPending === p.id}
+                    aria-label={`Message ${p.display_name}`}
+                    className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl px-3 py-2 text-left hover:bg-secondary disabled:opacity-60"
+                  >
+                    <Avatar
+                      name={p.display_name}
+                      accent={accentFor(p.id)}
+                      avatarPath={p.avatar_url}
+                      online={online}
+                      size="sm"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="flex min-w-0 items-center gap-1.5">
+                        {countryFlag(p.country) ? (
+                          <span
+                            className="shrink-0 text-sm leading-none"
+                            role="img"
+                            aria-label={`Flag of ${p.country}`}
+                            title={p.country ?? undefined}
+                          >
+                            {countryFlag(p.country)}
+                          </span>
+                        ) : null}
                         <span
                           className={cn(
-                            "shrink-0 rounded-full px-1.5 py-px text-[11px] font-semibold uppercase tracking-wide",
-                            siteRoleBadgeClass(role),
+                            "truncate text-sm font-medium",
+                            online ? siteRoleTextClass(role) : "text-muted-foreground",
                           )}
+                          style={online ? nameColorStyle(role, p.name_color) : undefined}
                         >
-                          {siteRoleLabel(role)}
+                          {p.display_name}
                         </span>
-                      ) : null}
+                        {decorationGlyph(p.decoration) ? (
+                          <span
+                            className="shrink-0 text-sm leading-none"
+                            role="img"
+                            aria-label={decorationLabel(p.decoration) ?? undefined}
+                            title={decorationLabel(p.decoration) ?? undefined}
+                          >
+                            {decorationGlyph(p.decoration)}
+                          </span>
+                        ) : null}
+                        {siteRoleLabel(role) ? (
+                          <span
+                            className={cn(
+                              "shrink-0 rounded-full px-1.5 py-px text-[11px] font-semibold uppercase tracking-wide",
+                              siteRoleBadgeClass(role),
+                            )}
+                          >
+                            {siteRoleLabel(role)}
+                          </span>
+                        ) : null}
+                      </span>
+                      <span className="block truncate text-xs text-muted-foreground">
+                        {dmPending === p.id
+                          ? "Opening chat…"
+                          : online
+                            ? p.status_message || "Online"
+                            : "Offline"}
+                      </span>
                     </span>
-                    <span className="block truncate text-xs text-muted-foreground">
-                      {dmPending === p.id
-                        ? "Opening chat…"
-                        : online
-                          ? p.status_message || "Online"
-                          : "Offline"}
-                    </span>
-                  </span>
-                  <MessageCircle className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-                </button>
-                <button
-                  onClick={() => void remove(p.id, p.display_name)}
-                  aria-label={`Remove ${p.display_name} from buddies`}
-                  className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-secondary hover:text-destructive"
-                >
-                  <UserMinus className="size-4" />
-                </button>
-              </li>
-            );
+                    <MessageCircle className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                  </button>
+                  <button
+                    onClick={() => void remove(p.id, p.display_name)}
+                    aria-label={`Remove ${p.display_name} from buddies`}
+                    className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-secondary hover:text-destructive"
+                  >
+                    <UserMinus className="size-4" />
+                  </button>
+                </li>
+              );
             }),
           ])}
           {buddyProfiles.length === 0 ? (

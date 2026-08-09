@@ -286,12 +286,18 @@ export function MemberList({
                       {isListedAdmin(p.id) ? (
                         <>
                           {tierOf(p.id) === "super" ? (
-                            <button onClick={() => onSetTier(p.id, "admin")} className={actionClass}>
+                            <button
+                              onClick={() => onSetTier(p.id, "admin")}
+                              className={actionClass}
+                            >
                               <ShieldCheck className="size-3" />
                               Make room admin
                             </button>
                           ) : (
-                            <button onClick={() => onSetTier(p.id, "super")} className={actionClass}>
+                            <button
+                              onClick={() => onSetTier(p.id, "super")}
+                              className={actionClass}
+                            >
                               <ShieldPlus className="size-3" />
                               Make super admin
                             </button>

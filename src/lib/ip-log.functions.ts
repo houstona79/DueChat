@@ -4,9 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 function clientIp(headers: Headers): string | null {
   const direct =
-    headers.get("cf-connecting-ip") ??
-    headers.get("x-real-ip") ??
-    headers.get("true-client-ip");
+    headers.get("cf-connecting-ip") ?? headers.get("x-real-ip") ?? headers.get("true-client-ip");
   if (direct) return direct.trim();
   const forwarded = headers.get("x-forwarded-for");
   const first = forwarded?.split(",")[0]?.trim();

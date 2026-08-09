@@ -101,9 +101,7 @@ export async function fetchUpdateReports(): Promise<UpdateReport[]> {
     update_body: r.profile_updates?.body ?? null,
     update_author_id: r.profile_updates?.user_id ?? null,
     reporter_name: names.get(r.reporter_id) ?? null,
-    author_name: r.profile_updates?.user_id
-      ? names.get(r.profile_updates.user_id) ?? null
-      : null,
+    author_name: r.profile_updates?.user_id ? (names.get(r.profile_updates.user_id) ?? null) : null,
   }));
 }
 

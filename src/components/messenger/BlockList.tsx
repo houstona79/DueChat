@@ -35,7 +35,10 @@ export function BlockList({ meId }: { meId: string }) {
         Blocked people can't be seen in your chats — their messages are hidden from you.
       </p>
 
-      <label htmlFor="block-search" className="mt-3 block text-[11px] font-medium text-muted-foreground">
+      <label
+        htmlFor="block-search"
+        className="mt-3 block text-[11px] font-medium text-muted-foreground"
+      >
         Block someone
       </label>
       <input
@@ -63,10 +66,17 @@ export function BlockList({ meId }: { meId: string }) {
                 }}
                 className="flex w-full items-center gap-2 rounded-xl px-2 py-1.5 text-left hover:bg-secondary"
               >
-                <Avatar name={p.display_name} accent={accentFor(p.id)} avatarPath={p.avatar_url} size="sm" />
+                <Avatar
+                  name={p.display_name}
+                  accent={accentFor(p.id)}
+                  avatarPath={p.avatar_url}
+                  size="sm"
+                />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm">{p.display_name}</span>
-                  <span className="block truncate text-xs text-muted-foreground">@{p.username}</span>
+                  <span className="block truncate text-xs text-muted-foreground">
+                    @{p.username}
+                  </span>
                 </span>
                 <UserX className="size-4 shrink-0 text-destructive" aria-hidden />
               </button>
@@ -78,7 +88,12 @@ export function BlockList({ meId }: { meId: string }) {
       <ul className="mt-3 space-y-1">
         {blocked.map((p) => (
           <li key={p.id} className="flex items-center gap-2 rounded-xl bg-secondary/50 px-2 py-1.5">
-            <Avatar name={p.display_name} accent={accentFor(p.id)} avatarPath={p.avatar_url} size="sm" />
+            <Avatar
+              name={p.display_name}
+              accent={accentFor(p.id)}
+              avatarPath={p.avatar_url}
+              size="sm"
+            />
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm">{p.display_name}</span>
               <span className="block truncate text-xs text-muted-foreground">@{p.username}</span>

@@ -25,7 +25,10 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   return (
-    <main id="main-content" className="relative grid min-h-screen place-items-center px-6 py-16 text-center">
+    <main
+      id="main-content"
+      className="relative grid min-h-screen place-items-center px-6 py-16 text-center"
+    >
       <img
         src={peopleBg.url}
         alt="People chatting on laptops, tablets and phones"
@@ -49,8 +52,8 @@ function Landing() {
           />
         </a>
         <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground">
-          Chat rooms with real accounts, live online status and one-tap voice or video calls — synced
-          across every device you sign in on.
+          Chat rooms with real accounts, live online status and one-tap voice or video calls —
+          synced across every device you sign in on.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link

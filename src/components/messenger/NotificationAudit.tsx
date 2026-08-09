@@ -21,7 +21,11 @@ async function fetchAllNotifications() {
 export function NotificationAudit() {
   const [search, setSearch] = useState("");
 
-  const { data: items = [], isLoading, error } = useQuery({
+  const {
+    data: items = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["admin-notifications"],
     queryFn: fetchAllNotifications,
     refetchInterval: 30_000,
@@ -44,7 +48,8 @@ export function NotificationAudit() {
     );
   }, [items, search, profiles]);
 
-  if (isLoading) return <p className="mt-5 text-sm text-muted-foreground">Loading notifications…</p>;
+  if (isLoading)
+    return <p className="mt-5 text-sm text-muted-foreground">Loading notifications…</p>;
   if (error) {
     return <p className="mt-5 text-sm text-destructive">Could not load notifications.</p>;
   }

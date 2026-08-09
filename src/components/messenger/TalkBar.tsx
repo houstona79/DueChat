@@ -71,7 +71,9 @@ export function TalkBar({
 
   const liveCams = participants.filter((p) => {
     const tracks = p.stream?.getVideoTracks() ?? [];
-    return tracks.length > 0 && (p.camOn || tracks.some((t) => t.readyState === "live" && !t.muted));
+    return (
+      tracks.length > 0 && (p.camOn || tracks.some((t) => t.readyState === "live" && !t.muted))
+    );
   }).length;
 
   const micLevel = useMicLevel(localStream, true);
@@ -172,137 +174,139 @@ export function TalkBar({
 
   return (
     <>
-    <section
-      aria-label="Room voice"
-      className="relative flex shrink-0 flex-wrap items-center gap-2 border-b border-border bg-sidebar/70 px-3 py-2"
-    >
-      <button
-        type="button"
-        onPointerDown={press}
-        onTouchStart={(e) => {
-          e.preventDefault();
-          press();
-        }}
-        onTouchEnd={(e) => {
-          e.preventDefault();
-          setHeld(false);
-        }}
-        onTouchCancel={() => setHeld(false)}
-        onMouseDown={press}
-        onMouseUp={() => setHeld(false)}
-        onContextMenu={(e) => e.preventDefault()}
-        onKeyDown={(e) => {
-          if (isSpaceKey(e) || e.key === "Enter") press();
-        }}
-        onKeyUp={(e) => {
-          if (isSpaceKey(e) || e.key === "Enter") setHeld(false);
-        }}
-        aria-label={
-          pushToTalk ? (live ? "Microphone open" : "Hold to talk") : "Microphone always open"
-        }
-        aria-pressed={live}
-        title={pushToTalk ? "Hold Space or click to talk" : "Open microphone mode"}
-        className={cn(
-          "flex h-11 touch-none select-none items-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors active:scale-95 [-webkit-touch-callout:none] [-webkit-user-select:none]",
-          live
-            ? "bg-primary text-primary-foreground"
-            : "bg-secondary text-foreground hover:bg-secondary/80",
-          !pushToTalk && "cursor-default",
-        )}
+      <section
+        aria-label="Room voice"
+        className="relative flex shrink-0 flex-wrap items-center gap-2 border-b border-border bg-sidebar/70 px-3 py-2"
       >
-        {live ? <Mic className="size-4" /> : <MicOff className="size-4" />}
-        {live ? "On air" : pushToTalk ? "Hold to talk" : "Mic open"}
-      </button>
+        <button
+          type="button"
+          onPointerDown={press}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            press();
+          }}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            setHeld(false);
+          }}
+          onTouchCancel={() => setHeld(false)}
+          onMouseDown={press}
+          onMouseUp={() => setHeld(false)}
+          onContextMenu={(e) => e.preventDefault()}
+          onKeyDown={(e) => {
+            if (isSpaceKey(e) || e.key === "Enter") press();
+          }}
+          onKeyUp={(e) => {
+            if (isSpaceKey(e) || e.key === "Enter") setHeld(false);
+          }}
+          aria-label={
+            pushToTalk ? (live ? "Microphone open" : "Hold to talk") : "Microphone always open"
+          }
+          aria-pressed={live}
+          title={pushToTalk ? "Hold Space or click to talk" : "Open microphone mode"}
+          className={cn(
+            "flex h-11 touch-none select-none items-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors active:scale-95 [-webkit-touch-callout:none] [-webkit-user-select:none]",
+            live
+              ? "bg-primary text-primary-foreground"
+              : "bg-secondary text-foreground hover:bg-secondary/80",
+            !pushToTalk && "cursor-default",
+          )}
+        >
+          {live ? <Mic className="size-4" /> : <MicOff className="size-4" />}
+          {live ? "On air" : pushToTalk ? "Hold to talk" : "Mic open"}
+        </button>
 
-      <MicLevelMeter level={micLevel} active={live} />
+        <MicLevelMeter level={micLevel} active={live} />
 
-      <button
-        type="button"
-        onClick={() => {
-          unlockAudioPlayback();
-          setPushToTalk((v) => {
-            const next = !v;
-            if (typeof window !== "undefined") {
-              window.localStorage.setItem("duechat:ptt", String(next));
-            }
-            return next;
-          });
-        }}
-        aria-label={pushToTalk ? "Switch to open microphone" : "Switch to push-to-talk"}
-        aria-pressed={pushToTalk}
-        className={cn(
-          "grid size-10 place-items-center rounded-xl",
-          pushToTalk ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
-        )}
-        title={pushToTalk ? "Push-to-talk on" : "Open mic on"}
-      >
-        {pushToTalk ? <Hand className="size-4" /> : <Radio className="size-4" />}
-      </button>
+        <button
+          type="button"
+          onClick={() => {
+            unlockAudioPlayback();
+            setPushToTalk((v) => {
+              const next = !v;
+              if (typeof window !== "undefined") {
+                window.localStorage.setItem("duechat:ptt", String(next));
+              }
+              return next;
+            });
+          }}
+          aria-label={pushToTalk ? "Switch to open microphone" : "Switch to push-to-talk"}
+          aria-pressed={pushToTalk}
+          className={cn(
+            "grid size-10 place-items-center rounded-xl",
+            pushToTalk ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+          )}
+          title={pushToTalk ? "Push-to-talk on" : "Open mic on"}
+        >
+          {pushToTalk ? <Hand className="size-4" /> : <Radio className="size-4" />}
+        </button>
 
-      <AudioDeviceMenu
-        mics={mics}
-        speakers={speakers}
-        micId={micId}
-        speakerId={speakerId}
-        onMicChange={setMicId}
-        onSpeakerChange={setSpeakerId}
-        onOpen={() => void refresh()}
-      />
+        <AudioDeviceMenu
+          mics={mics}
+          speakers={speakers}
+          micId={micId}
+          speakerId={speakerId}
+          onMicChange={setMicId}
+          onSpeakerChange={setSpeakerId}
+          onOpen={() => void refresh()}
+        />
 
-      <button
-        type="button"
-        onClick={() => onCamsOpenChange(!camsOpen)}
-        aria-label="Show room cameras"
-        aria-pressed={camsOpen}
-        title="Cams"
-        className={cn(
-          "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
-          camsOpen || camOn ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
-        )}
-      >
-        <Video className="size-4" />
-        Cams{liveCams + (camOn ? 1 : 0) > 0 ? ` ${liveCams + (camOn ? 1 : 0)}` : ""}
-      </button>
+        <button
+          type="button"
+          onClick={() => onCamsOpenChange(!camsOpen)}
+          aria-label="Show room cameras"
+          aria-pressed={camsOpen}
+          title="Cams"
+          className={cn(
+            "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
+            camsOpen || camOn
+              ? "bg-primary/15 text-primary"
+              : "text-muted-foreground hover:bg-secondary",
+          )}
+        >
+          <Video className="size-4" />
+          Cams{liveCams + (camOn ? 1 : 0) > 0 ? ` ${liveCams + (camOn ? 1 : 0)}` : ""}
+        </button>
 
-      <button
-        type="button"
-        onClick={() => setSpeaker((v) => !v)}
-        aria-label={speaker ? "Mute room sound" : "Unmute room sound"}
-        aria-pressed={speaker}
-        className="grid size-10 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
-      >
-        {speaker ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
-      </button>
+        <button
+          type="button"
+          onClick={() => setSpeaker((v) => !v)}
+          aria-label={speaker ? "Mute room sound" : "Unmute room sound"}
+          aria-pressed={speaker}
+          className="grid size-10 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+        >
+          {speaker ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
+        </button>
 
-      <p className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
-        {mediaError ??
-          (participants.length === 0
-            ? "You're on the mic — waiting for others to join."
-            : `${participants.length + 1} on the mic${
-                participants.filter((p) => !p.muted).length > 0
-                  ? ` · ${participants
-                      .filter((p) => !p.muted)
-                      .map((p) => p.name)
-                      .join(", ")} talking`
-                  : ""
-              }`)}
-      </p>
+        <p className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+          {mediaError ??
+            (participants.length === 0
+              ? "You're on the mic — waiting for others to join."
+              : `${participants.length + 1} on the mic${
+                  participants.filter((p) => !p.muted).length > 0
+                    ? ` · ${participants
+                        .filter((p) => !p.muted)
+                        .map((p) => p.name)
+                        .join(", ")} talking`
+                    : ""
+                }`)}
+        </p>
 
-      <button
-        type="button"
-        onClick={onLeave}
-        aria-label="Leave room voice"
-        className="grid size-10 shrink-0 place-items-center rounded-xl bg-destructive text-destructive-foreground"
-      >
-        <PhoneOff className="size-4" />
-      </button>
+        <button
+          type="button"
+          onClick={onLeave}
+          aria-label="Leave room voice"
+          className="grid size-10 shrink-0 place-items-center rounded-xl bg-destructive text-destructive-foreground"
+        >
+          <PhoneOff className="size-4" />
+        </button>
 
-      {participants.map((peer) => (
-        <PeerAudio key={peer.userId} peer={peer} speaker={speaker} speakerId={speakerId} />
-      ))}
-    </section>
+        {participants.map((peer) => (
+          <PeerAudio key={peer.userId} peer={peer} speaker={speaker} speakerId={speakerId} />
+        ))}
+      </section>
 
-    <CamPanel
+      <CamPanel
         open={camsOpen}
         onClose={() => onCamsOpenChange(false)}
         myName={myName}

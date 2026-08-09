@@ -100,7 +100,8 @@ export function ProfileFeed({
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "profile_update_reactions" },
-        () => void queryClient.invalidateQueries({ queryKey: ["profile-update-reactions", userId] }),
+        () =>
+          void queryClient.invalidateQueries({ queryKey: ["profile-update-reactions", userId] }),
       )
       .subscribe();
     return () => {
@@ -116,7 +117,8 @@ export function ProfileFeed({
       setError(null);
       return invalidate();
     },
-    onError: (e: unknown) => setError(e instanceof Error ? e.message : "Couldn’t post that update."),
+    onError: (e: unknown) =>
+      setError(e instanceof Error ? e.message : "Couldn’t post that update."),
   });
 
   const remove = useMutation({
@@ -343,7 +345,8 @@ export function ProfileFeed({
                       <div className="absolute bottom-9 left-0 z-20 flex gap-1 rounded-2xl border border-border bg-popover p-1.5 shadow-lg">
                         {REACTION_EMOJIS.map((emoji) => {
                           const mine = reactions.some(
-                            (r) => r.update_id === u.id && r.emoji === emoji && r.user_id === user.id,
+                            (r) =>
+                              r.update_id === u.id && r.emoji === emoji && r.user_id === user.id,
                           );
                           return (
                             <button
@@ -378,10 +381,16 @@ export function ProfileFeed({
                         onClick={() => pin.mutate({ id: u.id, pinned: !u.pinned_at })}
                         aria-label={u.pinned_at ? "Unpin update" : "Pin update"}
                         className={`grid size-8 place-items-center rounded-lg hover:bg-background ${
-                          u.pinned_at ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                          u.pinned_at
+                            ? "text-primary"
+                            : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
-                        {u.pinned_at ? <PinOff className="size-3.5" /> : <Pin className="size-3.5" />}
+                        {u.pinned_at ? (
+                          <PinOff className="size-3.5" />
+                        ) : (
+                          <Pin className="size-3.5" />
+                        )}
                       </button>
                       <button
                         type="button"
@@ -440,7 +449,9 @@ export function ProfileFeed({
                     </label>
                     <textarea
                       value={reportDetails}
-                      onChange={(e) => setReportDetails(e.target.value.slice(0, MAX_REPORT_DETAILS))}
+                      onChange={(e) =>
+                        setReportDetails(e.target.value.slice(0, MAX_REPORT_DETAILS))
+                      }
                       rows={2}
                       placeholder="Anything else moderators should know? (optional)"
                       aria-label="Additional details for moderators"

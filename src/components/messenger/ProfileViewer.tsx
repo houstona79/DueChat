@@ -94,10 +94,7 @@ export function ProfileViewer() {
   const visibility = profile?.profile_visibility ?? "public";
   const isMyBuddy = myBuddies.some((b) => b.buddy_id === userId);
   const canViewDetails =
-    isMe ||
-    isStaffViewer ||
-    visibility === "public" ||
-    (visibility === "buddies" && isMyBuddy);
+    isMe || isStaffViewer || visibility === "public" || (visibility === "buddies" && isMyBuddy);
 
   return (
     <div
@@ -185,7 +182,11 @@ export function ProfileViewer() {
               {profile.country ? (
                 <p className="flex items-center gap-2 text-xs text-muted-foreground">
                   {countryFlag(profile.country) ? (
-                    <span className="text-base leading-none" role="img" aria-label={`Flag of ${profile.country}`}>
+                    <span
+                      className="text-base leading-none"
+                      role="img"
+                      aria-label={`Flag of ${profile.country}`}
+                    >
                       {countryFlag(profile.country)}
                     </span>
                   ) : (
@@ -214,7 +215,9 @@ export function ProfileViewer() {
                   className="flex items-center gap-2 text-xs text-primary hover:underline"
                 >
                   <Globe className="size-3.5 shrink-0" aria-hidden />
-                  <span className="truncate">{profile.website_url.replace(/^https?:\/\//, "")}</span>
+                  <span className="truncate">
+                    {profile.website_url.replace(/^https?:\/\//, "")}
+                  </span>
                 </a>
               ) : null}
               {isAdultProfile(profile) ? (

@@ -50,13 +50,17 @@ function ResetPasswordPage() {
   };
 
   return (
-    <main id="main-content" className="mx-auto grid min-h-dvh max-w-md place-items-center px-4 py-10">
+    <main
+      id="main-content"
+      className="mx-auto grid min-h-dvh max-w-md place-items-center px-4 py-10"
+    >
       <form onSubmit={submit} className="w-full rounded-3xl border border-border bg-card p-6">
         <h1 className="text-xl font-semibold">Choose a new password</h1>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Enter a new password for your account.
-        </p>
-        <label htmlFor="new-password" className="mt-5 block text-[11px] font-medium text-muted-foreground">
+        <p className="mt-1 text-xs text-muted-foreground">Enter a new password for your account.</p>
+        <label
+          htmlFor="new-password"
+          className="mt-5 block text-[11px] font-medium text-muted-foreground"
+        >
           New password
         </label>
         <input
@@ -67,7 +71,10 @@ function ResetPasswordPage() {
           onChange={(e) => setPassword(e.target.value)}
           className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none"
         />
-        <label htmlFor="confirm-password" className="mt-3 block text-[11px] font-medium text-muted-foreground">
+        <label
+          htmlFor="confirm-password"
+          className="mt-3 block text-[11px] font-medium text-muted-foreground"
+        >
           Confirm password
         </label>
         <input

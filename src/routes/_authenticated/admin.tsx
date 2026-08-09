@@ -35,12 +35,7 @@ import {
   unbanUser,
 } from "@/lib/admin";
 import { fetchIpLog, sharedIps } from "@/lib/ip-log";
-import {
-  clearSessions,
-  deviceLabel,
-  fetchActiveSessions,
-  multiSessionUsers,
-} from "@/lib/sessions";
+import { clearSessions, deviceLabel, fetchActiveSessions, multiSessionUsers } from "@/lib/sessions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -141,11 +136,14 @@ function AdminPage() {
   );
   const isOwner = user?.id === OWNER_USER_ID;
 
-  const nameOf = (id: string) =>
-    data?.profiles.find((p) => p.id === id)?.display_name ?? "Unknown";
+  const nameOf = (id: string) => data?.profiles.find((p) => p.id === id)?.display_name ?? "Unknown";
 
   if (isLoading) {
-    return <Shell><p className="text-sm text-muted-foreground">Loading…</p></Shell>;
+    return (
+      <Shell>
+        <p className="text-sm text-muted-foreground">Loading…</p>
+      </Shell>
+    );
   }
 
   if (error || !data) {
@@ -210,165 +208,166 @@ function AdminPage() {
 
       {tab === "overview" && (
         <>
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          {stats.map((s) => (
-            <div key={s.label} className="rounded-2xl border border-border bg-card p-4">
-              <s.icon className="size-4 text-muted-foreground" />
-              <p className="mt-3 text-2xl font-semibold">{s.value}</p>
-              <p className="text-xs text-muted-foreground">{s.label}</p>
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            {stats.map((s) => (
+              <div key={s.label} className="rounded-2xl border border-border bg-card p-4">
+                <s.icon className="size-4 text-muted-foreground" />
+                <p className="mt-3 text-2xl font-semibold">{s.value}</p>
+                <p className="text-xs text-muted-foreground">{s.label}</p>
+              </div>
+            ))}
+            <div className="col-span-2 rounded-2xl border border-border bg-card p-4">
+              <p className="text-sm font-semibold">Direct conversations</p>
+              <p className="mt-1 text-2xl font-semibold">{data.rooms.length - groupRooms.length}</p>
             </div>
-          ))}
-          <div className="col-span-2 rounded-2xl border border-border bg-card p-4">
-            <p className="text-sm font-semibold">Direct conversations</p>
-            <p className="mt-1 text-2xl font-semibold">
-              {data.rooms.length - groupRooms.length}
-            </p>
           </div>
-        </div>
-        <h2 className="mt-6 text-sm font-semibold">Jump to a task</h2>
-        <div className="mt-2 grid gap-2 sm:grid-cols-2">
-          {(["users", "reports", "alerts", "bans", "sessions", "logs"] as Tab[]).map((t) => {
-            const m = TAB_META[t];
-            return (
-              <button
-                key={t}
-                type="button"
-                onClick={() => setTab(t)}
-                className="flex items-center gap-3 rounded-2xl border border-border bg-card px-3 py-3 text-left hover:bg-secondary"
-              >
-                <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary">
-                  <m.icon className="size-4" aria-hidden />
-                </span>
-                <span className="min-w-0">
-                  <span className="block truncate text-sm font-semibold">{m.label}</span>
-                  <span className="block truncate text-xs text-muted-foreground">{m.hint}</span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
+          <h2 className="mt-6 text-sm font-semibold">Jump to a task</h2>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            {(["users", "reports", "alerts", "bans", "sessions", "logs"] as Tab[]).map((t) => {
+              const m = TAB_META[t];
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setTab(t)}
+                  className="flex items-center gap-3 rounded-2xl border border-border bg-card px-3 py-3 text-left hover:bg-secondary"
+                >
+                  <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary">
+                    <m.icon className="size-4" aria-hidden />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-semibold">{m.label}</span>
+                    <span className="block truncate text-xs text-muted-foreground">{m.hint}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </>
       )}
 
       {tab === "users" && (
         <>
-        <label htmlFor="admin-user-search" className="sr-only">
-          Search members
-        </label>
-        <input
-          id="admin-user-search"
-          value={userSearch}
-          onChange={(e) => setUserSearch(e.target.value)}
-          placeholder="Search members by name or @username"
-          className="mt-5 w-full rounded-xl border border-border bg-secondary px-3 py-2.5 text-sm outline-none focus:border-primary"
-        />
-        <ul className="mt-3 space-y-2">
-          {data.profiles
-            .filter((p) => {
-              const q = userSearch.trim().toLowerCase();
-              if (!q) return true;
-              return (
-                p.display_name.toLowerCase().includes(q) || p.username.toLowerCase().includes(q)
-              );
-            })
-            .map((p) => {
-            const admin = data.roles.some((r) => r.user_id === p.id && r.role === "admin");
-            const moderator = data.roles.some(
-              (r) => r.user_id === p.id && r.role === "moderator",
-            );
-            const locked = p.id === OWNER_USER_ID || p.id === user?.id;
-            const banned = data.bans.some((b) => b.user_id === p.id);
-            return (
-              <li
-                key={p.id}
-                className="flex flex-wrap items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2.5"
-              >
-                <Avatar
-                  name={p.display_name}
-                  accent={accentFor(p.id)}
-                  avatarPath={p.avatar_url}
-                  online={isOnline(p)}
-                  size="sm"
-                />
-                <div className="min-w-0 flex-1 basis-40">
-                  <p className="truncate text-sm font-semibold">{p.display_name}</p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    @{p.username} · {isOnline(p) ? "Online" : `Seen ${formatTime(p.last_seen_at)}`}
-                  </p>
-                </div>
-                <button
-                  disabled={roleMutation.isPending || locked || !isOwner}
-                  title={
-                    p.id === OWNER_USER_ID
-                      ? "Owner account — admin access can’t be removed"
-                      : isOwner
-                        ? undefined
-                        : "Only the owner can assign admins"
-                  }
-                  onClick={() =>
-                    roleMutation.mutate({ userId: p.id, role: "admin", make: !admin })
-                  }
-                  className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold disabled:opacity-50 ${
-                    admin ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground"
-                  }`}
-                >
-                  {p.id === OWNER_USER_ID ? "Owner" : admin ? "Admin" : "Make admin"}
-                </button>
-                <button
-                  disabled={roleMutation.isPending || locked || admin}
-                  title={
-                    admin
-                      ? "Admins already have every moderator power"
-                      : moderator
-                        ? "Remove moderator role"
-                        : "Make this member a moderator"
-                  }
-                  onClick={() =>
-                    roleMutation.mutate({ userId: p.id, role: "moderator", make: !moderator })
-                  }
-                  className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold disabled:opacity-50 ${
-                    moderator ? "bg-accent/20 text-accent" : "bg-secondary text-muted-foreground"
-                  }`}
-                >
-                  {moderator ? "Moderator" : "Make mod"}
-                </button>
-                <button
-                  disabled={banMutation.isPending || locked || (admin && !banned)}
-                  title={
-                    locked
-                      ? "This account can’t be banned"
-                      : banned
-                        ? "Unban this member"
-                        : "Ban this member from DueChat"
-                  }
-                  onClick={() => banMutation.mutate({ userId: p.id, ban: !banned })}
-                  className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold disabled:opacity-50 ${
-                    banned
-                      ? "bg-destructive/15 text-destructive"
-                      : "bg-secondary text-muted-foreground"
-                  }`}
-                >
-                  {banned ? "Unban" : "Ban"}
-                </button>
-                <button
-                  disabled={kickMutation.isPending || locked || admin}
-                  title={
-                    locked
-                      ? "This account can’t be kicked"
-                      : admin
-                        ? "Admins can’t be kicked"
-                        : "Sign this member out of DueChat everywhere"
-                  }
-                  onClick={() => kickMutation.mutate({ userId: p.id, name: p.display_name })}
-                  className="flex shrink-0 items-center gap-1.5 rounded-xl bg-secondary px-3 py-1.5 text-xs font-semibold text-muted-foreground disabled:opacity-50"
-                >
-                  <LogOut className="size-3.5" />
-                  Kick
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+          <label htmlFor="admin-user-search" className="sr-only">
+            Search members
+          </label>
+          <input
+            id="admin-user-search"
+            value={userSearch}
+            onChange={(e) => setUserSearch(e.target.value)}
+            placeholder="Search members by name or @username"
+            className="mt-5 w-full rounded-xl border border-border bg-secondary px-3 py-2.5 text-sm outline-none focus:border-primary"
+          />
+          <ul className="mt-3 space-y-2">
+            {data.profiles
+              .filter((p) => {
+                const q = userSearch.trim().toLowerCase();
+                if (!q) return true;
+                return (
+                  p.display_name.toLowerCase().includes(q) || p.username.toLowerCase().includes(q)
+                );
+              })
+              .map((p) => {
+                const admin = data.roles.some((r) => r.user_id === p.id && r.role === "admin");
+                const moderator = data.roles.some(
+                  (r) => r.user_id === p.id && r.role === "moderator",
+                );
+                const locked = p.id === OWNER_USER_ID || p.id === user?.id;
+                const banned = data.bans.some((b) => b.user_id === p.id);
+                return (
+                  <li
+                    key={p.id}
+                    className="flex flex-wrap items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2.5"
+                  >
+                    <Avatar
+                      name={p.display_name}
+                      accent={accentFor(p.id)}
+                      avatarPath={p.avatar_url}
+                      online={isOnline(p)}
+                      size="sm"
+                    />
+                    <div className="min-w-0 flex-1 basis-40">
+                      <p className="truncate text-sm font-semibold">{p.display_name}</p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        @{p.username} ·{" "}
+                        {isOnline(p) ? "Online" : `Seen ${formatTime(p.last_seen_at)}`}
+                      </p>
+                    </div>
+                    <button
+                      disabled={roleMutation.isPending || locked || !isOwner}
+                      title={
+                        p.id === OWNER_USER_ID
+                          ? "Owner account — admin access can’t be removed"
+                          : isOwner
+                            ? undefined
+                            : "Only the owner can assign admins"
+                      }
+                      onClick={() =>
+                        roleMutation.mutate({ userId: p.id, role: "admin", make: !admin })
+                      }
+                      className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold disabled:opacity-50 ${
+                        admin ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground"
+                      }`}
+                    >
+                      {p.id === OWNER_USER_ID ? "Owner" : admin ? "Admin" : "Make admin"}
+                    </button>
+                    <button
+                      disabled={roleMutation.isPending || locked || admin}
+                      title={
+                        admin
+                          ? "Admins already have every moderator power"
+                          : moderator
+                            ? "Remove moderator role"
+                            : "Make this member a moderator"
+                      }
+                      onClick={() =>
+                        roleMutation.mutate({ userId: p.id, role: "moderator", make: !moderator })
+                      }
+                      className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold disabled:opacity-50 ${
+                        moderator
+                          ? "bg-accent/20 text-accent"
+                          : "bg-secondary text-muted-foreground"
+                      }`}
+                    >
+                      {moderator ? "Moderator" : "Make mod"}
+                    </button>
+                    <button
+                      disabled={banMutation.isPending || locked || (admin && !banned)}
+                      title={
+                        locked
+                          ? "This account can’t be banned"
+                          : banned
+                            ? "Unban this member"
+                            : "Ban this member from DueChat"
+                      }
+                      onClick={() => banMutation.mutate({ userId: p.id, ban: !banned })}
+                      className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold disabled:opacity-50 ${
+                        banned
+                          ? "bg-destructive/15 text-destructive"
+                          : "bg-secondary text-muted-foreground"
+                      }`}
+                    >
+                      {banned ? "Unban" : "Ban"}
+                    </button>
+                    <button
+                      disabled={kickMutation.isPending || locked || admin}
+                      title={
+                        locked
+                          ? "This account can’t be kicked"
+                          : admin
+                            ? "Admins can’t be kicked"
+                            : "Sign this member out of DueChat everywhere"
+                      }
+                      onClick={() => kickMutation.mutate({ userId: p.id, name: p.display_name })}
+                      className="flex shrink-0 items-center gap-1.5 rounded-xl bg-secondary px-3 py-1.5 text-xs font-semibold text-muted-foreground disabled:opacity-50"
+                    >
+                      <LogOut className="size-3.5" />
+                      Kick
+                    </button>
+                  </li>
+                );
+              })}
+          </ul>
         </>
       )}
 
@@ -397,8 +396,7 @@ function AdminPage() {
                     <li className="text-xs text-muted-foreground">Nobody has this role yet.</li>
                   )}
                   {holders.map((p) => {
-                    const canRemove =
-                      p.id !== OWNER_USER_ID && (role === "moderator" || isOwner);
+                    const canRemove = p.id !== OWNER_USER_ID && (role === "moderator" || isOwner);
                     return (
                       <li key={p.id} className="flex items-center gap-2">
                         <Avatar
@@ -423,9 +421,7 @@ function AdminPage() {
                                 ? `Remove ${role} role`
                                 : "Only the owner can remove admins"
                           }
-                          onClick={() =>
-                            roleMutation.mutate({ userId: p.id, role, make: false })
-                          }
+                          onClick={() => roleMutation.mutate({ userId: p.id, role, make: false })}
                           className="shrink-0 rounded-xl bg-secondary px-3 py-1.5 text-xs font-semibold text-muted-foreground disabled:opacity-50"
                         >
                           {p.id === OWNER_USER_ID ? "Owner" : "Remove"}
@@ -464,9 +460,7 @@ function AdminPage() {
                   })
                   .slice(0, 8)
                   .map((p) => {
-                    const admin = data.roles.some(
-                      (r) => r.user_id === p.id && r.role === "admin",
-                    );
+                    const admin = data.roles.some((r) => r.user_id === p.id && r.role === "admin");
                     const moderator = data.roles.some(
                       (r) => r.user_id === p.id && r.role === "moderator",
                     );
@@ -485,9 +479,7 @@ function AdminPage() {
                         </div>
                         <button
                           disabled={roleMutation.isPending || !isOwner || admin}
-                          title={
-                            isOwner ? "Assign Admin" : "Only the owner can assign admins"
-                          }
+                          title={isOwner ? "Assign Admin" : "Only the owner can assign admins"}
                           onClick={() =>
                             roleMutation.mutate({ userId: p.id, role: "admin", make: true })
                           }
@@ -517,9 +509,9 @@ function AdminPage() {
           <div className="rounded-2xl border border-border bg-card p-4">
             <p className="text-sm font-semibold">Multi-nick watch</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              DueChat allows one active session per member account. Accounts signed in from
-              more than one place right now are flagged here. Admins and moderators are
-              exempt and may use multiple sessions.
+              DueChat allows one active session per member account. Accounts signed in from more
+              than one place right now are flagged here. Admins and moderators are exempt and may
+              use multiple sessions.
             </p>
           </div>
 
@@ -593,9 +585,9 @@ function AdminPage() {
           <div className="rounded-2xl border border-border bg-card p-4">
             <p className="text-sm font-semibold">IP addresses</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Connection addresses recorded when members sign in, with VPN/proxy detection.
-              Members on a VPN are signed out automatically; admins and moderators are exempt.
-              Visible to admins only.
+              Connection addresses recorded when members sign in, with VPN/proxy detection. Members
+              on a VPN are signed out automatically; admins and moderators are exempt. Visible to
+              admins only.
             </p>
           </div>
 
@@ -635,9 +627,7 @@ function AdminPage() {
                     <p className="text-xs font-semibold text-destructive">VPN / proxy</p>
                   )}
                 </div>
-                <p className="shrink-0 text-xs text-muted-foreground">
-                  {formatTime(r.updated_at)}
-                </p>
+                <p className="shrink-0 text-xs text-muted-foreground">{formatTime(r.updated_at)}</p>
               </li>
             ))}
           </ul>
@@ -763,7 +753,6 @@ function AdminPage() {
     </Shell>
   );
 }
-
 
 function DmTab({
   rooms,
