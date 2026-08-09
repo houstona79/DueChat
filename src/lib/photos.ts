@@ -52,6 +52,7 @@ export async function updatePhotoCaption(photoId: string, caption: string) {
 }
 
 export async function signedPhotoUrl(path: string) {
+  if (/^https?:\/\//i.test(path)) return path;
   const { data, error } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
   if (error) return null;
   return data?.signedUrl ?? null;

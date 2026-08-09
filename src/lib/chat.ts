@@ -696,6 +696,8 @@ export async function uploadAvatar(userId: string, file: File) {
 }
 
 export async function signedAvatarUrl(path: string) {
+  // Google/OAuth avatars are already absolute URLs — never send them to storage signing.
+  if (/^https?:\/\//i.test(path)) return path;
   const { data, error } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
   if (error) return null;
   return data?.signedUrl ?? null;
