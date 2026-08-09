@@ -306,7 +306,7 @@ function Tile({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative aspect-[3/4] overflow-hidden rounded-3xl bg-secondary sm:aspect-square">
+    <div className="relative min-h-0 h-full w-full overflow-hidden rounded-3xl bg-secondary">
       <div className={showVideo ? "size-full" : "sr-only"}>{children}</div>
       {showVideo ? null : (
         <div className="grid size-full place-items-center">
