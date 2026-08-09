@@ -20,6 +20,7 @@ import {
   useSiteRoles,
 } from "@/hooks/use-roles";
 import { accentFor, isAdultProfile, isOnline } from "@/lib/chat";
+import { decorationGlyph, decorationLabel } from "@/lib/decorations";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/u/$username")({
@@ -52,6 +53,14 @@ function ProfilePage() {
   const role = profile ? siteRoleOf(roles, profile.id) : null;
   const online = profile ? isOnline(profile) : false;
   const isMe = !!profile && user?.id === profile.id;
+  const viewerRole = siteRoleOf(roles, user?.id ?? "");
+  const isStaffViewer = viewerRole === "admin" || viewerRole === "moderator";
+  const visibility = profile?.profile_visibility ?? "public";
+  const canViewDetails =
+    isMe ||
+    isStaffViewer ||
+    visibility === "public" ||
+    (visibility === "buddies" && myBuddies.some((b) => b.buddy_id === profile?.id));
 
   return (
     <main id="main-content" className="mx-auto min-w-0 w-full max-w-3xl px-3 py-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-5 sm:py-8">
@@ -105,6 +114,13 @@ function ProfilePage() {
             </div>
           </div>
 
+          {!canViewDetails ? (
+            <p className="mt-5 text-sm text-muted-foreground">
+              {visibility === "private"
+                ? "This profile is private."
+                : "This profile is only visible to their buddies."}
+            </p>
+          ) : (
           <div className="mt-5 space-y-3 text-sm">
             <YearBadges profile={profile} />
             <SocialStatus profile={profile} />
@@ -154,6 +170,7 @@ function ProfilePage() {
             <ProfilePhotos userId={profile.id} />
             <ProfileFeed userId={profile.id} />
           </div>
+          )}
 
           {!isMe ? (
             <button
