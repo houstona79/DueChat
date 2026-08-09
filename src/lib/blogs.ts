@@ -76,20 +76,25 @@ export async function updateBlogPost(
   id: string,
   patch: { title?: string; body?: string; excerpt?: string | null; coverPath?: string | null },
 ) {
-  const next: Record<string, string | null> = {};
+  const next: {
+    title?: string;
+    body?: string;
+    excerpt?: string | null;
+    cover_url?: string | null;
+  } = {};
   if (patch.title !== undefined) {
     const title = patch.title.trim().slice(0, MAX_BLOG_TITLE);
     if (!title) throw new Error("Give your blog a title.");
-    next["title"] = title;
+    next.title = title;
   }
   if (patch.body !== undefined) {
     const body = patch.body.trim().slice(0, MAX_BLOG_BODY);
     if (!body) throw new Error("Write something first.");
-    next["body"] = body;
+    next.body = body;
   }
   if (patch.excerpt !== undefined)
-    next["excerpt"] = patch.excerpt?.trim().slice(0, MAX_BLOG_EXCERPT) || null;
-  if (patch.coverPath !== undefined) next["cover_url"] = patch.coverPath;
+    next.excerpt = patch.excerpt?.trim().slice(0, MAX_BLOG_EXCERPT) || null;
+  if (patch.coverPath !== undefined) next.cover_url = patch.coverPath;
   const { error } = await supabase.from("blog_posts").update(next).eq("id", id);
   if (error) throw error;
 }
