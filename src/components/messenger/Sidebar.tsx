@@ -95,12 +95,12 @@ export function Sidebar({
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-sidebar">
-      <header className="px-5 pb-3 pt-6">
+      <header className="px-4 pb-3 pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-5">
         <div className="flex items-center justify-between gap-2">
           <a href="https://www.duechat.com" aria-label="Go to DueChat" className="inline-block">
             <img src={duechatLogo.url} alt="DueChat" className="h-8 w-auto object-contain" />
           </a>
-          <div className="flex items-center gap-1">
+          <div className="scroll-rail -mr-1 flex shrink-0 items-center gap-0.5 overflow-x-auto pr-1 sm:gap-1">
             {isAdmin ? (
               <Link
                 to="/admin"
