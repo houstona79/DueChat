@@ -9,6 +9,7 @@ import { Link } from "@tanstack/react-router";
 import { Avatar } from "./Avatar";
 import { ProfilePhotos } from "./ProfilePhotos";
 import { ProfileFeed } from "./ProfileFeed";
+import { ProfileBlogs } from "./ProfileBlogs";
 import { SocialStatus } from "./SocialStatus";
 import { YearBadges } from "./YearBadges";
 import { useAuth } from "@/hooks/use-auth";
@@ -224,6 +225,7 @@ export function ProfileViewer() {
                 <p className="text-xs text-muted-foreground">Verified 18+</p>
               ) : null}
               <ProfilePhotos userId={profile.id} />
+              <ProfileBlogs username={profile.username} />
               <ProfileFeed userId={profile.id} highlightUpdateId={highlightUpdateId} />
             </div>
           ) : profilesLoading ? (
