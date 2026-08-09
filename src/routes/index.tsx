@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { MessagesSquare, Radio, Video } from "lucide-react";
+import { Headset, MessagesSquare, Radio, Video } from "lucide-react";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import peopleBg from "@/assets/landing-people-devices.jpg.asset.json";
+import { SupportWidget } from "@/components/support/SupportWidget";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -80,7 +81,13 @@ function Landing() {
             Start a call from any room, on desktop or your phone's browser.
           </Feature>
         </ul>
+        <p className="mt-10 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+          <Headset className="size-4" aria-hidden />
+          Need help? Tap <span className="font-semibold text-foreground">Live support</span> to
+          message an admin.
+        </p>
       </div>
+      <SupportWidget />
     </main>
   );
 }
