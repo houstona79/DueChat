@@ -46,13 +46,13 @@ function ChatLayout() {
     <>
       <main
         id="main-content"
-        className="grid h-dvh grid-cols-1 overflow-hidden md:grid-cols-[280px_1fr] lg:grid-cols-[340px_1fr]"
+        className="grid h-dvh grid-cols-1 overflow-hidden md:grid-cols-[260px_minmax(0,1fr)] lg:grid-cols-[340px_minmax(0,1fr)]"
       >
         <div
           className={
             activeRoomId
-              ? "hidden min-h-0 border-r border-border md:block"
-              : "min-h-0 border-r border-border"
+              ? "hidden min-h-0 min-w-0 border-r border-border md:block"
+              : "min-h-0 min-w-0 border-r border-border"
           }
         >
           <Sidebar
@@ -63,7 +63,7 @@ function ChatLayout() {
             activeRoomId={activeRoomId}
           />
         </div>
-        <div className={activeRoomId ? "min-h-0" : "hidden min-h-0 md:block"}>
+        <div className={activeRoomId ? "min-h-0 min-w-0" : "hidden min-h-0 min-w-0 md:block"}>
           {activeRoomId ? (
             <Outlet />
           ) : (
