@@ -23,6 +23,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as ICodeRouteImport } from './routes/i.$code'
 import { Route as AuthenticatedChatRoomIdRouteImport } from './routes/_authenticated/chat.$roomId'
 import { Route as AuthenticatedUUsernameRouteImport } from './routes/_authenticated/u.$username'
+import { Route as BlogUsernameSlugRouteImport } from './routes/blog.$username.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -93,12 +94,17 @@ const AuthenticatedUUsernameRoute = AuthenticatedUUsernameRouteImport.update({
   path: '/u/$username',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const BlogUsernameSlugRoute = BlogUsernameSlugRouteImport.update({
+  id: '/$username/$slug',
+  path: '/$username/$slug',
+  getParentRoute: () => BlogRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accessibility': typeof AccessibilityRoute
   '/auth': typeof AuthRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -108,12 +114,13 @@ export interface FileRoutesByFullPath {
   '/i/$code': typeof ICodeRoute
   '/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
   '/u/$username': typeof AuthenticatedUUsernameRoute
+  '/blog/$username/$slug': typeof BlogUsernameSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accessibility': typeof AccessibilityRoute
   '/auth': typeof AuthRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/i/$code': typeof ICodeRoute
   '/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
   '/u/$username': typeof AuthenticatedUUsernameRoute
+  '/blog/$username/$slug': typeof BlogUsernameSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -130,7 +138,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/accessibility': typeof AccessibilityRoute
   '/auth': typeof AuthRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/i/$code': typeof ICodeRoute
   '/_authenticated/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
   '/_authenticated/u/$username': typeof AuthenticatedUUsernameRoute
+  '/blog/$username/$slug': typeof BlogUsernameSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
     | '/i/$code'
     | '/chat/$roomId'
     | '/u/$username'
+    | '/blog/$username/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/i/$code'
     | '/chat/$roomId'
     | '/u/$username'
+    | '/blog/$username/$slug'
   id:
     | '__root__'
     | '/'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/i/$code'
     | '/_authenticated/chat/$roomId'
     | '/_authenticated/u/$username'
+    | '/blog/$username/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -195,7 +207,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AccessibilityRoute: typeof AccessibilityRoute
   AuthRoute: typeof AuthRoute
-  BlogRoute: typeof BlogRoute
+  BlogRoute: typeof BlogRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermsRoute: typeof TermsRoute
   ICodeRoute: typeof ICodeRoute
@@ -301,6 +313,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUUsernameRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/blog/$username/$slug': {
+      id: '/blog/$username/$slug'
+      path: '/$username/$slug'
+      fullPath: '/blog/$username/$slug'
+      preLoaderRoute: typeof BlogUsernameSlugRouteImport
+      parentRoute: typeof BlogRoute
+    }
   }
 }
 
@@ -334,12 +353,22 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface BlogRouteChildren {
+  BlogUsernameSlugRoute: typeof BlogUsernameSlugRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogUsernameSlugRoute: BlogUsernameSlugRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AccessibilityRoute: AccessibilityRoute,
   AuthRoute: AuthRoute,
-  BlogRoute: BlogRoute,
+  BlogRoute: BlogRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   TermsRoute: TermsRoute,
   ICodeRoute: ICodeRoute,
