@@ -46,7 +46,7 @@ function ChatLayout() {
     <>
       <main
         id="main-content"
-        className="grid h-dvh grid-cols-1 overflow-hidden md:grid-cols-[260px_minmax(0,1fr)] lg:grid-cols-[340px_minmax(0,1fr)]"
+        className="fixed inset-0 grid overflow-hidden overscroll-none grid-cols-1 md:grid-cols-[260px_minmax(0,1fr)] lg:grid-cols-[340px_minmax(0,1fr)]"
       >
         <div
           className={
