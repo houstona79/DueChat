@@ -6,15 +6,18 @@ import { Avatar } from "@/components/messenger/Avatar";
 import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { ProfileFeed } from "@/components/messenger/ProfileFeed";
 import { InviteCard } from "@/components/messenger/InviteCard";
+import { BlockList } from "@/components/messenger/BlockList";
 import { AccessibilitySettings } from "@/components/system/AccessibilitySettings";
 import { ImageCropper } from "@/components/messenger/ImageCropper";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 import { accentFor, normalizeWebsiteUrl, updateProfile, uploadAvatar } from "@/lib/chat";
 import { isRedish, readableNameColor } from "@/hooks/use-roles";
 import { cn } from "@/lib/utils";
 import { COUNTRIES } from "@/lib/countries";
 import { GENDERS } from "@/lib/genders";
 import { FIELD_VISIBILITIES } from "@/lib/field-visibility";
+import { DECORATIONS } from "@/lib/decorations";
 import { postStatusChangeUpdate } from "@/lib/profile-updates";
 
 const NAME_COLORS = [
@@ -30,6 +33,12 @@ const NAME_COLORS = [
   { label: "Indigo", value: "#818cf8" },
   { label: "Slate", value: "#cbd5e1" },
 ];
+
+const PROFILE_VISIBILITIES = [
+  { value: "public", label: "Everyone" },
+  { value: "buddies", label: "Buddies only" },
+  { value: "private", label: "Private — nobody" },
+] as const;
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -62,6 +71,9 @@ function SettingsPage() {
   const [pronounsVisibility, setPronounsVisibility] = useState("public");
   const [bio, setBio] = useState("");
   const [website, setWebsite] = useState("");
+  const [profileVisibility, setProfileVisibility] = useState("public");
+  const [decoration, setDecoration] = useState("");
+  const [resetting, setResetting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -80,6 +92,8 @@ function SettingsPage() {
     setPronounsVisibility(me.pronouns_visibility ?? "public");
     setBio(me.bio ?? "");
     setWebsite(me.website_url ?? "");
+    setProfileVisibility(me.profile_visibility ?? "public");
+    setDecoration(me.decoration ?? "");
   }, [me]);
 
   if (!user || !me) return null;
@@ -114,6 +128,8 @@ function SettingsPage() {
         pronouns_visibility: pronounsVisibility,
         bio: bio.trim().slice(0, 500) || null,
         website_url: websiteUrl,
+        profile_visibility: profileVisibility,
+        decoration: decoration || null,
         ...(me.birth_date ? {} : { birth_date: birthDate || null }),
       });
       if (statusChanged && nextStatus) {
