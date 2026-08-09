@@ -619,16 +619,29 @@ export async function kickMember(roomId: string, userId: string) {
   if (error) throw error;
 }
 
-/** Bans someone from the room and removes them from the roster. */
+/**
+ * Restricts someone from the room and removes them from the roster.
+ * `expiresAt` null keeps them out until they are removed from the list.
+ */
 export async function banMember(
   roomId: string,
   userId: string,
   bannedBy: string,
   reason?: string,
+  expiresAt: string | null = null,
 ) {
   const { error } = await supabase
     .from("room_bans")
-    .insert({ room_id: roomId, user_id: userId, banned_by: bannedBy, reason: reason ?? null });
+    .upsert(
+      {
+        room_id: roomId,
+        user_id: userId,
+        banned_by: bannedBy,
+        reason: reason ?? null,
+        expires_at: expiresAt,
+      },
+      { onConflict: "room_id,user_id" },
+    );
   if (error) throw error;
   await kickMember(roomId, userId);
 }
@@ -661,6 +674,8 @@ export async function updateProfile(
       | "bio"
       | "website_url"
       | "accepted_eula_at"
+      | "profile_visibility"
+      | "decoration"
     >
   >,
 ) {
