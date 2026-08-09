@@ -5,6 +5,7 @@ import { countryFlag } from "@/lib/country-flags";
 import { Avatar } from "@/components/messenger/Avatar";
 import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { ProfileFeed } from "@/components/messenger/ProfileFeed";
+import { ProfileBlogs } from "@/components/messenger/ProfileBlogs";
 import { SocialStatus } from "@/components/messenger/SocialStatus";
 import { YearBadges } from "@/components/messenger/YearBadges";
 import { useAuth } from "@/hooks/use-auth";
@@ -187,6 +188,7 @@ function ProfilePage() {
                 <p className="text-xs text-muted-foreground">Verified 18+</p>
               ) : null}
               <ProfilePhotos userId={profile.id} />
+              <ProfileBlogs username={profile.username} />
               <ProfileFeed userId={profile.id} />
             </div>
           )}

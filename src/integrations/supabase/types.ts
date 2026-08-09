@@ -100,6 +100,109 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_comments: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          post_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          post_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_likes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_posts: {
+        Row: {
+          body: string
+          cover_url: string | null
+          created_at: string
+          excerpt: string | null
+          id: string
+          published_at: string | null
+          slug: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          cover_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          published_at?: string | null
+          slug: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          cover_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          published_at?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       buddies: {
         Row: {
           buddy_id: string
@@ -1160,6 +1263,19 @@ export type Database = {
     }
     Functions: {
       archive_and_clear_messages: { Args: never; Returns: number }
+      blog_comment_feed: {
+        Args: { _post_id: string }
+        Returns: {
+          author_avatar_url: string
+          author_display_name: string
+          author_username: string
+          body: string
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }[]
+      }
       claim_device: {
         Args: { _device_id: string; _user_agent: string }
         Returns: undefined
@@ -1169,6 +1285,24 @@ export type Database = {
         Returns: boolean
       }
       generate_invite_code: { Args: never; Returns: string }
+      get_published_blog: {
+        Args: { _slug: string; _username: string }
+        Returns: {
+          author_avatar_url: string
+          author_display_name: string
+          author_username: string
+          body: string
+          comment_count: number
+          cover_url: string
+          excerpt: string
+          id: string
+          like_count: number
+          published_at: string
+          slug: string
+          title: string
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1211,6 +1345,23 @@ export type Database = {
       }
       is_site_banned: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      list_published_blogs: {
+        Args: { _limit?: number; _username?: string }
+        Returns: {
+          author_avatar_url: string
+          author_display_name: string
+          author_username: string
+          comment_count: number
+          cover_url: string
+          excerpt: string
+          id: string
+          like_count: number
+          published_at: string
+          slug: string
+          title: string
+          user_id: string
+        }[]
+      }
       my_invite_code: { Args: never; Returns: string }
       room_is_staff_only: { Args: { _room_id: string }; Returns: boolean }
       room_requires_adult: { Args: { _room_id: string }; Returns: boolean }
