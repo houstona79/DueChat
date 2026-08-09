@@ -141,6 +141,12 @@ export function MemberList({
   const nameOf = (id: string) => profiles.find((p) => p.id === id)?.display_name ?? "Someone";
   const actionLabel = (action: "join" | "leave" | "bounce") =>
     action === "join" ? "came in" : action === "leave" ? "left" : "was bounced";
+  const [tab, setTab] = useState<"members" | "activity">("members");
+  const tabClass = (active: boolean) =>
+    cn(
+      "flex-1 rounded-xl px-3 py-2 text-xs font-semibold",
+      active ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+    );
 
   return (
     <section
@@ -158,7 +164,29 @@ export function MemberList({
           <X className="size-4" />
         </button>
       </header>
-      <ul className="min-h-0 flex-1 overflow-y-auto px-2 pb-4">
+      {events ? (
+        <div className="flex gap-1.5 px-3 pb-2" role="tablist" aria-label="Members panel views">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === "members"}
+            onClick={() => setTab("members")}
+            className={tabClass(tab === "members")}
+          >
+            In the room
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === "activity"}
+            onClick={() => setTab("activity")}
+            className={tabClass(tab === "activity")}
+          >
+            Coming &amp; going
+          </button>
+        </div>
+      ) : null}
+      <ul className={cn("min-h-0 flex-1 overflow-y-auto px-2 pb-4", tab === "activity" && "hidden")}>
         {members.map((p) => {
           const role = roleLabel(p.id);
           const siteRole = siteRoleOf(siteRoles, p.id);
@@ -395,38 +423,6 @@ export function MemberList({
           <li className="px-3 py-6 text-center text-xs text-muted-foreground">No members yet.</li>
         ) : null}
 
-        {events ? (
-          <li className="mt-3 border-t border-border px-2 pt-3">
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Coming &amp; going
-            </p>
-            {activity.length === 0 ? (
-              <p className="text-xs text-muted-foreground">No arrivals or exits yet.</p>
-            ) : (
-              <ul className="space-y-1" aria-live="polite">
-                {activity.map((e) => (
-                  <li key={e.id} className="flex items-center gap-2 text-xs">
-                    <span
-                      className={cn(
-                        "size-1.5 shrink-0 rounded-full",
-                        e.action === "join" ? "bg-primary" : "bg-muted-foreground/60",
-                      )}
-                      aria-hidden
-                    />
-                    <span className="min-w-0 flex-1 truncate text-muted-foreground">
-                      <span className="font-medium text-foreground">{nameOf(e.userId)}</span>{" "}
-                      {actionLabel(e.action)}
-                    </span>
-                    <span className="shrink-0 text-[11px] text-muted-foreground">
-                      {formatTime(e.at)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ) : null}
-
         {canModerate && silenceList.length > 0 ? (
           <li className="mt-3 border-t border-border px-2 pt-3">
             <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -472,6 +468,34 @@ export function MemberList({
           </li>
         ) : null}
       </ul>
+      {events && tab === "activity" ? (
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+          {activity.length === 0 ? (
+            <p className="text-xs text-muted-foreground">No arrivals or exits yet.</p>
+          ) : (
+            <ul className="space-y-1.5" aria-live="polite">
+              {activity.map((e) => (
+                <li key={e.id} className="flex items-center gap-2 text-xs">
+                  <span
+                    className={cn(
+                      "size-1.5 shrink-0 rounded-full",
+                      e.action === "join" ? "bg-primary" : "bg-muted-foreground/60",
+                    )}
+                    aria-hidden
+                  />
+                  <span className="min-w-0 flex-1 truncate text-muted-foreground">
+                    <span className="font-medium text-foreground">{nameOf(e.userId)}</span>{" "}
+                    {actionLabel(e.action)}
+                  </span>
+                  <span className="shrink-0 text-[11px] text-muted-foreground">
+                    {formatTime(e.at)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ) : null}
       {onLeave ? (
         <div className="border-t border-border p-3">
           <button
