@@ -6,6 +6,7 @@ import {
   Flag,
   Gauge,
   Hash,
+  Headset,
   MessageSquare,
   MonitorSmartphone,
   Bell,
@@ -31,7 +32,8 @@ export type AdminTab =
   | "dms"
   | "reports"
   | "notifications"
-  | "alerts";
+  | "alerts"
+  | "support";
 
 type Meta = { label: string; icon: LucideIcon; hint: string; group: string };
 
@@ -75,6 +77,12 @@ export const TAB_META: Record<AdminTab, Meta> = {
     hint: "Broadcast to everyone",
     group: "Moderation",
   },
+  support: {
+    label: "Live support",
+    icon: Headset,
+    hint: "Answer help requests",
+    group: "Moderation",
+  },
 };
 
 const GROUPS: { name: string; tabs: AdminTab[] }[] = [
@@ -82,7 +90,7 @@ const GROUPS: { name: string; tabs: AdminTab[] }[] = [
   { name: "People", tabs: ["users", "staff", "bans"] },
   { name: "Security", tabs: ["sessions", "ips"] },
   { name: "Content", tabs: ["rooms", "messages", "dms", "logs"] },
-  { name: "Moderation", tabs: ["reports", "notifications", "alerts"] },
+  { name: "Moderation", tabs: ["support", "reports", "notifications", "alerts"] },
 ];
 
 /**

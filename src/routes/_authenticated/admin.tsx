@@ -20,6 +20,7 @@ import { ChatLogs } from "@/components/messenger/ChatLogs";
 import { NotificationAudit } from "@/components/messenger/NotificationAudit";
 import { AlertComposer } from "@/components/messenger/AlertComposer";
 import { AdminNav, TAB_META, type AdminTab } from "@/components/admin/AdminNav";
+import { SupportInbox } from "@/components/admin/SupportInbox";
 import { useAuth } from "@/hooks/use-auth";
 import { accentFor, formatTime, isOnline } from "@/lib/chat";
 import {
@@ -741,6 +742,8 @@ function AdminPage() {
       {tab === "logs" && <ChatLogs canClear />}
 
       {tab === "notifications" && <NotificationAudit />}
+
+      {tab === "support" && <SupportInbox />}
 
       {tab === "alerts" &&
         (isAdmin ? (
