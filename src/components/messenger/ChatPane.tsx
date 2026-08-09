@@ -668,21 +668,55 @@ export function ChatPane({
           profiles={profiles}
           meId={meId}
           ownerId={room.is_direct ? undefined : room.created_by}
-          roomAdminIds={roomAdmins.map((a) => a.user_id)}
+          roomAdmins={roomAdmins}
           bans={bans}
+          silences={silences}
+          blocks={blocks}
           canModerate={canModerate}
-          isOwner={isOwner}
-          onPromote={(userId) =>
-            void runModeration(() => addRoomAdmin(room.id, userId, meId), ["room-admins"])
+          isSuper={isSuper}
+          onSetTier={(userId: string, tier: RoomAdminTier) =>
+            void runModeration(
+              () =>
+                roomAdmins.some((a) => a.user_id === userId)
+                  ? setRoomAdminTier(room.id, userId, tier)
+                  : addRoomAdmin(room.id, userId, meId, tier),
+              ["room-admins"],
+            )
           }
-          onDemote={(userId) =>
+          onRemoveAdmin={(userId: string) =>
             void runModeration(() => removeRoomAdmin(room.id, userId), ["room-admins"])
           }
-          onKick={(userId) => void runModeration(() => kickMember(room.id, userId), [])}
-          onBan={(userId) =>
-            void runModeration(() => banMember(room.id, userId, meId), ["room-bans"])
+          onBounce={(userId: string) => void runModeration(() => kickMember(room.id, userId), [])}
+          onRestrict={(userId: string, expiresAt: string | null) =>
+            void runModeration(
+              () => banMember(room.id, userId, meId, undefined, expiresAt),
+              ["room-bans"],
+            )
           }
-          onUnban={(userId) => void runModeration(() => unbanMember(room.id, userId), ["room-bans"])}
+          onUnrestrict={(userId: string) =>
+            void runModeration(() => unbanMember(room.id, userId), ["room-bans"])
+          }
+          onSilence={(userId: string, expiresAt: string | null) =>
+            void runModeration(
+              () => silenceMember(room.id, userId, meId, expiresAt),
+              ["room-silences"],
+            )
+          }
+          onUnsilence={(userId: string) =>
+            void runModeration(() => unsilenceMember(room.id, userId), ["room-silences"])
+          }
+          onBlock={(userId: string) =>
+            void runModeration(async () => {
+              await blockUser(meId, userId);
+              await queryClient.invalidateQueries({ queryKey: ["blocks"] });
+            }, [])
+          }
+          onUnblock={(userId: string) =>
+            void runModeration(async () => {
+              await unblockUser(meId, userId);
+              await queryClient.invalidateQueries({ queryKey: ["blocks"] });
+            }, [])
+          }
           onClose={() => setShowMembers(false)}
           onMessage={(userId) => {
             setShowMembers(false);
