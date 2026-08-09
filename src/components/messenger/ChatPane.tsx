@@ -527,6 +527,46 @@ export function ChatPane({
         </div>
       </header>
 
+      {statusDraft !== null ? (
+        <form
+          className="flex items-center gap-2 border-b border-border bg-secondary/40 px-3 py-2"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const next = statusDraft.trim();
+            try {
+              await setRoomStatusMessage(room.id, next || null);
+              await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+              setStatusDraft(null);
+            } catch (err) {
+              setError(err instanceof Error ? err.message : "Could not save the room status.");
+            }
+          }}
+        >
+          <input
+            value={statusDraft}
+            onChange={(e) => setStatusDraft(e.target.value)}
+            maxLength={200}
+            autoFocus
+            aria-label="Room status message"
+            placeholder="Room status shown to everyone (leave empty to clear)"
+            className="min-w-0 flex-1 rounded-xl bg-background px-3 py-1.5 text-xs outline-none placeholder:text-muted-foreground"
+          />
+          <button
+            type="submit"
+            className="shrink-0 rounded-xl bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatusDraft(null)}
+            className="shrink-0 rounded-xl bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground"
+          >
+            Cancel
+          </button>
+        </form>
+      ) : null}
+
       {talking ? (
         <TalkBar
           roomId={room.id}
