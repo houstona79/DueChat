@@ -4,6 +4,7 @@ import { ChevronDown, ChevronRight, MessageCircle, UserMinus, UserPlus, X } from
 import { toast } from "sonner";
 import { Avatar } from "./Avatar";
 import { countryFlag } from "@/lib/country-flags";
+import { decorationGlyph, decorationLabel } from "@/lib/decorations";
 import { useBuddies } from "@/hooks/use-chat";
 import { useOpenDirect } from "@/hooks/use-direct";
 import {
@@ -46,6 +47,10 @@ export function BuddyList({
     [profiles, buddyIds],
   );
   const onlineCount = buddyProfiles.filter(isOnline).length;
+  const groups = [
+    { key: "online", label: "Online", people: buddyProfiles.filter(isOnline) },
+    { key: "offline", label: "Offline", people: buddyProfiles.filter((p) => !isOnline(p)) },
+  ];
 
   const candidates = useMemo(() => {
     const term = search.trim().toLowerCase();
