@@ -14,7 +14,7 @@ export const listPublicBlogs = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { publicBlogClient } = await import("@/lib/blogs.server");
     const { data: rows, error } = await publicBlogClient().rpc("list_published_blogs", {
-      _username: data.username ?? undefined,
+      ...(data.username ? { _username: data.username } : {}),
       _limit: data.limit ?? 30,
     });
     if (error) throw error;
