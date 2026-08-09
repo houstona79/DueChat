@@ -13,17 +13,17 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AccessibilityRouteImport } from './routes/accessibility'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedModeratorRouteImport } from './routes/_authenticated/moderator'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as ICodeRouteImport } from './routes/i.$code'
 import { Route as AuthenticatedChatRoomIdRouteImport } from './routes/_authenticated/chat.$roomId'
 import { Route as AuthenticatedUUsernameRouteImport } from './routes/_authenticated/u.$username'
-import { Route as BlogUsernameSlugRouteImport } from './routes/blog.$username.$slug'
+import { Route as BlogUsernameSlugRouteImport } from './routes/blog/$username.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -42,11 +42,6 @@ const AccessibilityRoute = AccessibilityRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -79,6 +74,11 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ICodeRoute = ICodeRouteImport.update({
   id: '/i/$code',
   path: '/i/$code',
@@ -95,16 +95,15 @@ const AuthenticatedUUsernameRoute = AuthenticatedUUsernameRouteImport.update({
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const BlogUsernameSlugRoute = BlogUsernameSlugRouteImport.update({
-  id: '/$username/$slug',
-  path: '/$username/$slug',
-  getParentRoute: () => BlogRoute,
+  id: '/blog/$username/$slug',
+  path: '/blog/$username/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accessibility': typeof AccessibilityRoute
   '/auth': typeof AuthRoute
-  '/blog': typeof BlogRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -112,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/moderator': typeof AuthenticatedModeratorRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/i/$code': typeof ICodeRoute
+  '/blog/': typeof BlogIndexRoute
   '/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
   '/u/$username': typeof AuthenticatedUUsernameRoute
   '/blog/$username/$slug': typeof BlogUsernameSlugRoute
@@ -120,7 +120,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accessibility': typeof AccessibilityRoute
   '/auth': typeof AuthRoute
-  '/blog': typeof BlogRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -128,6 +127,7 @@ export interface FileRoutesByTo {
   '/moderator': typeof AuthenticatedModeratorRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/i/$code': typeof ICodeRoute
+  '/blog': typeof BlogIndexRoute
   '/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
   '/u/$username': typeof AuthenticatedUUsernameRoute
   '/blog/$username/$slug': typeof BlogUsernameSlugRoute
@@ -138,7 +138,6 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/accessibility': typeof AccessibilityRoute
   '/auth': typeof AuthRoute
-  '/blog': typeof BlogRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
@@ -146,6 +145,7 @@ export interface FileRoutesById {
   '/_authenticated/moderator': typeof AuthenticatedModeratorRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/i/$code': typeof ICodeRoute
+  '/blog/': typeof BlogIndexRoute
   '/_authenticated/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
   '/_authenticated/u/$username': typeof AuthenticatedUUsernameRoute
   '/blog/$username/$slug': typeof BlogUsernameSlugRoute
@@ -156,7 +156,6 @@ export interface FileRouteTypes {
     | '/'
     | '/accessibility'
     | '/auth'
-    | '/blog'
     | '/reset-password'
     | '/terms'
     | '/admin'
@@ -164,6 +163,7 @@ export interface FileRouteTypes {
     | '/moderator'
     | '/settings'
     | '/i/$code'
+    | '/blog/'
     | '/chat/$roomId'
     | '/u/$username'
     | '/blog/$username/$slug'
@@ -172,7 +172,6 @@ export interface FileRouteTypes {
     | '/'
     | '/accessibility'
     | '/auth'
-    | '/blog'
     | '/reset-password'
     | '/terms'
     | '/admin'
@@ -180,6 +179,7 @@ export interface FileRouteTypes {
     | '/moderator'
     | '/settings'
     | '/i/$code'
+    | '/blog'
     | '/chat/$roomId'
     | '/u/$username'
     | '/blog/$username/$slug'
@@ -189,7 +189,6 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/accessibility'
     | '/auth'
-    | '/blog'
     | '/reset-password'
     | '/terms'
     | '/_authenticated/admin'
@@ -197,6 +196,7 @@ export interface FileRouteTypes {
     | '/_authenticated/moderator'
     | '/_authenticated/settings'
     | '/i/$code'
+    | '/blog/'
     | '/_authenticated/chat/$roomId'
     | '/_authenticated/u/$username'
     | '/blog/$username/$slug'
@@ -207,10 +207,11 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AccessibilityRoute: typeof AccessibilityRoute
   AuthRoute: typeof AuthRoute
-  BlogRoute: typeof BlogRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermsRoute: typeof TermsRoute
   ICodeRoute: typeof ICodeRoute
+  BlogIndexRoute: typeof BlogIndexRoute
+  BlogUsernameSlugRoute: typeof BlogUsernameSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -241,13 +242,6 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -292,6 +286,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/i/$code': {
       id: '/i/$code'
       path: '/i/$code'
@@ -315,10 +316,10 @@ declare module '@tanstack/react-router' {
     }
     '/blog/$username/$slug': {
       id: '/blog/$username/$slug'
-      path: '/$username/$slug'
+      path: '/blog/$username/$slug'
       fullPath: '/blog/$username/$slug'
       preLoaderRoute: typeof BlogUsernameSlugRouteImport
-      parentRoute: typeof BlogRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -353,25 +354,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface BlogRouteChildren {
-  BlogUsernameSlugRoute: typeof BlogUsernameSlugRoute
-}
-
-const BlogRouteChildren: BlogRouteChildren = {
-  BlogUsernameSlugRoute: BlogUsernameSlugRoute,
-}
-
-const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AccessibilityRoute: AccessibilityRoute,
   AuthRoute: AuthRoute,
-  BlogRoute: BlogRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   TermsRoute: TermsRoute,
   ICodeRoute: ICodeRoute,
+  BlogIndexRoute: BlogIndexRoute,
+  BlogUsernameSlugRoute: BlogUsernameSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

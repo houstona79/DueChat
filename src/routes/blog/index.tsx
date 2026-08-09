@@ -4,7 +4,7 @@ import { listPublicBlogs } from "@/lib/blogs.functions";
 import { BlogCover } from "@/components/blogs/BlogCover";
 import { relativeTime } from "@/lib/profile-updates";
 
-export const Route = createFileRoute("/blog")({
+export const Route = createFileRoute("/blog/")({
   loader: () => listPublicBlogs({ data: { limit: 30 } }),
   head: () => ({
     meta: [
