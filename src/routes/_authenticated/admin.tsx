@@ -401,6 +401,22 @@ function AdminPage() {
                       <LogOut className="size-3.5" />
                       Kick
                     </button>
+                    {isAdmin && (
+                      <button
+                        title="Add gift credits to this member's balance"
+                        onClick={() =>
+                          setCreditTarget({
+                            id: p.id,
+                            name: p.display_name,
+                            username: p.username,
+                          })
+                        }
+                        className="flex shrink-0 items-center gap-1.5 rounded-xl bg-secondary px-3 py-1.5 text-xs font-semibold text-muted-foreground"
+                      >
+                        <Coins className="size-3.5" />
+                        Credits
+                      </button>
+                    )}
                     {isOwner && (
                       <button
                         disabled={deleteAccountMutation.isPending || locked}
