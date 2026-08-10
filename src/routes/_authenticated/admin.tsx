@@ -32,6 +32,7 @@ import { NotificationAudit } from "@/components/messenger/NotificationAudit";
 import { AlertComposer } from "@/components/messenger/AlertComposer";
 import { AdminNav, TAB_META, type AdminTab } from "@/components/admin/AdminNav";
 import { SupportInbox } from "@/components/admin/SupportInbox";
+import { SupportLogs } from "@/components/admin/SupportLogs";
 import { GiveCreditsDialog } from "@/components/admin/GiveCreditsDialog";
 import { fetchAllBalances } from "@/lib/credits";
 import { useAuth } from "@/hooks/use-auth";
@@ -827,6 +828,15 @@ function AdminPage() {
       {tab === "notifications" && <NotificationAudit />}
 
       {tab === "support" && <SupportInbox />}
+
+      {tab === "supportlogs" &&
+        (isAdmin ? (
+          <SupportLogs canClear />
+        ) : (
+          <p className="mt-5 text-sm text-muted-foreground">
+            Only admins can view archived support reports.
+          </p>
+        ))}
 
       {tab === "alerts" &&
         (isAdmin ? (
