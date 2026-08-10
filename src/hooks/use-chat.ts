@@ -14,6 +14,8 @@ import {
   touchPresence,
 } from "@/lib/chat";
 import { fetchBlocks } from "@/lib/blocks";
+import { fetchRoomHands } from "@/lib/hands";
+import { claimDailyCredits, fetchGiftItems } from "@/lib/credits";
 import { fetchMyRoomInvites, fetchSentRoomInvites } from "@/lib/room-invites";
 
 export function useRooms() {
@@ -95,6 +97,28 @@ export function useMyRoomInvites(userId: string | undefined) {
   });
 }
 
+/** Raised hands and granted microphones for a room. */
+export function useRoomHands(roomId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["room-hands", roomId],
+    queryFn: () => fetchRoomHands(roomId),
+    enabled,
+  });
+}
+
+/** My credit balance, topped up with today's free allowance on first read. */
+export function useCredits(userId: string | undefined) {
+  return useQuery({
+    queryKey: ["credits", userId],
+    queryFn: () => claimDailyCredits(),
+    enabled: !!userId,
+  });
+}
+
+export function useGiftItems() {
+  return useQuery({ queryKey: ["gift-items"], queryFn: fetchGiftItems, staleTime: 600_000 });
+}
+
 /** Invites already sent for a room, so the panel can show "Invited". */
 export function useSentRoomInvites(roomId: string, enabled: boolean) {
   return useQuery({
@@ -161,6 +185,12 @@ export function useChatRealtime() {
       .on("postgres_changes", { event: "*", schema: "public", table: "room_invites" }, () => {
         void queryClient.invalidateQueries({ queryKey: ["room-invites"] });
         void queryClient.invalidateQueries({ queryKey: ["room-invites-sent"] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "room_hands" }, (payload) => {
+        const roomId =
+          (payload.new as { room_id?: string } | null)?.room_id ??
+          (payload.old as { room_id?: string } | null)?.room_id;
+        if (roomId) void queryClient.invalidateQueries({ queryKey: ["room-hands", roomId] });
       })
       .subscribe();
 
