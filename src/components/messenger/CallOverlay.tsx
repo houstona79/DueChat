@@ -72,6 +72,18 @@ export function CallOverlay({
     return () => window.clearInterval(i);
   }, []);
 
+  // Outgoing ringback: keep ringing until someone else joins the call.
+  const waiting = participants.length === 0;
+  useEffect(() => {
+    if (!waiting) {
+      playSound("connected");
+      return;
+    }
+    playSound("dial");
+    const id = window.setInterval(() => playSound("dial"), 3000);
+    return () => window.clearInterval(id);
+  }, [waiting]);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onEnd();
