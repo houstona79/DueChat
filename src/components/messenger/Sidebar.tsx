@@ -96,10 +96,14 @@ export function Sidebar({
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-sidebar">
-      <header className="px-4 pb-3 pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-5">
+      <header className="shrink-0 px-4 pb-3 pt-[max(1.25rem,env(safe-area-inset-top))] short:pb-1.5 short:pt-[max(0.5rem,env(safe-area-inset-top))] sm:px-5">
         <div className="flex items-center justify-between gap-2">
           <a href="https://www.duechat.com" aria-label="Go to DueChat" className="inline-block">
-            <img src={duechatLogo.url} alt="DueChat" className="h-8 w-auto object-contain" />
+            <img
+              src={duechatLogo.url}
+              alt="DueChat"
+              className="h-8 w-auto object-contain short:h-6"
+            />
           </a>
           <div className="scroll-rail -mr-1 flex shrink-0 items-center gap-0.5 overflow-x-auto pr-1 sm:gap-1">
             {isAdmin ? (
@@ -156,7 +160,7 @@ export function Sidebar({
         {me ? (
           <Link
             to="/settings"
-            className="mt-4 flex items-center gap-3 rounded-2xl bg-secondary px-3 py-2.5 hover:bg-accent"
+            className="mt-4 flex items-center gap-3 rounded-2xl bg-secondary px-3 py-2.5 hover:bg-accent short:hidden"
           >
             <Avatar
               name={me.display_name}
@@ -191,7 +195,7 @@ export function Sidebar({
           </Link>
         ) : null}
 
-        <div className="mt-3 flex items-center gap-2 rounded-xl bg-secondary px-3 py-2">
+        <div className="mt-3 flex items-center gap-2 rounded-xl bg-secondary px-3 py-2 short:mt-2 short:py-1.5">
           <Search className="size-4 text-muted-foreground" aria-hidden />
           <input
             value={query}
