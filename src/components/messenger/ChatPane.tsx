@@ -3,6 +3,8 @@ import {
   ArrowLeft,
   Bot,
   Gamepad2,
+  Hand,
+  Lock,
   Mic,
   Newspaper,
   Phone,
@@ -33,14 +35,17 @@ import { TriviaBot } from "./TriviaBot";
 import { RoomBanner } from "./RoomBanner";
 import { RatingControl } from "./RoomRating";
 import { YouTubeEmbed } from "./YouTubeEmbed";
+import { GiftDialog } from "./GiftDialog";
 import {
   useBlocks,
   useMessages,
   useRoomAdmins,
   useRoomBans,
   useRoomEvents,
+  useRoomHands,
   useRoomSilences,
 } from "@/hooks/use-chat";
+import { grantMic, lowerHand, raiseHand, revokeMic } from "@/lib/hands";
 import { useOpenDirect } from "@/hooks/use-direct";
 import { blockUser, isBlocked, unblockUser } from "@/lib/blocks";
 import { takePendingCall } from "@/lib/call-invites";
@@ -76,6 +81,7 @@ import {
   setRoomYouTube,
   silenceMember,
   unbanMember,
+  unlockRoom,
   unsilenceMember,
   type Membership,
   type Profile,
@@ -146,6 +152,9 @@ export function ChatPane({
   const [talking, setTalking] = useState(false);
   const [showCams, setShowCams] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [codeDraft, setCodeDraft] = useState("");
+  const [unlocking, setUnlocking] = useState(false);
+  const [giftTo, setGiftTo] = useState<string | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -158,12 +167,16 @@ export function ChatPane({
   const isSuper = !room.is_direct && (isOwner || myTier === "super");
   const { data: bans = [] } = useRoomBans(room.id, canModerate);
   const { data: silences = [] } = useRoomSilences(room.id, joined && !room.is_direct);
+  const { data: hands = [] } = useRoomHands(room.id, joined && !room.is_direct);
   const { data: blocks = [] } = useBlocks(meId);
   const mySilence = silences.find((s) => s.user_id === meId && isActive(s)) ?? null;
   const { data: siteRoles } = useSiteRoles();
   const myProfile = profileOf(meId);
   const adultsOnly = room.rating === "R" && !room.is_direct;
   const ageBlocked = adultsOnly && !isAdultProfile(myProfile);
+  const myHand = hands.find((h) => h.user_id === meId) ?? null;
+  const needsCode = !room.is_direct && room.locked && !joined && !isOwner;
+  const giftProfile = giftTo ? profileOf(giftTo) : undefined;
 
   type TimelineItem =
     | { kind: "message"; id: string; at: string; message: (typeof messages)[number] }
@@ -245,6 +258,36 @@ export function ChatPane({
   const leave = async () => {
     await leaveRoom(room.id, meId);
     await queryClient.invalidateQueries({ queryKey: ["memberships"] });
+  };
+
+  const enterWithCode = async () => {
+    const code = codeDraft.trim();
+    if (!code || unlocking) return;
+    setUnlocking(true);
+    setError(null);
+    try {
+      const ok = await unlockRoom(room.id, code);
+      if (!ok) {
+        setError("That entry code is not right.");
+        return;
+      }
+      setCodeDraft("");
+      await queryClient.invalidateQueries({ queryKey: ["memberships"] });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not enter this room.");
+    } finally {
+      setUnlocking(false);
+    }
+  };
+
+  const toggleHand = async () => {
+    try {
+      if (myHand) await lowerHand(room.id, meId);
+      else await raiseHand(room.id, meId);
+      await queryClient.invalidateQueries({ queryKey: ["room-hands", room.id] });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not update your raised hand.");
+    }
   };
 
   const runModeration = async (action: () => Promise<void>, keys: string[]) => {
@@ -518,6 +561,21 @@ export function ChatPane({
             <Mic className="size-4" />
             Talk
           </button>
+          {!room.is_direct && joined ? (
+            <button
+              onClick={() => void toggleHand()}
+              className={cn(
+                "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
+                myHand ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+              )}
+              aria-label={myHand ? "Lower your hand" : "Raise your hand to ask for the mic"}
+              aria-pressed={Boolean(myHand)}
+              title="Raise hand"
+            >
+              <Hand className="size-4" />
+              {hands.length > 0 ? hands.length : "Hand"}
+            </button>
+          ) : null}
           <button
             onClick={() => {
               // Cams ride along on the room voice session, so make sure it's live.
@@ -598,6 +656,59 @@ export function ChatPane({
               camsOpen={showCams}
               onCamsOpenChange={setShowCams}
             />
+          ) : null}
+
+          {!room.is_direct && joined && hands.length > 0 ? (
+            <section
+              className="flex flex-wrap items-center gap-2 border-b border-border bg-secondary/40 px-3 py-2"
+              aria-label="Raised hands"
+            >
+              <span className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
+                <Hand className="size-3.5" aria-hidden />
+                Mic queue
+              </span>
+              {hands.map((hand) => {
+                const who = profileOf(hand.user_id);
+                const granted = Boolean(hand.granted_at);
+                return (
+                  <span
+                    key={hand.id}
+                    className={cn(
+                      "flex items-center gap-1.5 rounded-xl px-2 py-1 text-[11px]",
+                      granted ? "bg-primary/15 text-primary" : "bg-background",
+                    )}
+                  >
+                    {who?.display_name ?? "Member"}
+                    {granted ? " · has the mic" : ""}
+                    {canModerate ? (
+                      <button
+                        onClick={() =>
+                          void runModeration(
+                            () =>
+                              granted
+                                ? revokeMic(room.id, hand.user_id)
+                                : grantMic(room.id, hand.user_id, meId),
+                            ["room-hands"],
+                          )
+                        }
+                        className="rounded-lg bg-secondary px-1.5 py-0.5 font-medium"
+                      >
+                        {granted ? "Take back" : "Give mic"}
+                      </button>
+                    ) : null}
+                    {hand.user_id === meId ? (
+                      <button
+                        onClick={() => void toggleHand()}
+                        aria-label="Lower your hand"
+                        className="rounded-lg bg-secondary px-1.5 py-0.5 font-medium"
+                      >
+                        Lower
+                      </button>
+                    ) : null}
+                  </span>
+                );
+              })}
+            </section>
           ) : null}
 
           {!room.is_direct ? (
@@ -894,6 +1005,40 @@ export function ChatPane({
                     </Link>
                   )}
                 </>
+              ) : needsCode ? (
+                <>
+                  <h3 className="flex items-center justify-center gap-2 text-lg font-semibold">
+                    <Lock className="size-4 text-primary" aria-hidden />
+                    {title} is locked
+                  </h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Ask the room owner for the entry code, then type it below.
+                  </p>
+                  <form
+                    className="mt-4 flex gap-2"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      void enterWithCode();
+                    }}
+                  >
+                    <input
+                      value={codeDraft}
+                      onChange={(e) => setCodeDraft(e.target.value)}
+                      maxLength={40}
+                      autoComplete="off"
+                      aria-label="Room entry code"
+                      placeholder="Entry code"
+                      className="min-w-0 flex-1 rounded-xl bg-secondary px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!codeDraft.trim() || unlocking}
+                      className="shrink-0 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-40"
+                    >
+                      {unlocking ? "Checking…" : "Enter"}
+                    </button>
+                  </form>
+                </>
               ) : (
                 <>
                   <h3 className="text-lg font-semibold">Join {title}</h3>
@@ -1095,6 +1240,7 @@ export function ChatPane({
               setShowMembers(false);
               void openDirect(userId);
             }}
+            onGift={(userId) => setGiftTo(userId)}
             onLeave={
               room.is_direct
                 ? undefined
@@ -1106,6 +1252,15 @@ export function ChatPane({
           />
         ) : null}
       </div>
+      {giftTo && giftProfile ? (
+        <GiftDialog
+          meId={meId}
+          recipientId={giftTo}
+          recipientName={giftProfile.display_name}
+          roomId={room.is_direct ? null : room.id}
+          onClose={() => setGiftTo(null)}
+        />
+      ) : null}
     </section>
   );
 }

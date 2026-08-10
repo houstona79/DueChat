@@ -48,10 +48,14 @@ export type Room = {
   staff_only: boolean;
   /** Short notice set by the owner or a room super admin. */
   status_message: string | null;
+  /** Hidden rooms never appear in the room list for non-members. */
+  invisible: boolean;
+  /** Locked rooms are listed but need an entry code to get in. */
+  locked: boolean;
 };
 
 export const ROOM_COLS =
-  "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label, trivia_enabled, staff_only, status_message";
+  "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label, trivia_enabled, staff_only, status_message, invisible, locked";
 
 const PROFILE_COLS =
   "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, accepted_eula_at, profile_visibility, decoration, last_seen_at, created_at";
@@ -255,6 +259,7 @@ export async function createRoom(
   name: string,
   topic: string,
   category = "General",
+  options: { invisible?: boolean; lockCode?: string | null } = {},
 ) {
   const { data, error } = await supabase
     .from("rooms")
@@ -264,13 +269,38 @@ export async function createRoom(
       topic: topic.trim() || null,
       created_by: userId,
       category,
+      invisible: options.invisible ?? false,
     })
     .select(ROOM_COLS)
     .single();
   if (error) throw error;
   const join = await supabase.from("room_members").insert({ room_id: data.id, user_id: userId });
   if (join.error) throw join.error;
+  const code = options.lockCode?.trim();
+  if (code) {
+    await setRoomLock(data.id, code);
+    return { ...(data as Room), locked: true };
+  }
   return data as Room;
+}
+
+/** Sets (or clears, with null) a room's entry code. Owner / super admin only. */
+export async function setRoomLock(roomId: string, code: string | null) {
+  const { error } = await supabase.rpc("set_room_lock", { _room_id: roomId, _code: code ?? "" });
+  if (error) throw new Error(error.message || "Could not save the entry code.");
+}
+
+/** Checks the entry code and joins the room. Returns false when the code is wrong. */
+export async function unlockRoom(roomId: string, code: string) {
+  const { data, error } = await supabase.rpc("unlock_room", { _room_id: roomId, _code: code });
+  if (error) throw new Error(error.message || "Could not enter this room.");
+  return data === true;
+}
+
+/** Hides a room from the room list, or shows it again. */
+export async function setRoomInvisible(roomId: string, invisible: boolean) {
+  const { error } = await supabase.from("rooms").update({ invisible }).eq("id", roomId);
+  if (error) throw error;
 }
 
 export function directKeyFor(a: string, b: string) {

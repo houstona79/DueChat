@@ -17,6 +17,8 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
   const [topic, setTopic] = useState("");
   const [rating, setRating] = useState<RoomRating>("G");
   const [category, setCategory] = useState<string>("General");
+  const [invisible, setInvisible] = useState(false);
+  const [lockCode, setLockCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +28,10 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
     setBusy(true);
     setError(null);
     try {
-      const room = await createRoom(userId, name, topic, category);
+      const room = await createRoom(userId, name, topic, category, {
+        invisible,
+        lockCode: lockCode.trim() || null,
+      });
       if (rating !== "G") await setRoomRating(room.id, rating);
       await queryClient.invalidateQueries({ queryKey: ["rooms"] });
       await queryClient.invalidateQueries({ queryKey: ["memberships"] });
@@ -105,6 +110,39 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
           </button>
         ))}
       </div>
+      <span className="mt-3 block text-[11px] font-medium text-muted-foreground">Privacy</span>
+      <label className="mt-1 flex items-start gap-2 rounded-xl bg-background px-3 py-2 text-xs">
+        <input
+          type="checkbox"
+          checked={invisible}
+          onChange={(e) => setInvisible(e.target.checked)}
+          className="mt-0.5 size-4 shrink-0"
+        />
+        <span>
+          <span className="block font-medium">Invisible room</span>
+          <span className="block text-muted-foreground">
+            Hidden from the room list — only you, members and people you invite can see it.
+          </span>
+        </span>
+      </label>
+      <label
+        className="mt-2 block text-[11px] font-medium text-muted-foreground"
+        htmlFor="room-lock-code"
+      >
+        Entry code (optional)
+      </label>
+      <input
+        id="room-lock-code"
+        value={lockCode}
+        onChange={(e) => setLockCode(e.target.value)}
+        maxLength={40}
+        autoComplete="off"
+        placeholder="Leave blank for an open room"
+        className="mt-1 w-full rounded-xl bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
+      />
+      <p className="mt-1 text-[11px] text-muted-foreground">
+        A locked room still appears in the list, but people need this code to get in.
+      </p>
       {error ? <p className="mt-2 text-xs text-destructive">{error}</p> : null}
       <div className="mt-3 flex gap-2">
         <button

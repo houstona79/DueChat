@@ -257,6 +257,81 @@ export type Database = {
         }
         Relationships: []
       }
+      gift_items: {
+        Row: {
+          cost: number
+          created_at: string
+          emoji: string
+          key: string
+          label: string
+          sort_order: number
+        }
+        Insert: {
+          cost: number
+          created_at?: string
+          emoji: string
+          key: string
+          label: string
+          sort_order?: number
+        }
+        Update: {
+          cost?: number
+          created_at?: string
+          emoji?: string
+          key?: string
+          label?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      gifts: {
+        Row: {
+          created_at: string
+          credits: number
+          gift_key: string
+          id: string
+          note: string | null
+          recipient_id: string
+          room_id: string | null
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits: number
+          gift_key: string
+          id?: string
+          note?: string | null
+          recipient_id: string
+          room_id?: string | null
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          credits?: number
+          gift_key?: string
+          id?: string
+          note?: string | null
+          recipient_id?: string
+          room_id?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gifts_gift_key_fkey"
+            columns: ["gift_key"]
+            isOneToOne: false
+            referencedRelation: "gift_items"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "gifts_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invite_codes: {
         Row: {
           code: string
@@ -758,6 +833,44 @@ export type Database = {
           },
         ]
       }
+      room_hands: {
+        Row: {
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          raised_at: string
+          room_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          raised_at?: string
+          room_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          raised_at?: string
+          room_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_hands_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       room_invites: {
         Row: {
           created_at: string
@@ -785,6 +898,35 @@ export type Database = {
             foreignKeyName: "room_invites_room_id_fkey"
             columns: ["room_id"]
             isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      room_locks: {
+        Row: {
+          code: string
+          created_at: string
+          room_id: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          room_id: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          room_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_locks_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: true
             referencedRelation: "rooms"
             referencedColumns: ["id"]
           },
@@ -971,7 +1113,9 @@ export type Database = {
           direct_key: string | null
           icon_url: string | null
           id: string
+          invisible: boolean
           is_direct: boolean
+          locked: boolean
           name: string
           radio_name: string | null
           radio_url: string | null
@@ -994,7 +1138,9 @@ export type Database = {
           direct_key?: string | null
           icon_url?: string | null
           id?: string
+          invisible?: boolean
           is_direct?: boolean
+          locked?: boolean
           name: string
           radio_name?: string | null
           radio_url?: string | null
@@ -1017,7 +1163,9 @@ export type Database = {
           direct_key?: string | null
           icon_url?: string | null
           id?: string
+          invisible?: boolean
           is_direct?: boolean
+          locked?: boolean
           name?: string
           radio_name?: string | null
           radio_url?: string | null
@@ -1271,6 +1419,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_credits: {
+        Row: {
+          balance: number
+          created_at: string
+          last_grant_on: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          last_grant_on?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          last_grant_on?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_ip_log: {
         Row: {
           checked_at: string | null
@@ -1350,6 +1522,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      claim_daily_credits: { Args: never; Returns: number }
       claim_device: {
         Args: { _device_id: string; _user_agent: string }
         Returns: undefined
@@ -1437,8 +1610,27 @@ export type Database = {
         }[]
       }
       my_invite_code: { Args: never; Returns: string }
+      room_is_invisible: { Args: { _room_id: string }; Returns: boolean }
+      room_is_locked: { Args: { _room_id: string }; Returns: boolean }
       room_is_staff_only: { Args: { _room_id: string }; Returns: boolean }
       room_requires_adult: { Args: { _room_id: string }; Returns: boolean }
+      send_gift: {
+        Args: {
+          _gift_key: string
+          _note?: string
+          _recipient: string
+          _room_id?: string
+        }
+        Returns: number
+      }
+      set_room_lock: {
+        Args: { _code: string; _room_id: string }
+        Returns: undefined
+      }
+      unlock_room: {
+        Args: { _code: string; _room_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

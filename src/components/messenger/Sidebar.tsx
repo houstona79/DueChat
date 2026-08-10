@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { BuddyList } from "./BuddyList";
 import { NewRoomForm } from "./NewRoomForm";
+import { CreditsCard } from "./CreditsCard";
 import { NotificationsPanel } from "./NotificationsPanel";
 import { RoomInvites } from "./RoomInvites";
 import { WaterUpdates } from "./WaterUpdates";
@@ -205,6 +206,7 @@ export function Sidebar({
 
       <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
         <WaterUpdates />
+        <CreditsCard meId={me?.id} />
         <NotificationsPanel me={me} profiles={profiles} />
         <RoomInvites me={me} rooms={rooms} profiles={profiles} />
         <BuddyList profiles={profiles} me={me} />
@@ -329,6 +331,22 @@ export function Sidebar({
                           {room.staff_only ? (
                             <span className="shrink-0 rounded-full bg-staff/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-staff">
                               Staff
+                            </span>
+                          ) : null}
+                          {room.locked ? (
+                            <span
+                              className="shrink-0 rounded-full bg-secondary px-1.5 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground"
+                              title="Needs an entry code"
+                            >
+                              Locked
+                            </span>
+                          ) : null}
+                          {room.invisible ? (
+                            <span
+                              className="shrink-0 rounded-full bg-secondary px-1.5 py-0.5 text-[10px] font-semibold uppercase text-muted-foreground"
+                              title="Hidden from the public room list"
+                            >
+                              Hidden
                             </span>
                           ) : null}
                         </span>
