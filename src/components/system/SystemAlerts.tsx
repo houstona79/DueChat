@@ -10,6 +10,7 @@ import {
   levelLabel,
   type AlertLevel,
 } from "@/lib/announcements";
+import { playSound } from "@/lib/sounds";
 
 const tone: Record<AlertLevel, string> = {
   info: "bg-primary text-primary-foreground",
@@ -46,6 +47,7 @@ export function SystemAlerts() {
     const channel = supabase
       .channel("system-alerts")
       .on("postgres_changes", { event: "*", schema: "public", table: "announcements" }, () => {
+        playSound("alert");
         void queryClient.invalidateQueries({ queryKey: ["system-alerts"] });
       })
       .subscribe();

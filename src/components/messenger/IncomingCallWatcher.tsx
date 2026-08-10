@@ -5,6 +5,7 @@ import { Avatar } from "./Avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { accentFor, counterpartId, type Profile, type Room } from "@/lib/chat";
 import { setPendingCall } from "@/lib/call-invites";
+import { playSound } from "@/lib/sounds";
 
 type Ring = { roomId: string; callerId: string; mode: "voice" | "video" };
 
@@ -65,6 +66,15 @@ export function IncomingCallWatcher({
   }, [directKeys, meId]);
 
   const active = rings.filter((r) => !dismissed.includes(r.roomId));
+
+  // Repeat the ring tone while a call is waiting to be answered.
+  useEffect(() => {
+    if (active.length === 0) return;
+    playSound("ring");
+    const id = window.setInterval(() => playSound("ring"), 3000);
+    return () => window.clearInterval(id);
+  }, [active.length]);
+
   if (active.length === 0) return null;
 
   return (
