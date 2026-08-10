@@ -19,13 +19,54 @@ export async function fetchMyTicket(): Promise<SupportThread | null> {
 }
 
 export async function fetchTicketMessages(ticketId: string): Promise<SupportMessage[]> {
-  const { data } = await supabase
+  const { data: messages } = await supabase
     .from("support_messages")
-    .select("id, body, from_staff, created_at")
+    .select("id, body, from_staff, created_at, sender_id")
     .eq("ticket_id", ticketId)
     .order("created_at", { ascending: true })
     .limit(300);
-  return data ?? [];
+
+  const rows = messages ?? [];
+  const senderIds = [...new Set(rows.map((m) => m.sender_id).filter(Boolean))];
+
+  const profiles: Record<string, { display_name: string; username: string }> = {};
+  if (senderIds.length > 0) {
+    const { data: profileRows } = await supabase
+      .from("profiles")
+      .select("id, display_name, username")
+      .in("id", senderIds);
+    for (const p of profileRows ?? []) {
+      profiles[p.id] = p;
+    }
+  }
+
+  const hasGuest = rows.some((m) => !m.from_staff && !m.sender_id);
+  let guestName: string | null = null;
+  if (hasGuest) {
+    const { data: ticket } = await supabase
+      .from("support_tickets")
+      .select("guest_name")
+      .eq("id", ticketId)
+      .maybeSingle();
+    guestName = ticket?.guest_name ?? null;
+  }
+
+  return rows.map((m) => {
+    const profile = m.sender_id ? profiles[m.sender_id] : null;
+    const senderName = m.from_staff
+      ? profile?.display_name || profile?.username || "DueChat support"
+      : m.sender_id
+        ? profile?.display_name || profile?.username || "Member"
+        : guestName || "Guest";
+    return {
+      id: m.id,
+      body: m.body,
+      from_staff: m.from_staff,
+      created_at: m.created_at,
+      sender_id: m.sender_id,
+      sender_name: senderName,
+    };
+  });
 }
 
 /** Opens a support chat as the signed-in member. */

@@ -103,7 +103,8 @@ export function SupportInbox() {
                   m.from_staff ? "text-primary-foreground/70" : "text-muted-foreground"
                 }`}
               >
-                {m.from_staff ? "You" : "Member"} · {new Date(m.created_at).toLocaleString()}
+                {m.from_staff ? "You" : (m.sender_name ?? "Member")} ·{" "}
+                {new Date(m.created_at).toLocaleString()}
               </p>
             </div>
           ))}

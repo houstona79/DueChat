@@ -7,6 +7,8 @@ export type SupportMessage = {
   body: string;
   from_staff: boolean;
   created_at: string;
+  sender_id?: string | null;
+  sender_name?: string | null;
 };
 
 export type SupportThread = {
