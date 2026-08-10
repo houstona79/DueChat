@@ -20,7 +20,7 @@ import {
  * Live support chat for the home page: anyone can reach an admin, signed in or
  * not. Guests are identified by a private token kept in their own browser.
  */
-export function SupportWidget() {
+export function SupportWidget({ notice }: { notice?: string | undefined } = {}) {
   const [open, setOpen] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
 
@@ -54,6 +54,11 @@ export function SupportWidget() {
             <p className="text-xs text-muted-foreground">
               Message a DueChat admin about any issue — replies appear right here.
             </p>
+            {notice ? (
+              <p className="mt-2 rounded-xl bg-destructive/10 px-3 py-2 text-xs text-destructive">
+                {notice}
+              </p>
+            ) : null}
           </header>
           {signedIn ? <MemberChat /> : <GuestChat />}
         </section>
