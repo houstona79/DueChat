@@ -36,6 +36,7 @@ import {
   unbanUser,
 } from "@/lib/admin";
 import { fetchIpLog, sharedIps } from "@/lib/ip-log";
+import { deleteAccount } from "@/lib/accounts.functions";
 import { clearSessions, deviceLabel, fetchActiveSessions, multiSessionUsers } from "@/lib/sessions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -129,6 +130,15 @@ function AdminPage() {
       refresh();
     },
     onError: () => toast.error("Could not kick that member."),
+  });
+  const deleteAccountMutation = useMutation({
+    mutationFn: ({ userId }: { userId: string; name: string }) =>
+      deleteAccount({ data: { userId } }),
+    onSuccess: (_data, vars) => {
+      toast.success(`${vars.name}'s account was permanently deleted.`);
+      refresh();
+    },
+    onError: () => toast.error("Could not delete that account."),
   });
 
   const isAdmin = useMemo(
