@@ -33,6 +33,7 @@ import { AlertComposer } from "@/components/messenger/AlertComposer";
 import { AdminNav, TAB_META, type AdminTab } from "@/components/admin/AdminNav";
 import { SupportInbox } from "@/components/admin/SupportInbox";
 import { GiveCreditsDialog } from "@/components/admin/GiveCreditsDialog";
+import { fetchAllBalances } from "@/lib/credits";
 import { useAuth } from "@/hooks/use-auth";
 import { accentFor, formatTime, isOnline } from "@/lib/chat";
 import {
@@ -172,6 +173,11 @@ function AdminPage() {
     [data, user],
   );
   const isOwner = user?.id === OWNER_USER_ID;
+  const { data: balances } = useQuery({
+    queryKey: ["admin-credit-balances"],
+    queryFn: fetchAllBalances,
+    enabled: !!user,
+  });
 
   const nameOf = (id: string) => data?.profiles.find((p) => p.id === id)?.display_name ?? "Unknown";
 
@@ -330,6 +336,10 @@ function AdminPage() {
                         {isOnline(p) ? "Online" : `Seen ${formatTime(p.last_seen_at)}`}
                       </p>
                     </div>
+                    <span className="flex shrink-0 items-center gap-1 rounded-xl bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                      <Coins className="size-3.5" aria-hidden />
+                      {balances?.[p.id] ?? 0}
+                    </span>
                     <button
                       disabled={roleMutation.isPending || locked || !isOwner}
                       title={
