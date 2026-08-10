@@ -1577,6 +1577,16 @@ export type Database = {
           user_id: string
         }[]
       }
+      gift_shelf: {
+        Args: { _user_id: string }
+        Returns: {
+          emoji: string
+          gift_key: string
+          label: string
+          last_at: string
+          total: number
+        }[]
+      }
       grant_credits: {
         Args: { _amount: number; _note?: string; _user_id: string }
         Returns: number

@@ -103,3 +103,36 @@ async function fetchGiftsReceivedInner(userId: string): Promise<Gift[]> {
   if (error) throw error;
   return data ?? [];
 }
+export type GiftShelfEntry = {
+  gift_key: string;
+  label: string;
+  emoji: string;
+  total: number;
+  last_at: string;
+};
+
+/** Gifts a member has received, grouped by type (senders stay private). */
+export async function fetchGiftShelf(userId: string): Promise<GiftShelfEntry[]> {
+  const { data, error } = await supabase.rpc("gift_shelf", { _user_id: userId });
+  if (error) throw new Error(error.message || "Could not load gifts.");
+  return (data ?? []).map((row) => ({
+    gift_key: row.gift_key,
+    label: row.label,
+    emoji: row.emoji,
+    total: Number(row.total),
+    last_at: row.last_at,
+  }));
+}
+
+/** Sentinel body used to announce a gift inside a chat room. */
+export function giftNoticeBody(emoji: string, label: string, recipientName: string) {
+  return `::gift::${emoji}|${label}|${recipientName}`;
+}
+
+export function giftNoticeOf(body: string) {
+  const trimmed = body.trim();
+  if (!trimmed.startsWith("::gift::")) return null;
+  const [emoji, label, recipientName] = trimmed.slice("::gift::".length).split("|");
+  if (!emoji || !label || !recipientName) return null;
+  return { emoji, label, recipientName };
+}

@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.gift_shelf(uuid) FROM anon;
