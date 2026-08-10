@@ -10,6 +10,7 @@ import {
   levelLabel,
   type AlertLevel,
 } from "@/lib/announcements";
+import { playSound } from "@/lib/sounds";
 
 const tone: Record<AlertLevel, string> = {
   info: "bg-primary text-primary-foreground",
