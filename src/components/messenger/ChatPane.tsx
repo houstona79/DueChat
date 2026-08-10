@@ -658,6 +658,59 @@ export function ChatPane({
             />
           ) : null}
 
+          {!room.is_direct && joined && hands.length > 0 ? (
+            <section
+              className="flex flex-wrap items-center gap-2 border-b border-border bg-secondary/40 px-3 py-2"
+              aria-label="Raised hands"
+            >
+              <span className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
+                <Hand className="size-3.5" aria-hidden />
+                Mic queue
+              </span>
+              {hands.map((hand) => {
+                const who = profileOf(hand.user_id);
+                const granted = Boolean(hand.granted_at);
+                return (
+                  <span
+                    key={hand.id}
+                    className={cn(
+                      "flex items-center gap-1.5 rounded-xl px-2 py-1 text-[11px]",
+                      granted ? "bg-primary/15 text-primary" : "bg-background",
+                    )}
+                  >
+                    {who?.display_name ?? "Member"}
+                    {granted ? " · has the mic" : ""}
+                    {canModerate ? (
+                      <button
+                        onClick={() =>
+                          void runModeration(
+                            () =>
+                              granted
+                                ? revokeMic(room.id, hand.user_id)
+                                : grantMic(room.id, hand.user_id, meId),
+                            ["room-hands"],
+                          )
+                        }
+                        className="rounded-lg bg-secondary px-1.5 py-0.5 font-medium"
+                      >
+                        {granted ? "Take back" : "Give mic"}
+                      </button>
+                    ) : null}
+                    {hand.user_id === meId ? (
+                      <button
+                        onClick={() => void toggleHand()}
+                        aria-label="Lower your hand"
+                        className="rounded-lg bg-secondary px-1.5 py-0.5 font-medium"
+                      >
+                        Lower
+                      </button>
+                    ) : null}
+                  </span>
+                );
+              })}
+            </section>
+          ) : null}
+
           {!room.is_direct ? (
             <>
               <RoomBanner
