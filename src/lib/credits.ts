@@ -66,6 +66,25 @@ export async function sendGift(
 }
 
 export async function fetchGiftsReceived(userId: string): Promise<Gift[]> {
+  return fetchGiftsReceivedInner(userId);
+}
+
+/** Admin-only: adds credits to a member's balance and returns their new balance. */
+export async function grantCredits(
+  userId: string,
+  amount: number,
+  note?: string,
+): Promise<number> {
+  const { data, error } = await supabase.rpc("grant_credits", {
+    _user_id: userId,
+    _amount: amount,
+    ...(note?.trim() ? { _note: note.trim() } : {}),
+  });
+  if (error) throw new Error(error.message || "Could not give those credits.");
+  return data ?? 0;
+}
+
+async function fetchGiftsReceivedInner(userId: string): Promise<Gift[]> {
   const { data, error } = await supabase
     .from("gifts")
     .select("id, sender_id, recipient_id, room_id, gift_key, credits, note, created_at")
