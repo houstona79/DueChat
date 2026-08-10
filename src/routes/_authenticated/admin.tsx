@@ -10,6 +10,7 @@ import {
   MessageSquare,
   MonitorSmartphone,
   ShieldCheck,
+  Coins,
   Trash2,
   Users,
 } from "lucide-react";
@@ -31,6 +32,7 @@ import { NotificationAudit } from "@/components/messenger/NotificationAudit";
 import { AlertComposer } from "@/components/messenger/AlertComposer";
 import { AdminNav, TAB_META, type AdminTab } from "@/components/admin/AdminNav";
 import { SupportInbox } from "@/components/admin/SupportInbox";
+import { GiveCreditsDialog } from "@/components/admin/GiveCreditsDialog";
 import { useAuth } from "@/hooks/use-auth";
 import { accentFor, formatTime, isOnline } from "@/lib/chat";
 import {
@@ -76,6 +78,11 @@ function AdminPage() {
   const [staffSearch, setStaffSearch] = useState("");
   const [userSearch, setUserSearch] = useState("");
   const [pendingDelete, setPendingDelete] = useState<{
+    id: string;
+    name: string;
+    username: string;
+  } | null>(null);
+  const [creditTarget, setCreditTarget] = useState<{
     id: string;
     name: string;
     username: string;
