@@ -365,10 +365,7 @@ export function ChatPane({
             members={members}
             profiles={profiles}
             onShowAll={() => {
-              setShowFeed(false);
-              setShowMedia(false);
-              setShowGames(false);
-              setShowTrivia(false);
+              togglePanel("members");
               setShowMembers(true);
             }}
           />
@@ -1009,15 +1006,15 @@ export function ChatPane({
                       : `Message ${room.name}`
                   }
                   aria-label="Message"
-                  className="max-h-32 min-h-9 w-full resize-none bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted-foreground disabled:opacity-70"
+                  className="max-h-32 min-h-11 w-full resize-none bg-transparent px-2 py-2 text-base outline-none placeholder:text-muted-foreground disabled:opacity-70 lg:min-h-9 lg:py-1.5 lg:text-sm"
                 />
                 <button
                   onClick={() => void submit()}
                   disabled={draft.trim().length === 0 || Boolean(mySilence)}
                   aria-label="Send message"
-                  className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40"
+                  className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40 lg:size-10"
                 >
-                  <SendHorizonal className="size-4" />
+                  <SendHorizonal className="size-5 lg:size-4" />
                 </button>
               </div>
             </footer>
