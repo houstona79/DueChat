@@ -6,6 +6,7 @@ import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { Sidebar } from "@/components/messenger/Sidebar";
 import { ProfileViewer } from "@/components/messenger/ProfileViewer";
 import { IncomingCallWatcher } from "@/components/messenger/IncomingCallWatcher";
+import { SupportWidget } from "@/components/support/SupportWidget";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { useMyBan } from "@/hooks/use-my-ban";
 import {
