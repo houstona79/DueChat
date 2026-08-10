@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Gift as GiftIcon, X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCredits, useGiftItems } from "@/hooks/use-chat";
-import { sendGift } from "@/lib/credits";
+import { giftNoticeBody, sendGift } from "@/lib/credits";
+import { sendMessage } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 
 /** Pick a gift and spend credits on it. */
@@ -37,6 +38,18 @@ export function GiftDialog({
     try {
       const remaining = await sendGift(recipientId, chosen.key, roomId ?? null, note);
       queryClient.setQueryData(["credits", meId], remaining);
+      if (roomId) {
+        try {
+          await sendMessage(
+            roomId,
+            meId,
+            giftNoticeBody(chosen.emoji, chosen.label, recipientName),
+          );
+        } catch {
+          /* the gift still landed even if the room notice failed */
+        }
+      }
+      void queryClient.invalidateQueries({ queryKey: ["gift-shelf", recipientId] });
       setSent(true);
       window.setTimeout(onClose, 1200);
     } catch (err) {
