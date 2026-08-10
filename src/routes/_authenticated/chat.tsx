@@ -46,6 +46,8 @@ function ChatLayout() {
   const params = useParams({ strict: false }) as { roomId?: string };
   const activeRoomId = params.roomId;
 
+  if (myBan) return <BannedScreen reason={myBan.reason} />;
+
   return (
     <>
       <main
