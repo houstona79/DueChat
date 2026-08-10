@@ -10,6 +10,7 @@ import { Avatar } from "./Avatar";
 import { ProfilePhotos } from "./ProfilePhotos";
 import { ProfileFeed } from "./ProfileFeed";
 import { ProfileBlogs } from "./ProfileBlogs";
+import { GiftShelf } from "./GiftShelf";
 import { SocialStatus } from "./SocialStatus";
 import { YearBadges } from "./YearBadges";
 import { useAuth } from "@/hooks/use-auth";
@@ -175,6 +176,7 @@ export function ProfileViewer() {
             <div className="space-y-3 text-sm">
               <YearBadges profile={profile} />
               <SocialStatus profile={profile} />
+              <GiftShelf userId={profile.id} />
               {profile.bio ? (
                 <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">
                   {profile.bio}
