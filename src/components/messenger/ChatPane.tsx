@@ -865,12 +865,11 @@ export function ChatPane({
                     </div>
                   );
                 }
-                }
                 const prev = timeline[i - 1];
                 const grouped =
                   prev?.kind === "message" &&
                   prev.message.user_id === m.user_id &&
-                  !liveNoticeOf(prev.message.body);
+                  !isNotice(prev.message.body);
                 const author = profileOf(m.user_id);
                 const authorName = author?.display_name ?? "Someone";
                 return (
