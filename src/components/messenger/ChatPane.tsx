@@ -695,6 +695,7 @@ export function ChatPane({
               }}
               camsOpen={showCams}
               onCamsOpenChange={setShowCams}
+              isDirect={room.is_direct}
             />
           ) : null}
 

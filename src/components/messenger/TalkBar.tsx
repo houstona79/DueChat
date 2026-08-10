@@ -2,6 +2,8 @@ import { Hand, Mic, MicOff, PhoneOff, Radio, Video, Volume2, VolumeX } from "luc
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
+import { useRoomHands } from "@/hooks/use-chat";
+import { lowerHand, raiseHand } from "@/lib/hands";
 import { attachStream, playWithUnlock, unlockAudioPlayback } from "@/lib/webrtc";
 import { applySinkId, useAudioDevices } from "@/lib/audio-devices";
 import { useMicLevel } from "@/lib/use-mic-level";
@@ -25,6 +27,7 @@ export function TalkBar({
   onLeave,
   camsOpen,
   onCamsOpenChange,
+  isDirect = false,
 }: {
   roomId: string;
   meId: string;
@@ -32,6 +35,7 @@ export function TalkBar({
   onLeave: () => void;
   camsOpen: boolean;
   onCamsOpenChange: (open: boolean) => void;
+  isDirect?: boolean;
 }) {
   const [held, setHeld] = useState(false);
   const [pushToTalk, setPushToTalk] = useState(() => {
@@ -42,6 +46,23 @@ export function TalkBar({
   const { mics, speakers, micId, speakerId, setMicId, setSpeakerId, refresh } = useAudioDevices();
 
   const queryClient = useQueryClient();
+
+  const { data: hands = [] } = useRoomHands(roomId, !isDirect);
+  const myHand = hands.find((h) => h.user_id === meId) ?? null;
+  const [handBusy, setHandBusy] = useState(false);
+
+  const toggleHand = async () => {
+    setHandBusy(true);
+    try {
+      if (myHand) await lowerHand(roomId, meId);
+      else await raiseHand(roomId, meId);
+      await queryClient.invalidateQueries({ queryKey: ["room-hands", roomId] });
+    } catch {
+      /* best-effort — realtime will resync */
+    } finally {
+      setHandBusy(false);
+    }
+  };
 
   const { localStream, mediaError, participants, camOn, setCamOn, setMuted } = useGroupCall({
     roomId,
@@ -218,6 +239,40 @@ export function TalkBar({
 
         <MicLevelMeter level={micLevel} active={live} />
 
+        {!isDirect ? (
+          <button
+            type="button"
+            onClick={() => void toggleHand()}
+            disabled={handBusy}
+            aria-label={myHand ? "Lower your hand" : "Raise your hand to ask for the mic"}
+            aria-pressed={Boolean(myHand)}
+            title={
+              myHand?.granted_at
+                ? "You have the mic — tap to lower your hand"
+                : myHand
+                  ? "Hand raised — tap to lower"
+                  : "Raise your hand to ask for the mic"
+            }
+            className={cn(
+              "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold disabled:opacity-60",
+              myHand?.granted_at
+                ? "bg-primary text-primary-foreground"
+                : myHand
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:bg-secondary",
+            )}
+          >
+            <Hand className="size-4" />
+            {myHand?.granted_at
+              ? "Mic granted"
+              : myHand
+                ? "Hand up"
+                : hands.length > 0
+                  ? `Hand ${hands.length}`
+                  : "Hand"}
+          </button>
+        ) : null}
+
         <button
           type="button"
           onClick={() => {
@@ -238,7 +293,7 @@ export function TalkBar({
           )}
           title={pushToTalk ? "Push-to-talk on" : "Open mic on"}
         >
-          {pushToTalk ? <Hand className="size-4" /> : <Radio className="size-4" />}
+          {pushToTalk ? <Mic className="size-4" /> : <Radio className="size-4" />}
         </button>
 
         <AudioDeviceMenu
