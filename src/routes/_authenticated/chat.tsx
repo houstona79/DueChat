@@ -4,7 +4,9 @@ import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { Sidebar } from "@/components/messenger/Sidebar";
 import { ProfileViewer } from "@/components/messenger/ProfileViewer";
 import { IncomingCallWatcher } from "@/components/messenger/IncomingCallWatcher";
+import { SupportWidget } from "@/components/support/SupportWidget";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
+import { useMyBan } from "@/hooks/use-my-ban";
 import {
   useChatRealtime,
   useMemberships,
@@ -37,6 +39,7 @@ function ChatLayout() {
   const { data: rooms = [] } = useRooms();
   const { data: memberships = [] } = useMemberships();
   const { data: profiles = [] } = useProfiles();
+  const { data: myBan } = useMyBan(user?.id);
   usePresenceHeartbeat(user?.id);
   useChatRealtime();
 
@@ -88,6 +91,13 @@ function ChatLayout() {
         </div>
       </main>
       <ProfileViewer />
+      <SupportWidget
+        notice={
+          myBan
+            ? `Your account is banned from DueChat${myBan.reason ? ` — ${myBan.reason}` : ""}. You can still message an admin here to appeal.`
+            : undefined
+        }
+      />
       {user?.id ? <IncomingCallWatcher rooms={rooms} profiles={profiles} meId={user.id} /> : null}
     </>
   );
