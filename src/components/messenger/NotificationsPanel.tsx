@@ -40,6 +40,7 @@ import {
   fetchUpdateComments,
 } from "@/lib/update-comments";
 import { cn } from "@/lib/utils";
+import { playSound, useSoundUnlock, useSounds } from "@/lib/sounds";
 
 export function NotificationsPanel({
   me,
@@ -56,6 +57,8 @@ export function NotificationsPanel({
   const [sending, setSending] = useState(false);
   const [inviteBusy, setInviteBusy] = useState<string | null>(null);
   const { data: myInvites = [] } = useMyRoomInvites(me?.id);
+  const { enabled: soundOn, toggle: toggleSound } = useSounds();
+  useSoundUnlock();
 
   const { data: items = [] } = useQuery({
     queryKey: ["notifications", me?.id],
@@ -75,7 +78,11 @@ export function NotificationsPanel({
           table: "notifications",
           filter: `user_id=eq.${me.id}`,
         },
-        () => {
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            const kind = (payload.new as { kind?: string }).kind;
+            playSound(kind === "room_invite" ? "invite" : "notification");
+          }
           void queryClient.invalidateQueries({ queryKey: ["notifications", me.id] });
         },
       )
