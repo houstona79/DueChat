@@ -861,6 +861,8 @@ function AdminPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <GiveCreditsDialog member={creditTarget} onClose={() => setCreditTarget(null)} />
     </Shell>
   );
 }
