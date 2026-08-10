@@ -17,6 +17,7 @@ import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
 import { accentFor } from "@/lib/chat";
 import { attachStream, playWithUnlock } from "@/lib/webrtc";
 import { applySinkId, useAudioDevices } from "@/lib/audio-devices";
+import { playSound } from "@/lib/sounds";
 import { AudioDeviceMenu } from "./AudioDeviceMenu";
 import { cn } from "@/lib/utils";
 
