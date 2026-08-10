@@ -95,7 +95,6 @@ function ChatLayout() {
         </div>
       </main>
       <ProfileViewer />
-      <SupportWidget />
       {user?.id ? <IncomingCallWatcher rooms={rooms} profiles={profiles} meId={user.id} /> : null}
     </>
   );
