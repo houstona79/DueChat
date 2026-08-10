@@ -6,6 +6,7 @@ import { Avatar } from "@/components/messenger/Avatar";
 import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { ProfileFeed } from "@/components/messenger/ProfileFeed";
 import { ProfileBlogs } from "@/components/messenger/ProfileBlogs";
+import { GiftShelf } from "@/components/messenger/GiftShelf";
 import { SocialStatus } from "@/components/messenger/SocialStatus";
 import { YearBadges } from "@/components/messenger/YearBadges";
 import { useAuth } from "@/hooks/use-auth";
@@ -138,6 +139,7 @@ function ProfilePage() {
             <div className="mt-5 space-y-3 text-sm">
               <YearBadges profile={profile} />
               <SocialStatus profile={profile} />
+              <GiftShelf userId={profile.id} />
               {profile.bio ? (
                 <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">
                   {profile.bio}
