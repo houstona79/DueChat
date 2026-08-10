@@ -10,6 +10,7 @@ import {
   MessageSquare,
   MonitorSmartphone,
   ShieldCheck,
+  Coins,
   Trash2,
   Users,
 } from "lucide-react";
@@ -31,6 +32,7 @@ import { NotificationAudit } from "@/components/messenger/NotificationAudit";
 import { AlertComposer } from "@/components/messenger/AlertComposer";
 import { AdminNav, TAB_META, type AdminTab } from "@/components/admin/AdminNav";
 import { SupportInbox } from "@/components/admin/SupportInbox";
+import { GiveCreditsDialog } from "@/components/admin/GiveCreditsDialog";
 import { useAuth } from "@/hooks/use-auth";
 import { accentFor, formatTime, isOnline } from "@/lib/chat";
 import {
@@ -76,6 +78,11 @@ function AdminPage() {
   const [staffSearch, setStaffSearch] = useState("");
   const [userSearch, setUserSearch] = useState("");
   const [pendingDelete, setPendingDelete] = useState<{
+    id: string;
+    name: string;
+    username: string;
+  } | null>(null);
+  const [creditTarget, setCreditTarget] = useState<{
     id: string;
     name: string;
     username: string;
@@ -394,6 +401,22 @@ function AdminPage() {
                       <LogOut className="size-3.5" />
                       Kick
                     </button>
+                    {isAdmin && (
+                      <button
+                        title="Add gift credits to this member's balance"
+                        onClick={() =>
+                          setCreditTarget({
+                            id: p.id,
+                            name: p.display_name,
+                            username: p.username,
+                          })
+                        }
+                        className="flex shrink-0 items-center gap-1.5 rounded-xl bg-secondary px-3 py-1.5 text-xs font-semibold text-muted-foreground"
+                      >
+                        <Coins className="size-3.5" />
+                        Credits
+                      </button>
+                    )}
                     {isOwner && (
                       <button
                         disabled={deleteAccountMutation.isPending || locked}
@@ -838,6 +861,8 @@ function AdminPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <GiveCreditsDialog member={creditTarget} onClose={() => setCreditTarget(null)} />
     </Shell>
   );
 }

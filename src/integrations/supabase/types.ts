@@ -230,6 +230,33 @@ export type Database = {
         }
         Relationships: []
       }
+      credit_grants: {
+        Row: {
+          amount: number
+          created_at: string
+          granted_by: string
+          id: string
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          granted_by: string
+          id?: string
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          granted_by?: string
+          id?: string
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       device_accounts: {
         Row: {
           created_at: string
@@ -1549,6 +1576,10 @@ export type Database = {
           title: string
           user_id: string
         }[]
+      }
+      grant_credits: {
+        Args: { _amount: number; _note?: string; _user_id: string }
+        Returns: number
       }
       has_role: {
         Args: {
