@@ -11,6 +11,8 @@ import {
   MessageSquare,
   Send,
   Trash2,
+  Volume2,
+  VolumeX,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
