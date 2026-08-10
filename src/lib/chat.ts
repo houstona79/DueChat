@@ -286,7 +286,7 @@ export async function createRoom(
 
 /** Sets (or clears, with null) a room's entry code. Owner / super admin only. */
 export async function setRoomLock(roomId: string, code: string | null) {
-  const { error } = await supabase.rpc("set_room_lock", { _room_id: roomId, _code: code });
+  const { error } = await supabase.rpc("set_room_lock", { _room_id: roomId, _code: code ?? "" });
   if (error) throw new Error(error.message || "Could not save the entry code.");
 }
 
