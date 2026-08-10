@@ -6,7 +6,15 @@ import { useCallback, useEffect, useState } from "react";
  */
 const KEY = "duechat.sounds";
 
-export type SoundCue = "notification" | "message" | "support" | "invite" | "ring" | "alert";
+export type SoundCue =
+  | "notification"
+  | "message"
+  | "support"
+  | "invite"
+  | "ring"
+  | "dial"
+  | "connected"
+  | "alert";
 
 const CUES: Record<SoundCue, { notes: number[]; gain: number; step: number; dur: number }> = {
   notification: { notes: [660, 880], gain: 0.14, step: 0.09, dur: 0.16 },
@@ -14,6 +22,9 @@ const CUES: Record<SoundCue, { notes: number[]; gain: number; step: number; dur:
   support: { notes: [740, 988, 740], gain: 0.16, step: 0.11, dur: 0.16 },
   invite: { notes: [587, 784, 1046], gain: 0.14, step: 0.1, dur: 0.18 },
   ring: { notes: [880, 660, 880, 660], gain: 0.18, step: 0.18, dur: 0.22 },
+  // Outgoing ringback: two soft low tones, like a phone ringing on the far end.
+  dial: { notes: [440, 480], gain: 0.12, step: 0.42, dur: 0.4 },
+  connected: { notes: [660, 880, 1046], gain: 0.14, step: 0.08, dur: 0.14 },
   alert: { notes: [440, 440], gain: 0.2, step: 0.16, dur: 0.2 },
 };
 
