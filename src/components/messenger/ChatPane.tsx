@@ -1005,6 +1005,40 @@ export function ChatPane({
                     </Link>
                   )}
                 </>
+              ) : needsCode ? (
+                <>
+                  <h3 className="flex items-center justify-center gap-2 text-lg font-semibold">
+                    <Lock className="size-4 text-primary" aria-hidden />
+                    {title} is locked
+                  </h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Ask the room owner for the entry code, then type it below.
+                  </p>
+                  <form
+                    className="mt-4 flex gap-2"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      void enterWithCode();
+                    }}
+                  >
+                    <input
+                      value={codeDraft}
+                      onChange={(e) => setCodeDraft(e.target.value)}
+                      maxLength={40}
+                      autoComplete="off"
+                      aria-label="Room entry code"
+                      placeholder="Entry code"
+                      className="min-w-0 flex-1 rounded-xl bg-secondary px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!codeDraft.trim() || unlocking}
+                      className="shrink-0 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-40"
+                    >
+                      {unlocking ? "Checking…" : "Enter"}
+                    </button>
+                  </form>
+                </>
               ) : (
                 <>
                   <h3 className="text-lg font-semibold">Join {title}</h3>
