@@ -187,6 +187,16 @@ export function ChatPane({
   const needsCode = !room.is_direct && room.locked && !joined && !isOwner;
   const giftProfile = giftTo ? profileOf(giftTo) : undefined;
 
+  /** Only one docked/slide-out panel at a time — keeps small screens readable. */
+  const togglePanel = (which: "members" | "feed" | "media" | "games" | "trivia" | "invite") => {
+    setShowMembers((v) => (which === "members" ? !v : false));
+    setShowFeed((v) => (which === "feed" ? !v : false));
+    setShowMedia((v) => (which === "media" ? !v : false));
+    setShowGames((v) => (which === "games" ? !v : false));
+    setShowTrivia((v) => (which === "trivia" ? !v : false));
+    setShowInvite((v) => (which === "invite" ? !v : false));
+  };
+
   type TimelineItem =
     | { kind: "message"; id: string; at: string; message: (typeof messages)[number] }
     | {
