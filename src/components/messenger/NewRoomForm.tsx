@@ -9,6 +9,13 @@ import {
   type RoomRating,
 } from "@/lib/chat";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => void }) {
   const navigate = useNavigate();
@@ -45,7 +52,16 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
   };
 
   return (
-    <form onSubmit={submit} className="mt-3 rounded-2xl bg-secondary p-3">
+    <Dialog open onOpenChange={(next) => { if (!next) onDone(); }}>
+      <DialogContent className="flex max-h-[90dvh] w-[calc(100vw-1.5rem)] max-w-md flex-col gap-0 overflow-hidden p-0 sm:max-w-md">
+        <DialogHeader className="border-b px-4 py-3 text-left">
+          <DialogTitle className="text-base">Create a room</DialogTitle>
+          <DialogDescription className="text-xs">
+            Set the name, audience and privacy for your new room.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
       <label className="block text-[11px] font-medium text-muted-foreground" htmlFor="room-name">
         Room name
       </label>
@@ -56,7 +72,7 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
         onChange={(e) => setName(e.target.value)}
         maxLength={60}
         placeholder="Design crit"
-        className="mt-1 w-full rounded-xl bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
+        className="mt-1 w-full rounded-xl bg-secondary px-3 py-2 text-base outline-none placeholder:text-muted-foreground sm:text-sm"
       />
       <label
         className="mt-2 block text-[11px] font-medium text-muted-foreground"
@@ -70,7 +86,7 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
         onChange={(e) => setTopic(e.target.value)}
         maxLength={120}
         placeholder="Weekly reviews"
-        className="mt-1 w-full rounded-xl bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
+        className="mt-1 w-full rounded-xl bg-secondary px-3 py-2 text-base outline-none placeholder:text-muted-foreground sm:text-sm"
       />
       <label
         className="mt-2 block text-[11px] font-medium text-muted-foreground"
@@ -82,7 +98,7 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
         id="room-category"
         value={category}
         onChange={(e) => setCategory(e.target.value)}
-        className="mt-1 w-full rounded-xl bg-background px-3 py-2 text-sm outline-none"
+        className="mt-1 w-full rounded-xl bg-secondary px-3 py-2 text-base outline-none sm:text-sm"
       >
         {ROOM_CATEGORIES.map((c) => (
           <option key={c} value={c}>
@@ -103,7 +119,7 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
                 ? option === "R"
                   ? "bg-destructive/20 text-destructive"
                   : "bg-primary/20 text-primary"
-                : "bg-background text-muted-foreground",
+                : "bg-secondary text-muted-foreground",
             )}
           >
             {option} · {ROOM_RATING_LABEL[option]}
@@ -111,7 +127,7 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
         ))}
       </div>
       <span className="mt-3 block text-[11px] font-medium text-muted-foreground">Privacy</span>
-      <label className="mt-1 flex items-start gap-2 rounded-xl bg-background px-3 py-2 text-xs">
+      <label className="mt-1 flex items-start gap-2 rounded-xl bg-secondary px-3 py-2 text-xs">
         <input
           type="checkbox"
           checked={invisible}
@@ -138,28 +154,31 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
         maxLength={40}
         autoComplete="off"
         placeholder="Leave blank for an open room"
-        className="mt-1 w-full rounded-xl bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
+        className="mt-1 w-full rounded-xl bg-secondary px-3 py-2 text-base outline-none placeholder:text-muted-foreground sm:text-sm"
       />
       <p className="mt-1 text-[11px] text-muted-foreground">
         A locked room still appears in the list, but people need this code to get in.
       </p>
       {error ? <p className="mt-2 text-xs text-destructive">{error}</p> : null}
-      <div className="mt-3 flex gap-2">
+          </div>
+          <div className="flex gap-2 border-t px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <button
           type="submit"
           disabled={!name.trim() || busy}
-          className="flex-1 rounded-xl bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-40"
+          className="min-h-11 flex-1 rounded-xl bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-40"
         >
           {busy ? "Creating…" : "Create room"}
         </button>
         <button
           type="button"
           onClick={onDone}
-          className="rounded-xl px-3 py-2 text-sm text-muted-foreground hover:bg-background"
+          className="min-h-11 rounded-xl px-3 py-2 text-sm text-muted-foreground hover:bg-secondary"
         >
           Cancel
         </button>
-      </div>
-    </form>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
