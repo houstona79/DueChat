@@ -48,10 +48,14 @@ export type Room = {
   staff_only: boolean;
   /** Short notice set by the owner or a room super admin. */
   status_message: string | null;
+  /** Hidden rooms never appear in the room list for non-members. */
+  invisible: boolean;
+  /** Locked rooms are listed but need an entry code to get in. */
+  locked: boolean;
 };
 
 export const ROOM_COLS =
-  "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label, trivia_enabled, staff_only, status_message";
+  "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label, trivia_enabled, staff_only, status_message, invisible, locked";
 
 const PROFILE_COLS =
   "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, accepted_eula_at, profile_visibility, decoration, last_seen_at, created_at";
