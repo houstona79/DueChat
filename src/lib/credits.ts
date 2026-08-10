@@ -48,6 +48,15 @@ export async function fetchBalance(userId: string): Promise<number> {
   return data?.balance ?? 0;
 }
 
+/** Staff-only: balances for every member, keyed by user id. */
+export async function fetchAllBalances(): Promise<Record<string, number>> {
+  const { data, error } = await supabase.from("user_credits").select("user_id, balance");
+  if (error) throw error;
+  const map: Record<string, number> = {};
+  for (const row of data ?? []) map[row.user_id] = row.balance;
+  return map;
+}
+
 /** Sends a gift and returns the sender's remaining balance. */
 export async function sendGift(
   recipientId: string,
