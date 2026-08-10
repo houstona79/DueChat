@@ -65,7 +65,7 @@ export function SupportInbox() {
             <p className="truncate text-xs text-muted-foreground">
               {current.guest_email
                 ? `${current.guest_name ?? "Guest"} · ${current.guest_email}`
-                : "Signed-in member"}
+                : (current.member_name ?? "Signed-in member")}
             </p>
           </div>
           <button
@@ -159,7 +159,10 @@ export function SupportInbox() {
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-semibold">{t.subject}</span>
             <span className="block truncate text-xs text-muted-foreground">
-              {t.guest_email ? `${t.guest_name ?? "Guest"} · ${t.guest_email}` : "Member"} ·{" "}
+              {t.guest_email
+                ? `${t.guest_name ?? "Guest"} · ${t.guest_email}`
+                : (t.member_name ?? "Member")}{" "}
+              ·{" "}
               {new Date(t.last_message_at).toLocaleString()}
             </span>
           </span>
