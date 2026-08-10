@@ -98,6 +98,7 @@ import {
   type RoomAdminTier,
 } from "@/lib/chat";
 import { cn } from "@/lib/utils";
+import { giftNoticeOf } from "@/lib/credits";
 import { MessageVideo, videoEmbedOf } from "./MessageVideo";
 
 function isEmojiOnly(body: string) {
