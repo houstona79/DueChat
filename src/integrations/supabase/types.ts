@@ -1257,6 +1257,51 @@ export type Database = {
         }
         Relationships: []
       }
+      support_logs: {
+        Row: {
+          archived_at: string
+          body: string
+          from_staff: boolean
+          guest_email: string | null
+          guest_name: string | null
+          id: string
+          member_name: string | null
+          message_id: string | null
+          sender_id: string | null
+          sent_at: string
+          subject: string | null
+          ticket_id: string | null
+        }
+        Insert: {
+          archived_at?: string
+          body: string
+          from_staff?: boolean
+          guest_email?: string | null
+          guest_name?: string | null
+          id?: string
+          member_name?: string | null
+          message_id?: string | null
+          sender_id?: string | null
+          sent_at: string
+          subject?: string | null
+          ticket_id?: string | null
+        }
+        Update: {
+          archived_at?: string
+          body?: string
+          from_staff?: boolean
+          guest_email?: string | null
+          guest_name?: string | null
+          id?: string
+          member_name?: string | null
+          message_id?: string | null
+          sender_id?: string | null
+          sent_at?: string
+          subject?: string | null
+          ticket_id?: string | null
+        }
+        Relationships: []
+      }
       support_messages: {
         Row: {
           body: string
@@ -1536,6 +1581,7 @@ export type Database = {
     }
     Functions: {
       archive_and_clear_messages: { Args: never; Returns: number }
+      archive_and_clear_support: { Args: never; Returns: number }
       blog_comment_feed: {
         Args: { _post_id: string }
         Returns: {
