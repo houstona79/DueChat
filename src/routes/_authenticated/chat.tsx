@@ -1,5 +1,7 @@
-import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
-import { MessagesSquare } from "lucide-react";
+import { createFileRoute, Outlet, useNavigate, useParams } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { MessagesSquare, ShieldAlert } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { Sidebar } from "@/components/messenger/Sidebar";
 import { ProfileViewer } from "@/components/messenger/ProfileViewer";
