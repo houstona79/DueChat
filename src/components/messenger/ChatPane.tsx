@@ -1240,6 +1240,7 @@ export function ChatPane({
               setShowMembers(false);
               void openDirect(userId);
             }}
+            onGift={(userId) => setGiftTo(userId)}
             onLeave={
               room.is_direct
                 ? undefined
@@ -1251,6 +1252,15 @@ export function ChatPane({
           />
         ) : null}
       </div>
+      {giftTo && giftProfile ? (
+        <GiftDialog
+          meId={meId}
+          recipientId={giftTo}
+          recipientName={giftProfile.display_name}
+          roomId={room.is_direct ? null : room.id}
+          onClose={() => setGiftTo(null)}
+        />
+      ) : null}
     </section>
   );
 }
