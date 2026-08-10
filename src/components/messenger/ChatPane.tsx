@@ -152,6 +152,9 @@ export function ChatPane({
   const [talking, setTalking] = useState(false);
   const [showCams, setShowCams] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [codeDraft, setCodeDraft] = useState("");
+  const [unlocking, setUnlocking] = useState(false);
+  const [giftTo, setGiftTo] = useState<string | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -164,12 +167,16 @@ export function ChatPane({
   const isSuper = !room.is_direct && (isOwner || myTier === "super");
   const { data: bans = [] } = useRoomBans(room.id, canModerate);
   const { data: silences = [] } = useRoomSilences(room.id, joined && !room.is_direct);
+  const { data: hands = [] } = useRoomHands(room.id, joined && !room.is_direct);
   const { data: blocks = [] } = useBlocks(meId);
   const mySilence = silences.find((s) => s.user_id === meId && isActive(s)) ?? null;
   const { data: siteRoles } = useSiteRoles();
   const myProfile = profileOf(meId);
   const adultsOnly = room.rating === "R" && !room.is_direct;
   const ageBlocked = adultsOnly && !isAdultProfile(myProfile);
+  const myHand = hands.find((h) => h.user_id === meId) ?? null;
+  const needsCode = !room.is_direct && room.locked && !joined && !isOwner;
+  const giftProfile = giftTo ? profileOf(giftTo) : undefined;
 
   type TimelineItem =
     | { kind: "message"; id: string; at: string; message: (typeof messages)[number] }
@@ -251,6 +258,36 @@ export function ChatPane({
   const leave = async () => {
     await leaveRoom(room.id, meId);
     await queryClient.invalidateQueries({ queryKey: ["memberships"] });
+  };
+
+  const enterWithCode = async () => {
+    const code = codeDraft.trim();
+    if (!code || unlocking) return;
+    setUnlocking(true);
+    setError(null);
+    try {
+      const ok = await unlockRoom(room.id, code);
+      if (!ok) {
+        setError("That entry code is not right.");
+        return;
+      }
+      setCodeDraft("");
+      await queryClient.invalidateQueries({ queryKey: ["memberships"] });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not enter this room.");
+    } finally {
+      setUnlocking(false);
+    }
+  };
+
+  const toggleHand = async () => {
+    try {
+      if (myHand) await lowerHand(room.id, meId);
+      else await raiseHand(room.id, meId);
+      await queryClient.invalidateQueries({ queryKey: ["room-hands", room.id] });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not update your raised hand.");
+    }
   };
 
   const runModeration = async (action: () => Promise<void>, keys: string[]) => {
