@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { playSound, useSoundUnlock } from "@/lib/sounds";
 
 /**
  * Pops a toast for admins the moment someone writes in a live support chat.
@@ -11,6 +12,7 @@ import { useAuth } from "@/hooks/use-auth";
 export function SupportAlerts() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  useSoundUnlock();
 
   useEffect(() => {
     if (!user) return;
@@ -27,6 +29,7 @@ export function SupportAlerts() {
         (payload) => {
           const row = payload.new as { kind?: string; preview?: string | null };
           if (row.kind !== "support") return;
+          playSound("support");
           toast("New live support message", {
             description: row.preview ?? "Someone needs help in the support chat.",
             action: {
