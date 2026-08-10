@@ -65,6 +65,11 @@ function AdminPage() {
   const [openDm, setOpenDm] = useState<string | null>(null);
   const [staffSearch, setStaffSearch] = useState("");
   const [userSearch, setUserSearch] = useState("");
+  const [pendingDelete, setPendingDelete] = useState<{
+    id: string;
+    name: string;
+    username: string;
+  } | null>(null);
 
   const transcript = useQuery({
     queryKey: ["admin-transcript", openDm],
@@ -136,9 +141,13 @@ function AdminPage() {
       deleteAccount({ data: { userId } }),
     onSuccess: (_data, vars) => {
       toast.success(`${vars.name}'s account was permanently deleted.`);
+      setPendingDelete(null);
       refresh();
     },
-    onError: () => toast.error("Could not delete that account."),
+    onError: (err: unknown) => {
+      const message = err instanceof Error ? err.message : "";
+      toast.error(message ? `Could not delete that account: ${message}` : "Could not delete that account.");
+    },
   });
 
   const isAdmin = useMemo(
@@ -784,6 +793,41 @@ function AdminPage() {
             Only admins can send system-wide alerts.
           </p>
         ))}
+
+      <AlertDialog
+        open={!!pendingDelete}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this account?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingDelete
+                ? `${pendingDelete.name} (@${pendingDelete.username}) will be removed permanently, along with their profile, messages, photos and blogs. This can’t be undone.`
+                : ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteAccountMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deleteAccountMutation.isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                if (!pendingDelete) return;
+                deleteAccountMutation.mutate({
+                  userId: pendingDelete.id,
+                  name: pendingDelete.name,
+                });
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteAccountMutation.isPending ? "Deleting…" : "Delete account"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Shell>
   );
 }
