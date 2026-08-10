@@ -36,6 +36,7 @@ import {
   unbanUser,
 } from "@/lib/admin";
 import { fetchIpLog, sharedIps } from "@/lib/ip-log";
+import { deleteAccount } from "@/lib/accounts.functions";
 import { clearSessions, deviceLabel, fetchActiveSessions, multiSessionUsers } from "@/lib/sessions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -129,6 +130,15 @@ function AdminPage() {
       refresh();
     },
     onError: () => toast.error("Could not kick that member."),
+  });
+  const deleteAccountMutation = useMutation({
+    mutationFn: ({ userId }: { userId: string; name: string }) =>
+      deleteAccount({ data: { userId } }),
+    onSuccess: (_data, vars) => {
+      toast.success(`${vars.name}'s account was permanently deleted.`);
+      refresh();
+    },
+    onError: () => toast.error("Could not delete that account."),
   });
 
   const isAdmin = useMemo(
@@ -365,6 +375,29 @@ function AdminPage() {
                       <LogOut className="size-3.5" />
                       Kick
                     </button>
+                    {isOwner && (
+                      <button
+                        disabled={deleteAccountMutation.isPending || locked}
+                        title={
+                          locked
+                            ? "This account can’t be deleted"
+                            : "Permanently delete this account and all of its data"
+                        }
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              `Permanently delete ${p.display_name} (@${p.username})? This removes their profile, messages, photos and blogs. This cannot be undone.`,
+                            )
+                          ) {
+                            deleteAccountMutation.mutate({ userId: p.id, name: p.display_name });
+                          }
+                        }}
+                        className="flex shrink-0 items-center gap-1.5 rounded-xl bg-destructive/15 px-3 py-1.5 text-xs font-semibold text-destructive disabled:opacity-50"
+                      >
+                        <Trash2 className="size-3.5" />
+                        Delete
+                      </button>
+                    )}
                   </li>
                 );
               })}
