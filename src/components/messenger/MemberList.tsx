@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   Ban,
+  Gift,
   LogOut,
   MessageSquare,
   MicOff,
