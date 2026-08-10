@@ -68,6 +68,7 @@ export function MemberList({
   isSuper,
   onClose,
   onMessage,
+  onGift,
   onLeave,
   onSetTier,
   onRemoveAdmin,
@@ -93,6 +94,7 @@ export function MemberList({
   isSuper?: boolean | undefined;
   onClose: () => void;
   onMessage: (userId: string) => void;
+  onGift?: ((userId: string) => void) | undefined;
   onLeave?: (() => void) | undefined;
   onSetTier?: ((userId: string, tier: RoomAdminTier) => void) | undefined;
   onRemoveAdmin?: ((userId: string) => void) | undefined;
@@ -272,6 +274,17 @@ export function MemberList({
                   </span>
                 </button>
                 {p.id === meId ? null : (
+                  <>
+                    {onGift ? (
+                      <button
+                        onClick={() => onGift(p.id)}
+                        aria-label={`Send a gift to ${p.display_name}`}
+                        title="Send a gift"
+                        className="grid size-10 shrink-0 place-items-center rounded-xl bg-secondary text-muted-foreground hover:bg-primary/15 hover:text-primary"
+                      >
+                        <Gift className="size-4" />
+                      </button>
+                    ) : null}
                   <button
                     onClick={() => onMessage(p.id)}
                     aria-label={`Message ${p.display_name}`}
@@ -279,6 +292,7 @@ export function MemberList({
                   >
                     <MessageSquare className="size-4" />
                   </button>
+                  </>
                 )}
               </div>
 
