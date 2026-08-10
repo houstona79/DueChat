@@ -126,6 +126,10 @@ function liveNoticeOf(body: string): "on" | "off" | null {
   return null;
 }
 
+function isNotice(body: string) {
+  return liveNoticeOf(body) !== null || giftNoticeOf(body) !== null;
+}
+
 export function ChatPane({
   room,
   memberships,
@@ -843,6 +847,24 @@ export function ChatPane({
                       </span>
                     </div>
                   );
+                }
+
+                const giftNotice = giftNoticeOf(m.body);
+                if (giftNotice) {
+                  const who = profileOf(m.user_id);
+                  const name = mine ? "You" : (who?.display_name ?? "Someone");
+                  return (
+                    <div key={m.id} className="mt-4 flex justify-center">
+                      <span className="flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-center text-[11px] font-medium text-primary">
+                        <span className="text-sm leading-none" aria-hidden>
+                          {giftNotice.emoji}
+                        </span>
+                        {`${name} sent ${giftNotice.recipientName} a ${giftNotice.label}`} ·{" "}
+                        {formatTime(m.created_at)}
+                      </span>
+                    </div>
+                  );
+                }
                 }
                 const prev = timeline[i - 1];
                 const grouped =
