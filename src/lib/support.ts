@@ -27,7 +27,7 @@ export async function fetchTicketMessages(ticketId: string): Promise<SupportMess
     .limit(300);
 
   const rows = messages ?? [];
-  const senderIds = [...new Set(rows.map((m) => m.sender_id).filter(Boolean))];
+  const senderIds = [...new Set(rows.map((m) => m.sender_id).filter((id): id is string => Boolean(id)))];
 
   const profiles: Record<string, { display_name: string; username: string }> = {};
   if (senderIds.length > 0) {
