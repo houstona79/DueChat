@@ -46,6 +46,7 @@ export function SystemAlerts() {
     const channel = supabase
       .channel("system-alerts")
       .on("postgres_changes", { event: "*", schema: "public", table: "announcements" }, () => {
+        playSound("alert");
         void queryClient.invalidateQueries({ queryKey: ["system-alerts"] });
       })
       .subscribe();
