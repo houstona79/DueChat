@@ -33,7 +33,8 @@ export type AdminTab =
   | "reports"
   | "notifications"
   | "alerts"
-  | "support";
+  | "support"
+  | "supportlogs";
 
 type Meta = { label: string; icon: LucideIcon; hint: string; group: string };
 
@@ -83,6 +84,12 @@ export const TAB_META: Record<AdminTab, Meta> = {
     hint: "Answer help requests",
     group: "Moderation",
   },
+  supportlogs: {
+    label: "Support reports",
+    icon: ScrollText,
+    hint: "Nightly support archives",
+    group: "Moderation",
+  },
 };
 
 const GROUPS: { name: string; tabs: AdminTab[] }[] = [
@@ -90,7 +97,10 @@ const GROUPS: { name: string; tabs: AdminTab[] }[] = [
   { name: "People", tabs: ["users", "staff", "bans"] },
   { name: "Security", tabs: ["sessions", "ips"] },
   { name: "Content", tabs: ["rooms", "messages", "dms", "logs"] },
-  { name: "Moderation", tabs: ["support", "reports", "notifications", "alerts"] },
+  {
+    name: "Moderation",
+    tabs: ["support", "supportlogs", "reports", "notifications", "alerts"],
+  },
 ];
 
 /**
