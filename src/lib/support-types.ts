@@ -23,6 +23,7 @@ export type SupportTicket = {
   user_id: string | null;
   guest_name: string | null;
   guest_email: string | null;
+  member_name?: string | null;
   subject: string;
   status: SupportStatus;
   last_message_at: string;

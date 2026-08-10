@@ -108,7 +108,25 @@ export async function fetchSupportTickets(): Promise<SupportTicket[]> {
     .order("last_message_at", { ascending: false })
     .limit(100);
   if (error) throw new Error(error.message);
-  return (data ?? []) as SupportTicket[];
+  const rows = (data ?? []) as SupportTicket[];
+
+  const memberIds = [
+    ...new Set(rows.map((t) => t.user_id).filter((id): id is string => Boolean(id))),
+  ];
+  if (memberIds.length === 0) return rows;
+
+  const { data: profileRows } = await supabase
+    .from("profiles")
+    .select("id, display_name, username")
+    .in("id", memberIds);
+  const names: Record<string, string> = {};
+  for (const p of profileRows ?? []) {
+    names[p.id] = p.display_name || p.username;
+  }
+  return rows.map((t) => ({
+    ...t,
+    member_name: t.user_id ? (names[t.user_id] ?? null) : null,
+  }));
 }
 
 export async function sendStaffMessage(ticketId: string, body: string) {
