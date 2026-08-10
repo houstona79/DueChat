@@ -198,6 +198,14 @@ export function NotificationsPanel({
             </span>
           ) : null}
         </button>
+        <button
+          onClick={toggleSound}
+          aria-label={soundOn ? "Mute notification sounds" : "Unmute notification sounds"}
+          aria-pressed={soundOn}
+          className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-secondary"
+        >
+          {soundOn ? <Volume2 className="size-3.5" /> : <VolumeX className="size-3.5" />}
+        </button>
         {!collapsed && items.length > 0 ? (
           <>
             <button
