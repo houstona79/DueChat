@@ -46,7 +46,9 @@ export function CallChat({
   const endRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
-  const visible = messages.filter((m) => !m.body.startsWith("::live::"));
+  const visible = messages.filter(
+    (m) => !m.body.startsWith("::live::") && !m.body.startsWith("::gift::"),
+  );
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end" });
