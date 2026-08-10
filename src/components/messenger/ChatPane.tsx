@@ -331,7 +331,7 @@ export function ChatPane({
       className="flex h-full min-h-0 flex-col bg-background"
       aria-label={`Conversation: ${title}`}
     >
-      <header className="flex flex-col gap-2 border-b border-border px-3 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] lg:flex-row lg:flex-wrap lg:items-center lg:gap-3 lg:px-4">
+      <header className="flex shrink-0 flex-col gap-2 border-b border-border px-3 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] short:gap-1 short:py-1.5 short:pt-[max(0.375rem,env(safe-area-inset-top))] lg:flex-row lg:flex-wrap lg:items-center lg:gap-3 lg:px-4">
         <div className="flex min-w-0 items-center gap-2 lg:min-w-[220px] lg:flex-1 lg:gap-3">
           <Link
             to="/chat"
@@ -366,14 +366,16 @@ export function ChatPane({
           </div>
         </div>
         {!room.is_direct && members.length > 0 ? (
-          <MemberAvatars
-            members={members}
-            profiles={profiles}
-            onShowAll={() => {
-              togglePanel("members");
-              setShowMembers(true);
-            }}
-          />
+          <div className="min-w-0 short:hidden">
+            <MemberAvatars
+              members={members}
+              profiles={profiles}
+              onShowAll={() => {
+                togglePanel("members");
+                setShowMembers(true);
+              }}
+            />
+          </div>
         ) : null}
         <div className="scroll-rail -mx-3 flex items-center gap-1.5 overflow-x-auto px-3 pb-0.5 lg:mx-0 lg:flex-wrap lg:justify-end lg:overflow-visible lg:px-0">
           <a
@@ -753,7 +755,7 @@ export function ChatPane({
           ) : null}
 
           {!room.is_direct ? (
-            <>
+            <div className="short:hidden">
               <RoomBanner
                 roomId={room.id}
                 roomName={room.name}
@@ -771,7 +773,7 @@ export function ChatPane({
                   );
                 }}
               />
-            </>
+            </div>
           ) : null}
 
         {showInvite && !room.is_direct ? (
