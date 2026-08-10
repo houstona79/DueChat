@@ -6,6 +6,7 @@ import {
   Hand,
   Lock,
   Mic,
+  MoreHorizontal,
   Newspaper,
   Phone,
   Radio,
@@ -15,6 +16,14 @@ import {
   Video,
   X,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { EmojiPicker } from "./EmojiPicker";
 import { GifPicker } from "./GifPicker";
