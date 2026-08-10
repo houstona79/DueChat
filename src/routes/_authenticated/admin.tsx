@@ -383,15 +383,13 @@ function AdminPage() {
                             ? "This account can’t be deleted"
                             : "Permanently delete this account and all of its data"
                         }
-                        onClick={() => {
-                          if (
-                            window.confirm(
-                              `Permanently delete ${p.display_name} (@${p.username})? This removes their profile, messages, photos and blogs. This cannot be undone.`,
-                            )
-                          ) {
-                            deleteAccountMutation.mutate({ userId: p.id, name: p.display_name });
-                          }
-                        }}
+                        onClick={() =>
+                          setPendingDelete({
+                            id: p.id,
+                            name: p.display_name,
+                            username: p.username,
+                          })
+                        }
                         className="flex shrink-0 items-center gap-1.5 rounded-xl bg-destructive/15 px-3 py-1.5 text-xs font-semibold text-destructive disabled:opacity-50"
                       >
                         <Trash2 className="size-3.5" />
