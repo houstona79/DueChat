@@ -4,6 +4,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Landscape phones: very little vertical room, so compact the chrome. */
+@custom-variant short (@media (max-height: 520px));
+
 /*
  * Design system definition.
  *
