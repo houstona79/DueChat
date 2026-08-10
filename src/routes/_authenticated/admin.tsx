@@ -15,6 +15,16 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "@/components/messenger/Avatar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { ReportQueue } from "@/components/messenger/ReportQueue";
 import { ChatLogs } from "@/components/messenger/ChatLogs";
 import { NotificationAudit } from "@/components/messenger/NotificationAudit";
@@ -65,6 +75,11 @@ function AdminPage() {
   const [openDm, setOpenDm] = useState<string | null>(null);
   const [staffSearch, setStaffSearch] = useState("");
   const [userSearch, setUserSearch] = useState("");
+  const [pendingDelete, setPendingDelete] = useState<{
+    id: string;
+    name: string;
+    username: string;
+  } | null>(null);
 
   const transcript = useQuery({
     queryKey: ["admin-transcript", openDm],
@@ -136,9 +151,13 @@ function AdminPage() {
       deleteAccount({ data: { userId } }),
     onSuccess: (_data, vars) => {
       toast.success(`${vars.name}'s account was permanently deleted.`);
+      setPendingDelete(null);
       refresh();
     },
-    onError: () => toast.error("Could not delete that account."),
+    onError: (err: unknown) => {
+      const message = err instanceof Error ? err.message : "";
+      toast.error(message ? `Could not delete that account: ${message}` : "Could not delete that account.");
+    },
   });
 
   const isAdmin = useMemo(
@@ -383,15 +402,13 @@ function AdminPage() {
                             ? "This account can’t be deleted"
                             : "Permanently delete this account and all of its data"
                         }
-                        onClick={() => {
-                          if (
-                            window.confirm(
-                              `Permanently delete ${p.display_name} (@${p.username})? This removes their profile, messages, photos and blogs. This cannot be undone.`,
-                            )
-                          ) {
-                            deleteAccountMutation.mutate({ userId: p.id, name: p.display_name });
-                          }
-                        }}
+                        onClick={() =>
+                          setPendingDelete({
+                            id: p.id,
+                            name: p.display_name,
+                            username: p.username,
+                          })
+                        }
                         className="flex shrink-0 items-center gap-1.5 rounded-xl bg-destructive/15 px-3 py-1.5 text-xs font-semibold text-destructive disabled:opacity-50"
                       >
                         <Trash2 className="size-3.5" />
@@ -786,6 +803,41 @@ function AdminPage() {
             Only admins can send system-wide alerts.
           </p>
         ))}
+
+      <AlertDialog
+        open={!!pendingDelete}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this account?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingDelete
+                ? `${pendingDelete.name} (@${pendingDelete.username}) will be removed permanently, along with their profile, messages, photos and blogs. This can’t be undone.`
+                : ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteAccountMutation.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deleteAccountMutation.isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                if (!pendingDelete) return;
+                deleteAccountMutation.mutate({
+                  userId: pendingDelete.id,
+                  name: pendingDelete.name,
+                });
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteAccountMutation.isPending ? "Deleting…" : "Delete account"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Shell>
   );
 }
