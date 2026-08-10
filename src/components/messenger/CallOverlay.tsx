@@ -17,6 +17,7 @@ import { useGroupCall, type CallPeer } from "@/hooks/use-group-call";
 import { accentFor } from "@/lib/chat";
 import { attachStream, playWithUnlock } from "@/lib/webrtc";
 import { applySinkId, useAudioDevices } from "@/lib/audio-devices";
+import { playSound } from "@/lib/sounds";
 import { AudioDeviceMenu } from "./AudioDeviceMenu";
 import { cn } from "@/lib/utils";
 
@@ -71,6 +72,18 @@ export function CallOverlay({
     const i = window.setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => window.clearInterval(i);
   }, []);
+
+  // Outgoing ringback: keep ringing until someone else joins the call.
+  const waiting = participants.length === 0;
+  useEffect(() => {
+    if (!waiting) {
+      playSound("connected");
+      return;
+    }
+    playSound("dial");
+    const id = window.setInterval(() => playSound("dial"), 3000);
+    return () => window.clearInterval(id);
+  }, [waiting]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
