@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -23,11 +23,13 @@ export function GiveCreditsDialog({
 }) {
   const [amount, setAmount] = useState("50");
   const [note, setNote] = useState("");
+  const queryClient = useQueryClient();
 
   const give = useMutation({
     mutationFn: () => grantCredits(member!.id, Number(amount), note),
     onSuccess: (balance) => {
       toast.success(`${member?.name} now has ${balance} credits.`);
+      void queryClient.invalidateQueries({ queryKey: ["admin-credit-balances"] });
       setNote("");
       onClose();
     },
