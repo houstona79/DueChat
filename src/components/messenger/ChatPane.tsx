@@ -3,6 +3,8 @@ import {
   ArrowLeft,
   Bot,
   Gamepad2,
+  Hand,
+  Lock,
   Mic,
   Newspaper,
   Phone,
@@ -33,14 +35,17 @@ import { TriviaBot } from "./TriviaBot";
 import { RoomBanner } from "./RoomBanner";
 import { RatingControl } from "./RoomRating";
 import { YouTubeEmbed } from "./YouTubeEmbed";
+import { GiftDialog } from "./GiftDialog";
 import {
   useBlocks,
   useMessages,
   useRoomAdmins,
   useRoomBans,
   useRoomEvents,
+  useRoomHands,
   useRoomSilences,
 } from "@/hooks/use-chat";
+import { grantMic, lowerHand, raiseHand, revokeMic } from "@/lib/hands";
 import { useOpenDirect } from "@/hooks/use-direct";
 import { blockUser, isBlocked, unblockUser } from "@/lib/blocks";
 import { takePendingCall } from "@/lib/call-invites";
@@ -76,6 +81,7 @@ import {
   setRoomYouTube,
   silenceMember,
   unbanMember,
+  unlockRoom,
   unsilenceMember,
   type Membership,
   type Profile,
