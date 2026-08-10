@@ -561,6 +561,21 @@ export function ChatPane({
             <Mic className="size-4" />
             Talk
           </button>
+          {!room.is_direct && joined ? (
+            <button
+              onClick={() => void toggleHand()}
+              className={cn(
+                "flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2.5 text-xs font-semibold",
+                myHand ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
+              )}
+              aria-label={myHand ? "Lower your hand" : "Raise your hand to ask for the mic"}
+              aria-pressed={Boolean(myHand)}
+              title="Raise hand"
+            >
+              <Hand className="size-4" />
+              {hands.length > 0 ? hands.length : "Hand"}
+            </button>
+          ) : null}
           <button
             onClick={() => {
               // Cams ride along on the room voice session, so make sure it's live.
