@@ -52,10 +52,69 @@ export type Room = {
   invisible: boolean;
   /** Locked rooms are listed but need an entry code to get in. */
   locked: boolean;
+  /** Optional hex color for the room name, chosen by the owner. */
+  name_color: string | null;
 };
 
 export const ROOM_COLS =
-  "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label, trivia_enabled, staff_only, status_message, invisible, locked";
+  "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label, trivia_enabled, staff_only, status_message, invisible, locked, name_color";
+
+/** The 25 room-name colors owners can pick from. */
+export const ROOM_NAME_COLORS: { hex: string; label: string }[] = [
+  { hex: "#EF4444", label: "Red" },
+  { hex: "#F97316", label: "Orange" },
+  { hex: "#F59E0B", label: "Amber" },
+  { hex: "#EAB308", label: "Gold" },
+  { hex: "#84CC16", label: "Lime" },
+  { hex: "#22C55E", label: "Green" },
+  { hex: "#10B981", label: "Emerald" },
+  { hex: "#14B8A6", label: "Teal" },
+  { hex: "#06B6D4", label: "Cyan" },
+  { hex: "#0EA5E9", label: "Sky" },
+  { hex: "#3B82F6", label: "Blue" },
+  { hex: "#1D4ED8", label: "Dark blue" },
+  { hex: "#6366F1", label: "Indigo" },
+  { hex: "#8B5CF6", label: "Violet" },
+  { hex: "#4C1D95", label: "Midnight violet" },
+  { hex: "#A855F7", label: "Purple" },
+  { hex: "#D946EF", label: "Fuchsia" },
+  { hex: "#EC4899", label: "Pink" },
+  { hex: "#FF69B4", label: "Hot pink" },
+  { hex: "#F43F5E", label: "Rose" },
+  { hex: "#800000", label: "Maroon" },
+  { hex: "#B45309", label: "Bronze" },
+  { hex: "#78716C", label: "Stone" },
+  { hex: "#C0C0C0", label: "Silver" },
+  { hex: "#F0FFF0", label: "Honeydew" },
+];
+
+export type RoomSettings = {
+  name: string;
+  topic: string | null;
+  category: string;
+  rating: RoomRating;
+  status_message: string | null;
+  invisible: boolean;
+  name_color: string | null;
+};
+
+/** Saves the owner-editable room details in one update. */
+export async function updateRoomSettings(roomId: string, settings: RoomSettings) {
+  const { data, error } = await supabase
+    .from("rooms")
+    .update(settings)
+    .eq("id", roomId)
+    .select("id")
+    .maybeSingle();
+  if (error) {
+    const raw = `${error.message} ${error.details ?? ""}`;
+    if (/rooms_name_color_hex/.test(raw)) throw new Error("Pick a color from the palette.");
+    if (/row-level security|permission|policy/i.test(raw))
+      throw new Error("Only the room owner or a site admin can edit this room.");
+    throw new Error(error.message || "Could not save the room.");
+  }
+  if (!data) throw new Error("Only the room owner or a site admin can edit this room.");
+}
 
 const PROFILE_COLS =
   "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, accepted_eula_at, profile_visibility, decoration, last_seen_at, created_at";
