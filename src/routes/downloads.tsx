@@ -137,6 +137,15 @@ function Downloads() {
               <strong>System Settings → Privacy & Security</strong>, scroll down, and click{" "}
               <strong>Open Anyway</strong> next to the DueChat block notice.
             </p>
+            <p className="mt-2 font-medium text-foreground">Microphone and camera on macOS</p>
+            <p className="mt-1">
+              The first time you join a voice room or turn your cam on, macOS asks for
+              microphone and camera access — choose <strong>Allow</strong>. If you dismissed it
+              earlier, open <strong>System Settings → Privacy &amp; Security → Microphone</strong>{" "}
+              (and <strong>Camera</strong>) and switch <strong>DueChat</strong> on, then relaunch
+              the app. Moving DueChat to your <strong>Applications</strong> folder before first
+              launch keeps those permissions stable.
+            </p>
           </div>
         </div>
       </div>
