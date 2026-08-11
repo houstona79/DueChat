@@ -14,6 +14,8 @@ export type DirectoryRoom = {
   rating_count: number;
 };
 
+export type TrendingRoom = DirectoryRoom & { join_count: number };
+
 export const getRoomsDirectory = createServerFn({ method: "GET" }).handler(async () => {
   const { publicBlogClient } = await import("@/lib/blogs.server");
   const client = publicBlogClient();
