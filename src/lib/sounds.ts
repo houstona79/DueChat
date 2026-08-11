@@ -18,7 +18,8 @@ export type SoundCue =
 
 const CUES: Record<SoundCue, { notes: number[]; gain: number; step: number; dur: number }> = {
   notification: { notes: [660, 880], gain: 0.14, step: 0.09, dur: 0.16 },
-  message: { notes: [520], gain: 0.1, step: 0.08, dur: 0.12 },
+  // DM chime: louder two-tone so it carries over room audio and phone speakers.
+  message: { notes: [660, 880], gain: 0.42, step: 0.1, dur: 0.2 },
   support: { notes: [740, 988, 740], gain: 0.16, step: 0.11, dur: 0.16 },
   invite: { notes: [587, 784, 1046], gain: 0.14, step: 0.1, dur: 0.18 },
   ring: { notes: [880, 660, 880, 660], gain: 0.18, step: 0.18, dur: 0.22 },
