@@ -286,6 +286,7 @@ export type Database = {
       }
       gift_items: {
         Row: {
+          color_hex: string | null
           cost: number
           created_at: string
           credit_payout: number
@@ -296,6 +297,7 @@ export type Database = {
           sort_order: number
         }
         Insert: {
+          color_hex?: string | null
           cost: number
           created_at?: string
           credit_payout?: number
@@ -306,6 +308,7 @@ export type Database = {
           sort_order?: number
         }
         Update: {
+          color_hex?: string | null
           cost?: number
           created_at?: string
           credit_payout?: number
@@ -707,6 +710,7 @@ export type Database = {
           id: string
           last_seen_at: string
           name_color: string | null
+          name_color_expires_at: string | null
           profile_visibility: string
           pronouns: string | null
           pronouns_visibility: string
@@ -729,6 +733,7 @@ export type Database = {
           id: string
           last_seen_at?: string
           name_color?: string | null
+          name_color_expires_at?: string | null
           profile_visibility?: string
           pronouns?: string | null
           pronouns_visibility?: string
@@ -751,6 +756,7 @@ export type Database = {
           id?: string
           last_seen_at?: string
           name_color?: string | null
+          name_color_expires_at?: string | null
           profile_visibility?: string
           pronouns?: string | null
           pronouns_visibility?: string
@@ -1610,6 +1616,7 @@ export type Database = {
         Args: { _device_id: string }
         Returns: boolean
       }
+      expire_name_colors: { Args: never; Returns: number }
       generate_invite_code: { Args: never; Returns: string }
       get_published_blog: {
         Args: { _slug: string; _username: string }
@@ -1632,6 +1639,7 @@ export type Database = {
       gift_shelf: {
         Args: { _user_id: string }
         Returns: {
+          color_hex: string
           emoji: string
           gift_key: string
           image_url: string
