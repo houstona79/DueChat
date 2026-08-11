@@ -1,6 +1,5 @@
 const { app, BrowserWindow, session, systemPreferences, shell } = require("electron");
 const path = require("path");
-const fs = require("fs");
 
 const APP_URL = "https://app.duechat.com";
 const DEV_URL = "http://localhost:8080";
@@ -35,9 +34,14 @@ const allowMediaPermissions = () => {
   }
 };
 
+/**
+ * Always load the hosted app: server-backed features (GIFs, stickers,
+ * translation) need the live backend, which a local file:// build has no
+ * access to.
+ */
 const loadUrl = () => {
-  if (process.env.NODE_ENV === "development" && process.env.DUECHAT_DEV_URL) {
-    return process.env.DUECHAT_DEV_URL;
+  if (process.env.NODE_ENV === "development") {
+    return process.env.DUECHAT_DEV_URL || DEV_URL;
   }
   return APP_URL;
 };
@@ -55,12 +59,7 @@ const createWindow = () => {
     },
   });
 
-  const localIndex = path.join(__dirname, "..", "dist", "client", "index.html");
-  if (fs.existsSync(localIndex)) {
-    mainWindow.loadFile(localIndex);
-  } else {
-    mainWindow.loadURL(loadUrl());
-  }
+  mainWindow.loadURL(loadUrl());
 
   // External links open in the user's browser instead of hijacking the app.
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
