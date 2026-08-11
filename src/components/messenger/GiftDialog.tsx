@@ -88,9 +88,21 @@ export function GiftDialog({
         </div>
 
         {sent ? (
-          <p className="mt-4 rounded-xl bg-primary/10 px-3 py-3 text-sm text-primary">
-            {chosen?.emoji} Sent to {recipientName}!
-          </p>
+          <div className="mt-4 flex items-center gap-2 rounded-xl bg-primary/10 px-3 py-3 text-sm text-primary">
+            {chosen?.image_url ? (
+              <img
+                src={chosen.image_url}
+                alt={chosen.label}
+                loading="lazy"
+                width={512}
+                height={512}
+                className="size-10 object-contain"
+              />
+            ) : (
+              <span aria-hidden>{chosen?.emoji}</span>
+            )}
+            <span>Sent to {recipientName}!</span>
+          </div>
         ) : (
           <>
             <div className="mt-3 grid grid-cols-4 gap-2">
@@ -109,9 +121,20 @@ export function GiftDialog({
                     )}
                     title={`${item.label} · ${item.cost} credits`}
                   >
-                    <span className="text-2xl leading-none" aria-hidden>
-                      {item.emoji}
-                    </span>
+                    {item.image_url ? (
+                      <img
+                        src={item.image_url}
+                        alt={item.label}
+                        loading="lazy"
+                        width={512}
+                        height={512}
+                        className="size-9 object-contain"
+                      />
+                    ) : (
+                      <span className="text-2xl leading-none" aria-hidden>
+                        {item.emoji}
+                      </span>
+                    )}
                     <span className="truncate">{item.label}</span>
                     <span className="text-muted-foreground">{item.cost}</span>
                   </button>
