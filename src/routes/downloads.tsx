@@ -102,8 +102,15 @@ function Downloads() {
               className="group relative flex flex-col rounded-2xl border border-border bg-card p-5 shadow-sm transition-all hover:border-primary/30 hover:shadow-md"
             >
               <div className="flex items-start justify-between">
-                <span className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary">
-                  <item.icon className="size-6" />
+                <span className="grid size-12 place-items-center rounded-xl bg-primary/10 p-2">
+                  <img
+                    src={item.image}
+                    alt={item.imageAlt}
+                    className="h-full w-full object-contain"
+                    loading="lazy"
+                    width={48}
+                    height={48}
+                  />
                 </span>
                 <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
                   {item.size}
