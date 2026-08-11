@@ -8,6 +8,8 @@ import type {
   PublicRoomStaff,
 } from "@/lib/room-profiles";
 import { RatingBadge } from "@/components/messenger/RoomRating";
+import { RoomCrownBadges } from "@/components/rooms/RoomCrown";
+import { CROWN_LABEL, sortCrowns, type RoomCrown } from "@/lib/room-crowns";
 import { RadioPlayer } from "@/components/messenger/RadioPlayer";
 import { StarRow } from "@/components/rooms/StarRating";
 import { RoomRatingForm } from "@/components/rooms/RoomRatingForm";
@@ -87,8 +89,10 @@ function RoomProfilePage() {
     room: PublicRoomProfile;
     staff: PublicRoomStaff[];
     reviews: PublicRoomReview[];
+    crowns: RoomCrown[];
   };
   const { room, staff, reviews } = data;
+  const crowns = data.crowns ?? [];
   const avg = room.rating_avg ? Number(room.rating_avg) : 0;
 
   return (
@@ -135,7 +139,15 @@ function RoomProfilePage() {
                   {room.name}
                 </h1>
                 <RatingBadge rating={room.rating} />
+                <RoomCrownBadges crowns={crowns} />
               </div>
+              {crowns.length > 0 ? (
+                <p className="mt-1 text-xs font-medium text-primary">
+                  {sortCrowns(crowns)
+                    .map((c) => CROWN_LABEL[c.period])
+                    .join(" · ")}
+                </p>
+              ) : null}
               <p className="mt-0.5 text-xs text-muted-foreground">
                 {room.category || "General"} · {room.member_count}{" "}
                 {room.member_count === 1 ? "member" : "members"} · created{" "}

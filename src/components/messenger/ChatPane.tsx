@@ -27,6 +27,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { EmojiPicker } from "./EmojiPicker";
+import { RoomCrownMarks } from "@/components/rooms/RoomCrown";
+import { useRoomCrowns } from "@/lib/room-crowns";
 import { GifPicker } from "./GifPicker";
 
 import { useEffect, useRef, useState } from "react";
@@ -156,6 +158,8 @@ export function ChatPane({
   const title = room.is_direct ? (partner?.display_name ?? "Direct message") : room.name;
   const { open: openDirect } = useOpenDirect(meId);
   const [showMembers, setShowMembers] = useState(!room.is_direct);
+  const roomCrowns = useRoomCrowns();
+  const myCrowns = roomCrowns.get(room.id) ?? [];
   const [showFeed, setShowFeed] = useState(false);
   const [showMedia, setShowMedia] = useState(false);
   const [showGames, setShowGames] = useState(false);
@@ -351,12 +355,15 @@ export function ChatPane({
             size="sm"
           />
           <div className="min-w-0 flex-1">
-            <h2
-              className="truncate text-sm font-semibold"
-              style={!room.is_direct && room.name_color ? { color: room.name_color } : undefined}
-            >
-              {title}
-            </h2>
+            <div className="flex min-w-0 items-center gap-1.5">
+              <h2
+                className="truncate text-sm font-semibold"
+                style={!room.is_direct && room.name_color ? { color: room.name_color } : undefined}
+              >
+                {title}
+              </h2>
+              {room.is_direct ? null : <RoomCrownMarks crowns={myCrowns} />}
+            </div>
             <p className="truncate text-xs text-muted-foreground">
               {room.is_direct
                 ? partner

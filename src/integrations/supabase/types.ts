@@ -1817,6 +1817,15 @@ export type Database = {
           username: string
         }[]
       }
+      room_crowns: {
+        Args: never
+        Returns: {
+          join_count: number
+          period: string
+          room_id: string
+          slug: string
+        }[]
+      }
       room_is_invisible: { Args: { _room_id: string }; Returns: boolean }
       room_is_locked: { Args: { _room_id: string }; Returns: boolean }
       room_is_staff_only: { Args: { _room_id: string }; Returns: boolean }

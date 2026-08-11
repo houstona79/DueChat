@@ -48,5 +48,12 @@ export const getRoomsDirectory = createServerFn({ method: "GET" }).handler(async
     }),
   );
 
-  return { top, all, trending: { day, week, month } };
+  const { data: crownRows } = await client.rpc("room_crowns");
+
+  return {
+    top,
+    all,
+    trending: { day, week, month },
+    crowns: (crownRows ?? []) as import("@/lib/room-crowns").RoomCrown[],
+  };
 });
