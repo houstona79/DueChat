@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
+  BadgeInfo,
   Bot,
   Gamepad2,
   Hand,
@@ -374,9 +375,10 @@ export function ChatPane({
               <Link
                 to="/r/$slug"
                 params={{ slug: room.slug }}
-                className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline short:hidden"
+                className="inline-flex items-center gap-1 text-xs font-medium text-primary underline-offset-2 hover:underline short:hidden"
               >
-                Room profile
+                <BadgeInfo className="size-3.5 shrink-0" aria-hidden />
+                View room profile
               </Link>
             ) : null}
           </div>
@@ -459,6 +461,18 @@ export function ChatPane({
                 }}
               />
             </span>
+          ) : null}
+          {!room.is_direct ? (
+            <Link
+              to="/r/$slug"
+              params={{ slug: room.slug }}
+              className="hidden h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium text-muted-foreground hover:bg-secondary lg:flex"
+              aria-label="View room profile"
+              title="View room profile"
+            >
+              <BadgeInfo className="size-4" />
+              Room profile
+            </Link>
           ) : null}
           <button
             onClick={() => togglePanel("games")}
@@ -646,6 +660,13 @@ export function ChatPane({
               <DropdownMenuItem onSelect={() => togglePanel("games")}>
                 <Gamepad2 className="size-4" /> Games
               </DropdownMenuItem>
+              {!room.is_direct ? (
+                <DropdownMenuItem asChild>
+                  <Link to="/r/$slug" params={{ slug: room.slug }}>
+                    <BadgeInfo className="size-4" /> View room profile
+                  </Link>
+                </DropdownMenuItem>
+              ) : null}
               {!room.is_direct ? (
                 <DropdownMenuItem onSelect={() => togglePanel("trivia")}>
                   <Bot className="size-4" /> Trivia bot
