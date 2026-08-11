@@ -11,6 +11,7 @@ export type GiftItem = {
   sort_order: number;
   image_url: string | null;
   credit_payout: number;
+  color_hex: string | null;
 };
 
 export type Gift = {
@@ -27,10 +28,10 @@ export type Gift = {
 export async function fetchGiftItems(): Promise<GiftItem[]> {
   const { data, error } = await supabase
     .from("gift_items")
-    .select("key, label, emoji, cost, sort_order, image_url, credit_payout")
+    .select("key, label, emoji, cost, sort_order, image_url, credit_payout, color_hex")
     .order("sort_order", { ascending: true });
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []).map((row) => ({ ...row, color_hex: row.color_hex ?? null }));
 }
 
 /** Balance for the signed-in member, granting today's free credits on the way. */
@@ -110,6 +111,7 @@ export type GiftShelfEntry = {
   label: string;
   emoji: string;
   image_url: string | null;
+  color_hex: string | null;
   total: number;
   last_at: string;
 };
@@ -123,6 +125,7 @@ export async function fetchGiftShelf(userId: string): Promise<GiftShelfEntry[]> 
     label: row.label,
     emoji: row.emoji,
     image_url: row.image_url ?? null,
+    color_hex: row.color_hex ?? null,
     total: Number(row.total),
     last_at: row.last_at,
   }));

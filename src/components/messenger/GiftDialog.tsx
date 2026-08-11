@@ -121,10 +121,17 @@ export function GiftDialog({
                     )}
                     title={
                       `${item.label} · ${item.cost} credits` +
-                      (item.credit_payout ? ` · gives ${item.credit_payout} points` : "")
+                      (item.credit_payout ? ` · gives ${item.credit_payout} points` : "") +
+                      (item.color_hex ? " · name color for 30 days" : "")
                     }
                   >
-                    {item.image_url ? (
+                    {item.color_hex ? (
+                      <span
+                        aria-hidden
+                        style={{ backgroundColor: item.color_hex }}
+                        className="size-9 rounded-full border border-border"
+                      />
+                    ) : item.image_url ? (
                       <img
                         src={item.image_url}
                         alt={item.label}
@@ -144,6 +151,9 @@ export function GiftDialog({
                       <span className="text-[10px] font-medium text-primary">
                         +{item.credit_payout} pts
                       </span>
+                    ) : null}
+                    {item.color_hex ? (
+                      <span className="text-[10px] font-medium text-primary">30 days</span>
                     ) : null}
                   </button>
                 );
