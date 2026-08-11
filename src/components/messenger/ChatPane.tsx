@@ -102,6 +102,7 @@ import {
   type RoomAdminTier,
 } from "@/lib/chat";
 import { cn } from "@/lib/utils";
+import { playSound } from "@/lib/sounds";
 import { TranslatedText } from "@/components/system/TranslatedText";
 import { giftNoticeOf } from "@/lib/credits";
 import { MessageVideo, videoEmbedOf } from "./MessageVideo";
