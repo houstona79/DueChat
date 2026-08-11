@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>DueChat needs your microphone so you can talk in voice rooms and calls.</string>
+  <key>NSCameraUsageDescription</key>
+  <string>DueChat needs your camera so you can join video calls and turn your cam on.</string>
+  <key>NSSpeechRecognitionUsageDescription</key>
+  <string>DueChat does not use speech recognition.</string>
+</dict>
+</plist>
