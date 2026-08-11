@@ -1,4 +1,6 @@
 import { RatingBadge } from "./RoomRating";
+import { RoomCrownMarks } from "@/components/rooms/RoomCrown";
+import { useRoomCrowns } from "@/lib/room-crowns";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { LogOut, NotebookPen, Plus, Search, Settings, Shield, ShieldCheck, Users } from "lucide-react";
 import { useState } from "react";
@@ -53,6 +55,7 @@ export function Sidebar({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { open: openDirect, pending: dmPending } = useOpenDirect(me?.id);
+  const roomCrowns = useRoomCrowns();
 
   const profileOf = (id: string) => profiles.find((p) => p.id === id);
   const dmPartner = (room: Room) => {
