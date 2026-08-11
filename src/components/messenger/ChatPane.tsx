@@ -462,6 +462,18 @@ export function ChatPane({
               />
             </span>
           ) : null}
+          {!room.is_direct ? (
+            <Link
+              to="/r/$slug"
+              params={{ slug: room.slug }}
+              className="hidden h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium text-muted-foreground hover:bg-secondary lg:flex"
+              aria-label="View room profile"
+              title="View room profile"
+            >
+              <BadgeInfo className="size-4" />
+              Room profile
+            </Link>
+          ) : null}
           <button
             onClick={() => togglePanel("games")}
             className={cn(
