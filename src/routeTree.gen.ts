@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AccessibilityRouteImport } from './routes/accessibility'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RoomsRouteImport } from './routes/rooms'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedBlogsRouteImport } from './routes/_authenticated/blogs'
@@ -49,6 +50,11 @@ const AuthRoute = AuthRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoomsRoute = RoomsRouteImport.update({
+  id: '/rooms',
+  path: '/rooms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/accessibility': typeof AccessibilityRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/rooms': typeof RoomsRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/blogs': typeof AuthenticatedBlogsRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/accessibility': typeof AccessibilityRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/rooms': typeof RoomsRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/blogs': typeof AuthenticatedBlogsRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   '/accessibility': typeof AccessibilityRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/rooms': typeof RoomsRoute
   '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/blogs': typeof AuthenticatedBlogsRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/accessibility'
     | '/auth'
     | '/reset-password'
+    | '/rooms'
     | '/terms'
     | '/admin'
     | '/blogs'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/accessibility'
     | '/auth'
     | '/reset-password'
+    | '/rooms'
     | '/terms'
     | '/admin'
     | '/blogs'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/accessibility'
     | '/auth'
     | '/reset-password'
+    | '/rooms'
     | '/terms'
     | '/_authenticated/admin'
     | '/_authenticated/blogs'
@@ -232,6 +244,7 @@ export interface RootRouteChildren {
   AccessibilityRoute: typeof AccessibilityRoute
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  RoomsRoute: typeof RoomsRoute
   TermsRoute: typeof TermsRoute
   ICodeRoute: typeof ICodeRoute
   RSlugRoute: typeof RSlugRoute
@@ -274,6 +287,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rooms': {
+      id: '/rooms'
+      path: '/rooms'
+      fullPath: '/rooms'
+      preLoaderRoute: typeof RoomsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -401,6 +421,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccessibilityRoute: AccessibilityRoute,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  RoomsRoute: RoomsRoute,
   TermsRoute: TermsRoute,
   ICodeRoute: ICodeRoute,
   RSlugRoute: RSlugRoute,

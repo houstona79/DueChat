@@ -11,6 +11,7 @@ const PUBLIC_PREFIXES = [
   "/blog",
   "/i",
   "/r/",
+  "/rooms",
   "/",
 ];
 
