@@ -240,13 +240,23 @@ export function BuddyList({
                     </span>
                     <MessageCircle className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                   </button>
-                  <button
-                    onClick={() => void remove(p.id, p.display_name)}
-                    aria-label={`Remove ${p.display_name} from buddies`}
-                    className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-secondary hover:text-destructive"
-                  >
-                    <UserMinus className="size-4" />
-                  </button>
+                  {lockedFor(p) ? (
+                    <span
+                      className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground/60"
+                      title="Staff buddy link — stays while the role is held"
+                      aria-label={`${p.display_name} is a locked staff buddy`}
+                    >
+                      <Lock className="size-4" aria-hidden />
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => void remove(p.id, p.display_name)}
+                      aria-label={`Remove ${p.display_name} from buddies`}
+                      className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-secondary hover:text-destructive"
+                    >
+                      <UserMinus className="size-4" />
+                    </button>
+                  )}
                 </li>
               );
             }),
