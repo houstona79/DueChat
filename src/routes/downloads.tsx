@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Apple, Monitor, Terminal, Download, ArrowLeft, Info } from "lucide-react";
+import { Download, ArrowLeft, Info } from "lucide-react";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import macAsset from "@/assets/DueChat-mac.zip.asset.json";
 import windowsAsset from "@/assets/DueChat-windows.zip.asset.json";
 import linuxAsset from "@/assets/DueChat-linux.tar.gz.asset.json";
+import appleIcon from "@/assets/apple-icon.png.asset.json";
+import windowsIcon from "@/assets/windows-icon.png.asset.json";
+import linuxIcon from "@/assets/linux-icon.png.asset.json";
 
 export const Route = createFileRoute("/downloads")({
   head: () => ({
