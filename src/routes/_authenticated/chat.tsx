@@ -6,6 +6,7 @@ import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { Sidebar } from "@/components/messenger/Sidebar";
 import { ProfileViewer } from "@/components/messenger/ProfileViewer";
 import { IncomingCallWatcher } from "@/components/messenger/IncomingCallWatcher";
+import { DirectMessageAlerts } from "@/components/messenger/DirectMessageAlerts";
 import { SupportWidget } from "@/components/support/SupportWidget";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { useMyBan } from "@/hooks/use-my-ban";
@@ -96,6 +97,14 @@ function ChatLayout() {
       </main>
       <ProfileViewer />
       {user?.id ? <IncomingCallWatcher rooms={rooms} profiles={profiles} meId={user.id} /> : null}
+      {user?.id ? (
+        <DirectMessageAlerts
+          rooms={rooms}
+          profiles={profiles}
+          meId={user.id}
+          activeRoomId={activeRoomId}
+        />
+      ) : null}
     </>
   );
 }
