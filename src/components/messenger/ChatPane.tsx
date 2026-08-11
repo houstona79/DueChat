@@ -1011,7 +1011,11 @@ export function ChatPane({
                               "bg-transparent px-1 py-0.5 text-3xl leading-tight",
                           )}
                         >
-                          {m.body}
+                          {isEmojiOnly(m.body) || mine ? (
+                            m.body
+                          ) : (
+                            <TranslatedText text={m.body} auto className="block" />
+                          )}
                         </div>
                       )}
                       <span className="mt-1 px-1 text-[11px] text-muted-foreground">
