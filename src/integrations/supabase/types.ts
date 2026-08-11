@@ -1701,6 +1701,7 @@ export type Database = {
         }[]
       }
       my_invite_code: { Args: never; Returns: string }
+      profile_points: { Args: { _user_id: string }; Returns: number }
       room_is_invisible: { Args: { _room_id: string }; Returns: boolean }
       room_is_locked: { Args: { _room_id: string }; Returns: boolean }
       room_is_staff_only: { Args: { _room_id: string }; Returns: boolean }
