@@ -26,7 +26,15 @@ export function GiftShelf({ userId }: { userId: string }) {
             title={`${gift.label} × ${gift.total}`}
             className="flex items-center gap-1 rounded-xl bg-background px-2 py-1 text-xs"
           >
-            {gift.image_url ? (
+            {gift.color_hex ? (
+              <span
+                title={gift.label}
+                style={{ backgroundColor: gift.color_hex }}
+                className="size-6 rounded-full border border-border"
+                role="img"
+                aria-label={gift.label}
+              />
+            ) : gift.image_url ? (
               <img
                 src={gift.image_url}
                 alt={gift.label}
