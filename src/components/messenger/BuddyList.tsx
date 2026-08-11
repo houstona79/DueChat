@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { ChevronDown, ChevronRight, MessageCircle, UserMinus, UserPlus, X } from "lucide-react";
+import { ChevronDown, ChevronRight, Lock, MessageCircle, UserMinus, UserPlus, X } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "./Avatar";
 import { countryFlag } from "@/lib/country-flags";
@@ -17,6 +17,8 @@ import {
 } from "@/hooks/use-roles";
 import { accentFor, addBuddy, isOnline, removeBuddy, type Profile } from "@/lib/chat";
 import { cn } from "@/lib/utils";
+
+const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
 
 export function BuddyList({
   profiles,
@@ -81,6 +83,16 @@ export function BuddyList({
     } catch {
       toast.error("Couldn't remove that buddy");
     }
+  };
+
+  const myRole = siteRoleOf(roles, me?.id ?? "");
+  const iAmStaff = myRole === "admin" || myRole === "moderator";
+  const lockedFor = (p: Profile) => {
+    const theirRole = siteRoleOf(roles, p.id);
+    if (p.id === OWNER_USER_ID && iAmStaff) return true;
+    if (me?.id === OWNER_USER_ID && (theirRole === "admin" || theirRole === "moderator"))
+      return true;
+    return false;
   };
 
   return (
@@ -228,13 +240,23 @@ export function BuddyList({
                     </span>
                     <MessageCircle className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                   </button>
-                  <button
-                    onClick={() => void remove(p.id, p.display_name)}
-                    aria-label={`Remove ${p.display_name} from buddies`}
-                    className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-secondary hover:text-destructive"
-                  >
-                    <UserMinus className="size-4" />
-                  </button>
+                  {lockedFor(p) ? (
+                    <span
+                      className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground/60"
+                      title="Staff buddy link — stays while the role is held"
+                      aria-label={`${p.display_name} is a locked staff buddy`}
+                    >
+                      <Lock className="size-4" aria-hidden />
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => void remove(p.id, p.display_name)}
+                      aria-label={`Remove ${p.display_name} from buddies`}
+                      className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-secondary hover:text-destructive"
+                    >
+                      <UserMinus className="size-4" />
+                    </button>
+                  )}
                 </li>
               );
             }),
