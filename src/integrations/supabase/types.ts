@@ -288,6 +288,7 @@ export type Database = {
         Row: {
           cost: number
           created_at: string
+          credit_payout: number
           emoji: string
           image_url: string | null
           key: string
@@ -297,6 +298,7 @@ export type Database = {
         Insert: {
           cost: number
           created_at?: string
+          credit_payout?: number
           emoji: string
           image_url?: string | null
           key: string
@@ -306,6 +308,7 @@ export type Database = {
         Update: {
           cost?: number
           created_at?: string
+          credit_payout?: number
           emoji?: string
           image_url?: string | null
           key?: string
