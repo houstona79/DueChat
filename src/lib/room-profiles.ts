@@ -13,6 +13,8 @@ export type PublicRoomProfile = {
   banner_url: string | null;
   website_url: string | null;
   website_label: string | null;
+  radio_url: string | null;
+  radio_name: string | null;
   created_at: string;
   member_count: number;
   rating_avg: number | null;
