@@ -39,7 +39,8 @@ const downloads = [
   {
     id: "mac",
     name: "macOS",
-    icon: Apple,
+    image: appleIcon.url,
+    imageAlt: "Apple logo",
     file: "DueChat-mac.zip",
     size: formatBytes(macAsset.size),
     href: macAsset.url,
@@ -48,7 +49,8 @@ const downloads = [
   {
     id: "windows",
     name: "Windows",
-    icon: Monitor,
+    image: windowsIcon.url,
+    imageAlt: "Windows logo",
     file: "DueChat-windows.zip",
     size: formatBytes(windowsAsset.size),
     href: windowsAsset.url,
@@ -57,7 +59,8 @@ const downloads = [
   {
     id: "linux",
     name: "Linux",
-    icon: Terminal,
+    image: linuxIcon.url,
+    imageAlt: "Linux penguin logo",
     file: "DueChat-linux.tar.gz",
     size: formatBytes(linuxAsset.size),
     href: linuxAsset.url,
