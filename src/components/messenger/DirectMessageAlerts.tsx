@@ -18,7 +18,7 @@ export function DirectMessageAlerts({
   rooms: Room[];
   profiles: Profile[];
   meId: string;
-  activeRoomId?: string;
+  activeRoomId?: string | undefined;
 }) {
   const navigate = useNavigate();
   useSoundUnlock();
