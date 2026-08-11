@@ -128,6 +128,15 @@ function Downloads() {
               OAuth may need a browser sign-in first. Extract the archive and run the DueChat
               executable inside.
             </p>
+            <p className="mt-2 font-medium text-foreground">macOS “cannot be opened” warning</p>
+            <p className="mt-1">
+              Because the app is not code-signed with an Apple Developer ID, macOS may show
+              “DueChat cannot be opened because the developer cannot be verified.” To run it,
+              right-click the DueChat app and choose <strong>Open</strong>, then click{" "}
+              <strong>Open</strong> again in the dialog. Alternatively, go to{" "}
+              <strong>System Settings → Privacy & Security</strong>, scroll down, and click{" "}
+              <strong>Open Anyway</strong> next to the DueChat block notice.
+            </p>
           </div>
         </div>
       </div>
