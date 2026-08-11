@@ -75,6 +75,12 @@ function Landing() {
           >
             Browse rooms
           </Link>
+          <Link
+            to="/downloads"
+            className="rounded-xl border border-border px-5 py-2.5 text-sm font-medium"
+          >
+            Download app
+          </Link>
         </div>
         <ul className="mt-12 grid gap-4 text-left sm:grid-cols-3">
           <Feature icon={<MessagesSquare className="size-4" />} title="Shared rooms">

@@ -1,0 +1,136 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Apple, Monitor, Terminal, Download, ArrowLeft, Info } from "lucide-react";
+import duechatLogo from "@/assets/duechat-logo.png.asset.json";
+import macAsset from "@/assets/DueChat-mac.zip.asset.json";
+import windowsAsset from "@/assets/DueChat-windows.zip.asset.json";
+import linuxAsset from "@/assets/DueChat-linux.tar.gz.asset.json";
+
+export const Route = createFileRoute("/downloads")({
+  head: () => ({
+    meta: [
+      { title: "Download DueChat — Mac, Windows & Linux" },
+      {
+        name: "description",
+        content:
+          "Download the DueChat desktop app for macOS, Windows or Linux. Chat rooms, voice and video calls, and real-time presence in one app.",
+      },
+      { property: "og:title", content: "Download DueChat — Mac, Windows & Linux" },
+      {
+        property: "og:description",
+        content:
+          "Download the DueChat desktop app for macOS, Windows or Linux. Chat rooms, voice and video calls, and real-time presence in one app.",
+      },
+    ],
+  }),
+  component: Downloads,
+});
+
+function formatBytes(bytes: number) {
+  if (bytes === 0) return "0 MB";
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1)} ${sizes[i]}`;
+}
+
+const downloads = [
+  {
+    id: "mac",
+    name: "macOS",
+    icon: Apple,
+    file: "DueChat-mac.zip",
+    size: formatBytes(macAsset.size),
+    href: macAsset.url,
+    note: "Intel & Apple Silicon",
+  },
+  {
+    id: "windows",
+    name: "Windows",
+    icon: Monitor,
+    file: "DueChat-windows.zip",
+    size: formatBytes(windowsAsset.size),
+    href: windowsAsset.url,
+    note: "Windows 10/11",
+  },
+  {
+    id: "linux",
+    name: "Linux",
+    icon: Terminal,
+    file: "DueChat-linux.tar.gz",
+    size: formatBytes(linuxAsset.size),
+    href: linuxAsset.url,
+    note: "Extract and run DueChat",
+  },
+];
+
+function Downloads() {
+  return (
+    <main id="main-content" className="min-h-screen px-6 py-12">
+      <div className="mx-auto max-w-5xl">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" aria-hidden />
+          Back to home
+        </Link>
+
+        <div className="mt-8 text-center">
+          <img
+            src={duechatLogo.url}
+            alt="DueChat"
+            className="mx-auto h-12 w-auto object-contain sm:h-14"
+          />
+          <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+            Download DueChat
+          </h1>
+          <p className="mx-auto mt-3 max-w-xl text-base text-muted-foreground">
+            Get the desktop app for your platform. One download, all your rooms, calls and
+            buddies.
+          </p>
+        </div>
+
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {downloads.map((item) => (
+            <div
+              key={item.id}
+              className="group relative flex flex-col rounded-2xl border border-border bg-card p-5 shadow-sm transition-all hover:border-primary/30 hover:shadow-md"
+            >
+              <div className="flex items-start justify-between">
+                <span className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary">
+                  <item.icon className="size-6" />
+                </span>
+                <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
+                  {item.size}
+                </span>
+              </div>
+              <h2 className="mt-4 text-lg font-semibold">{item.name}</h2>
+              <p className="text-sm text-muted-foreground">{item.note}</p>
+              <p className="mt-1 text-xs font-mono text-muted-foreground/70">{item.file}</p>
+              <a
+                href={item.href}
+                download={item.file}
+                className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                <Download className="size-4" aria-hidden />
+                Download for {item.name}
+              </a>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-10 flex items-start gap-3 rounded-2xl border border-border bg-secondary/50 p-4 text-sm text-muted-foreground">
+          <Info className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+          <div>
+            <p className="font-medium text-foreground">Desktop app notes</p>
+            <p className="mt-1">
+              The desktop app wraps the live web app at app.duechat.com, so an internet
+              connection is required. Most features work the same as in your browser; Google
+              OAuth may need a browser sign-in first. Extract the archive and run the DueChat
+              executable inside.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}

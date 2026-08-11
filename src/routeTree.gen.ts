@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AccessibilityRouteImport } from './routes/accessibility'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as DownloadsRouteImport } from './routes/downloads'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RoomsRouteImport } from './routes/rooms'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -45,6 +46,11 @@ const AccessibilityRoute = AccessibilityRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DownloadsRoute = DownloadsRouteImport.update({
+  id: '/downloads',
+  path: '/downloads',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accessibility': typeof AccessibilityRoute
   '/auth': typeof AuthRoute
+  '/downloads': typeof DownloadsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rooms': typeof RoomsRoute
   '/terms': typeof TermsRoute
@@ -141,6 +148,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accessibility': typeof AccessibilityRoute
   '/auth': typeof AuthRoute
+  '/downloads': typeof DownloadsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rooms': typeof RoomsRoute
   '/terms': typeof TermsRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/accessibility': typeof AccessibilityRoute
   '/auth': typeof AuthRoute
+  '/downloads': typeof DownloadsRoute
   '/reset-password': typeof ResetPasswordRoute
   '/rooms': typeof RoomsRoute
   '/terms': typeof TermsRoute
@@ -183,6 +192,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accessibility'
     | '/auth'
+    | '/downloads'
     | '/reset-password'
     | '/rooms'
     | '/terms'
@@ -202,6 +212,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accessibility'
     | '/auth'
+    | '/downloads'
     | '/reset-password'
     | '/rooms'
     | '/terms'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/accessibility'
     | '/auth'
+    | '/downloads'
     | '/reset-password'
     | '/rooms'
     | '/terms'
@@ -243,6 +255,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AccessibilityRoute: typeof AccessibilityRoute
   AuthRoute: typeof AuthRoute
+  DownloadsRoute: typeof DownloadsRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RoomsRoute: typeof RoomsRoute
   TermsRoute: typeof TermsRoute
@@ -280,6 +293,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/downloads': {
+      id: '/downloads'
+      path: '/downloads'
+      fullPath: '/downloads'
+      preLoaderRoute: typeof DownloadsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -420,6 +440,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AccessibilityRoute: AccessibilityRoute,
   AuthRoute: AuthRoute,
+  DownloadsRoute: DownloadsRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RoomsRoute: RoomsRoute,
   TermsRoute: TermsRoute,
