@@ -26,9 +26,20 @@ export function GiftShelf({ userId }: { userId: string }) {
             title={`${gift.label} × ${gift.total}`}
             className="flex items-center gap-1 rounded-xl bg-background px-2 py-1 text-xs"
           >
-            <span className="text-lg leading-none" role="img" aria-label={gift.label}>
-              {gift.emoji}
-            </span>
+            {gift.image_url ? (
+              <img
+                src={gift.image_url}
+                alt={gift.label}
+                loading="lazy"
+                width={512}
+                height={512}
+                className="size-7 object-contain"
+              />
+            ) : (
+              <span className="text-lg leading-none" role="img" aria-label={gift.label}>
+                {gift.emoji}
+              </span>
+            )}
             <span className="font-medium">×{gift.total}</span>
           </li>
         ))}
