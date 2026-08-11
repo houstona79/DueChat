@@ -9,6 +9,7 @@ export type GiftItem = {
   emoji: string;
   cost: number;
   sort_order: number;
+  image_url: string | null;
 };
 
 export type Gift = {
@@ -25,7 +26,7 @@ export type Gift = {
 export async function fetchGiftItems(): Promise<GiftItem[]> {
   const { data, error } = await supabase
     .from("gift_items")
-    .select("key, label, emoji, cost, sort_order")
+    .select("key, label, emoji, cost, sort_order, image_url")
     .order("sort_order", { ascending: true });
   if (error) throw error;
   return data ?? [];
@@ -107,6 +108,7 @@ export type GiftShelfEntry = {
   gift_key: string;
   label: string;
   emoji: string;
+  image_url: string | null;
   total: number;
   last_at: string;
 };
@@ -119,6 +121,7 @@ export async function fetchGiftShelf(userId: string): Promise<GiftShelfEntry[]> 
     gift_key: row.gift_key,
     label: row.label,
     emoji: row.emoji,
+    image_url: row.image_url ?? null,
     total: Number(row.total),
     last_at: row.last_at,
   }));

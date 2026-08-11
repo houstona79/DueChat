@@ -289,6 +289,7 @@ export type Database = {
           cost: number
           created_at: string
           emoji: string
+          image_url: string | null
           key: string
           label: string
           sort_order: number
@@ -297,6 +298,7 @@ export type Database = {
           cost: number
           created_at?: string
           emoji: string
+          image_url?: string | null
           key: string
           label: string
           sort_order?: number
@@ -305,6 +307,7 @@ export type Database = {
           cost?: number
           created_at?: string
           emoji?: string
+          image_url?: string | null
           key?: string
           label?: string
           sort_order?: number
@@ -1628,6 +1631,7 @@ export type Database = {
         Returns: {
           emoji: string
           gift_key: string
+          image_url: string
           label: string
           last_at: string
           total: number
