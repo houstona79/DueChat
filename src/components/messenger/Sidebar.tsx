@@ -13,6 +13,7 @@ import { NotificationsPanel } from "./NotificationsPanel";
 import { RoomInvites } from "./RoomInvites";
 import { WaterUpdates } from "./WaterUpdates";
 import { ThemeToggle } from "@/components/system/ThemeToggle";
+import { LanguageSwitcher } from "@/components/system/LanguageSwitcher";
 import { AccessibilityButton } from "@/components/system/AccessibilitySettings";
 import { supabase } from "@/integrations/supabase/client";
 import { useOpenDirect } from "@/hooks/use-direct";
