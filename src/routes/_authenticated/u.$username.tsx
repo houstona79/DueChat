@@ -7,6 +7,7 @@ import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { ProfileFeed } from "@/components/messenger/ProfileFeed";
 import { ProfileBlogs } from "@/components/messenger/ProfileBlogs";
 import { GiftShelf } from "@/components/messenger/GiftShelf";
+import { PointsBadge } from "@/components/messenger/PointsBadge";
 import { SocialStatus } from "@/components/messenger/SocialStatus";
 import { YearBadges } from "@/components/messenger/YearBadges";
 import { useAuth } from "@/hooks/use-auth";
@@ -138,6 +139,7 @@ function ProfilePage() {
           ) : (
             <div className="mt-5 space-y-3 text-sm">
               <YearBadges profile={profile} />
+              <PointsBadge userId={profile.id} />
               <SocialStatus profile={profile} />
               <GiftShelf userId={profile.id} />
               {profile.bio ? (
