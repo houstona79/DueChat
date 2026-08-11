@@ -90,7 +90,7 @@ function RoomCard({ room, rank }: { room: DirectoryRoom; rank?: number }) {
 }
 
 function RoomsDirectoryPage() {
-  const { top, all } = Route.useLoaderData();
+  const { top, all } = Route.useLoaderData() as { top: DirectoryRoom[]; all: DirectoryRoom[] };
 
   return (
     <main
