@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Apple, Monitor, Terminal, Download, ArrowLeft, Info } from "lucide-react";
+import { Download, ArrowLeft, Info } from "lucide-react";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import macAsset from "@/assets/DueChat-mac.zip.asset.json";
 import windowsAsset from "@/assets/DueChat-windows.zip.asset.json";
 import linuxAsset from "@/assets/DueChat-linux.tar.gz.asset.json";
+import appleIcon from "@/assets/apple-icon.png.asset.json";
+import windowsIcon from "@/assets/windows-icon.png.asset.json";
+import linuxIcon from "@/assets/linux-icon.png.asset.json";
 
 export const Route = createFileRoute("/downloads")({
   head: () => ({
@@ -36,7 +39,8 @@ const downloads = [
   {
     id: "mac",
     name: "macOS",
-    icon: Apple,
+    image: appleIcon.url,
+    imageAlt: "Apple logo",
     file: "DueChat-mac.zip",
     size: formatBytes(macAsset.size),
     href: macAsset.url,
@@ -45,7 +49,8 @@ const downloads = [
   {
     id: "windows",
     name: "Windows",
-    icon: Monitor,
+    image: windowsIcon.url,
+    imageAlt: "Windows logo",
     file: "DueChat-windows.zip",
     size: formatBytes(windowsAsset.size),
     href: windowsAsset.url,
@@ -54,7 +59,8 @@ const downloads = [
   {
     id: "linux",
     name: "Linux",
-    icon: Terminal,
+    image: linuxIcon.url,
+    imageAlt: "Linux penguin logo",
     file: "DueChat-linux.tar.gz",
     size: formatBytes(linuxAsset.size),
     href: linuxAsset.url,
@@ -96,8 +102,15 @@ function Downloads() {
               className="group relative flex flex-col rounded-2xl border border-border bg-card p-5 shadow-sm transition-all hover:border-primary/30 hover:shadow-md"
             >
               <div className="flex items-start justify-between">
-                <span className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary">
-                  <item.icon className="size-6" />
+                <span className="grid size-12 place-items-center rounded-xl bg-primary/10 p-2">
+                  <img
+                    src={item.image}
+                    alt={item.imageAlt}
+                    className="h-full w-full object-contain"
+                    loading="lazy"
+                    width={48}
+                    height={48}
+                  />
                 </span>
                 <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
                   {item.size}
