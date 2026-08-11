@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "package": "npx vite build && npx @electron/packager . DueChat --platform=darwin,win32 --arch=x64 --out=electron-release --overwrite --ignore='node_modules' --ignore='^/src' --ignore='^/public' --ignore='^/electron-release' --ignore='^/supabase' --ignore='^/.lovable' --ignore='^/.git'"
+    "package": "npx @electron/packager . DueChat --platform=darwin,win32 --arch=x64 --out=electron-release --overwrite --ignore='node_modules' --ignore='^/src' --ignore='^/public' --ignore='^/dist' --ignore='^/electron-release' --ignore='^/supabase' --ignore='^/.lovable' --ignore='^/.git' --ignore='^/.env'"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
