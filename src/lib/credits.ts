@@ -10,6 +10,7 @@ export type GiftItem = {
   cost: number;
   sort_order: number;
   image_url: string | null;
+  credit_payout: number;
 };
 
 export type Gift = {
@@ -26,7 +27,7 @@ export type Gift = {
 export async function fetchGiftItems(): Promise<GiftItem[]> {
   const { data, error } = await supabase
     .from("gift_items")
-    .select("key, label, emoji, cost, sort_order, image_url")
+    .select("key, label, emoji, cost, sort_order, image_url, credit_payout")
     .order("sort_order", { ascending: true });
   if (error) throw error;
   return data ?? [];
