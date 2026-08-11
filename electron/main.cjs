@@ -32,11 +32,24 @@ app.commandLine.appendSwitch(
 );
 app.commandLine.appendSwitch("disable-features", [
   "WebRtcHideLocalIpsWithMdns",
+  // Windows: the Media Foundation D3D11 capture path returns all-black frames
+  // on many webcams inside Chromium/Electron. The legacy capture path works.
+  ...(process.platform === "win32"
+    ? ["MediaFoundationD3D11VideoCapture", "MediaFoundationCameraUsageMonitoring"]
+    : []),
   // Some Linux distros ship PulseAudio/ALSA combos Chromium rejects unless the
   // audio service runs in-process.
   ...(process.platform === "linux" ? ["AudioServiceOutOfProcess"] : []),
 ].join(","));
 app.commandLine.appendSwitch("enable-usermedia-screen-capturing");
+// Black/frozen local preview: GPU-backed video frames are unreliable on Windows
+// and Linux drivers, so copy camera frames through shared memory instead.
+if (process.platform === "win32") {
+  app.commandLine.appendSwitch("disable-gpu-memory-buffer-video-frames");
+  app.commandLine.appendSwitch("disable-gpu-compositing");
+} else if (process.platform === "linux") {
+  app.commandLine.appendSwitch("disable-gpu-memory-buffer-video-frames");
+}
 // Keep WebRTC alive when the window is in the background or minimized.
 app.commandLine.appendSwitch("disable-background-timer-throttling");
 app.commandLine.appendSwitch("disable-renderer-backgrounding");
