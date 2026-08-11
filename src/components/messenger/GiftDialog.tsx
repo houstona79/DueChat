@@ -119,7 +119,10 @@ export function GiftDialog({
                       selected === item.key ? "bg-primary/15 text-primary" : "bg-secondary",
                       !affordable && "opacity-40",
                     )}
-                    title={`${item.label} · ${item.cost} credits`}
+                    title={
+                      `${item.label} · ${item.cost} credits` +
+                      (item.credit_payout ? ` · gives ${item.credit_payout} points` : "")
+                    }
                   >
                     {item.image_url ? (
                       <img
@@ -137,6 +140,11 @@ export function GiftDialog({
                     )}
                     <span className="truncate">{item.label}</span>
                     <span className="text-muted-foreground">{item.cost}</span>
+                    {item.credit_payout ? (
+                      <span className="text-[10px] font-medium text-primary">
+                        +{item.credit_payout} pts
+                      </span>
+                    ) : null}
                   </button>
                 );
               })}
