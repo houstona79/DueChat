@@ -1834,6 +1834,23 @@ export type Database = {
         Args: { _code: string; _room_id: string }
         Returns: undefined
       }
+      top_rooms_since: {
+        Args: { _limit?: number; _since: string }
+        Returns: {
+          category: string
+          icon_url: string
+          id: string
+          join_count: number
+          member_count: number
+          name: string
+          name_color: string
+          rating: string
+          rating_avg: number
+          rating_count: number
+          slug: string
+          topic: string
+        }[]
+      }
       unlock_room: {
         Args: { _code: string; _room_id: string }
         Returns: boolean
