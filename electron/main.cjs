@@ -2,20 +2,44 @@ const { app, BrowserWindow, session, systemPreferences, shell } = require("elect
 
 const APP_URL = "https://app.duechat.com";
 const DEV_URL = "http://localhost:8080";
-const TRUSTED_ORIGINS = new Set([new URL(APP_URL).origin, new URL(DEV_URL).origin]);
+
+/** Any DueChat host (app/preview/published) plus localhost during development. */
+const isTrustedOrigin = (rawUrl) => {
+  if (!rawUrl) return false;
+  try {
+    const { hostname, protocol } = new URL(rawUrl);
+    if (protocol === "http:" && (hostname === "localhost" || hostname === "127.0.0.1")) return true;
+    if (protocol !== "https:") return false;
+    return (
+      hostname === "duechat.com" ||
+      hostname.endsWith(".duechat.com") ||
+      hostname.endsWith(".lovable.app")
+    );
+  } catch {
+    return false;
+  }
+};
 
 /**
- * Windows/Linux Chromium needs these switches before the app is ready, or
- * getUserMedia can fail outright (Wayland screen/camera capture, and the
- * media-stream permission gate on remote origins).
+ * Chromium switches that must be set before the app is ready.
+ * WebRtcHideLocalIpsWithMdns must be OFF: Electron builds resolve mDNS (.local)
+ * ICE candidates unreliably, which makes peer connections stall forever and the
+ * call never actually joins even though the mic/camera work.
  */
-app.commandLine.appendSwitch("enable-features", "WebRTCPipeWireCapturer");
+app.commandLine.appendSwitch(
+  "enable-features",
+  "WebRTCPipeWireCapturer,WebRtcHideLocalIpsWithMdns:false",
+);
+app.commandLine.appendSwitch("disable-features", [
+  "WebRtcHideLocalIpsWithMdns",
+  // Some Linux distros ship PulseAudio/ALSA combos Chromium rejects unless the
+  // audio service runs in-process.
+  ...(process.platform === "linux" ? ["AudioServiceOutOfProcess"] : []),
+].join(","));
 app.commandLine.appendSwitch("enable-usermedia-screen-capturing");
-// Some Linux distros ship PulseAudio/ALSA combos that Chromium rejects unless
-// the audio service runs in-process.
-if (process.platform === "linux") {
-  app.commandLine.appendSwitch("disable-features", "AudioServiceOutOfProcess");
-}
+// Keep WebRTC alive when the window is in the background or minimized.
+app.commandLine.appendSwitch("disable-background-timer-throttling");
+app.commandLine.appendSwitch("disable-renderer-backgrounding");
 
 /** Ask macOS for mic/camera access up front so the OS prompt appears once. */
 const requestMediaAccess = async () => {
@@ -33,48 +57,29 @@ const requestMediaAccess = async () => {
 
 /** Allow the app's own pages to use mic, camera and screen share. */
 const allowMediaPermissions = () => {
-  const allowed = new Set([
-    "media",
-    "microphone",
-    "camera",
-    "mediaKeySystem",
-    "audioCapture",
-    "videoCapture",
-    "display-capture",
-    "clipboard-read",
-    "clipboard-sanitized-write",
-    "notifications",
-    "fullscreen",
-    "pointerLock",
-  ]);
   const ses = session.defaultSession;
 
-  const isTrusted = (rawUrl) => {
-    if (!rawUrl) return false;
-    try {
-      return TRUSTED_ORIGINS.has(new URL(rawUrl).origin);
-    } catch {
-      return false;
-    }
-  };
-
-  // Electron has changed the exact permission labels across releases. Accept
-  // every media label, but only for DueChat itself. Both handlers are needed:
-  // Chromium can run the check without ever opening the request handler.
-  ses.setPermissionRequestHandler((webContents, permission, callback, details) => {
-    const requestingUrl = details?.requestingUrl || webContents.getURL();
-    callback(isTrusted(requestingUrl) && allowed.has(permission));
+  // Electron has changed permission labels across releases, so trust the origin
+  // rather than the label. Both handlers are needed: Chromium can run the check
+  // without ever opening the request handler.
+  ses.setPermissionRequestHandler((webContents, _permission, callback, details) => {
+    const url = details?.requestingUrl || details?.securityOrigin || webContents?.getURL();
+    callback(isTrustedOrigin(url));
   });
-  ses.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
-    const requestingUrl =
-      requestingOrigin || details?.requestingUrl || details?.embeddingOrigin || webContents?.getURL();
-    return isTrusted(requestingUrl) && allowed.has(permission);
+  ses.setPermissionCheckHandler((webContents, _permission, requestingOrigin, details) => {
+    const url =
+      requestingOrigin ||
+      details?.requestingUrl ||
+      details?.embeddingOrigin ||
+      details?.securityOrigin ||
+      webContents?.getURL();
+    return isTrustedOrigin(url);
   });
-  ses.setDevicePermissionHandler((details) => isTrusted(details.origin));
+  ses.setDevicePermissionHandler((details) => isTrustedOrigin(details?.origin));
   if (ses.setDisplayMediaRequestHandler) {
     ses.setDisplayMediaRequestHandler(
       (request, callback) => {
-        if (!isTrusted(request.frame?.url)) return callback({});
+        if (!isTrustedOrigin(request.frame?.url)) return callback({});
         callback({ video: undefined, audio: "loopback" });
       },
       { useSystemPicker: true },
@@ -104,8 +109,6 @@ const createWindow = () => {
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
-      // Remote origin is https, so media capture is allowed; these keep
-      // Chromium from silently dropping the getUserMedia request.
       webSecurity: true,
       backgroundThrottling: false,
       autoplayPolicy: "no-user-gesture-required",
