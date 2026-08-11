@@ -14,19 +14,19 @@ export function RoomCrownMarks({ crowns, className }: { crowns: RoomCrown[]; cla
   return (
     <span className={cn("inline-flex shrink-0 items-center gap-0.5", className)}>
       {sortCrowns(crowns).map((crown) => (
-        <Crown
-          key={crown.period}
-          aria-label={CROWN_LABEL[crown.period]}
-          title={CROWN_LABEL[crown.period]}
-          className={cn(
-            "size-3.5",
-            crown.period === "month"
-              ? "text-primary"
-              : crown.period === "week"
-                ? "text-staff"
-                : "text-muted-foreground",
-          )}
-        />
+        <span key={crown.period} title={CROWN_LABEL[crown.period]} className="inline-flex">
+          <Crown
+            aria-label={CROWN_LABEL[crown.period]}
+            className={cn(
+              "size-3.5",
+              crown.period === "month"
+                ? "text-primary"
+                : crown.period === "week"
+                  ? "text-staff"
+                  : "text-muted-foreground",
+            )}
+          />
+        </span>
       ))}
     </span>
   );
