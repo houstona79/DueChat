@@ -27,6 +27,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { EmojiPicker } from "./EmojiPicker";
+import { RoomCrownMarks } from "@/components/rooms/RoomCrown";
+import { useRoomCrowns } from "@/lib/room-crowns";
 import { GifPicker } from "./GifPicker";
 
 import { useEffect, useRef, useState } from "react";
@@ -156,6 +158,8 @@ export function ChatPane({
   const title = room.is_direct ? (partner?.display_name ?? "Direct message") : room.name;
   const { open: openDirect } = useOpenDirect(meId);
   const [showMembers, setShowMembers] = useState(!room.is_direct);
+  const roomCrowns = useRoomCrowns();
+  const myCrowns = roomCrowns.get(room.id) ?? [];
   const [showFeed, setShowFeed] = useState(false);
   const [showMedia, setShowMedia] = useState(false);
   const [showGames, setShowGames] = useState(false);
