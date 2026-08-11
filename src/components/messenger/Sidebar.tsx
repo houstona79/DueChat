@@ -142,6 +142,7 @@ export function Sidebar({
               <NotebookPen className="size-4" />
             </Link>
             <ThemeToggle />
+            <LanguageSwitcher className="size-9 justify-center rounded-xl border-0 bg-transparent p-0 text-muted-foreground hover:bg-secondary" />
             <AccessibilityButton />
             <button
               onClick={signOut}
