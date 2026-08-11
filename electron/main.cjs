@@ -3,6 +3,20 @@ const { app, BrowserWindow, session, systemPreferences, shell } = require("elect
 const APP_URL = "https://app.duechat.com";
 const DEV_URL = "http://localhost:8080";
 
+/**
+ * Windows/Linux Chromium needs these switches before the app is ready, or
+ * getUserMedia can fail outright (Wayland screen/camera capture, and the
+ * media-stream permission gate on remote origins).
+ */
+app.commandLine.appendSwitch("enable-features", "WebRTCPipeWireCapturer");
+app.commandLine.appendSwitch("use-fake-ui-for-media-stream-disabled", "false");
+app.commandLine.appendSwitch("enable-usermedia-screen-capturing");
+// Some Linux distros ship PulseAudio/ALSA combos that Chromium rejects unless
+// the audio service runs in-process.
+if (process.platform === "linux") {
+  app.commandLine.appendSwitch("disable-features", "AudioServiceOutOfProcess");
+}
+
 /** Ask macOS for mic/camera access up front so the OS prompt appears once. */
 const requestMediaAccess = async () => {
   if (process.platform !== "darwin") return;
@@ -19,13 +33,29 @@ const requestMediaAccess = async () => {
 
 /** Allow the app's own pages to use mic, camera and screen share. */
 const allowMediaPermissions = () => {
-  const allowed = new Set(["media", "audioCapture", "videoCapture", "display-capture", "clipboard-read", "notifications"]);
+  const allowed = new Set([
+    "media",
+    "mediaKeySystem",
+    "audioCapture",
+    "videoCapture",
+    "display-capture",
+    "clipboard-read",
+    "clipboard-sanitized-write",
+    "notifications",
+    "fullscreen",
+    "pointerLock",
+  ]);
   const ses = session.defaultSession;
 
-  ses.setPermissionRequestHandler((_wc, permission, callback) => {
+  // Windows/Linux report camera and mic requests as "media" with mediaTypes,
+  // and the check handler is consulted before any prompt — both must say yes.
+  ses.setPermissionRequestHandler((_wc, permission, callback, details) => {
+    const types = (details && details.mediaTypes) || [];
+    if (permission === "media" && types.length === 0) return callback(true);
     callback(allowed.has(permission));
   });
   ses.setPermissionCheckHandler((_wc, permission) => allowed.has(permission));
+  ses.setDevicePermissionHandler(() => true);
   if (ses.setDisplayMediaRequestHandler) {
     ses.setDisplayMediaRequestHandler((_req, callback) => callback({ video: undefined, audio: "loopback" }), {
       useSystemPicker: true,
@@ -55,6 +85,10 @@ const createWindow = () => {
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
+      // Remote origin is https, so media capture is allowed; these keep
+      // Chromium from silently dropping the getUserMedia request.
+      webSecurity: true,
+      backgroundThrottling: false,
     },
   });
 
