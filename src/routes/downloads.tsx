@@ -159,6 +159,18 @@ function Downloads() {
               the app. Moving DueChat to your <strong>Applications</strong> folder before first
               launch keeps those permissions stable.
             </p>
+            <p className="mt-2 font-medium text-foreground">
+              Microphone and camera on Windows &amp; Linux
+            </p>
+            <p className="mt-1">
+              On <strong>Windows 10/11</strong>, open{" "}
+              <strong>Settings → Privacy &amp; security → Microphone</strong> (and{" "}
+              <strong>Camera</strong>) and make sure{" "}
+              <strong>Let desktop apps access your microphone/camera</strong> is on, then relaunch
+              DueChat. On <strong>Linux</strong>, your user must be in the{" "}
+              <code>video</code> and <code>audio</code> groups and no other app may be holding the
+              device. If a call still shows no devices, close other video apps and restart DueChat.
+            </p>
           </div>
         </div>
       </div>
