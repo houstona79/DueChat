@@ -2,6 +2,7 @@ const { app, BrowserWindow, session, systemPreferences, shell } = require("elect
 
 const APP_URL = "https://app.duechat.com";
 const DEV_URL = "http://localhost:8080";
+const TRUSTED_ORIGINS = new Set([new URL(APP_URL).origin, new URL(DEV_URL).origin]);
 
 /**
  * Windows/Linux Chromium needs these switches before the app is ready, or
@@ -9,7 +10,6 @@ const DEV_URL = "http://localhost:8080";
  * media-stream permission gate on remote origins).
  */
 app.commandLine.appendSwitch("enable-features", "WebRTCPipeWireCapturer");
-app.commandLine.appendSwitch("use-fake-ui-for-media-stream-disabled", "false");
 app.commandLine.appendSwitch("enable-usermedia-screen-capturing");
 // Some Linux distros ship PulseAudio/ALSA combos that Chromium rejects unless
 // the audio service runs in-process.
@@ -35,6 +35,8 @@ const requestMediaAccess = async () => {
 const allowMediaPermissions = () => {
   const allowed = new Set([
     "media",
+    "microphone",
+    "camera",
     "mediaKeySystem",
     "audioCapture",
     "videoCapture",
@@ -47,19 +49,36 @@ const allowMediaPermissions = () => {
   ]);
   const ses = session.defaultSession;
 
-  // Windows/Linux report camera and mic requests as "media" with mediaTypes,
-  // and the check handler is consulted before any prompt — both must say yes.
-  ses.setPermissionRequestHandler((_wc, permission, callback, details) => {
-    const types = (details && details.mediaTypes) || [];
-    if (permission === "media" && types.length === 0) return callback(true);
-    callback(allowed.has(permission));
+  const isTrusted = (rawUrl) => {
+    if (!rawUrl) return false;
+    try {
+      return TRUSTED_ORIGINS.has(new URL(rawUrl).origin);
+    } catch {
+      return false;
+    }
+  };
+
+  // Electron has changed the exact permission labels across releases. Accept
+  // every media label, but only for DueChat itself. Both handlers are needed:
+  // Chromium can run the check without ever opening the request handler.
+  ses.setPermissionRequestHandler((webContents, permission, callback, details) => {
+    const requestingUrl = details?.requestingUrl || webContents.getURL();
+    callback(isTrusted(requestingUrl) && allowed.has(permission));
   });
-  ses.setPermissionCheckHandler((_wc, permission) => allowed.has(permission));
-  ses.setDevicePermissionHandler(() => true);
+  ses.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
+    const requestingUrl =
+      requestingOrigin || details?.requestingUrl || details?.embeddingOrigin || webContents?.getURL();
+    return isTrusted(requestingUrl) && allowed.has(permission);
+  });
+  ses.setDevicePermissionHandler((details) => isTrusted(details.origin));
   if (ses.setDisplayMediaRequestHandler) {
-    ses.setDisplayMediaRequestHandler((_req, callback) => callback({ video: undefined, audio: "loopback" }), {
-      useSystemPicker: true,
-    });
+    ses.setDisplayMediaRequestHandler(
+      (request, callback) => {
+        if (!isTrusted(request.frame?.url)) return callback({});
+        callback({ video: undefined, audio: "loopback" });
+      },
+      { useSystemPicker: true },
+    );
   }
 };
 
@@ -89,6 +108,7 @@ const createWindow = () => {
       // Chromium from silently dropping the getUserMedia request.
       webSecurity: true,
       backgroundThrottling: false,
+      autoplayPolicy: "no-user-gesture-required",
     },
   });
 

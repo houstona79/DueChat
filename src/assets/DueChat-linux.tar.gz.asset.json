@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "asset_id": "18aea107-3f01-4325-b2bc-8ab092183b0d",
+  "asset_id": "a680b00c-98a8-49bf-b2ad-a0dafed4f325",
   "project_id": "955d515f-4290-493f-8c9b-751f9387ae24",
-  "url": "/__l5e/assets-v1/18aea107-3f01-4325-b2bc-8ab092183b0d/DueChat-linux.tar.gz",
-  "r2_key": "a/v1/955d515f-4290-493f-8c9b-751f9387ae24/18aea107-3f01-4325-b2bc-8ab092183b0d/DueChat-linux.tar.gz",
+  "url": "/__l5e/assets-v1/a680b00c-98a8-49bf-b2ad-a0dafed4f325/DueChat-linux.tar.gz",
+  "r2_key": "a/v1/955d515f-4290-493f-8c9b-751f9387ae24/a680b00c-98a8-49bf-b2ad-a0dafed4f325/DueChat-linux.tar.gz",
   "original_filename": "DueChat-linux.tar.gz",
-  "size": 126037001,
+  "size": 126038314,
   "content_type": "application/x-gzip",
-  "created_at": "2026-08-11T19:24:16Z"
+  "created_at": "2026-08-11T19:45:10Z"
 }
