@@ -7,6 +7,8 @@ import {
 } from "@/lib/rooms-directory.functions";
 import { RatingBadge } from "@/components/messenger/RoomRating";
 import { StarRow } from "@/components/rooms/StarRating";
+import { RoomCrownBadges } from "@/components/rooms/RoomCrown";
+import { crownsById, type RoomCrown } from "@/lib/room-crowns";
 import { initials } from "@/lib/chat";
 
 const title = "Top rooms & full room list — DueChat";
@@ -48,7 +50,17 @@ function RoomIcon({ name, url }: { name: string; url: string | null }) {
   );
 }
 
-function RoomCard({ room, rank, note }: { room: DirectoryRoom; rank?: number; note?: string }) {
+function RoomCard({
+  room,
+  rank,
+  note,
+  crowns = [],
+}: {
+  room: DirectoryRoom;
+  rank?: number;
+  note?: string;
+  crowns?: RoomCrown[];
+}) {
   const avg = room.rating_avg ? Number(room.rating_avg) : 0;
   return (
     <li className="rounded-3xl border border-border bg-card p-4">
@@ -70,6 +82,7 @@ function RoomCard({ room, rank, note }: { room: DirectoryRoom; rank?: number; no
               {room.name}
             </span>
             <RatingBadge rating={room.rating} />
+            <RoomCrownBadges crowns={crowns} />
           </span>
           <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
             <span>{room.category || "General"}</span>
@@ -94,7 +107,15 @@ function RoomCard({ room, rank, note }: { room: DirectoryRoom; rank?: number; no
   );
 }
 
-function TrendingSection({ label, rooms }: { label: string; rooms: TrendingRoom[] }) {
+function TrendingSection({
+  label,
+  rooms,
+  crowns,
+}: {
+  label: string;
+  rooms: TrendingRoom[];
+  crowns: Map<string, RoomCrown[]>;
+}) {
   return (
     <div>
       <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -109,6 +130,7 @@ function TrendingSection({ label, rooms }: { label: string; rooms: TrendingRoom[
               key={room.id}
               room={room}
               rank={i + 1}
+              crowns={crowns.get(room.id) ?? []}
               note={`${room.join_count} join${room.join_count === 1 ? "" : "s"}`}
             />
           ))}
@@ -119,11 +141,13 @@ function TrendingSection({ label, rooms }: { label: string; rooms: TrendingRoom[
 }
 
 function RoomsDirectoryPage() {
-  const { top, all, trending } = Route.useLoaderData() as {
+  const { top, all, trending, crowns } = Route.useLoaderData() as {
     top: DirectoryRoom[];
     all: DirectoryRoom[];
     trending: { day: TrendingRoom[]; week: TrendingRoom[]; month: TrendingRoom[] };
+    crowns: RoomCrown[];
   };
+  const crownMap = crownsById(crowns ?? []);
 
   return (
     <main
@@ -153,9 +177,9 @@ function RoomsDirectoryPage() {
           Top 3 rooms by people joining, for today, this week, and this month.
         </p>
         <div className="mt-4 space-y-6">
-          <TrendingSection label="Today" rooms={trending.day} />
-          <TrendingSection label="This week" rooms={trending.week} />
-          <TrendingSection label="This month" rooms={trending.month} />
+          <TrendingSection label="Today" rooms={trending.day} crowns={crownMap} />
+          <TrendingSection label="This week" rooms={trending.week} crowns={crownMap} />
+          <TrendingSection label="This month" rooms={trending.month} crowns={crownMap} />
         </div>
       </section>
 
@@ -171,7 +195,7 @@ function RoomsDirectoryPage() {
         ) : (
           <ul className="mt-4 space-y-3">
             {top.map((room, i) => (
-              <RoomCard key={room.id} room={room} rank={i + 1} />
+              <RoomCard key={room.id} room={room} rank={i + 1} crowns={crownMap.get(room.id) ?? []} />
             ))}
           </ul>
         )}
@@ -184,7 +208,7 @@ function RoomsDirectoryPage() {
         ) : (
           <ul className="mt-4 grid gap-3 sm:grid-cols-2">
             {all.map((room) => (
-              <RoomCard key={room.id} room={room} />
+              <RoomCard key={room.id} room={room} crowns={crownMap.get(room.id) ?? []} />
             ))}
           </ul>
         )}
