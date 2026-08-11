@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { getPublicBlog } from "@/lib/blogs.functions";
 import { BlogCover } from "@/components/blogs/BlogCover";
 import { BlogComments } from "@/components/blogs/BlogComments";
+import { TranslatedText } from "@/components/system/TranslatedText";
 import { relativeTime } from "@/lib/profile-updates";
 
 export const Route = createFileRoute("/blog/$username/$slug")({
@@ -66,7 +67,7 @@ function BlogPostPage() {
           {post.author_display_name} @{post.author_username} · {relativeTime(post.published_at)}
         </p>
         <div className="mt-6 whitespace-pre-line break-words text-base leading-relaxed text-muted-foreground">
-          {post.body}
+          <TranslatedText text={post.body} className="block" />
         </div>
       </article>
       <BlogComments postId={post.id} />

@@ -8,6 +8,7 @@ import { ProfileFeed } from "@/components/messenger/ProfileFeed";
 import { InviteCard } from "@/components/messenger/InviteCard";
 import { BlockList } from "@/components/messenger/BlockList";
 import { AccessibilitySettings } from "@/components/system/AccessibilitySettings";
+import { LanguageSettings } from "@/components/system/LanguageSettings";
 import { ImageCropper } from "@/components/messenger/ImageCropper";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -204,6 +205,10 @@ function SettingsPage() {
 
       <div id="accessibility" className="mt-6 scroll-mt-6">
         <AccessibilitySettings />
+      </div>
+
+      <div id="language" className="mt-6 scroll-mt-6">
+        <LanguageSettings />
       </div>
 
       <div className="mt-6 flex items-center gap-4">

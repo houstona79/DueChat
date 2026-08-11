@@ -7,6 +7,7 @@ import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { ProfileFeed } from "@/components/messenger/ProfileFeed";
 import { ProfileBlogs } from "@/components/messenger/ProfileBlogs";
 import { GiftShelf } from "@/components/messenger/GiftShelf";
+import { TranslatedText } from "@/components/system/TranslatedText";
 import { PointsBadge } from "@/components/messenger/PointsBadge";
 import { SocialStatus } from "@/components/messenger/SocialStatus";
 import { YearBadges } from "@/components/messenger/YearBadges";
@@ -144,7 +145,7 @@ function ProfilePage() {
               <GiftShelf userId={profile.id} />
               {profile.bio ? (
                 <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">
-                  {profile.bio}
+                  <TranslatedText text={profile.bio} className="block" />
                 </p>
               ) : null}
               {profile.country ? (

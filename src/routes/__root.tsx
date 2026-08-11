@@ -18,6 +18,7 @@ import { RecoveryGate } from "@/components/system/RecoveryGate";
 import { DeviceLock } from "@/components/system/DeviceLock";
 import { SystemAlerts } from "@/components/system/SystemAlerts";
 import { SupportAlerts } from "@/components/support/SupportAlerts";
+import { LanguageProvider } from "@/lib/i18n";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -155,16 +156,18 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <KickWatcher />
-      <SystemAlerts />
-      <SupportAlerts />
-      <AuthWatcher />
-      <RecoveryGate />
-      <DeviceLock />
-      <SessionTracker />
-      <Toaster />
+      <LanguageProvider>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <KickWatcher />
+        <SystemAlerts />
+        <SupportAlerts />
+        <AuthWatcher />
+        <RecoveryGate />
+        <DeviceLock />
+        <SessionTracker />
+        <Toaster />
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }

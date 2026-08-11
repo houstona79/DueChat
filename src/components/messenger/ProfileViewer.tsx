@@ -11,6 +11,7 @@ import { ProfilePhotos } from "./ProfilePhotos";
 import { ProfileFeed } from "./ProfileFeed";
 import { ProfileBlogs } from "./ProfileBlogs";
 import { GiftShelf } from "./GiftShelf";
+import { TranslatedText } from "@/components/system/TranslatedText";
 import { PointsBadge } from "./PointsBadge";
 import { SocialStatus } from "./SocialStatus";
 import { YearBadges } from "./YearBadges";
@@ -181,7 +182,7 @@ export function ProfileViewer() {
               <GiftShelf userId={profile.id} />
               {profile.bio ? (
                 <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">
-                  {profile.bio}
+                  <TranslatedText text={profile.bio} className="block" />
                 </p>
               ) : null}
               {profile.country ? (
