@@ -10,6 +10,7 @@ import { clearPendingInvite, pendingInvite } from "@/lib/invites";
 import { isRecoveryUrl } from "@/lib/recovery";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { ThemeToggle } from "@/components/system/ThemeToggle";
+import { LanguageSwitcher } from "@/components/system/LanguageSwitcher";
 
 function ageFrom(value: string): number | null {
   if (!value) return null;
@@ -168,7 +169,8 @@ function AuthPage() {
       className="grid min-h-screen place-items-center bg-background px-5 py-10"
     >
       <div className="w-full max-w-sm">
-        <div className="mb-2 flex justify-end">
+        <div className="mb-2 flex justify-end gap-2">
+          <LanguageSwitcher showLabel />
           <ThemeToggle />
         </div>
         <a href="https://www.duechat.com" aria-label="Go to DueChat" className="inline-block">
