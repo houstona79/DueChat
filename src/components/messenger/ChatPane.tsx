@@ -161,6 +161,7 @@ export function ChatPane({
   const [showTrivia, setShowTrivia] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
   const [statusDraft, setStatusDraft] = useState<string | null>(null);
+  const [editingRoom, setEditingRoom] = useState(false);
 
   const [draft, setDraft] = useState("");
   const [call, setCall] = useState<"voice" | "video" | null>(null);
@@ -1334,6 +1335,9 @@ export function ChatPane({
           roomId={room.is_direct ? null : room.id}
           onClose={() => setGiftTo(null)}
         />
+      ) : null}
+      {editingRoom && !room.is_direct ? (
+        <EditRoomDialog room={room} onDone={() => setEditingRoom(false)} />
       ) : null}
     </section>
   );
