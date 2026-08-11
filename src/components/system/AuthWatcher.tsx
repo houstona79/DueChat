@@ -3,7 +3,16 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 
-const PUBLIC_PREFIXES = ["/auth", "/reset-password", "/terms", "/accessibility", "/blog", "/i", "/"];
+const PUBLIC_PREFIXES = [
+  "/auth",
+  "/reset-password",
+  "/terms",
+  "/accessibility",
+  "/blog",
+  "/i",
+  "/r/",
+  "/",
+];
 
 function isPublicPath(path: string) {
   if (path === "/") return true;

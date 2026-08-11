@@ -370,6 +370,15 @@ export function ChatPane({
                 {room.status_message}
               </p>
             ) : null}
+            {!room.is_direct ? (
+              <Link
+                to="/r/$slug"
+                params={{ slug: room.slug }}
+                className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline short:hidden"
+              >
+                Room profile
+              </Link>
+            ) : null}
           </div>
         </div>
         {!room.is_direct && members.length > 0 ? (

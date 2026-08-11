@@ -1102,6 +1102,44 @@ export type Database = {
           },
         ]
       }
+      room_ratings: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          room_id: string
+          stars: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          room_id: string
+          stars: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          room_id?: string
+          stars?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_ratings_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       room_silences: {
         Row: {
           created_at: string
@@ -1697,6 +1735,22 @@ export type Database = {
       }
       is_site_banned: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      list_public_rooms: {
+        Args: { _limit?: number }
+        Returns: {
+          category: string
+          icon_url: string
+          id: string
+          member_count: number
+          name: string
+          name_color: string
+          rating: string
+          rating_avg: number
+          rating_count: number
+          slug: string
+          topic: string
+        }[]
+      }
       list_published_blogs: {
         Args: { _limit?: number; _username?: string }
         Returns: {
@@ -1716,6 +1770,51 @@ export type Database = {
       }
       my_invite_code: { Args: never; Returns: string }
       profile_points: { Args: { _user_id: string }; Returns: number }
+      public_room_profile: {
+        Args: { _slug: string }
+        Returns: {
+          banner_url: string
+          category: string
+          created_at: string
+          icon_url: string
+          id: string
+          member_count: number
+          name: string
+          name_color: string
+          rating: string
+          rating_avg: number
+          rating_count: number
+          slug: string
+          status_message: string
+          topic: string
+          website_label: string
+          website_url: string
+        }[]
+      }
+      public_room_reviews: {
+        Args: { _limit?: number; _slug: string }
+        Returns: {
+          avatar_url: string
+          comment: string
+          created_at: string
+          display_name: string
+          id: string
+          stars: number
+          username: string
+        }[]
+      }
+      public_room_staff: {
+        Args: { _slug: string }
+        Returns: {
+          avatar_url: string
+          country: string
+          display_name: string
+          name_color: string
+          tier: string
+          user_id: string
+          username: string
+        }[]
+      }
       room_is_invisible: { Args: { _room_id: string }; Returns: boolean }
       room_is_locked: { Args: { _room_id: string }; Returns: boolean }
       room_is_staff_only: { Args: { _room_id: string }; Returns: boolean }
