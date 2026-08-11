@@ -11,6 +11,7 @@ import { ProfilePhotos } from "./ProfilePhotos";
 import { ProfileFeed } from "./ProfileFeed";
 import { ProfileBlogs } from "./ProfileBlogs";
 import { GiftShelf } from "./GiftShelf";
+import { TranslatedText } from "@/components/system/TranslatedText";
 import { PointsBadge } from "./PointsBadge";
 import { SocialStatus } from "./SocialStatus";
 import { YearBadges } from "./YearBadges";
