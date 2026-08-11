@@ -375,6 +375,8 @@ export function ChatPane({
               <Link
                 to="/r/$slug"
                 params={{ slug: room.slug }}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-xs font-medium text-primary underline-offset-2 hover:underline short:hidden"
               >
                 <BadgeInfo className="size-3.5 shrink-0" aria-hidden />
@@ -466,9 +468,11 @@ export function ChatPane({
             <Link
               to="/r/$slug"
               params={{ slug: room.slug }}
+              target="_blank"
+              rel="noopener noreferrer"
               className="hidden h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium text-muted-foreground hover:bg-secondary lg:flex"
-              aria-label="View room profile"
-              title="View room profile"
+              aria-label="View room profile in a new tab"
+              title="View room profile (new tab)"
             >
               <BadgeInfo className="size-4" />
               Room profile
@@ -662,7 +666,12 @@ export function ChatPane({
               </DropdownMenuItem>
               {!room.is_direct ? (
                 <DropdownMenuItem asChild>
-                  <Link to="/r/$slug" params={{ slug: room.slug }}>
+                  <Link
+                    to="/r/$slug"
+                    params={{ slug: room.slug }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <BadgeInfo className="size-4" /> View room profile
                   </Link>
                 </DropdownMenuItem>

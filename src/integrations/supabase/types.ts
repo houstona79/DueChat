@@ -1781,6 +1781,8 @@ export type Database = {
           member_count: number
           name: string
           name_color: string
+          radio_name: string
+          radio_url: string
           rating: string
           rating_avg: number
           rating_count: number

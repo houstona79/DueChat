@@ -8,6 +8,7 @@ import type {
   PublicRoomStaff,
 } from "@/lib/room-profiles";
 import { RatingBadge } from "@/components/messenger/RoomRating";
+import { RadioPlayer } from "@/components/messenger/RadioPlayer";
 import { StarRow } from "@/components/rooms/StarRating";
 import { RoomRatingForm } from "@/components/rooms/RoomRatingForm";
 import { countryFlag } from "@/lib/country-flags";
@@ -186,6 +187,20 @@ function RoomProfilePage() {
           </Link>
         </div>
       </article>
+
+      {room.radio_url ? (
+        <section className="mt-6 overflow-hidden rounded-3xl border border-border bg-card">
+          <h2 className="px-6 pt-6 text-sm font-semibold">Room radio</h2>
+          <div className="mt-3">
+            <RadioPlayer
+              url={room.radio_url}
+              name={room.radio_name}
+              canEdit={false}
+              onSave={async () => {}}
+            />
+          </div>
+        </section>
+      ) : null}
 
       <section className="mt-6 rounded-3xl border border-border bg-card p-6">
         <h2 className="flex items-center gap-2 text-sm font-semibold">
