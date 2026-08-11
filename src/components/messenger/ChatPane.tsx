@@ -102,6 +102,7 @@ import {
   type RoomAdminTier,
 } from "@/lib/chat";
 import { cn } from "@/lib/utils";
+import { playSound } from "@/lib/sounds";
 import { TranslatedText } from "@/components/system/TranslatedText";
 import { giftNoticeOf } from "@/lib/credits";
 import { MessageVideo, videoEmbedOf } from "./MessageVideo";
@@ -262,6 +263,7 @@ export function ChatPane({
     setDraft("");
     try {
       await sendMessage(room.id, meId, text);
+      if (room.is_direct) playSound("message");
       await queryClient.invalidateQueries({ queryKey: ["messages", room.id] });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Message failed to send.");
