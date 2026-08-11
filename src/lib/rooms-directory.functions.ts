@@ -14,9 +14,12 @@ export type DirectoryRoom = {
   rating_count: number;
 };
 
+export type TrendingRoom = DirectoryRoom & { join_count: number };
+
 export const getRoomsDirectory = createServerFn({ method: "GET" }).handler(async () => {
   const { publicBlogClient } = await import("@/lib/blogs.server");
-  const { data, error } = await publicBlogClient().rpc("list_public_rooms", { _limit: 200 });
+  const client = publicBlogClient();
+  const { data, error } = await client.rpc("list_public_rooms", { _limit: 200 });
   if (error) throw error;
   const rooms = ((data ?? []) as DirectoryRoom[]).filter(
     (r) => (r.category ?? "").toLowerCase() !== "help" && !/^staff room$/i.test(r.name),
@@ -31,5 +34,19 @@ export const getRoomsDirectory = createServerFn({ method: "GET" }).handler(async
     )
     .slice(0, 10);
   const all = [...rooms].sort((a, b) => a.name.localeCompare(b.name));
-  return { top, all };
+
+  const now = Date.now();
+  const windows = {
+    day: new Date(now - 24 * 60 * 60 * 1000).toISOString(),
+    week: new Date(now - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    month: new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString(),
+  };
+  const [day, week, month] = await Promise.all(
+    [windows.day, windows.week, windows.month].map(async (since) => {
+      const { data: rows } = await client.rpc("top_rooms_since", { _since: since, _limit: 3 });
+      return ((rows ?? []) as TrendingRoom[]).filter((r) => (r.join_count ?? 0) > 0);
+    }),
+  );
+
+  return { top, all, trending: { day, week, month } };
 });

@@ -1,6 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Crown, Users } from "lucide-react";
-import { getRoomsDirectory, type DirectoryRoom } from "@/lib/rooms-directory.functions";
+import { ArrowLeft, Crown, Flame, Users } from "lucide-react";
+import {
+  getRoomsDirectory,
+  type DirectoryRoom,
+  type TrendingRoom,
+} from "@/lib/rooms-directory.functions";
 import { RatingBadge } from "@/components/messenger/RoomRating";
 import { StarRow } from "@/components/rooms/StarRating";
 import { initials } from "@/lib/chat";
@@ -44,7 +48,7 @@ function RoomIcon({ name, url }: { name: string; url: string | null }) {
   );
 }
 
-function RoomCard({ room, rank }: { room: DirectoryRoom; rank?: number }) {
+function RoomCard({ room, rank, note }: { room: DirectoryRoom; rank?: number; note?: string }) {
   const avg = room.rating_avg ? Number(room.rating_avg) : 0;
   return (
     <li className="rounded-3xl border border-border bg-card p-4">
@@ -77,6 +81,7 @@ function RoomCard({ room, rank }: { room: DirectoryRoom; rank?: number }) {
             <span>
               {room.rating_count > 0 ? `${avg.toFixed(1)} (${room.rating_count})` : "No ratings"}
             </span>
+            {note ? <span className="font-medium text-foreground">{note}</span> : null}
           </span>
           {room.topic ? (
             <span className="mt-1 line-clamp-2 block text-xs text-muted-foreground">
@@ -89,8 +94,36 @@ function RoomCard({ room, rank }: { room: DirectoryRoom; rank?: number }) {
   );
 }
 
+function TrendingSection({ label, rooms }: { label: string; rooms: TrendingRoom[] }) {
+  return (
+    <div>
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        {label}
+      </h3>
+      {rooms.length === 0 ? (
+        <p className="mt-2 text-sm text-muted-foreground">No room activity yet in this window.</p>
+      ) : (
+        <ul className="mt-3 space-y-3">
+          {rooms.map((room, i) => (
+            <RoomCard
+              key={room.id}
+              room={room}
+              rank={i + 1}
+              note={`${room.join_count} join${room.join_count === 1 ? "" : "s"}`}
+            />
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function RoomsDirectoryPage() {
-  const { top, all } = Route.useLoaderData() as { top: DirectoryRoom[]; all: DirectoryRoom[] };
+  const { top, all, trending } = Route.useLoaderData() as {
+    top: DirectoryRoom[];
+    all: DirectoryRoom[];
+    trending: { day: TrendingRoom[]; week: TrendingRoom[]; month: TrendingRoom[] };
+  };
 
   return (
     <main
@@ -112,6 +145,21 @@ function RoomsDirectoryPage() {
       </p>
 
       <section className="mt-8">
+        <h2 className="flex items-center gap-2 text-sm font-semibold">
+          <Flame className="size-4 text-primary" aria-hidden />
+          Busiest rooms
+        </h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Top 3 rooms by people joining, for today, this week, and this month.
+        </p>
+        <div className="mt-4 space-y-6">
+          <TrendingSection label="Today" rooms={trending.day} />
+          <TrendingSection label="This week" rooms={trending.week} />
+          <TrendingSection label="This month" rooms={trending.month} />
+        </div>
+      </section>
+
+      <section className="mt-10">
         <h2 className="flex items-center gap-2 text-sm font-semibold">
           <Crown className="size-4 text-primary" aria-hidden />
           Top rooms
