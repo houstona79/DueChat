@@ -1,5 +1,4 @@
 const { app, BrowserWindow, session, systemPreferences, shell } = require("electron");
-const path = require("path");
 
 const APP_URL = "https://app.duechat.com";
 const DEV_URL = "http://localhost:8080";
