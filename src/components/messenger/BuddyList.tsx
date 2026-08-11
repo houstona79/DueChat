@@ -18,6 +18,8 @@ import {
 import { accentFor, addBuddy, isOnline, removeBuddy, type Profile } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 
+const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
+
 export function BuddyList({
   profiles,
   me,
@@ -81,6 +83,16 @@ export function BuddyList({
     } catch {
       toast.error("Couldn't remove that buddy");
     }
+  };
+
+  const myRole = siteRoleOf(roles, me?.id ?? "");
+  const iAmStaff = myRole === "admin" || myRole === "moderator";
+  const lockedFor = (p: Profile) => {
+    const theirRole = siteRoleOf(roles, p.id);
+    if (p.id === OWNER_USER_ID && iAmStaff) return true;
+    if (me?.id === OWNER_USER_ID && (theirRole === "admin" || theirRole === "moderator"))
+      return true;
+    return false;
   };
 
   return (
