@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { ChevronDown, ChevronRight, MessageCircle, UserMinus, UserPlus, X } from "lucide-react";
+import { ChevronDown, ChevronRight, Lock, MessageCircle, UserMinus, UserPlus, X } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "./Avatar";
 import { countryFlag } from "@/lib/country-flags";
