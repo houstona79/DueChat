@@ -2,6 +2,11 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ExternalLink, Globe, MessageSquare, Users } from "lucide-react";
 import { getPublicRoomProfile } from "@/lib/room-profiles.functions";
 import { ROOM_STAFF_LABEL } from "@/lib/room-profiles";
+import type {
+  PublicRoomProfile,
+  PublicRoomReview,
+  PublicRoomStaff,
+} from "@/lib/room-profiles";
 import { RatingBadge } from "@/components/messenger/RoomRating";
 import { StarRow } from "@/components/rooms/StarRating";
 import { RoomRatingForm } from "@/components/rooms/RoomRatingForm";
@@ -77,7 +82,12 @@ function StaffAvatar({ name, url }: { name: string; url: string | null }) {
 }
 
 function RoomProfilePage() {
-  const { room, staff, reviews } = Route.useLoaderData();
+  const data = Route.useLoaderData() as {
+    room: PublicRoomProfile;
+    staff: PublicRoomStaff[];
+    reviews: PublicRoomReview[];
+  };
+  const { room, staff, reviews } = data;
   const avg = room.rating_avg ? Number(room.rating_avg) : 0;
 
   return (
