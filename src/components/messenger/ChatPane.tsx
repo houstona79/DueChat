@@ -262,6 +262,7 @@ export function ChatPane({
     setDraft("");
     try {
       await sendMessage(room.id, meId, text);
+      if (room.is_direct) playSound("message");
       await queryClient.invalidateQueries({ queryKey: ["messages", room.id] });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Message failed to send.");
