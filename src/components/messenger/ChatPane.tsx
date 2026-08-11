@@ -351,12 +351,15 @@ export function ChatPane({
             size="sm"
           />
           <div className="min-w-0 flex-1">
-            <h2
-              className="truncate text-sm font-semibold"
-              style={!room.is_direct && room.name_color ? { color: room.name_color } : undefined}
-            >
-              {title}
-            </h2>
+            <div className="flex min-w-0 items-center gap-1.5">
+              <h2
+                className="truncate text-sm font-semibold"
+                style={!room.is_direct && room.name_color ? { color: room.name_color } : undefined}
+              >
+                {title}
+              </h2>
+              {room.is_direct ? null : <RoomCrownMarks crowns={myCrowns} />}
+            </div>
             <p className="truncate text-xs text-muted-foreground">
               {room.is_direct
                 ? partner
