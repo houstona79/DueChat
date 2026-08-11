@@ -181,7 +181,7 @@ export function ProfileViewer() {
               <GiftShelf userId={profile.id} />
               {profile.bio ? (
                 <p className="whitespace-pre-line break-words leading-relaxed text-muted-foreground">
-                  {profile.bio}
+                  <TranslatedText text={profile.bio} className="block" />
                 </p>
               ) : null}
               {profile.country ? (
