@@ -22,6 +22,7 @@ import { Route as AuthenticatedModeratorRouteImport } from './routes/_authentica
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as ICodeRouteImport } from './routes/i.$code'
+import { Route as RSlugRouteImport } from './routes/r.$slug'
 import { Route as AuthenticatedChatRoomIdRouteImport } from './routes/_authenticated/chat.$roomId'
 import { Route as AuthenticatedUUsernameRouteImport } from './routes/_authenticated/u.$username'
 import { Route as BlogUsernameSlugRouteImport } from './routes/blog/$username.$slug'
@@ -90,6 +91,11 @@ const ICodeRoute = ICodeRouteImport.update({
   path: '/i/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RSlugRoute = RSlugRouteImport.update({
+  id: '/r/$slug',
+  path: '/r/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedChatRoomIdRoute = AuthenticatedChatRoomIdRouteImport.update({
   id: '/$roomId',
   path: '/$roomId',
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/moderator': typeof AuthenticatedModeratorRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/i/$code': typeof ICodeRoute
+  '/r/$slug': typeof RSlugRoute
   '/blog/': typeof BlogIndexRoute
   '/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
   '/u/$username': typeof AuthenticatedUUsernameRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/moderator': typeof AuthenticatedModeratorRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/i/$code': typeof ICodeRoute
+  '/r/$slug': typeof RSlugRoute
   '/blog': typeof BlogIndexRoute
   '/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
   '/u/$username': typeof AuthenticatedUUsernameRoute
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/_authenticated/moderator': typeof AuthenticatedModeratorRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/i/$code': typeof ICodeRoute
+  '/r/$slug': typeof RSlugRoute
   '/blog/': typeof BlogIndexRoute
   '/_authenticated/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
   '/_authenticated/u/$username': typeof AuthenticatedUUsernameRoute
@@ -173,6 +182,7 @@ export interface FileRouteTypes {
     | '/moderator'
     | '/settings'
     | '/i/$code'
+    | '/r/$slug'
     | '/blog/'
     | '/chat/$roomId'
     | '/u/$username'
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/moderator'
     | '/settings'
     | '/i/$code'
+    | '/r/$slug'
     | '/blog'
     | '/chat/$roomId'
     | '/u/$username'
@@ -208,6 +219,7 @@ export interface FileRouteTypes {
     | '/_authenticated/moderator'
     | '/_authenticated/settings'
     | '/i/$code'
+    | '/r/$slug'
     | '/blog/'
     | '/_authenticated/chat/$roomId'
     | '/_authenticated/u/$username'
@@ -222,6 +234,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermsRoute: typeof TermsRoute
   ICodeRoute: typeof ICodeRoute
+  RSlugRoute: typeof RSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
   BlogUsernameSlugRoute: typeof BlogUsernameSlugRoute
 }
@@ -319,6 +332,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ICodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/r/$slug': {
+      id: '/r/$slug'
+      path: '/r/$slug'
+      fullPath: '/r/$slug'
+      preLoaderRoute: typeof RSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/chat/$roomId': {
       id: '/_authenticated/chat/$roomId'
       path: '/$roomId'
@@ -383,19 +403,10 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   TermsRoute: TermsRoute,
   ICodeRoute: ICodeRoute,
+  RSlugRoute: RSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
   BlogUsernameSlugRoute: BlogUsernameSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
