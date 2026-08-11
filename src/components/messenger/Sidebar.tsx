@@ -337,6 +337,7 @@ export function Sidebar({
                             {room.name}
                           </span>
                           <RatingBadge rating={room.rating} />
+                          <RoomCrownMarks crowns={roomCrowns.get(room.id) ?? []} />
                           {room.staff_only ? (
                             <span className="shrink-0 rounded-full bg-staff/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-staff">
                               Staff
