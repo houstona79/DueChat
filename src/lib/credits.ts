@@ -139,3 +139,10 @@ export function giftNoticeOf(body: string) {
   if (!emoji || !label || !recipientName) return null;
   return { emoji, label, recipientName };
 }
+
+/** Public "points" total for any member's profile (their credit balance). */
+export async function fetchProfilePoints(userId: string): Promise<number> {
+  const { data, error } = await supabase.rpc("profile_points", { _user_id: userId });
+  if (error) throw new Error(error.message || "Could not load points.");
+  return data ?? 0;
+}
