@@ -45,6 +45,7 @@ import { RoomBanner } from "./RoomBanner";
 import { RatingControl } from "./RoomRating";
 import { YouTubeEmbed } from "./YouTubeEmbed";
 import { GiftDialog } from "./GiftDialog";
+import { EditRoomDialog } from "./EditRoomDialog";
 import {
   useBlocks,
   useMessages,
@@ -160,6 +161,7 @@ export function ChatPane({
   const [showTrivia, setShowTrivia] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
   const [statusDraft, setStatusDraft] = useState<string | null>(null);
+  const [editingRoom, setEditingRoom] = useState(false);
 
   const [draft, setDraft] = useState("");
   const [call, setCall] = useState<"voice" | "video" | null>(null);
@@ -348,7 +350,12 @@ export function ChatPane({
             size="sm"
           />
           <div className="min-w-0 flex-1">
-            <h2 className="truncate text-sm font-semibold">{title}</h2>
+            <h2
+              className="truncate text-sm font-semibold"
+              style={!room.is_direct && room.name_color ? { color: room.name_color } : undefined}
+            >
+              {title}
+            </h2>
             <p className="truncate text-xs text-muted-foreground">
               {room.is_direct
                 ? partner
@@ -395,6 +402,14 @@ export function ChatPane({
               className="hidden shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70 lg:block"
             >
               Room status
+            </button>
+          ) : null}
+          {!room.is_direct && isOwner ? (
+            <button
+              onClick={() => setEditingRoom(true)}
+              className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70"
+            >
+              Edit room
             </button>
           ) : null}
           {!room.is_direct && isOwner ? (
@@ -1320,6 +1335,9 @@ export function ChatPane({
           roomId={room.is_direct ? null : room.id}
           onClose={() => setGiftTo(null)}
         />
+      ) : null}
+      {editingRoom && !room.is_direct ? (
+        <EditRoomDialog room={room} onDone={() => setEditingRoom(false)} />
       ) : null}
     </section>
   );

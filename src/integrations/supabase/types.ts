@@ -1156,6 +1156,7 @@ export type Database = {
           is_direct: boolean
           locked: boolean
           name: string
+          name_color: string | null
           radio_name: string | null
           radio_url: string | null
           rating: string
@@ -1181,6 +1182,7 @@ export type Database = {
           is_direct?: boolean
           locked?: boolean
           name: string
+          name_color?: string | null
           radio_name?: string | null
           radio_url?: string | null
           rating?: string
@@ -1206,6 +1208,7 @@ export type Database = {
           is_direct?: boolean
           locked?: boolean
           name?: string
+          name_color?: string | null
           radio_name?: string | null
           radio_url?: string | null
           rating?: string
