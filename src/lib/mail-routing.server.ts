@@ -468,12 +468,24 @@ type CfAddress = { tag: string; email: string; verified?: string | null };
 async function accountId(domain: string, token: string) {
   const fromEnv = process.env["CLOUDFLARE_ACCOUNT_ID"];
   if (fromEnv) return fromEnv;
-  const zone = await zoneId(domain, token);
-  const info = (await cf(`/zones/${zone}`, token)) as { account?: { id?: string } };
-  const id = info?.account?.id;
+  let id: string | undefined;
+  try {
+    const zone = await zoneId(domain, token);
+    const info = (await cf(`/zones/${zone}`, token)) as { account?: { id?: string } };
+    id = info?.account?.id;
+  } catch {
+    id = undefined;
+  }
+  if (!id) {
+    // Fall back to the accounts list (needs any account-scoped permission).
+    const accounts = (await cf(`/accounts?per_page=1`, token).catch(() => null)) as
+      | Array<{ id?: string }>
+      | null;
+    id = accounts?.[0]?.id;
+  }
   if (!id)
     throw new CfError(
-      "Could not read the Cloudflare account for this zone. Add permission Zone → Zone → Read.",
+      "The Cloudflare token has no account-level access, so member inboxes can't be registered. Create a token with Account → Email Routing Addresses → Edit (and save the account ID).",
       403,
       [],
     );
