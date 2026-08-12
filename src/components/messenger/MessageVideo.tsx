@@ -1,4 +1,6 @@
-type VideoKind = { kind: "file"; src: string } | { kind: "embed"; src: string; title: string };
+type VideoKind =
+  | { kind: "file"; src: string }
+  | { kind: "embed"; src: string; title: string; portrait?: boolean };
 
 export function videoEmbedOf(body: string): VideoKind | null {
   const trimmed = body.trim();
@@ -32,6 +34,38 @@ export function videoEmbedOf(body: string): VideoKind | null {
     const id = url.pathname.split("/").filter(Boolean)[0];
     if (id && /^\d+$/.test(id)) {
       return { kind: "embed", src: `https://player.vimeo.com/video/${id}`, title: "Vimeo video" };
+    }
+  }
+
+  // TikTok — /@user/video/ID, /v/ID, /embed/ID (vm.tiktok.com short links can't be resolved client-side)
+  if (host === "tiktok.com" || host === "m.tiktok.com") {
+    const m =
+      url.pathname.match(/\/video\/(\d+)/) ??
+      url.pathname.match(/^\/v\/(\d+)/) ??
+      url.pathname.match(/^\/embed\/(?:v2\/)?(\d+)/);
+    if (m?.[1]) {
+      return {
+        kind: "embed",
+        src: `https://www.tiktok.com/embed/v2/${m[1]}`,
+        title: "TikTok video",
+        portrait: true,
+      };
+    }
+  }
+
+  // Snapchat Spotlight
+  if (host === "snapchat.com" || host === "story.snapchat.com") {
+    const m =
+      url.pathname.match(/^\/spotlight\/([\w-]+)/) ??
+      url.pathname.match(/^\/embed\/([\w-]+)/) ??
+      url.pathname.match(/^\/p\/[\w-]+\/([\w-]+)/);
+    if (m?.[1]) {
+      return {
+        kind: "embed",
+        src: `https://www.snapchat.com/embed/${m[1]}`,
+        title: "Snapchat video",
+        portrait: true,
+      };
     }
   }
 
@@ -70,7 +104,7 @@ export function MessageVideo({ video }: { video: VideoKind }) {
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
           referrerPolicy="strict-origin-when-cross-origin"
-          className="aspect-video w-full border-0"
+          className={video.portrait ? "aspect-[9/16] w-full border-0" : "aspect-video w-full border-0"}
         />
       )}
     </div>
