@@ -1,5 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { BadgeCheck, ExternalLink, Globe, MapPin, MessageSquare, User, X } from "lucide-react";
+import { BadgeCheck, ExternalLink, Globe, Mail, MapPin, MessageSquare, User, X } from "lucide-react";
 import { genderLabel } from "@/lib/genders";
 import { countryFlag } from "@/lib/country-flags";
 import { visibleGender, visiblePronouns } from "@/lib/field-visibility";
@@ -26,7 +26,7 @@ import {
   siteRoleTextClass,
   useSiteRoles,
 } from "@/hooks/use-roles";
-import { accentFor, isAdultProfile, isOnline } from "@/lib/chat";
+import { accentFor, isAdultProfile, isOnline, MAIL_DOMAIN } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 
 /** Tiny global store so any list can open a profile card. */
@@ -223,6 +223,17 @@ export function ProfileViewer() {
                   <Globe className="size-3.5 shrink-0" aria-hidden />
                   <span className="truncate">
                     {profile.website_url.replace(/^https?:\/\//, "")}
+                  </span>
+                </a>
+              ) : null}
+              {profile.mail_handle ? (
+                <a
+                  href={`mailto:${profile.mail_handle}@${MAIL_DOMAIN}`}
+                  className="flex items-center gap-2 text-xs text-primary hover:underline"
+                >
+                  <Mail className="size-3.5 shrink-0" aria-hidden />
+                  <span className="truncate">
+                    {profile.mail_handle}@{MAIL_DOMAIN}
                   </span>
                 </a>
               ) : null}
