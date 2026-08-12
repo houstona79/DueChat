@@ -20,7 +20,11 @@ import { GENDERS } from "@/lib/genders";
 import { FIELD_VISIBILITIES } from "@/lib/field-visibility";
 import { DECORATIONS } from "@/lib/decorations";
 import { postStatusChangeUpdate } from "@/lib/profile-updates";
-import { syncMyMailRoute } from "@/lib/mail-routing.functions";
+import {
+  refreshMyMailForward,
+  setMyMailForward,
+  syncMyMailRoute,
+} from "@/lib/mail-routing.functions";
 
 const NAME_COLORS = [
   { label: "Default", value: "" },
@@ -80,6 +84,9 @@ function SettingsPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [forwardTo, setForwardTo] = useState("");
+  const [forwardBusy, setForwardBusy] = useState(false);
+  const [forwardNote, setForwardNote] = useState<string | null>(null);
 
   useEffect(() => {
     if (!me) return;
@@ -96,6 +103,7 @@ function SettingsPage() {
     setBio(me.bio ?? "");
     setWebsite(me.website_url ?? "");
     setMailHandle(me.mail_handle ?? "");
+    setForwardTo(me.mail_forward_to ?? "");
     setProfileVisibility(me.profile_visibility ?? "public");
     setDecoration(me.decoration ?? "");
   }, [me]);
@@ -337,6 +345,75 @@ function SettingsPage() {
             Shown on your profile so people can reach you. Mail sent here forwards to the inbox you
             set up with your address — DueChat doesn't host the mailbox.
           </p>
+        </div>
+
+        <div>
+          <label
+            htmlFor="mail-forward"
+            className="block text-[11px] font-medium text-muted-foreground"
+          >
+            Forward my mail to
+          </label>
+          <input
+            id="mail-forward"
+            type="email"
+            value={forwardTo}
+            placeholder="you@gmail.com"
+            onChange={(e) => setForwardTo(e.target.value)}
+            className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground"
+          />
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            {me.mail_forward_to
+              ? me.mail_forward_verified
+                ? `Confirmed — mail to your handle goes straight to ${me.mail_forward_to}.`
+                : `${me.mail_forward_to} isn't confirmed yet, so mail still goes to the shared DueChat inbox. Check that inbox for the confirmation email.`
+              : "Add your own inbox to receive handle mail directly. You'll get a confirmation email you need to click first."}
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={forwardBusy}
+              onClick={async () => {
+                setForwardBusy(true);
+                setForwardNote(null);
+                try {
+                  const res = await setMyMailForward({
+                    data: { email: forwardTo.trim() || null },
+                  });
+                  setForwardNote(res.message);
+                  await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+                } catch {
+                  setForwardNote("Couldn't update your forwarding inbox right now.");
+                } finally {
+                  setForwardBusy(false);
+                }
+              }}
+              className="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"
+            >
+              {forwardTo.trim() ? "Save & send confirmation" : "Remove"}
+            </button>
+            <button
+              type="button"
+              disabled={forwardBusy || !me.mail_forward_to}
+              onClick={async () => {
+                setForwardBusy(true);
+                setForwardNote(null);
+                try {
+                  const res = await refreshMyMailForward();
+                  setForwardNote(res.message);
+                  await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+                } catch {
+                  setForwardNote("Couldn't check confirmation right now.");
+                } finally {
+                  setForwardBusy(false);
+                }
+              }}
+              className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold disabled:opacity-60"
+            >
+              I confirmed it — re-check
+            </button>
+          </div>
+          {forwardNote ? <p className="mt-2 text-[11px] text-primary">{forwardNote}</p> : null}
         </div>
 
         <div>
