@@ -709,6 +709,7 @@ export type Database = {
           gender_visibility: string
           id: string
           last_seen_at: string
+          mail_handle: string | null
           name_color: string | null
           name_color_expires_at: string | null
           profile_visibility: string
@@ -732,6 +733,7 @@ export type Database = {
           gender_visibility?: string
           id: string
           last_seen_at?: string
+          mail_handle?: string | null
           name_color?: string | null
           name_color_expires_at?: string | null
           profile_visibility?: string
@@ -755,6 +757,7 @@ export type Database = {
           gender_visibility?: string
           id?: string
           last_seen_at?: string
+          mail_handle?: string | null
           name_color?: string | null
           name_color_expires_at?: string | null
           profile_visibility?: string

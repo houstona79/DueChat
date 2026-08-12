@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, BadgeCheck, Globe, MapPin, MessageSquare, User } from "lucide-react";
+import { ArrowLeft, BadgeCheck, Globe, Mail, MapPin, MessageSquare, User } from "lucide-react";
 import { genderLabel } from "@/lib/genders";
 import { countryFlag } from "@/lib/country-flags";
 import { Avatar } from "@/components/messenger/Avatar";
@@ -23,7 +23,7 @@ import {
   siteRoleTextClass,
   useSiteRoles,
 } from "@/hooks/use-roles";
-import { accentFor, isAdultProfile, isOnline } from "@/lib/chat";
+import { accentFor, isAdultProfile, isOnline, MAIL_DOMAIN } from "@/lib/chat";
 import { decorationGlyph, decorationLabel } from "@/lib/decorations";
 import { cn } from "@/lib/utils";
 
@@ -186,6 +186,17 @@ function ProfilePage() {
                   <Globe className="size-3.5 shrink-0" aria-hidden />
                   <span className="truncate">
                     {profile.website_url.replace(/^https?:\/\//, "")}
+                  </span>
+                </a>
+              ) : null}
+              {profile.mail_handle ? (
+                <a
+                  href={`mailto:${profile.mail_handle}@${MAIL_DOMAIN}`}
+                  className="flex items-center gap-2 text-xs text-primary hover:underline"
+                >
+                  <Mail className="size-3.5 shrink-0" aria-hidden />
+                  <span className="truncate">
+                    {profile.mail_handle}@{MAIL_DOMAIN}
                   </span>
                 </a>
               ) : null}

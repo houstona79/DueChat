@@ -1,5 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 
+/** Domain used for member mail handles (forwarding is configured at the DNS provider). */
+export const MAIL_DOMAIN = "comtv.us";
+
 export type Profile = {
   id: string;
   username: string;
@@ -15,6 +18,8 @@ export type Profile = {
   pronouns_visibility: string;
   bio: string | null;
   website_url: string | null;
+  /** Claimed @comtv.us mail handle (local part only), or null. */
+  mail_handle: string | null;
   accepted_eula_at: string | null;
   /** Who may open this profile: everyone, buddies only, or nobody. */
   profile_visibility: string;
@@ -117,7 +122,7 @@ export async function updateRoomSettings(roomId: string, settings: RoomSettings)
 }
 
 const PROFILE_COLS =
-  "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, accepted_eula_at, profile_visibility, decoration, last_seen_at, created_at";
+  "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, mail_handle, accepted_eula_at, profile_visibility, decoration, last_seen_at, created_at";
 
 export type RoomBranding = {
   icon_url: string | null;
@@ -796,6 +801,7 @@ export async function updateProfile(
       | "pronouns_visibility"
       | "bio"
       | "website_url"
+      | "mail_handle"
       | "accepted_eula_at"
       | "profile_visibility"
       | "decoration"

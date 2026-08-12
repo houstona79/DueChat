@@ -12,7 +12,7 @@ import { LanguageSettings } from "@/components/system/LanguageSettings";
 import { ImageCropper } from "@/components/messenger/ImageCropper";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { accentFor, normalizeWebsiteUrl, updateProfile, uploadAvatar } from "@/lib/chat";
+import { accentFor, MAIL_DOMAIN, normalizeWebsiteUrl, updateProfile, uploadAvatar } from "@/lib/chat";
 import { isRedish, readableNameColor } from "@/hooks/use-roles";
 import { cn } from "@/lib/utils";
 import { COUNTRIES } from "@/lib/countries";
@@ -72,6 +72,7 @@ function SettingsPage() {
   const [pronounsVisibility, setPronounsVisibility] = useState("public");
   const [bio, setBio] = useState("");
   const [website, setWebsite] = useState("");
+  const [mailHandle, setMailHandle] = useState("");
   const [profileVisibility, setProfileVisibility] = useState("public");
   const [decoration, setDecoration] = useState("");
   const [resetting, setResetting] = useState(false);
@@ -93,6 +94,7 @@ function SettingsPage() {
     setPronounsVisibility(me.pronouns_visibility ?? "public");
     setBio(me.bio ?? "");
     setWebsite(me.website_url ?? "");
+    setMailHandle(me.mail_handle ?? "");
     setProfileVisibility(me.profile_visibility ?? "public");
     setDecoration(me.decoration ?? "");
   }, [me]);
@@ -116,6 +118,17 @@ function SettingsPage() {
         return;
       }
       const nextStatus = status.trim().slice(0, 120) || null;
+      const handle = mailHandle
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9._-]/g, "");
+      if (handle && !/^[a-z0-9][a-z0-9._-]{2,23}$/.test(handle)) {
+        setMessage(
+          "Mail handles are 3–24 characters and can use letters, numbers, dots, dashes and underscores.",
+        );
+        setBusy(false);
+        return;
+      }
       const statusChanged = nextStatus !== (me.status_message ?? null);
       await updateProfile(user.id, {
         display_name: displayName.trim().slice(0, 60) || me.display_name,
@@ -134,6 +147,7 @@ function SettingsPage() {
         pronouns_visibility: pronounsVisibility,
         bio: bio.trim().slice(0, 500) || null,
         website_url: websiteUrl,
+        mail_handle: handle || null,
         profile_visibility: profileVisibility,
         decoration: decoration || null,
         ...(me.birth_date ? {} : { birth_date: birthDate || null }),
@@ -155,7 +169,12 @@ function SettingsPage() {
           : "Profile saved.",
       );
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : "Could not save profile.");
+      const raw = err instanceof Error ? err.message : "";
+      setMessage(
+        /mail_handle/i.test(raw)
+          ? "That mail handle is already taken — try another."
+          : raw || "Could not save profile.",
+      );
     } finally {
       setBusy(false);
     }
@@ -277,6 +296,30 @@ function SettingsPage() {
           onChange={setWebsite}
           placeholder="https://example.com"
         />
+
+        <div>
+          <label
+            htmlFor="mail-handle"
+            className="block text-[11px] font-medium text-muted-foreground"
+          >
+            Your {MAIL_DOMAIN} mail handle
+          </label>
+          <div className="mt-1 flex items-center gap-2 rounded-xl bg-secondary px-3 py-2.5">
+            <input
+              id="mail-handle"
+              value={mailHandle}
+              maxLength={24}
+              placeholder="yourname"
+              onChange={(e) => setMailHandle(e.target.value)}
+              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+            />
+            <span className="shrink-0 text-sm text-muted-foreground">@{MAIL_DOMAIN}</span>
+          </div>
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            Shown on your profile so people can reach you. Mail sent here forwards to the inbox you
+            set up with your address — DueChat doesn't host the mailbox.
+          </p>
+        </div>
 
         <div>
           <span className="block text-[11px] font-medium text-muted-foreground">Date of birth</span>
