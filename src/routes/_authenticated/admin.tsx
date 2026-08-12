@@ -31,6 +31,7 @@ import { ChatLogs } from "@/components/messenger/ChatLogs";
 import { NotificationAudit } from "@/components/messenger/NotificationAudit";
 import { AlertComposer } from "@/components/messenger/AlertComposer";
 import { AdminNav, TAB_META, type AdminTab } from "@/components/admin/AdminNav";
+import { MailHandles } from "@/components/admin/MailHandles";
 import { SupportInbox } from "@/components/admin/SupportInbox";
 import { SupportLogs } from "@/components/admin/SupportLogs";
 import { GiveCreditsDialog } from "@/components/admin/GiveCreditsDialog";
@@ -820,6 +821,8 @@ function AdminPage() {
           deleting={messageMutation.isPending}
         />
       )}
+
+      {tab === "mail" && <MailHandles />}
 
       {tab === "reports" && <ReportQueue />}
 

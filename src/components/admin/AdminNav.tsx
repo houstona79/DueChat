@@ -7,6 +7,7 @@ import {
   Gauge,
   Hash,
   Headset,
+  Mail,
   MessageSquare,
   MonitorSmartphone,
   Bell,
@@ -34,7 +35,8 @@ export type AdminTab =
   | "notifications"
   | "alerts"
   | "support"
-  | "supportlogs";
+  | "supportlogs"
+  | "mail";
 
 type Meta = { label: string; icon: LucideIcon; hint: string; group: string };
 
@@ -84,6 +86,12 @@ export const TAB_META: Record<AdminTab, Meta> = {
     hint: "Answer help requests",
     group: "Moderation",
   },
+  mail: {
+    label: "Mail handles",
+    icon: Mail,
+    hint: "Claimed comtv.us addresses",
+    group: "People",
+  },
   supportlogs: {
     label: "Support reports",
     icon: ScrollText,
@@ -94,7 +102,7 @@ export const TAB_META: Record<AdminTab, Meta> = {
 
 const GROUPS: { name: string; tabs: AdminTab[] }[] = [
   { name: "Dashboard", tabs: ["overview"] },
-  { name: "People", tabs: ["users", "staff", "bans"] },
+  { name: "People", tabs: ["users", "staff", "bans", "mail"] },
   { name: "Security", tabs: ["sessions", "ips"] },
   { name: "Content", tabs: ["rooms", "messages", "dms", "logs"] },
   {
