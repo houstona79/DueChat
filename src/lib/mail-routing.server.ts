@@ -263,6 +263,99 @@ export async function checkCloudflareAccess(domain: string): Promise<MailRouteCh
 }
 
 /**
+ * Reports the configured forwarding destination and whether Cloudflare
+ * currently accepts it (verified). Proven with a throwaway disabled rule.
+ */
+export async function describeMailDestination(domain: string): Promise<{
+  destination: string | null;
+  sameDomain: boolean;
+  verified: boolean;
+  message: string;
+}> {
+  const token = process.env["CLOUDFLARE_API_TOKEN"];
+  const destination = process.env["CLOUDFLARE_EMAIL_DESTINATION"] ?? null;
+  if (!destination)
+    return {
+      destination: null,
+      sameDomain: false,
+      verified: false,
+      message:
+        "No forwarding destination is saved yet. Add an external inbox you own (for example a Gmail or Outlook address).",
+    };
+  const sameDomain = destination.toLowerCase().endsWith(`@${domain.toLowerCase()}`);
+  if (sameDomain)
+    return {
+      destination,
+      sameDomain,
+      verified: false,
+      message: `${destination} is on ${domain}, the same domain mail is forwarded from. Cloudflare can never verify it. Use an external inbox you own instead.`,
+    };
+  if (!token)
+    return {
+      destination,
+      sameDomain,
+      verified: false,
+      message: "No Cloudflare API token is saved, so the destination cannot be checked.",
+    };
+
+  let zone: string;
+  try {
+    zone = await zoneId(domain, token);
+  } catch {
+    return {
+      destination,
+      sameDomain,
+      verified: false,
+      message: `Could not reach the ${domain} zone in Cloudflare to check the destination.`,
+    };
+  }
+
+  let probeTag: string | null = null;
+  try {
+    const created = (await cf(`/zones/${zone}/email/routing/rules`, token, {
+      method: "POST",
+      body: JSON.stringify({
+        name: "duechat:destination-check",
+        enabled: false,
+        matchers: [
+          {
+            type: "literal",
+            field: "to",
+            value: `duechat-destination-check-${Date.now()}@${domain}`,
+          },
+        ],
+        actions: [{ type: "forward", value: [destination] }],
+      }),
+    })) as { tag?: string } | null;
+    probeTag = created?.tag ?? null;
+    return {
+      destination,
+      sameDomain,
+      verified: true,
+      message: `${destination} is verified in Cloudflare — member handles forward to it.`,
+    };
+  } catch (err) {
+    const unverified = err instanceof CfError && /destination|verif/i.test(err.message);
+    return {
+      destination,
+      sameDomain,
+      verified: false,
+      message: unverified
+        ? `${destination} is not verified yet. Add it in Cloudflare → Email Routing → Destination addresses, click the confirmation link Cloudflare emails you, then re-run this check.`
+        : err instanceof Error
+          ? err.message
+          : "Cloudflare rejected the destination check.",
+    };
+  } finally {
+    if (probeTag) {
+      await cf(`/zones/${zone}/email/routing/rules/${probeTag}`, token, {
+        method: "DELETE",
+      }).catch(() => undefined);
+    }
+  }
+}
+
+/**
  * Creates/updates/removes the Cloudflare Email Routing rule that forwards
  * `<handle>@<domain>` to the shared verified destination address.
  * Each member owns exactly one rule, tracked by the rule name `duechat:<userId>`.
