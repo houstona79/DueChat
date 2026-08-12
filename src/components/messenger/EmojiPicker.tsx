@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Smile } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { IMAGE_EMOJIS, shortcodeOf } from "@/lib/image-emojis";
 
 const GROUPS: { label: string; emojis: string[] }[] = [
   {
@@ -235,6 +236,32 @@ export function EmojiPicker({ onSelect }: { onSelect: (emoji: string) => void })
         side="top"
         className="max-h-72 w-[min(20rem,calc(100vw-2rem))] overflow-y-auto p-3"
       >
+        <div className="mb-3">
+          <p className="mb-1 px-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            Picture emojis
+          </p>
+          <div className="grid grid-cols-6 gap-1">
+            {IMAGE_EMOJIS.map((emoji) => (
+              <button
+                key={emoji.name}
+                type="button"
+                onClick={() => onSelect(shortcodeOf(emoji))}
+                aria-label={emoji.label}
+                title={emoji.label}
+                className="grid size-10 place-items-center rounded-lg transition-colors hover:bg-secondary"
+              >
+                <img
+                  src={emoji.url}
+                  alt={emoji.label}
+                  loading="lazy"
+                  width={512}
+                  height={512}
+                  className="size-8 object-contain"
+                />
+              </button>
+            ))}
+          </div>
+        </div>
         {GROUPS.map((group) => (
           <div key={group.label} className="mb-3 last:mb-0">
             <p className="mb-1 px-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
