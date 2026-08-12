@@ -119,6 +119,7 @@ const createWindow = () => {
     minWidth: 375,
     minHeight: 600,
     title: "DueChat",
+    icon: require("path").join(__dirname, "icons", "icon.png"),
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
