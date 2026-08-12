@@ -20,6 +20,7 @@ import { GENDERS } from "@/lib/genders";
 import { FIELD_VISIBILITIES } from "@/lib/field-visibility";
 import { DECORATIONS } from "@/lib/decorations";
 import { postStatusChangeUpdate } from "@/lib/profile-updates";
+import { syncMyMailRoute } from "@/lib/mail-routing.functions";
 
 const NAME_COLORS = [
   { label: "Default", value: "" },
@@ -130,6 +131,7 @@ function SettingsPage() {
         return;
       }
       const statusChanged = nextStatus !== (me.status_message ?? null);
+      const handleChanged = (handle || null) !== (me.mail_handle ?? null);
       await updateProfile(user.id, {
         display_name: displayName.trim().slice(0, 60) || me.display_name,
         username:
@@ -163,10 +165,25 @@ function SettingsPage() {
       }
       await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
       await queryClient.invalidateQueries({ queryKey: ["profiles"] });
+      let routeNote = "";
+      if (handleChanged) {
+        try {
+          const res = await syncMyMailRoute();
+          if (res.synced && handle) routeNote = ` Mail forwarding for ${handle}@${MAIL_DOMAIN} is live.`;
+          else if (res.reason === "address_taken")
+            routeNote = " That mail address already has a forwarding rule — pick another handle.";
+          else if (res.reason === "not_configured")
+            routeNote = " Mail forwarding isn't connected yet, so the address won't receive mail.";
+        } catch {
+          routeNote = " Saved, but mail forwarding couldn't be updated right now.";
+        }
+      }
       setMessage(
+        (
         statusChanged && nextStatus
           ? "Profile saved — status shared to your feed."
-          : "Profile saved.",
+          : "Profile saved."
+        ) + routeNote,
       );
     } catch (err) {
       const raw = err instanceof Error ? err.message : "";
