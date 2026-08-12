@@ -15,6 +15,8 @@ export type Profile = {
   pronouns_visibility: string;
   bio: string | null;
   website_url: string | null;
+  /** Claimed @comtv.us mail handle (local part only), or null. */
+  mail_handle: string | null;
   accepted_eula_at: string | null;
   /** Who may open this profile: everyone, buddies only, or nobody. */
   profile_visibility: string;
