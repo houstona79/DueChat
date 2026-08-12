@@ -1,4 +1,4 @@
-const { app, BrowserWindow, session, systemPreferences, shell } = require("electron");
+const { app, BrowserWindow, Menu, session, systemPreferences, shell, clipboard } = require("electron");
 
 const APP_URL = "https://app.duechat.com";
 const DEV_URL = "http://localhost:8080";
@@ -111,6 +111,63 @@ const loadUrl = () => {
   return APP_URL;
 };
 
+/**
+ * Without an application menu Chromium never registers the standard editing
+ * accelerators, so Cmd/Ctrl+V does nothing in the desktop build and users
+ * cannot paste video links into rooms. Registering roles restores them.
+ */
+const buildAppMenu = () => {
+  const isMac = process.platform === "darwin";
+  const template = [
+    ...(isMac ? [{ role: "appMenu" }] : []),
+    { role: "fileMenu" },
+    {
+      label: "Edit",
+      submenu: [
+        { role: "undo" },
+        { role: "redo" },
+        { type: "separator" },
+        { role: "cut" },
+        { role: "copy" },
+        { role: "paste" },
+        { role: "pasteAndMatchStyle" },
+        { role: "selectAll" },
+      ],
+    },
+    { role: "viewMenu" },
+    { role: "windowMenu" },
+  ];
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+};
+
+/** Right-click cut/copy/paste, since many users paste links that way. */
+const attachContextMenu = (webContents) => {
+  webContents.on("context-menu", (_event, params) => {
+    const items = [];
+    if (params.isEditable) {
+      items.push(
+        { role: "undo" },
+        { role: "redo" },
+        { type: "separator" },
+        { role: "cut", enabled: params.editFlags?.canCut },
+        { role: "copy", enabled: params.editFlags?.canCopy },
+        {
+          label: "Paste",
+          enabled: params.editFlags?.canPaste !== false,
+          click: () => webContents.paste(),
+        },
+        { role: "selectAll" },
+      );
+    } else if (params.selectionText) {
+      items.push({
+        label: "Copy",
+        click: () => clipboard.writeText(params.selectionText),
+      });
+    }
+    if (items.length) Menu.buildFromTemplate(items).popup();
+  });
+};
+
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 1400,
@@ -118,6 +175,7 @@ const createWindow = () => {
     minWidth: 375,
     minHeight: 600,
     title: "DueChat",
+    icon: require("path").join(__dirname, "icons", "icon.png"),
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
@@ -128,6 +186,7 @@ const createWindow = () => {
   });
 
   mainWindow.loadURL(loadUrl());
+  attachContextMenu(mainWindow.webContents);
 
   // External links open in the user's browser instead of hijacking the app.
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -142,6 +201,7 @@ const createWindow = () => {
 
 app.whenReady().then(async () => {
   allowMediaPermissions();
+  buildAppMenu();
   await requestMediaAccess();
   createWindow();
 
