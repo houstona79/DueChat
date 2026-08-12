@@ -168,6 +168,18 @@ export function useGroupCall({
           stream.getTracks().forEach((t) => t.stop());
           return;
         }
+        // A camera can succeed while Windows fails the requested microphone.
+        // Do not accept that partial stream as a successful call: acquire the
+        // default input separately and merge it into the same MediaStream.
+        if (stream.getAudioTracks().length === 0) {
+          try {
+            const audioOnly = await getMediaStreamResilient({ audio: true, video: false });
+            const audioTrack = audioOnly.getAudioTracks()[0];
+            if (audioTrack) stream.addTrack(audioTrack);
+          } catch {
+            /* The missing track is reflected by muted state below. */
+          }
+        }
         localStreamRef.current = stream;
         setLocalStream(stream);
         if (stream.getVideoTracks().length > 0 || mode !== "video") setMediaError(null);
