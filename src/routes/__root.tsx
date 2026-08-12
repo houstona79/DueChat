@@ -19,6 +19,7 @@ import { DeviceLock } from "@/components/system/DeviceLock";
 import { SystemAlerts } from "@/components/system/SystemAlerts";
 import { SupportAlerts } from "@/components/support/SupportAlerts";
 import { UpdateAlerts } from "@/components/messenger/UpdateAlerts";
+import { SystemUpdateNotice } from "@/components/system/SystemUpdateNotice";
 import { LanguageProvider } from "@/lib/i18n";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -162,6 +163,7 @@ function RootComponent() {
         <Outlet />
         <KickWatcher />
         <SystemAlerts />
+        <SystemUpdateNotice />
         <SupportAlerts />
         <UpdateAlerts />
         <AuthWatcher />
