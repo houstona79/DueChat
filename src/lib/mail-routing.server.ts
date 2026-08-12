@@ -450,3 +450,153 @@ export async function syncCloudflareRoute(opts: {
     return { synced: false, ...(destBad ?? c) };
   }
 }
+/* ---------------------------------------------------------------------------
+ * Per-member forwarding destinations
+ * Cloudflare only forwards to inboxes that have clicked its confirmation link,
+ * so each member's own address must be registered and verified account-side.
+ * ------------------------------------------------------------------------- */
+
+type CfAddress = { tag: string; email: string; verified?: string | null };
+
+async function accountId(domain: string, token: string) {
+  const fromEnv = process.env["CLOUDFLARE_ACCOUNT_ID"];
+  if (fromEnv) return fromEnv;
+  const zone = await zoneId(domain, token);
+  const info = (await cf(`/zones/${zone}`, token)) as { account?: { id?: string } };
+  const id = info?.account?.id;
+  if (!id)
+    throw new CfError(
+      "Could not read the Cloudflare account for this zone. Add permission Zone → Zone → Read.",
+      403,
+      [],
+    );
+  return id;
+}
+
+export type MemberDestinationState = {
+  email: string | null;
+  verified: boolean;
+  known: boolean;
+  message: string;
+  reason?: MailRouteReason | "no_address_access";
+};
+
+async function listAddresses(domain: string, token: string) {
+  const acct = await accountId(domain, token);
+  const list =
+    ((await cf(`/accounts/${acct}/email/routing/addresses?per_page=100`, token)) as CfAddress[]) ??
+    [];
+  return { acct, list };
+}
+
+/** Reads whether one member address is registered + verified in Cloudflare. */
+export async function memberDestinationStatus(
+  email: string,
+  domain: string,
+): Promise<MemberDestinationState> {
+  const token = process.env["CLOUDFLARE_API_TOKEN"];
+  if (!token)
+    return {
+      email,
+      verified: false,
+      known: false,
+      reason: "missing_token",
+      message: "Mail forwarding isn't connected yet.",
+    };
+  try {
+    const { list } = await listAddresses(domain, token);
+    const found = list.find((a) => a.email.toLowerCase() === email.toLowerCase());
+    if (!found)
+      return {
+        email,
+        verified: false,
+        known: false,
+        message: "This inbox isn't registered with Cloudflare yet.",
+      };
+    const verified = Boolean(found.verified);
+    return {
+      email,
+      verified,
+      known: true,
+      message: verified
+        ? `${email} is confirmed — your handle forwards straight to it.`
+        : `${email} still needs confirming. Open the email Cloudflare sent you and click the link.`,
+    };
+  } catch (err) {
+    return {
+      email,
+      verified: false,
+      known: false,
+      reason: "no_address_access",
+      message:
+        err instanceof CfError && (err.status === 403 || err.status === 401)
+          ? "The Cloudflare token can't manage destination addresses. Add the account permission Email Routing Addresses → Edit."
+          : err instanceof Error
+            ? err.message
+            : "Could not check that inbox with Cloudflare.",
+    };
+  }
+}
+
+/**
+ * Registers a member's own inbox with Cloudflare so it receives a confirmation
+ * email. Safe to call repeatedly — an existing address is reported as-is.
+ */
+export async function requestMemberDestination(
+  email: string,
+  domain: string,
+): Promise<MemberDestinationState> {
+  const token = process.env["CLOUDFLARE_API_TOKEN"];
+  if (!token)
+    return {
+      email,
+      verified: false,
+      known: false,
+      reason: "missing_token",
+      message: "Mail forwarding isn't connected yet.",
+    };
+  if (email.toLowerCase().endsWith(`@${domain.toLowerCase()}`))
+    return {
+      email,
+      verified: false,
+      known: false,
+      reason: "destination_unverified",
+      message: `Pick an inbox outside ${domain} — Cloudflare can't forward mail to the same domain it comes from.`,
+    };
+  try {
+    const { acct, list } = await listAddresses(domain, token);
+    const found = list.find((a) => a.email.toLowerCase() === email.toLowerCase());
+    if (found)
+      return {
+        email,
+        verified: Boolean(found.verified),
+        known: true,
+        message: found.verified
+          ? `${email} is already confirmed.`
+          : `${email} is registered — click the link in the email Cloudflare sent you.`,
+      };
+    await cf(`/accounts/${acct}/email/routing/addresses`, token, {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+    return {
+      email,
+      verified: false,
+      known: true,
+      message: `Cloudflare just emailed ${email} — click the confirmation link, then re-check here.`,
+    };
+  } catch (err) {
+    return {
+      email,
+      verified: false,
+      known: false,
+      reason: "no_address_access",
+      message:
+        err instanceof CfError && (err.status === 403 || err.status === 401)
+          ? "The Cloudflare token can't add destination addresses. Add the account permission Email Routing Addresses → Edit."
+          : err instanceof Error
+            ? err.message
+            : "Could not register that inbox with Cloudflare.",
+    };
+  }
+}
