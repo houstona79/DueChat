@@ -456,6 +456,26 @@ export function isValidRadioUrl(url: string) {
   }
 }
 
+/**
+ * Spotify playlists/albums/artists/shows can be used as a room "station".
+ * They can't stream through <audio>, so we render Spotify's own embed player.
+ * Returns the embed URL, or null when the link isn't a supported Spotify link.
+ */
+export function spotifyEmbedUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url.trim());
+    if (!/(^|\.)spotify\.com$/i.test(parsed.hostname)) return null;
+    const match = /^\/(?:intl-[a-z-]+\/)?(playlist|album|track|artist|show|episode)\/([A-Za-z0-9]+)/.exec(
+      parsed.pathname,
+    );
+    if (!match) return null;
+    return `https://open.spotify.com/embed/${match[1]}/${match[2]}?utm_source=duechat`;
+  } catch {
+    return null;
+  }
+}
+
 export async function setRoomYouTube(
   roomId: string,
   video: { url: string | null; title: string | null },
