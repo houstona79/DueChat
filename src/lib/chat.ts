@@ -20,6 +20,10 @@ export type Profile = {
   website_url: string | null;
   /** Claimed @comtv.us mail handle (local part only), or null. */
   mail_handle: string | null;
+  /** The member's own external inbox their handle forwards to, or null. */
+  mail_forward_to: string | null;
+  /** True once Cloudflare has confirmed that inbox. */
+  mail_forward_verified: boolean;
   accepted_eula_at: string | null;
   /** Who may open this profile: everyone, buddies only, or nobody. */
   profile_visibility: string;
