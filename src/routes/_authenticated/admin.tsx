@@ -234,6 +234,7 @@ function AdminPage() {
       <AdminNav
         tab={tab}
         onChange={setTab}
+        isOwner={isOwner}
         counts={{
           users: data.profiles.length,
           bans: data.bans.length,
@@ -822,7 +823,7 @@ function AdminPage() {
         />
       )}
 
-      {tab === "mail" && <MailHandles />}
+      {tab === "mail" && isOwner && <MailHandles isOwner={isOwner} />}
 
       {tab === "reports" && <ReportQueue />}
 

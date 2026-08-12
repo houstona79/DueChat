@@ -24,8 +24,8 @@ async function fetchMailHandles(): Promise<Row[]> {
   return (data ?? []) as Row[];
 }
 
-/** Staff view of every claimed @{MAIL_DOMAIN} mail handle. */
-export function MailHandles() {
+/** Staff view of every claimed @{MAIL_DOMAIN} mail handle. Config is owner-only. */
+export function MailHandles({ isOwner = false }: { isOwner?: boolean }) {
   const [search, setSearch] = useState("");
   const { data, isLoading, error } = useQuery({
     queryKey: ["admin-mail-handles"],
@@ -55,6 +55,7 @@ export function MailHandles() {
 
   return (
     <div className="mt-5 space-y-3">
+      {isOwner && (
       <div className="space-y-2 rounded-xl bg-card p-3 ring-1 ring-border">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm font-semibold">Cloudflare forwarding connection</p>
@@ -110,6 +111,7 @@ export function MailHandles() {
           </>
         )}
       </div>
+      )}
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-semibold">Claimed {MAIL_DOMAIN} handles</p>
