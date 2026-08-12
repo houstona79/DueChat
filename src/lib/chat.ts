@@ -1,5 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 
+/** Domain used for member mail handles (forwarding is configured at the DNS provider). */
+export const MAIL_DOMAIN = "comtv.us";
+
 export type Profile = {
   id: string;
   username: string;
