@@ -25,7 +25,7 @@ export const checkMailRouting = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { data: isStaff, error } = await context.supabase.rpc("has_role", {
       _user_id: context.userId,
-      _role: "owner",
+      _role: "admin",
     });
     if (error) throw error;
     if (!isStaff) throw new Error("Forbidden");
