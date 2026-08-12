@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Music2, Pause, Play, Radio, Settings2, Volume2, X } from "lucide-react";
-import { isValidRadioUrl, spotifyEmbedUrl } from "@/lib/chat";
+import { ClipboardPaste, Music2, Pause, Play, Radio, Settings2, Volume2, X } from "lucide-react";
+import { isValidRadioUrl, normalizeRadioInput, spotifyEmbedUrl } from "@/lib/chat";
 import { getNowPlaying } from "@/lib/radio-meta.functions";
 import { cn } from "@/lib/utils";
 
@@ -82,9 +82,11 @@ export function RadioPlayer({
 
   const save = async (clear = false) => {
     setError(null);
-    const nextUrl = clear ? null : draftUrl.trim();
+    const nextUrl = clear ? null : normalizeRadioInput(draftUrl);
     if (nextUrl && !isValidRadioUrl(nextUrl)) {
-      setError("Enter a full https:// stream link.");
+      setError(
+        "That doesn't look like a full link. Paste the whole address, starting with https:// (or a Spotify playlist link).",
+      );
       return;
     }
     if (nextUrl && !licensed) {
@@ -210,15 +212,48 @@ export function RadioPlayer({
               </li>
             </ul>
           </div>
-          <input
-            value={draftUrl}
-            onChange={(e) => setDraftUrl(e.target.value)}
-            placeholder="https://stream.example.com/live.mp3 or Spotify playlist link"
-            inputMode="url"
-            maxLength={500}
-            className="w-full rounded-xl bg-secondary px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
-            aria-label="Radio stream or Spotify playlist URL"
-          />
+          <div className="flex gap-2">
+            <input
+              value={draftUrl}
+              onChange={(e) => setDraftUrl(e.target.value)}
+              onPaste={(e) => {
+                const text = e.clipboardData.getData("text");
+                if (!text) return;
+                e.preventDefault();
+                setDraftUrl(normalizeRadioInput(text).slice(0, 500));
+                setError(null);
+              }}
+              placeholder="https://stream.example.com/live.mp3 or Spotify playlist link"
+              inputMode="url"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              maxLength={500}
+              className="min-w-0 flex-1 rounded-xl bg-secondary px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
+              aria-label="Radio stream or Spotify playlist URL"
+            />
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  const text = await navigator.clipboard.readText();
+                  if (!text.trim()) {
+                    setError("Clipboard is empty — copy the station link first.");
+                    return;
+                  }
+                  setDraftUrl(normalizeRadioInput(text).slice(0, 500));
+                  setError(null);
+                } catch {
+                  setError("Your browser blocked clipboard access — long-press the field and paste.");
+                }
+              }}
+              className="flex shrink-0 items-center gap-1 rounded-xl bg-secondary px-3 py-2 text-xs font-medium text-muted-foreground"
+              aria-label="Paste station link from clipboard"
+            >
+              <ClipboardPaste className="size-4" />
+              Paste
+            </button>
+          </div>
           <input
             value={draftName}
             onChange={(e) => setDraftName(e.target.value)}
