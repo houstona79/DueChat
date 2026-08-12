@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { CheckCircle2, Mail, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Mail, XCircle } from "lucide-react";
 import { Avatar } from "@/components/messenger/Avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { MAIL_DOMAIN, accentFor } from "@/lib/chat";
-import { checkMailRouting } from "@/lib/mail-routing.functions";
+import { checkMailRouting, getMailDestination } from "@/lib/mail-routing.functions";
 
 type Row = {
   id: string;
@@ -32,6 +32,11 @@ export function MailHandles({ isOwner = false }: { isOwner?: boolean }) {
     queryFn: fetchMailHandles,
   });
   const check = useMutation({ mutationFn: () => checkMailRouting() });
+  const destination = useQuery({
+    queryKey: ["admin-mail-destination"],
+    queryFn: () => getMailDestination(),
+    enabled: isOwner,
+  });
   const result = check.data;
   const steps: Array<[string, string | undefined]> = result
     ? [
@@ -55,6 +60,52 @@ export function MailHandles({ isOwner = false }: { isOwner?: boolean }) {
 
   return (
     <div className="mt-5 space-y-3">
+      {isOwner && (
+        <div className="space-y-2 rounded-xl bg-card p-3 ring-1 ring-border">
+          <p className="text-sm font-semibold">Forwarding destination</p>
+          {destination.isLoading && (
+            <p className="text-xs text-muted-foreground">Checking destination…</p>
+          )}
+          {destination.isError && (
+            <p className="text-xs text-destructive">Could not read the destination right now.</p>
+          )}
+          {destination.data && (
+            <>
+              <div className="flex items-center gap-2">
+                {destination.data.verified ? (
+                  <CheckCircle2 className="size-4 shrink-0 text-primary" />
+                ) : (
+                  <AlertTriangle className="size-4 shrink-0 text-destructive" />
+                )}
+                <span className="break-all font-mono text-sm">
+                  {destination.data.destination ?? "not set"}
+                </span>
+              </div>
+              <p
+                className={`text-xs ${destination.data.verified ? "text-muted-foreground" : "text-destructive"}`}
+              >
+                {destination.data.message}
+              </p>
+              {!destination.data.verified && (
+                <p className="text-[11px] text-muted-foreground">
+                  Verify this exact address in Cloudflare → Email Routing → Destination addresses.
+                  It must be an inbox you can open (Gmail, Outlook, iCloud, work email) — never an
+                  address on {MAIL_DOMAIN}. Member handles start forwarding as soon as it shows
+                  Verified.
+                </p>
+              )}
+              <button
+                type="button"
+                onClick={() => destination.refetch()}
+                disabled={destination.isFetching}
+                className="rounded-lg bg-secondary px-3 py-1.5 text-xs font-semibold disabled:opacity-60"
+              >
+                {destination.isFetching ? "Re-checking…" : "Re-check destination"}
+              </button>
+            </>
+          )}
+        </div>
+      )}
       {isOwner && (
       <div className="space-y-2 rounded-xl bg-card p-3 ring-1 ring-border">
         <div className="flex flex-wrap items-center justify-between gap-2">
