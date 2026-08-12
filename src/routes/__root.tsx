@@ -18,6 +18,7 @@ import { RecoveryGate } from "@/components/system/RecoveryGate";
 import { DeviceLock } from "@/components/system/DeviceLock";
 import { SystemAlerts } from "@/components/system/SystemAlerts";
 import { SupportAlerts } from "@/components/support/SupportAlerts";
+import { UpdateAlerts } from "@/components/messenger/UpdateAlerts";
 import { LanguageProvider } from "@/lib/i18n";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -162,6 +163,7 @@ function RootComponent() {
         <KickWatcher />
         <SystemAlerts />
         <SupportAlerts />
+        <UpdateAlerts />
         <AuthWatcher />
         <RecoveryGate />
         <DeviceLock />
