@@ -46,7 +46,7 @@ export function splitImageEmojis(body: string): EmojiPart[] {
   const parts: EmojiPart[] = [];
   let last = 0;
   for (const match of body.matchAll(TOKEN)) {
-    const emoji = BY_NAME.get(match[1].toLowerCase());
+    const emoji = BY_NAME.get((match[1] ?? "").toLowerCase());
     if (!emoji) continue;
     const start = match.index ?? 0;
     if (start > last) parts.push({ type: "text", value: body.slice(last, start) });
