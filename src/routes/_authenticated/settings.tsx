@@ -12,7 +12,7 @@ import { LanguageSettings } from "@/components/system/LanguageSettings";
 import { ImageCropper } from "@/components/messenger/ImageCropper";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { accentFor, normalizeWebsiteUrl, updateProfile, uploadAvatar } from "@/lib/chat";
+import { accentFor, MAIL_DOMAIN, normalizeWebsiteUrl, updateProfile, uploadAvatar } from "@/lib/chat";
 import { isRedish, readableNameColor } from "@/hooks/use-roles";
 import { cn } from "@/lib/utils";
 import { COUNTRIES } from "@/lib/countries";
