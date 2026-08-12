@@ -191,13 +191,15 @@ export async function checkCloudflareAccess(domain: string): Promise<MailRouteCh
     return { ok: false, reason, message: c.message, checks, destination };
   }
 
-  // 3. Email Routing read (also tells us if routing is enabled)
+  // 3. Email Routing read — use the rules endpoint, which only needs the
+  // Email Routing Rules permission. The zone-level routing *settings*
+  // endpoint needs broader access, so it is checked opportunistically only.
   try {
-    const settings = (await cf(`/zones/${zone}/email/routing`, token)) as {
-      enabled?: boolean;
-      status?: string;
-    } | null;
+    await cf(`/zones/${zone}/email/routing/rules?per_page=1`, token);
     checks.routingRead = "ok";
+    const settings = (await cf(`/zones/${zone}/email/routing`, token).catch(() => null)) as {
+      enabled?: boolean;
+    } | null;
     if (settings && settings.enabled === false) {
       return {
         ok: false,
