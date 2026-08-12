@@ -18,7 +18,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "duechat"
+const SITE_NAME = "DueChat"
 const ROOT_DOMAIN = "app.duechat.com"
 
 // Sample data for preview mode ONLY (not used in actual email sending).
