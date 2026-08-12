@@ -364,15 +364,22 @@ export async function syncCloudflareRoute(opts: {
   userId: string;
   handle: string | null;
   domain: string;
+  /** The member's own inbox; used only when Cloudflare has confirmed it. */
+  forwardTo?: string | null;
 }): Promise<{ synced: boolean; reason?: MailRouteReason; message?: string }> {
   const token = process.env["CLOUDFLARE_API_TOKEN"];
-  const destination = process.env["CLOUDFLARE_EMAIL_DESTINATION"];
+  const shared = process.env["CLOUDFLARE_EMAIL_DESTINATION"];
   if (!token)
     return {
       synced: false,
       reason: "missing_token",
       message: "Mail forwarding isn't connected: no Cloudflare API token is saved.",
     };
+  let destination = shared;
+  if (opts.forwardTo) {
+    const state = await memberDestinationStatus(opts.forwardTo, opts.domain);
+    if (state.verified) destination = opts.forwardTo;
+  }
   if (!destination)
     return {
       synced: false,
