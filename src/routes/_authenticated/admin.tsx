@@ -234,6 +234,7 @@ function AdminPage() {
       <AdminNav
         tab={tab}
         onChange={setTab}
+        isOwner={isOwner}
         counts={{
           users: data.profiles.length,
           bans: data.bans.length,
