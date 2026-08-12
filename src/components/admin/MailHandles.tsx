@@ -4,7 +4,11 @@ import { AlertTriangle, CheckCircle2, Mail, XCircle } from "lucide-react";
 import { Avatar } from "@/components/messenger/Avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { MAIL_DOMAIN, accentFor } from "@/lib/chat";
-import { checkMailRouting, getMailDestination } from "@/lib/mail-routing.functions";
+import {
+  checkMailRouting,
+  getMailDestination,
+  resyncAllMailRoutes,
+} from "@/lib/mail-routing.functions";
 
 type Row = {
   id: string;
@@ -32,6 +36,7 @@ export function MailHandles({ isOwner = false }: { isOwner?: boolean }) {
     queryFn: fetchMailHandles,
   });
   const check = useMutation({ mutationFn: () => checkMailRouting() });
+  const resync = useMutation({ mutationFn: () => resyncAllMailRoutes() });
   const destination = useQuery({
     queryKey: ["admin-mail-destination"],
     queryFn: () => getMailDestination(),
@@ -168,6 +173,52 @@ export function MailHandles({ isOwner = false }: { isOwner?: boolean }) {
         <p className="text-sm font-semibold">Claimed {MAIL_DOMAIN} handles</p>
         <span className="text-[11px] text-muted-foreground">{rows.length} claimed</span>
       </div>
+      {isOwner && (
+        <div className="space-y-2 rounded-xl bg-card p-3 ring-1 ring-border">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm font-semibold">Push verified inboxes to Cloudflare</p>
+            <button
+              type="button"
+              onClick={() => resync.mutate()}
+              disabled={resync.isPending}
+              className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"
+            >
+              {resync.isPending ? "Syncing…" : "Re-sync all handles"}
+            </button>
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            Re-writes every claimed handle's forwarding rule, sending mail to each member's own
+            confirmed inbox when they have one, otherwise the shared DueChat inbox.
+          </p>
+          {resync.isError && (
+            <p className="text-xs text-destructive">Could not re-sync right now.</p>
+          )}
+          {resync.data && (
+            <>
+              <p
+                className={`text-xs ${resync.data.failures.length ? "text-destructive" : "text-muted-foreground"}`}
+              >
+                {resync.data.message}
+              </p>
+              {resync.data.failures.length > 0 && (
+                <ul className="space-y-1">
+                  {resync.data.failures.map((f) => (
+                    <li key={f.handle} className="flex items-start gap-2 text-[11px]">
+                      <XCircle className="mt-0.5 size-3.5 shrink-0 text-destructive" />
+                      <span>
+                        <span className="font-mono">
+                          {f.handle}@{MAIL_DOMAIN}
+                        </span>
+                        {f.message ? ` — ${f.message}` : ""}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          )}
+        </div>
+      )}
       <input
         value={search}
         onChange={(e) => setSearch(e.target.value)}

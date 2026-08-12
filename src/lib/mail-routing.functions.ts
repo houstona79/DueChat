@@ -133,3 +133,48 @@ export const getMailDestination = createServerFn({ method: "POST" })
     const { describeMailDestination } = await import("@/lib/mail-routing.server");
     return describeMailDestination(MAIL_DOMAIN);
   });
+
+/**
+ * Owner-only: pushes every claimed handle back into Cloudflare Email Routing,
+ * pointing each rule at the member's verified inbox when there is one.
+ */
+export const resyncAllMailRoutes = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    if (context.userId !== OWNER_USER_ID) throw new Error("Forbidden");
+    const { data, error } = await context.supabase
+      .from("profiles")
+      .select("id, mail_handle, mail_forward_to, mail_forward_verified")
+      .not("mail_handle", "is", null);
+    if (error) throw error;
+    const { syncCloudflareRoute } = await import("@/lib/mail-routing.server");
+    const rows = (data ?? []) as Array<{
+      id: string;
+      mail_handle: string;
+      mail_forward_to: string | null;
+      mail_forward_verified: boolean | null;
+    }>;
+    const results: Array<{ handle: string; synced: boolean; message?: string }> = [];
+    for (const row of rows) {
+      const res = await syncCloudflareRoute({
+        userId: row.id,
+        handle: row.mail_handle,
+        forwardTo: row.mail_forward_verified ? row.mail_forward_to : null,
+        domain: MAIL_DOMAIN,
+      });
+      results.push({
+        handle: row.mail_handle,
+        synced: res.synced,
+        ...(res.message ? { message: res.message } : {}),
+      });
+    }
+    const failed = results.filter((r) => !r.synced);
+    return {
+      total: results.length,
+      synced: results.length - failed.length,
+      failures: failed,
+      message: failed.length
+        ? `${results.length - failed.length} of ${results.length} handles synced; ${failed.length} need attention.`
+        : `All ${results.length} handles are pointed at their verified inbox in Cloudflare.`,
+    };
+  });
