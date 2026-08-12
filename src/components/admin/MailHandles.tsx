@@ -111,6 +111,7 @@ export function MailHandles({ isOwner = false }: { isOwner?: boolean }) {
           </>
         )}
       </div>
+      )}
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-semibold">Claimed {MAIL_DOMAIN} handles</p>
