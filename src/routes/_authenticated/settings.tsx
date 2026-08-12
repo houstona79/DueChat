@@ -84,6 +84,9 @@ function SettingsPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [forwardTo, setForwardTo] = useState("");
+  const [forwardBusy, setForwardBusy] = useState(false);
+  const [forwardNote, setForwardNote] = useState<string | null>(null);
 
   useEffect(() => {
     if (!me) return;
@@ -100,6 +103,7 @@ function SettingsPage() {
     setBio(me.bio ?? "");
     setWebsite(me.website_url ?? "");
     setMailHandle(me.mail_handle ?? "");
+    setForwardTo(me.mail_forward_to ?? "");
     setProfileVisibility(me.profile_visibility ?? "public");
     setDecoration(me.decoration ?? "");
   }, [me]);
