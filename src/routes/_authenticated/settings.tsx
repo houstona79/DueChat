@@ -348,6 +348,75 @@ function SettingsPage() {
         </div>
 
         <div>
+          <label
+            htmlFor="mail-forward"
+            className="block text-[11px] font-medium text-muted-foreground"
+          >
+            Forward my mail to
+          </label>
+          <input
+            id="mail-forward"
+            type="email"
+            value={forwardTo}
+            placeholder="you@gmail.com"
+            onChange={(e) => setForwardTo(e.target.value)}
+            className="mt-1 w-full rounded-xl bg-secondary px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground"
+          />
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            {me.mail_forward_to
+              ? me.mail_forward_verified
+                ? `Confirmed — mail to your handle goes straight to ${me.mail_forward_to}.`
+                : `${me.mail_forward_to} isn't confirmed yet, so mail still goes to the shared DueChat inbox. Check that inbox for the confirmation email.`
+              : "Add your own inbox to receive handle mail directly. You'll get a confirmation email you need to click first."}
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={forwardBusy}
+              onClick={async () => {
+                setForwardBusy(true);
+                setForwardNote(null);
+                try {
+                  const res = await setMyMailForward({
+                    data: { email: forwardTo.trim() || null },
+                  });
+                  setForwardNote(res.message);
+                  await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+                } catch {
+                  setForwardNote("Couldn't update your forwarding inbox right now.");
+                } finally {
+                  setForwardBusy(false);
+                }
+              }}
+              className="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"
+            >
+              {forwardTo.trim() ? "Save & send confirmation" : "Remove"}
+            </button>
+            <button
+              type="button"
+              disabled={forwardBusy || !me.mail_forward_to}
+              onClick={async () => {
+                setForwardBusy(true);
+                setForwardNote(null);
+                try {
+                  const res = await refreshMyMailForward();
+                  setForwardNote(res.message);
+                  await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+                } catch {
+                  setForwardNote("Couldn't check confirmation right now.");
+                } finally {
+                  setForwardBusy(false);
+                }
+              }}
+              className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold disabled:opacity-60"
+            >
+              I confirmed it — re-check
+            </button>
+          </div>
+          {forwardNote ? <p className="mt-2 text-[11px] text-primary">{forwardNote}</p> : null}
+        </div>
+
+        <div>
           <span className="block text-[11px] font-medium text-muted-foreground">Date of birth</span>
           {me.birth_date ? (
             <p className="mt-1 text-sm">
