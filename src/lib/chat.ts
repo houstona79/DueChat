@@ -452,7 +452,7 @@ export async function touchPresence(userId: string) {
 export function normalizeRadioInput(raw: string) {
   let value = raw.replace(/[\s\u00a0]+/g, " ").trim().replace(/^["'<]+|["'>]+$/g, "");
   const uri = /^spotify:(playlist|album|track|artist|show|episode):([A-Za-z0-9]+)$/i.exec(value);
-  if (uri) return `https://open.spotify.com/${uri[1].toLowerCase()}/${uri[2]}`;
+  if (uri) return `https://open.spotify.com/${(uri[1] ?? "").toLowerCase()}/${uri[2] ?? ""}`;
   if (/^http:\/\//i.test(value)) value = `https://${value.slice(7)}`;
   if (/^(open\.spotify\.com|www\.)/i.test(value)) value = `https://${value}`;
   return value;
