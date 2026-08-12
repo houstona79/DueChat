@@ -444,6 +444,20 @@ export async function touchPresence(userId: string) {
 
 /* ---------- room radio ---------- */
 
+/**
+ * Clean up a pasted station link: strip stray whitespace/newlines and quotes,
+ * turn `spotify:playlist:ID` URIs into web links, and upgrade http:// to https://
+ * (the database only accepts https).
+ */
+export function normalizeRadioInput(raw: string) {
+  let value = raw.replace(/[\s\u00a0]+/g, " ").trim().replace(/^["'<]+|["'>]+$/g, "");
+  const uri = /^spotify:(playlist|album|track|artist|show|episode):([A-Za-z0-9]+)$/i.exec(value);
+  if (uri) return `https://open.spotify.com/${uri[1].toLowerCase()}/${uri[2]}`;
+  if (/^http:\/\//i.test(value)) value = `https://${value.slice(7)}`;
+  if (/^(open\.spotify\.com|www\.)/i.test(value)) value = `https://${value}`;
+  return value;
+}
+
 /** Only https stream URLs are accepted (matches the database check). */
 export function isValidRadioUrl(url: string) {
   const trimmed = url.trim();
