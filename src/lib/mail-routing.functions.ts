@@ -32,6 +32,14 @@ export const setMyMailForward = createServerFn({ method: "POST" })
     if (data.email && !EMAIL_RE.test(data.email))
       return { saved: false, verified: false, message: "That email address doesn't look right." };
 
+    const existing = await context.supabase
+      .from("profiles")
+      .select("mail_handle")
+      .eq("id", context.userId)
+      .maybeSingle();
+    if (existing.error) throw existing.error;
+    const handle = (existing.data?.mail_handle as string | null) ?? null;
+
     const { error } = await context.supabase
       .from("profiles")
       .update({ mail_forward_to: data.email, mail_forward_verified: false })
@@ -42,7 +50,7 @@ export const setMyMailForward = createServerFn({ method: "POST" })
     if (!data.email) {
       const cleared = await mod.syncCloudflareRoute({
         userId: context.userId,
-        handle: await currentHandle(context),
+        handle,
         forwardTo: null,
         domain: MAIL_DOMAIN,
       });
@@ -64,7 +72,7 @@ export const setMyMailForward = createServerFn({ method: "POST" })
     }
     const route = await mod.syncCloudflareRoute({
       userId: context.userId,
-      handle: await currentHandle(context),
+      handle,
       forwardTo: state.verified ? data.email : null,
       domain: MAIL_DOMAIN,
     });
