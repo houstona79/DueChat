@@ -43,6 +43,7 @@ type PeerCtx = {
   audioSender: RTCRtpSender | null;
   videoSender: RTCRtpSender | null;
   remote: MediaStream;
+  pendingCandidates: RTCIceCandidateInit[];
 };
 
 /**
@@ -143,7 +144,22 @@ export function useGroupCall({
             pcsRef.current.forEach((ctx) => void ctx.audioSender?.replaceTrack(a));
             return;
           }
-          stream = await getMediaStreamResilient({ audio: audioConstraint, video: false });
+          // Saved device IDs can become stale after an OS update, unplug, or
+          // Electron upgrade. Retry the complete request with the system mic
+          // before falling back to audio-only; otherwise Windows can return a
+          // working camera stream with no microphone track.
+          if (micId) {
+            try {
+              stream = await getMediaStreamResilient({
+                audio: true,
+                video: { facingMode: "user" },
+              });
+            } catch {
+              stream = await getMediaStreamResilient({ audio: true, video: false });
+            }
+          } else {
+            stream = await getMediaStreamResilient({ audio: true, video: false });
+          }
           setMediaError(
             "We couldn't reach your camera, so you joined with audio only. Close other camera apps and tap the camera button to retry.",
           );
@@ -151,6 +167,18 @@ export function useGroupCall({
         if (cancelled) {
           stream.getTracks().forEach((t) => t.stop());
           return;
+        }
+        // A camera can succeed while Windows fails the requested microphone.
+        // Do not accept that partial stream as a successful call: acquire the
+        // default input separately and merge it into the same MediaStream.
+        if (stream.getAudioTracks().length === 0) {
+          try {
+            const audioOnly = await getMediaStreamResilient({ audio: true, video: false });
+            const audioTrack = audioOnly.getAudioTracks()[0];
+            if (audioTrack) stream.addTrack(audioTrack);
+          } catch {
+            /* The missing track is reflected by muted state below. */
+          }
         }
         localStreamRef.current = stream;
         setLocalStream(stream);
@@ -208,6 +236,7 @@ export function useGroupCall({
         audioSender: null,
         videoSender: null,
         remote,
+        pendingCandidates: [],
       };
       pcsRef.current.set(peerId, ctx);
 
@@ -337,6 +366,12 @@ export function useGroupCall({
           } else {
             await pc.setRemoteDescription(new RTCSessionDescription(signal.description));
           }
+          if (pc.remoteDescription && ctx.pendingCandidates.length > 0) {
+            const queued = ctx.pendingCandidates.splice(0);
+            for (const candidate of queued) {
+              await pc.addIceCandidate(new RTCIceCandidate(candidate));
+            }
+          }
           if (signal.description.type === "offer") {
             const answer = await pc.createAnswer();
             await pc.setLocalDescription(answer);
@@ -347,6 +382,10 @@ export function useGroupCall({
             });
           }
         } else if (signal.candidate) {
+          if (!pc.remoteDescription) {
+            ctx.pendingCandidates.push(signal.candidate);
+            return;
+          }
           try {
             await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
           } catch (error) {
