@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, session, systemPreferences, shell, clipboard } = require("electron");
+const { app, BrowserWindow, Menu, session, systemPreferences, shell, clipboard, dialog } = require("electron");
 
 const APP_URL = "https://app.duechat.com";
 const DEV_URL = "http://localhost:8080";
@@ -136,6 +136,12 @@ const buildAppMenu = () => {
     },
     { role: "viewMenu" },
     { role: "windowMenu" },
+    {
+      role: "help",
+      submenu: [
+        { label: "Check for Updates…", click: () => void checkForUpdates({ silent: false }) },
+      ],
+    },
   ];
   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 };
@@ -166,6 +172,85 @@ const attachContextMenu = (webContents) => {
     }
     if (items.length) Menu.buildFromTemplate(items).popup();
   });
+};
+
+
+/* ------------------------------------------------------------------ *
+ * Auto update check
+ *
+ * The desktop shell loads the hosted app, so web changes arrive
+ * instantly. Only the shell itself (Electron/Chromium switches, menus,
+ * permissions) ships in the binary, so we poll a small JSON manifest and
+ * prompt the user to download a fresh build when the version is newer.
+ * ------------------------------------------------------------------ */
+const UPDATE_MANIFEST_URL = `${APP_URL}/api/public/desktop-version`;
+const UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
+let updatePromptOpen = false;
+let promptedVersion = null;
+
+/** Compare dotted numeric versions. Returns true when `a` is newer than `b`. */
+const isNewerVersion = (a, b) => {
+  const pa = String(a).split(".").map((n) => parseInt(n, 10) || 0);
+  const pb = String(b).split(".").map((n) => parseInt(n, 10) || 0);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const d = (pa[i] || 0) - (pb[i] || 0);
+    if (d !== 0) return d > 0;
+  }
+  return false;
+};
+
+const checkForUpdates = async ({ silent = true } = {}) => {
+  if (updatePromptOpen) return;
+  let manifest;
+  try {
+    const res = await fetch(UPDATE_MANIFEST_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    manifest = await res.json();
+  } catch {
+    if (!silent) {
+      await dialog.showMessageBox({
+        type: "warning",
+        message: "Could not check for updates",
+        detail: "DueChat could not reach the update server. Please try again later.",
+        buttons: ["OK"],
+      });
+    }
+    return;
+  }
+
+  const current = app.getVersion();
+  const latest = manifest?.version;
+  if (!latest || !isNewerVersion(latest, current)) {
+    if (!silent) {
+      await dialog.showMessageBox({
+        type: "info",
+        message: "DueChat is up to date",
+        detail: `You are running version ${current}.`,
+        buttons: ["OK"],
+      });
+    }
+    return;
+  }
+  if (silent && promptedVersion === latest) return;
+  promptedVersion = latest;
+
+  const downloadUrl =
+    manifest?.platforms?.[process.platform] || manifest?.downloadsUrl || `${APP_URL}/downloads`;
+
+  updatePromptOpen = true;
+  try {
+    const { response } = await dialog.showMessageBox({
+      type: "info",
+      message: `DueChat ${latest} is available`,
+      detail: `${manifest?.notes || "A new version of the desktop app is ready."}\n\nYou are on ${current}. Download the update and replace the current app.`,
+      buttons: ["Download update", "Later"],
+      defaultId: 0,
+      cancelId: 1,
+    });
+    if (response === 0) await shell.openExternal(downloadUrl);
+  } finally {
+    updatePromptOpen = false;
+  }
 };
 
 const createWindow = () => {
@@ -204,6 +289,10 @@ app.whenReady().then(async () => {
   buildAppMenu();
   await requestMediaAccess();
   createWindow();
+
+  // Check shortly after launch, then periodically while the app stays open.
+  setTimeout(() => void checkForUpdates(), 8000);
+  setInterval(() => void checkForUpdates(), UPDATE_CHECK_INTERVAL_MS);
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

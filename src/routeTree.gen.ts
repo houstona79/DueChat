@@ -27,6 +27,7 @@ import { Route as ICodeRouteImport } from './routes/i.$code'
 import { Route as RSlugRouteImport } from './routes/r.$slug'
 import { Route as AuthenticatedChatRoomIdRouteImport } from './routes/_authenticated/chat.$roomId'
 import { Route as AuthenticatedUUsernameRouteImport } from './routes/_authenticated/u.$username'
+import { Route as ApiPublicDesktopVersionRouteImport } from './routes/api/public/desktop-version'
 import { Route as BlogUsernameSlugRouteImport } from './routes/blog/$username.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -118,6 +119,11 @@ const AuthenticatedUUsernameRoute = AuthenticatedUUsernameRouteImport.update({
   path: '/u/$username',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicDesktopVersionRoute = ApiPublicDesktopVersionRouteImport.update({
+  id: '/api/public/desktop-version',
+  path: '/api/public/desktop-version',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogUsernameSlugRoute = BlogUsernameSlugRouteImport.update({
   id: '/blog/$username/$slug',
   path: '/blog/$username/$slug',
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/blog/': typeof BlogIndexRoute
   '/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
   '/u/$username': typeof AuthenticatedUUsernameRoute
+  '/api/public/desktop-version': typeof ApiPublicDesktopVersionRoute
   '/blog/$username/$slug': typeof BlogUsernameSlugRoute
 }
 export interface FileRoutesByTo {
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogIndexRoute
   '/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
   '/u/$username': typeof AuthenticatedUUsernameRoute
+  '/api/public/desktop-version': typeof ApiPublicDesktopVersionRoute
   '/blog/$username/$slug': typeof BlogUsernameSlugRoute
 }
 export interface FileRoutesById {
@@ -184,6 +192,7 @@ export interface FileRoutesById {
   '/blog/': typeof BlogIndexRoute
   '/_authenticated/chat/$roomId': typeof AuthenticatedChatRoomIdRoute
   '/_authenticated/u/$username': typeof AuthenticatedUUsernameRoute
+  '/api/public/desktop-version': typeof ApiPublicDesktopVersionRoute
   '/blog/$username/$slug': typeof BlogUsernameSlugRoute
 }
 export interface FileRouteTypes {
@@ -206,6 +215,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/chat/$roomId'
     | '/u/$username'
+    | '/api/public/desktop-version'
     | '/blog/$username/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/chat/$roomId'
     | '/u/$username'
+    | '/api/public/desktop-version'
     | '/blog/$username/$slug'
   id:
     | '__root__'
@@ -247,6 +258,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/_authenticated/chat/$roomId'
     | '/_authenticated/u/$username'
+    | '/api/public/desktop-version'
     | '/blog/$username/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -262,6 +274,7 @@ export interface RootRouteChildren {
   ICodeRoute: typeof ICodeRoute
   RSlugRoute: typeof RSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  ApiPublicDesktopVersionRoute: typeof ApiPublicDesktopVersionRoute
   BlogUsernameSlugRoute: typeof BlogUsernameSlugRoute
 }
 
@@ -393,6 +406,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUUsernameRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/desktop-version': {
+      id: '/api/public/desktop-version'
+      path: '/api/public/desktop-version'
+      fullPath: '/api/public/desktop-version'
+      preLoaderRoute: typeof ApiPublicDesktopVersionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/$username/$slug': {
       id: '/blog/$username/$slug'
       path: '/blog/$username/$slug'
@@ -447,6 +467,7 @@ const rootRouteChildren: RootRouteChildren = {
   ICodeRoute: ICodeRoute,
   RSlugRoute: RSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
+  ApiPublicDesktopVersionRoute: ApiPublicDesktopVersionRoute,
   BlogUsernameSlugRoute: BlogUsernameSlugRoute,
 }
 export const routeTree = rootRouteImport
