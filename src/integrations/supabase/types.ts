@@ -709,6 +709,8 @@ export type Database = {
           gender_visibility: string
           id: string
           last_seen_at: string
+          mail_forward_to: string | null
+          mail_forward_verified: boolean
           mail_handle: string | null
           name_color: string | null
           name_color_expires_at: string | null
@@ -733,6 +735,8 @@ export type Database = {
           gender_visibility?: string
           id: string
           last_seen_at?: string
+          mail_forward_to?: string | null
+          mail_forward_verified?: boolean
           mail_handle?: string | null
           name_color?: string | null
           name_color_expires_at?: string | null
@@ -757,6 +761,8 @@ export type Database = {
           gender_visibility?: string
           id?: string
           last_seen_at?: string
+          mail_forward_to?: string | null
+          mail_forward_verified?: boolean
           mail_handle?: string | null
           name_color?: string | null
           name_color_expires_at?: string | null
