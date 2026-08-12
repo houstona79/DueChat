@@ -823,7 +823,7 @@ function AdminPage() {
         />
       )}
 
-      {tab === "mail" && <MailHandles />}
+      {tab === "mail" && isOwner && <MailHandles isOwner={isOwner} />}
 
       {tab === "reports" && <ReportQueue />}
 
