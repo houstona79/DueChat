@@ -29,3 +29,12 @@ export const checkMailRouting = createServerFn({ method: "POST" })
     const { checkCloudflareAccess } = await import("@/lib/mail-routing.server");
     return checkCloudflareAccess(MAIL_DOMAIN);
   });
+
+/** Owner-only: which external inbox to verify in Cloudflare, and its status. */
+export const getMailDestination = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    if (context.userId !== OWNER_USER_ID) throw new Error("Forbidden");
+    const { describeMailDestination } = await import("@/lib/mail-routing.server");
+    return describeMailDestination(MAIL_DOMAIN);
+  });
