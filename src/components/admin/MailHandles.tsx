@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Mail } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { CheckCircle2, Mail, XCircle } from "lucide-react";
 import { Avatar } from "@/components/messenger/Avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { MAIL_DOMAIN, accentFor } from "@/lib/chat";
+import { checkMailRouting } from "@/lib/mail-routing.functions";
 
 type Row = {
   id: string;
@@ -30,6 +31,16 @@ export function MailHandles() {
     queryKey: ["admin-mail-handles"],
     queryFn: fetchMailHandles,
   });
+  const check = useMutation({ mutationFn: () => checkMailRouting() });
+  const result = check.data;
+  const steps: Array<[string, string | undefined]> = result
+    ? [
+        ["API token valid", result.checks.token],
+        [`Can read ${MAIL_DOMAIN} zone`, result.checks.zone],
+        ["Can read Email Routing", result.checks.routingRead],
+        ["Can edit Email Routing rules", result.checks.routingEdit],
+      ]
+    : [];
 
   const rows = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -44,6 +55,62 @@ export function MailHandles() {
 
   return (
     <div className="mt-5 space-y-3">
+      <div className="space-y-2 rounded-xl bg-card p-3 ring-1 ring-border">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm font-semibold">Cloudflare forwarding connection</p>
+          <button
+            type="button"
+            onClick={() => check.mutate()}
+            disabled={check.isPending}
+            className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-60"
+          >
+            {check.isPending ? "Testing…" : "Test token"}
+          </button>
+        </div>
+        {check.isError && (
+          <p className="text-xs text-destructive">
+            {check.error instanceof Error && /forbidden/i.test(check.error.message)
+              ? "Only owners can run this check."
+              : "Could not run the check right now."}
+          </p>
+        )}
+        {result && (
+          <>
+            <ul className="space-y-1">
+              {steps.map(([label, state]) => (
+                <li key={label} className="flex items-center gap-2 text-xs">
+                  {state === "ok" ? (
+                    <CheckCircle2 className="size-3.5 text-primary" />
+                  ) : state === "failed" ? (
+                    <XCircle className="size-3.5 text-destructive" />
+                  ) : (
+                    <span className="size-3.5 rounded-full bg-secondary" />
+                  )}
+                  <span
+                    className={
+                      state === "failed"
+                        ? "text-destructive"
+                        : state === "ok"
+                          ? ""
+                          : "text-muted-foreground"
+                    }
+                  >
+                    {label}
+                    {state === "skipped" ? " — not checked" : ""}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className={`text-xs ${result.ok ? "text-muted-foreground" : "text-destructive"}`}>
+              {result.message}
+            </p>
+            {result.reason && (
+              <p className="text-[11px] text-muted-foreground">Reason code: {result.reason}</p>
+            )}
+          </>
+        )}
+      </div>
+
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-semibold">Claimed {MAIL_DOMAIN} handles</p>
         <span className="text-[11px] text-muted-foreground">{rows.length} claimed</span>
