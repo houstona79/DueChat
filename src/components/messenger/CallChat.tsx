@@ -6,6 +6,8 @@ import { accentFor, formatTime, sendMessage } from "@/lib/chat";
 import { Avatar } from "./Avatar";
 import { EmojiPicker } from "./EmojiPicker";
 import { GifPicker } from "./GifPicker";
+import { EmojiText } from "./EmojiText";
+import { isImageEmojiOnly } from "@/lib/image-emojis";
 
 function isEmojiOnly(body: string) {
   const trimmed = body.trim();
@@ -125,12 +127,12 @@ export function CallChat({
                 ) : (
                   <p
                     className={
-                      isEmojiOnly(m.body)
+                      isEmojiOnly(m.body) || isImageEmojiOnly(m.body)
                         ? "break-words text-2xl leading-tight"
                         : "break-words text-xs leading-relaxed"
                     }
                   >
-                    {m.body}
+                    <EmojiText body={m.body} large={isImageEmojiOnly(m.body)} />
                   </p>
                 )}
               </div>
