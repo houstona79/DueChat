@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Mail } from "lucide-react";
 import { Avatar } from "@/components/messenger/Avatar";
 import { supabase } from "@/integrations/supabase/client";
-import { MAIL_DOMAIN } from "@/lib/chat";
+import { MAIL_DOMAIN, accentFor } from "@/lib/chat";
 
 type Row = {
   id: string;
@@ -69,7 +69,7 @@ export function MailHandles() {
             key={r.id}
             className="flex items-center gap-3 rounded-xl bg-card px-3 py-2.5 ring-1 ring-border"
           >
-            <Avatar name={r.display_name} url={r.avatar_url} size={34} />
+            <Avatar name={r.display_name} accent={accentFor(r.username)} avatarPath={r.avatar_url} size="sm" />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{r.display_name}</p>
               <p className="truncate text-[11px] text-muted-foreground">@{r.username}</p>
