@@ -20,7 +20,11 @@ import { GENDERS } from "@/lib/genders";
 import { FIELD_VISIBILITIES } from "@/lib/field-visibility";
 import { DECORATIONS } from "@/lib/decorations";
 import { postStatusChangeUpdate } from "@/lib/profile-updates";
-import { syncMyMailRoute } from "@/lib/mail-routing.functions";
+import {
+  refreshMyMailForward,
+  setMyMailForward,
+  syncMyMailRoute,
+} from "@/lib/mail-routing.functions";
 
 const NAME_COLORS = [
   { label: "Default", value: "" },
