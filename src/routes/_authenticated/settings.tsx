@@ -170,10 +170,11 @@ function SettingsPage() {
         try {
           const res = await syncMyMailRoute();
           if (res.synced && handle) routeNote = ` Mail forwarding for ${handle}@${MAIL_DOMAIN} is live.`;
-          else if (res.reason === "address_taken")
-            routeNote = " That mail address already has a forwarding rule — pick another handle.";
-          else if (res.reason === "not_configured")
-            routeNote = " Mail forwarding isn't connected yet, so the address won't receive mail.";
+          else if (!res.synced)
+            routeNote =
+              res.reason === "address_taken"
+                ? " That mail address already has a forwarding rule — pick another handle."
+                : ` Saved, but mail forwarding wasn't updated: ${res.message ?? "forwarding isn't connected yet."}`;
         } catch {
           routeNote = " Saved, but mail forwarding couldn't be updated right now.";
         }
