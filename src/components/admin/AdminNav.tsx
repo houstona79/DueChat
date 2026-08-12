@@ -119,10 +119,12 @@ export function AdminNav({
   tab,
   onChange,
   counts,
+  isOwner = false,
 }: {
   tab: AdminTab;
   onChange: (t: AdminTab) => void;
   counts?: Partial<Record<AdminTab, number>>;
+  isOwner?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
@@ -133,9 +135,10 @@ export function AdminNav({
     ...g,
     tabs: g.tabs.filter(
       (t) =>
-        !query ||
+        (isOwner || t !== "mail") &&
+        (!query ||
         TAB_META[t].label.toLowerCase().includes(query) ||
-        TAB_META[t].hint.toLowerCase().includes(query),
+        TAB_META[t].hint.toLowerCase().includes(query)),
     ),
   })).filter((g) => g.tabs.length > 0);
 
