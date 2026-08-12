@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Music2, Pause, Play, Radio, Settings2, Volume2, X } from "lucide-react";
-import { isValidRadioUrl } from "@/lib/chat";
+import { isValidRadioUrl, spotifyEmbedUrl } from "@/lib/chat";
 import { getNowPlaying } from "@/lib/radio-meta.functions";
 import { cn } from "@/lib/utils";
 
@@ -28,10 +28,11 @@ export function RadioPlayer({
   const [licensed, setLicensed] = useState(false);
 
   const fetchNowPlaying = useServerFn(getNowPlaying);
+  const spotifyUrl = spotifyEmbedUrl(url);
   const { data: nowPlaying } = useQuery({
     queryKey: ["radio-now-playing", url],
     queryFn: () => fetchNowPlaying({ data: { url: url! } }),
-    enabled: !!url,
+    enabled: !!url && !spotifyUrl,
     refetchInterval: playing ? 20_000 : 60_000,
     staleTime: 15_000,
     retry: false,
@@ -113,16 +114,22 @@ export function RadioPlayer({
         <span
           className={cn(
             "grid size-8 shrink-0 place-items-center rounded-xl",
-            playing ? "bg-primary/20 text-primary" : "bg-secondary text-muted-foreground",
+            playing && !spotifyUrl
+              ? "bg-primary/20 text-primary"
+              : "bg-secondary text-muted-foreground",
           )}
         >
           <Radio className="size-4" />
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-xs font-semibold">
-            {url ? (name ?? "Room radio") : "No station yet"}
+            {url ? (name ?? (spotifyUrl ? "Spotify playlist" : "Room radio")) : "No station yet"}
           </p>
-          {url && track ? (
+          {url && spotifyUrl ? (
+            <p className="truncate text-[11px] text-muted-foreground">
+              Playing from Spotify — sign in to Spotify for full tracks
+            </p>
+          ) : url && track ? (
             <p className="flex items-center gap-1 truncate text-[11px] text-muted-foreground">
               <Music2 className="size-3 shrink-0" aria-hidden="true" />
               <span className="truncate">
@@ -143,12 +150,12 @@ export function RadioPlayer({
                 ? playing
                   ? "Playing live"
                   : "Tap play to listen"
-                : "Add a stream link to play music"}
+                : "Add a stream or Spotify playlist link"}
             </p>
           )}
         </div>
 
-        {url ? (
+        {url && !spotifyUrl ? (
           <>
             <button
               onClick={() => void toggle()}
@@ -206,11 +213,11 @@ export function RadioPlayer({
           <input
             value={draftUrl}
             onChange={(e) => setDraftUrl(e.target.value)}
-            placeholder="https://stream.example.com/live.mp3"
+            placeholder="https://stream.example.com/live.mp3 or Spotify playlist link"
             inputMode="url"
             maxLength={500}
             className="w-full rounded-xl bg-secondary px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
-            aria-label="Radio stream URL"
+            aria-label="Radio stream or Spotify playlist URL"
           />
           <input
             value={draftName}
@@ -255,7 +262,17 @@ export function RadioPlayer({
 
       {error ? <p className="mt-1.5 text-[11px] text-destructive">{error}</p> : null}
 
-      {url ? (
+      {spotifyUrl ? (
+        <iframe
+          src={spotifyUrl}
+          title={name ?? "Spotify player"}
+          className="mt-2 w-full rounded-xl"
+          height={152}
+          frameBorder={0}
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+        />
+      ) : url ? (
         <audio
           ref={audioRef}
           src={url}
