@@ -30,6 +30,8 @@ import { EmojiPicker } from "./EmojiPicker";
 import { RoomCrownMarks } from "@/components/rooms/RoomCrown";
 import { useRoomCrowns } from "@/lib/room-crowns";
 import { GifPicker } from "./GifPicker";
+import { EmojiText } from "./EmojiText";
+import { hasImageEmoji, isImageEmojiOnly } from "@/lib/image-emojis";
 
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -1010,11 +1012,13 @@ export function ChatPane({
                             mine
                               ? "rounded-3xl rounded-br-md bg-bubble-me text-bubble-me-foreground"
                               : "rounded-3xl rounded-bl-md bg-bubble-them text-bubble-them-foreground",
-                            isEmojiOnly(m.body) &&
+                            (isEmojiOnly(m.body) || isImageEmojiOnly(m.body)) &&
                               "bg-transparent px-1 py-0.5 text-3xl leading-tight",
                           )}
                         >
-                          {isEmojiOnly(m.body) || mine ? (
+                          {hasImageEmoji(m.body) ? (
+                            <EmojiText body={m.body} large={isImageEmojiOnly(m.body)} />
+                          ) : isEmojiOnly(m.body) || mine ? (
                             m.body
                           ) : (
                             <TranslatedText text={m.body} auto className="block" />
