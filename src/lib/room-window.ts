@@ -30,7 +30,13 @@ export function openRoomWindow(roomId: string, kind: RoomWindowKind = "room"): b
   if (isDesktopShell()) {
     const desktop = window.duechatDesktop;
     if (!desktop) return false;
-    void desktop.openRoomWindow(url, kind);
+    // If the native window could not be created, fall back to in-app
+    // navigation so the click is never a no-op.
+    void Promise.resolve(desktop.openRoomWindow(url, kind))
+      .then((opened) => {
+        if (opened === false) window.location.assign(url);
+      })
+      .catch(() => window.location.assign(url));
     return true;
   }
   return false;

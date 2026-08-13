@@ -295,10 +295,12 @@ const createRoomWindow = (url, parentWindow, kind = "room") => {
     resizable: false,
     maximizable: false,
     fullscreenable: false,
-    parent: parentWindow && !parentWindow.isDestroyed() ? parentWindow : undefined,
     title: kind === "im" ? "DueChat IM" : "DueChat Room",
     icon: path.join(__dirname, "icons", "icon.png"),
-    show: false,
+    // Show immediately: waiting for ready-to-show meant a slow or failed load
+    // left an invisible window cached in roomWindows, so later clicks did
+    // nothing at all.
+    show: true,
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
@@ -317,8 +319,21 @@ const createRoomWindow = (url, parentWindow, kind = "room") => {
     else void shell.openExternal(nextUrl);
     return { action: "deny" };
   });
-  roomWindow.once("ready-to-show", () => roomWindow.show());
-  void roomWindow.loadURL(safeUrl);
+  roomWindow.webContents.on("did-fail-load", (_e, code, desc, failedUrl, isMainFrame) => {
+    if (!isMainFrame || code === -3) return;
+    console.error("[DueChat] room window failed to load", code, desc, failedUrl);
+    if (!roomWindow.isDestroyed()) roomWindow.destroy();
+    roomWindows.delete(roomKey);
+  });
+  roomWindow.once("ready-to-show", () => {
+    if (!roomWindow.isDestroyed()) roomWindow.show();
+  });
+  roomWindow.loadURL(safeUrl).catch((error) => {
+    console.error("[DueChat] room window loadURL error", error);
+    if (!roomWindow.isDestroyed()) roomWindow.destroy();
+    roomWindows.delete(roomKey);
+  });
+  roomWindow.focus();
   return roomWindow;
 };
 
@@ -371,8 +386,8 @@ app.whenReady().then(async () => {
     const senderWindow = BrowserWindow.fromWebContents(event.sender);
     const senderUrl = event.sender.getURL();
     if (!senderWindow || !isTrustedOrigin(senderUrl)) return false;
-    createRoomWindow(rawUrl, senderWindow, kind === "im" ? "im" : "room");
-    return true;
+    const created = createRoomWindow(rawUrl, senderWindow, kind === "im" ? "im" : "room");
+    return !!created;
   });
   allowMediaPermissions();
   buildAppMenu();
