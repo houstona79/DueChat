@@ -14,6 +14,7 @@ import { RoomInvites } from "./RoomInvites";
 import { WaterUpdates } from "./WaterUpdates";
 import { ThemeToggle } from "@/components/system/ThemeToggle";
 import { ThemeSkinSwatches } from "@/components/system/ThemePicker";
+import { WallpaperPicker } from "@/components/system/WallpaperPicker";
 import { LanguageSwitcher } from "@/components/system/LanguageSwitcher";
 import { AccessibilityButton } from "@/components/system/AccessibilitySettings";
 import { supabase } from "@/integrations/supabase/client";
@@ -202,6 +203,7 @@ export function Sidebar({
         ) : null}
 
         <ThemeSkinSwatches className="mt-3 rounded-xl bg-secondary px-3 py-2 short:mt-2 short:py-1.5" />
+        <WallpaperPicker className="mt-2 rounded-xl bg-secondary px-3 py-2 short:py-1.5" />
         <div className="mt-2 flex items-center gap-2 rounded-xl bg-secondary px-3 py-2 short:py-1.5">
           <Search className="size-4 text-muted-foreground" aria-hidden />
           <input
