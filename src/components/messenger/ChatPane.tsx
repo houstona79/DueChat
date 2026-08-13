@@ -105,7 +105,7 @@ import {
   type RoomAdminTier,
 } from "@/lib/chat";
 import { cn } from "@/lib/utils";
-import { roomWindowUrl } from "@/lib/room-window";
+import { openRoomWindow } from "@/lib/room-window";
 import { playSound } from "@/lib/sounds";
 import { TranslatedText } from "@/components/system/TranslatedText";
 import { giftNoticeOf } from "@/lib/credits";
@@ -495,17 +495,10 @@ export function ChatPane({
           {typeof window !== "undefined" && !window.opener ? (
             <button
               type="button"
-              onClick={async () => {
-                if (!window.duechatDesktop) {
-                  setError("Fixed room windows are available in the latest DueChat desktop app.");
-                  return;
-                }
-                const opened = await window.duechatDesktop.openRoomWindow(
-                  roomWindowUrl(room.id),
-                  room.is_direct ? "im" : "room",
-                );
+              onClick={() => {
+                const opened = openRoomWindow(room.id, room.is_direct ? "im" : "room");
                 if (!opened) {
-                  setError("DueChat could not open the fixed room window. Restart the app and try again.");
+                  setError("DueChat could not open the window. Allow pop-ups for DueChat and try again.");
                 }
               }}
               className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border text-xs font-medium text-muted-foreground hover:bg-secondary lg:w-auto lg:gap-1.5 lg:px-2.5"
