@@ -102,6 +102,19 @@ export function Sidebar({
     void navigate({ to: "/auth", replace: true });
   };
 
+  const floating = useFloatingRooms();
+  /**
+   * Rooms open as an in-app floating window when there's space for one; small
+   * screens and pop-out windows keep plain navigation.
+   */
+  const openRoom = (roomId: string, kind: "room" | "im", title: string): boolean => {
+    if (floating && supportsFloatingRooms()) {
+      floating.open(roomId, kind, title);
+      return true;
+    }
+    return openRoomWindow(roomId, kind);
+  };
+
   return (
     <div className="chat-glass flex h-full min-h-0 flex-col bg-sidebar">
       <header className="shrink-0 px-4 pb-3 pt-[max(1.25rem,env(safe-area-inset-top))] short:pb-1.5 short:pt-[max(0.5rem,env(safe-area-inset-top))] sm:px-5">
