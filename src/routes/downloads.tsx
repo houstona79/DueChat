@@ -102,7 +102,7 @@ function Downloads() {
               className="group relative flex flex-col rounded-2xl border border-border bg-card p-5 shadow-sm transition-all hover:border-primary/30 hover:shadow-md"
             >
               <div className="flex items-start justify-between">
-                <span className="grid size-12 place-items-center rounded-xl bg-primary/10 p-2">
+                <span className="grid size-12 place-items-center rounded-xl border-2 border-primary/80 bg-primary/10 p-2">
                   <img
                     src={item.image}
                     alt={item.imageAlt}
