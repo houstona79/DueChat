@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   BadgeInfo,
   Bot,
+  ExternalLink,
   Gamepad2,
   Hand,
   Lock,
@@ -489,6 +490,24 @@ export function ChatPane({
               <BadgeInfo className="size-4" />
               Room profile
             </Link>
+          ) : null}
+          {typeof window !== "undefined" && !window.opener ? (
+            <button
+              type="button"
+              onClick={() =>
+                window.open(
+                  `/chat/${room.id}?popout=1`,
+                  `duechat-room-${room.id}`,
+                  "popup=yes,width=520,height=780,noopener=no",
+                )
+              }
+              className="hidden h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium text-muted-foreground hover:bg-secondary lg:flex"
+              aria-label="Open this room in a separate window"
+              title="Open in separate window"
+            >
+              <ExternalLink className="size-4" />
+              Pop out
+            </button>
           ) : null}
           <button
             onClick={() => togglePanel("games")}
