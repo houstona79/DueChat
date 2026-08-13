@@ -502,17 +502,18 @@ export function ChatPane({
                 }
                 const opened = await window.duechatDesktop.openRoomWindow(
                   roomWindowUrl(room.id),
+                  room.is_direct ? "im" : "room",
                 );
                 if (!opened) {
                   setError("DueChat could not open the fixed room window. Restart the app and try again.");
                 }
               }}
               className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border text-xs font-medium text-muted-foreground hover:bg-secondary lg:w-auto lg:gap-1.5 lg:px-2.5"
-              aria-label="Open this room in a fixed window"
+              aria-label={room.is_direct ? "Open this IM in a fixed window" : "Open this room in a fixed window"}
               title="Open in fixed window"
             >
               <ExternalLink className="size-4" />
-              <span className="hidden lg:inline">Room window</span>
+              <span className="hidden lg:inline">{room.is_direct ? "IM window" : "Room window"}</span>
             </button>
           ) : null}
           <button
