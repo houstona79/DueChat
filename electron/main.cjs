@@ -315,9 +315,25 @@ const createRoomWindow = (url, parentWindow, kind = "room") => {
   roomWindow.on("closed", () => roomWindows.delete(roomKey));
   attachContextMenu(roomWindow.webContents);
   roomWindow.webContents.setWindowOpenHandler(({ url: nextUrl }) => {
-    if (isTrustedOrigin(nextUrl)) createRoomWindow(nextUrl, roomWindow, kind);
-    else void shell.openExternal(nextUrl);
+    // Chat rooms must never hand off to the user's browser.
+    if (isTrustedOrigin(nextUrl)) {
+      if (new URL(nextUrl).pathname.startsWith("/chat/")) {
+        createRoomWindow(nextUrl, roomWindow, kind);
+      } else {
+        roomWindow.loadURL(nextUrl);
+      }
+    } else {
+      void shell.openExternal(nextUrl);
+    }
     return { action: "deny" };
+  });
+  // Any in-page navigation to a non-DueChat site goes to the browser; DueChat
+  // pages always stay inside the desktop window.
+  roomWindow.webContents.on("will-navigate", (event, nextUrl) => {
+    if (!isTrustedOrigin(nextUrl)) {
+      event.preventDefault();
+      void shell.openExternal(nextUrl);
+    }
   });
   roomWindow.webContents.on("did-fail-load", (_e, code, desc, failedUrl, isMainFrame) => {
     if (!isMainFrame || code === -3) return;
@@ -361,12 +377,23 @@ const createWindow = () => {
   // Room pop-outs (window.open on our own origin) must open as a real desktop
   // window. Only genuinely external links go to the user's browser.
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    if (isTrustedOrigin(url) && new URL(url).pathname.startsWith("/chat/")) {
-      createRoomWindow(url, mainWindow);
+    if (isTrustedOrigin(url)) {
+      const isRoom = new URL(url).pathname.startsWith("/chat/");
+      // Rooms open as a fixed native window; other DueChat pages load in the
+      // main window. Nothing on our own origin is ever sent to the browser.
+      if (isRoom) createRoomWindow(url, mainWindow);
+      else mainWindow.loadURL(url);
       return { action: "deny" };
     }
     void shell.openExternal(url);
     return { action: "deny" };
+  });
+
+  mainWindow.webContents.on("will-navigate", (event, url) => {
+    if (!isTrustedOrigin(url)) {
+      event.preventDefault();
+      void shell.openExternal(url);
+    }
   });
 
   // Give child windows the same right-click editing menu as the main window.
