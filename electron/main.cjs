@@ -264,6 +264,41 @@ const parseWindowFeatures = (features) => {
   return out;
 };
 
+/**
+ * Open trusted room links ourselves instead of relying on Chromium's implicit
+ * window.open handling. This is consistent across macOS, Windows and Linux and
+ * keeps the default session, including the member's signed-in state.
+ */
+const createRoomWindow = (url, features = "") => {
+  const parsed = parseWindowFeatures(features);
+  const roomWindow = new BrowserWindow({
+    width: parsed.width || 520,
+    height: parsed.height || 780,
+    minWidth: 375,
+    minHeight: 500,
+    title: "DueChat",
+    icon: require("path").join(__dirname, "icons", "icon.png"),
+    show: false,
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      webSecurity: true,
+      backgroundThrottling: false,
+      autoplayPolicy: "no-user-gesture-required",
+    },
+  });
+
+  attachContextMenu(roomWindow.webContents);
+  roomWindow.webContents.setWindowOpenHandler(({ url: nextUrl, features: nextFeatures }) => {
+    if (isTrustedOrigin(nextUrl)) createRoomWindow(nextUrl, nextFeatures);
+    else void shell.openExternal(nextUrl);
+    return { action: "deny" };
+  });
+  roomWindow.once("ready-to-show", () => roomWindow.show());
+  void roomWindow.loadURL(url);
+  return roomWindow;
+};
+
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 1400,
@@ -288,25 +323,8 @@ const createWindow = () => {
   // window. Only genuinely external links go to the user's browser.
   mainWindow.webContents.setWindowOpenHandler(({ url, features }) => {
     if (isTrustedOrigin(url)) {
-      const parsed = parseWindowFeatures(features);
-      return {
-        action: "allow",
-        overrideBrowserWindowOptions: {
-          width: parsed.width || 520,
-          height: parsed.height || 780,
-          minWidth: 375,
-          minHeight: 500,
-          title: "DueChat",
-          autoHideMenuBar: false,
-          webPreferences: {
-            contextIsolation: true,
-            nodeIntegration: false,
-            webSecurity: true,
-            backgroundThrottling: false,
-            autoplayPolicy: "no-user-gesture-required",
-          },
-        },
-      };
+      createRoomWindow(url, features);
+      return { action: "deny" };
     }
     void shell.openExternal(url);
     return { action: "deny" };

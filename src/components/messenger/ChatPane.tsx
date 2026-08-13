@@ -494,19 +494,22 @@ export function ChatPane({
           {typeof window !== "undefined" && !window.opener ? (
             <button
               type="button"
-              onClick={() =>
-                window.open(
-                  `/chat/${room.id}?popout=1`,
+              onClick={() => {
+                const roomUrl = new URL(`/chat/${room.id}`, window.location.origin);
+                roomUrl.searchParams.set("popout", "1");
+                const popup = window.open(
+                  roomUrl.toString(),
                   `duechat-room-${room.id}`,
-                  "popup=yes,width=520,height=780,noopener=no",
-                )
-              }
-              className="hidden h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium text-muted-foreground hover:bg-secondary lg:flex"
+                  "popup=yes,width=520,height=780,resizable=yes,scrollbars=yes",
+                );
+                if (!popup) setError("The room window was blocked. Allow pop-ups for DueChat and try again.");
+              }}
+              className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border text-xs font-medium text-muted-foreground hover:bg-secondary lg:w-auto lg:gap-1.5 lg:px-2.5"
               aria-label="Open this room in a separate window"
               title="Open in separate window"
             >
               <ExternalLink className="size-4" />
-              Pop out
+              <span className="hidden lg:inline">Pop out</span>
             </button>
           ) : null}
           <button
