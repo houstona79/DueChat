@@ -315,9 +315,25 @@ const createRoomWindow = (url, parentWindow, kind = "room") => {
   roomWindow.on("closed", () => roomWindows.delete(roomKey));
   attachContextMenu(roomWindow.webContents);
   roomWindow.webContents.setWindowOpenHandler(({ url: nextUrl }) => {
-    if (isTrustedOrigin(nextUrl)) createRoomWindow(nextUrl, roomWindow, kind);
-    else void shell.openExternal(nextUrl);
+    // Chat rooms must never hand off to the user's browser.
+    if (isTrustedOrigin(nextUrl)) {
+      if (new URL(nextUrl).pathname.startsWith("/chat/")) {
+        createRoomWindow(nextUrl, roomWindow, kind);
+      } else {
+        roomWindow.loadURL(nextUrl);
+      }
+    } else {
+      void shell.openExternal(nextUrl);
+    }
     return { action: "deny" };
+  });
+  // Any in-page navigation to a non-DueChat site goes to the browser; DueChat
+  // pages always stay inside the desktop window.
+  roomWindow.webContents.on("will-navigate", (event, nextUrl) => {
+    if (!isTrustedOrigin(nextUrl)) {
+      event.preventDefault();
+      void shell.openExternal(nextUrl);
+    }
   });
   roomWindow.webContents.on("did-fail-load", (_e, code, desc, failedUrl, isMainFrame) => {
     if (!isMainFrame || code === -3) return;
