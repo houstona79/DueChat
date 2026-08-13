@@ -238,7 +238,7 @@ export function Sidebar({
                     to="/chat/$roomId"
                     params={{ roomId: room.id }}
                     onClick={(e) => {
-                      if (openRoomWindow(room.id)) e.preventDefault();
+                      if (openRoomWindow(room.id, "im")) e.preventDefault();
                     }}
                     className={cn(
                       "flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors",
