@@ -304,6 +304,19 @@ html[data-wallpaper]:not([data-wallpaper="none"]) .chat-wallpaper::before {
   position: absolute;
   inset: 0;
   z-index: -1;
+  background-color: var(--color-background);
+  pointer-events: none;
+}
+
+html[data-wallpaper]:not([data-wallpaper="none"]) .chat-wallpaper {
+  background-color: transparent;
+}
+
+html[data-wallpaper]:not([data-wallpaper="none"]) .chat-wallpaper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background-image: var(--chat-wallpaper);
   background-size: cover;
   background-position: center;
