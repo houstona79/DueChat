@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import {
   ArrowLeft,
   BadgeInfo,
@@ -328,6 +328,9 @@ export function ChatPane({
     }
   };
 
+  const searchStr = useRouterState({ select: (s) => s.location.searchStr });
+  const isPopout = /(^|[?&])popout=1(&|$)/.test(searchStr ?? "");
+
   const runModeration = async (action: () => Promise<void>, keys: string[]) => {
     try {
       await action();
@@ -347,13 +350,25 @@ export function ChatPane({
     >
       <header className="flex shrink-0 flex-col gap-2 border-b border-border px-3 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] short:gap-1 short:py-1.5 short:pt-[max(0.375rem,env(safe-area-inset-top))] lg:flex-row lg:flex-wrap lg:items-center lg:gap-3 lg:px-4">
         <div className="flex min-w-0 items-center gap-2 lg:min-w-[220px] lg:flex-1 lg:gap-3">
-          <Link
-            to="/chat"
-            className="-ml-1 grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary md:hidden"
-            aria-label="Back to rooms"
-          >
-            <ArrowLeft className="size-5" />
-          </Link>
+          {isPopout ? (
+            <Link
+              to="/chat"
+              search={{ popout: "1" }}
+              className="-ml-1 flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-2 text-xs font-semibold text-muted-foreground hover:bg-secondary"
+              aria-label="Back to room list"
+            >
+              <ArrowLeft className="size-4" />
+              Rooms
+            </Link>
+          ) : (
+            <Link
+              to="/chat"
+              className="-ml-1 grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary md:hidden"
+              aria-label="Back to rooms"
+            >
+              <ArrowLeft className="size-5" />
+            </Link>
+          )}
           <Avatar
             name={title}
             accent={accentFor(partner?.id ?? room.id)}
