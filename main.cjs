@@ -5,6 +5,13 @@ const APP_URL = "https://app.duechat.com";
 const DEV_URL = "http://localhost:8080";
 const ROOM_WINDOW_WIDTH = 520;
 const ROOM_WINDOW_HEIGHT = 780;
+// Direct messages get a narrower classic-IM sized window.
+const IM_WINDOW_WIDTH = 400;
+const IM_WINDOW_HEIGHT = 620;
+const windowSize = (kind) =>
+  kind === "im"
+    ? { width: IM_WINDOW_WIDTH, height: IM_WINDOW_HEIGHT }
+    : { width: ROOM_WINDOW_WIDTH, height: ROOM_WINDOW_HEIGHT };
 const roomWindows = new Map();
 
 /** Any DueChat host (app/preview/published) plus localhost during development. */
@@ -262,7 +269,7 @@ const checkForUpdates = async ({ silent = true } = {}) => {
  * window.open handling. This is consistent across macOS, Windows and Linux and
  * keeps the default session, including the member's signed-in state.
  */
-const createRoomWindow = (url, parentWindow) => {
+const createRoomWindow = (url, parentWindow, kind = "room") => {
   const roomKey = new URL(url).pathname;
   const existingWindow = roomWindows.get(roomKey);
   if (existingWindow && !existingWindow.isDestroyed()) {
@@ -272,18 +279,19 @@ const createRoomWindow = (url, parentWindow) => {
     return existingWindow;
   }
 
+  const { width, height } = windowSize(kind);
   const roomWindow = new BrowserWindow({
-    width: ROOM_WINDOW_WIDTH,
-    height: ROOM_WINDOW_HEIGHT,
-    minWidth: ROOM_WINDOW_WIDTH,
-    minHeight: ROOM_WINDOW_HEIGHT,
-    maxWidth: ROOM_WINDOW_WIDTH,
-    maxHeight: ROOM_WINDOW_HEIGHT,
+    width,
+    height,
+    minWidth: width,
+    minHeight: height,
+    maxWidth: width,
+    maxHeight: height,
     resizable: false,
     maximizable: false,
     fullscreenable: false,
     parent: parentWindow && !parentWindow.isDestroyed() ? parentWindow : undefined,
-    title: "DueChat Room",
+    title: kind === "im" ? "DueChat IM" : "DueChat Room",
     icon: path.join(__dirname, "icons", "icon.png"),
     show: false,
     webPreferences: {
@@ -300,7 +308,7 @@ const createRoomWindow = (url, parentWindow) => {
   roomWindow.on("closed", () => roomWindows.delete(roomKey));
   attachContextMenu(roomWindow.webContents);
   roomWindow.webContents.setWindowOpenHandler(({ url: nextUrl }) => {
-    if (isTrustedOrigin(nextUrl)) createRoomWindow(nextUrl, roomWindow);
+    if (isTrustedOrigin(nextUrl)) createRoomWindow(nextUrl, roomWindow, kind);
     else void shell.openExternal(nextUrl);
     return { action: "deny" };
   });
@@ -352,12 +360,12 @@ const createWindow = () => {
 };
 
 app.whenReady().then(async () => {
-  ipcMain.handle("duechat:open-room-window", (event, rawUrl) => {
+  ipcMain.handle("duechat:open-room-window", (event, rawUrl, kind) => {
     if (typeof rawUrl !== "string" || !isTrustedOrigin(rawUrl)) return false;
     const senderWindow = BrowserWindow.fromWebContents(event.sender);
     const senderUrl = event.sender.getURL();
     if (!senderWindow || !isTrustedOrigin(senderUrl)) return false;
-    createRoomWindow(rawUrl, senderWindow);
+    createRoomWindow(rawUrl, senderWindow, kind === "im" ? "im" : "room");
     return true;
   });
   allowMediaPermissions();
