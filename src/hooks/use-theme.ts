@@ -2,6 +2,54 @@ import { useCallback, useEffect, useState } from "react";
 
 export type Theme = "light" | "dark";
 const KEY = "duechat.theme";
+const SKIN_KEY = "duechat.skin";
+
+export type SkinId = "midnight" | "ocean" | "plum" | "ember" | "forest" | "slate";
+
+export const SKINS: { id: SkinId; label: string; swatch: string }[] = [
+  { id: "midnight", label: "Midnight", swatch: "oklch(0.649 0.176 262)" },
+  { id: "ocean", label: "Ocean", swatch: "oklch(0.72 0.13 195)" },
+  { id: "plum", label: "Plum", swatch: "oklch(0.68 0.17 320)" },
+  { id: "ember", label: "Ember", swatch: "oklch(0.7 0.16 45)" },
+  { id: "forest", label: "Forest", swatch: "oklch(0.68 0.15 155)" },
+  { id: "slate", label: "Slate", swatch: "oklch(0.7 0.03 264)" },
+];
+
+export function applySkin(skin: SkinId) {
+  document.documentElement.setAttribute("data-skin", skin);
+  try {
+    localStorage.setItem(SKIN_KEY, skin);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function readStoredSkin(): SkinId {
+  try {
+    const stored = localStorage.getItem(SKIN_KEY);
+    if (SKINS.some((s) => s.id === stored)) return stored as SkinId;
+  } catch {
+    /* ignore */
+  }
+  return "midnight";
+}
+
+export function useSkin() {
+  const [skin, setSkin] = useState<SkinId>("midnight");
+
+  useEffect(() => {
+    const next = readStoredSkin();
+    setSkin(next);
+    applySkin(next);
+  }, []);
+
+  const setAndApply = useCallback((next: SkinId) => {
+    setSkin(next);
+    applySkin(next);
+  }, []);
+
+  return { skin, setSkin: setAndApply };
+}
 
 export function applyTheme(theme: Theme) {
   const root = document.documentElement;

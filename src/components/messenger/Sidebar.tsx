@@ -13,6 +13,7 @@ import { NotificationsPanel } from "./NotificationsPanel";
 import { RoomInvites } from "./RoomInvites";
 import { WaterUpdates } from "./WaterUpdates";
 import { ThemeToggle } from "@/components/system/ThemeToggle";
+import { ThemeSkinButton } from "@/components/system/ThemePicker";
 import { LanguageSwitcher } from "@/components/system/LanguageSwitcher";
 import { AccessibilityButton } from "@/components/system/AccessibilitySettings";
 import { supabase } from "@/integrations/supabase/client";
@@ -143,6 +144,7 @@ export function Sidebar({
               <NotebookPen className="size-4" />
             </Link>
             <ThemeToggle />
+            <ThemeSkinButton />
             <LanguageSwitcher className="size-9 justify-center rounded-xl border-0 bg-transparent p-0 text-muted-foreground hover:bg-secondary" />
             <AccessibilityButton />
             <button

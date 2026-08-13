@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import { TEXT_SCALES, useA11y, type A11yPrefs } from "@/hooks/use-a11y";
 import { useTheme } from "@/hooks/use-theme";
+import { ThemePicker } from "@/components/system/ThemePicker";
 
 const TOGGLES: { key: keyof A11yPrefs; label: string; hint: string }[] = [
   {
@@ -102,6 +103,8 @@ export function AccessibilitySettings() {
           ))}
         </div>
       </fieldset>
+
+      <ThemePicker />
 
       <ul className="mt-5 space-y-2">
         {TOGGLES.map((t) => {
