@@ -38,6 +38,7 @@ import {
   type Room,
 } from "@/lib/chat";
 import { cn } from "@/lib/utils";
+import { openRoomWindow } from "@/lib/room-window";
 
 export function Sidebar({
   rooms,
@@ -236,6 +237,9 @@ export function Sidebar({
                     key={room.id}
                     to="/chat/$roomId"
                     params={{ roomId: room.id }}
+                    onClick={(e) => {
+                      if (openRoomWindow(room.id)) e.preventDefault();
+                    }}
                     className={cn(
                       "flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors",
                       room.id === activeRoomId ? "bg-accent" : "hover:bg-secondary",
@@ -309,6 +313,9 @@ export function Sidebar({
                     key={room.id}
                     to="/chat/$roomId"
                     params={{ roomId: room.id }}
+                    onClick={(e) => {
+                      if (openRoomWindow(room.id)) e.preventDefault();
+                    }}
                     className={cn(
                       "flex items-center gap-3 rounded-2xl px-3 py-3 transition-colors",
                       room.id === activeRoomId ? "bg-accent" : "hover:bg-secondary",
