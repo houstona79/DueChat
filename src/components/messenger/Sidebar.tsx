@@ -252,7 +252,8 @@ export function Sidebar({
                     to="/chat/$roomId"
                     params={{ roomId: room.id }}
                     onClick={(e) => {
-                      if (openRoomWindow(room.id, "im")) e.preventDefault();
+                      const title = partner?.display_name ?? "Direct message";
+                      if (openRoom(room.id, "im", title)) e.preventDefault();
                     }}
                     className={cn(
                       "flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors",
@@ -328,7 +329,7 @@ export function Sidebar({
                     to="/chat/$roomId"
                     params={{ roomId: room.id }}
                     onClick={(e) => {
-                      if (openRoomWindow(room.id)) e.preventDefault();
+                      if (openRoom(room.id, "room", room.name)) e.preventDefault();
                     }}
                     className={cn(
                       "flex items-center gap-3 rounded-2xl px-3 py-3 transition-colors",
