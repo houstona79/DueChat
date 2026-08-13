@@ -360,8 +360,46 @@ const createRoomWindow = (url, parentWindow, kind = "room") => {
   return roomWindow;
 };
 
+/**
+ * Safety net: every webContents in the app (main window, room windows, iframes,
+ * child windows) keeps DueChat URLs inside the app. Only genuinely external
+ * links are handed to the system browser.
+ */
+const applyNavigationPolicy = (webContents) => {
+  webContents.setWindowOpenHandler(({ url }) => {
+    if (isTrustedOrigin(url)) {
+      const owner = BrowserWindow.fromWebContents(webContents);
+      try {
+        if (new URL(url).pathname.startsWith("/chat/")) {
+          createRoomWindow(url, owner);
+          return { action: "deny" };
+        }
+      } catch {
+        /* fall through to loading in place */
+      }
+      if (owner && !owner.isDestroyed()) void owner.loadURL(url);
+      return { action: "deny" };
+    }
+    void shell.openExternal(url);
+    return { action: "deny" };
+  });
+  const blockExternal = (event, url) => {
+    if (!isTrustedOrigin(url)) {
+      event.preventDefault();
+      void shell.openExternal(url);
+    }
+  };
+  webContents.on("will-navigate", blockExternal);
+  // Iframed room views navigate as frames, which will-navigate does not cover.
+  webContents.on("will-frame-navigate", (event) => {
+    if (!isTrustedOrigin(event.url)) {
+      event.preventDefault();
+      void shell.openExternal(event.url);
+    }
+  });
+};
+
 const createWindow = () => {
-  const mainWindow = new BrowserWindow({
   const mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
