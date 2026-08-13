@@ -253,6 +253,17 @@ const checkForUpdates = async ({ silent = true } = {}) => {
   }
 };
 
+/** Read width/height out of a window.open features string. */
+const parseWindowFeatures = (features) => {
+  const out = {};
+  for (const part of String(features || "").split(",")) {
+    const [key, value] = part.split("=");
+    const num = parseInt(value, 10);
+    if (key && !Number.isNaN(num)) out[key.trim()] = num;
+  }
+  return out;
+};
+
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 1400,
@@ -273,10 +284,37 @@ const createWindow = () => {
   mainWindow.loadURL(loadUrl());
   attachContextMenu(mainWindow.webContents);
 
-  // External links open in the user's browser instead of hijacking the app.
-  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+  // Room pop-outs (window.open on our own origin) must open as a real desktop
+  // window. Only genuinely external links go to the user's browser.
+  mainWindow.webContents.setWindowOpenHandler(({ url, features }) => {
+    if (isTrustedOrigin(url)) {
+      const parsed = parseWindowFeatures(features);
+      return {
+        action: "allow",
+        overrideBrowserWindowOptions: {
+          width: parsed.width || 520,
+          height: parsed.height || 780,
+          minWidth: 375,
+          minHeight: 500,
+          title: "DueChat",
+          autoHideMenuBar: false,
+          webPreferences: {
+            contextIsolation: true,
+            nodeIntegration: false,
+            webSecurity: true,
+            backgroundThrottling: false,
+            autoplayPolicy: "no-user-gesture-required",
+          },
+        },
+      };
+    }
     void shell.openExternal(url);
     return { action: "deny" };
+  });
+
+  // Give child windows the same right-click editing menu as the main window.
+  mainWindow.webContents.on("did-create-window", (childWindow) => {
+    attachContextMenu(childWindow.webContents);
   });
 
   if (process.env.NODE_ENV === "development") {
