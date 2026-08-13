@@ -299,34 +299,41 @@ html.dark {
   isolation: isolate;
 }
 
-html[data-wallpaper]:not([data-wallpaper="none"]) .chat-wallpaper::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
+/* One app-wide wallpaper layer sits behind every messenger surface. */
+html[data-wallpaper]:not([data-wallpaper="none"]) {
   background-color: var(--color-background);
-  pointer-events: none;
 }
 
-html[data-wallpaper]:not([data-wallpaper="none"]) .chat-wallpaper {
+html[data-wallpaper]:not([data-wallpaper="none"]) body {
   background-color: transparent;
 }
 
-html[data-wallpaper]:not([data-wallpaper="none"]) .chat-wallpaper::after {
+html[data-wallpaper]:not([data-wallpaper="none"]) body::before {
   content: "";
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: -1;
   background-image: var(--chat-wallpaper);
   background-size: cover;
   background-position: center;
-  opacity: 0.92;
+  background-repeat: no-repeat;
   pointer-events: none;
 }
 
 /* Slightly brighten wallpapers in dark mode so they stay visible. */
-html.dark[data-wallpaper]:not([data-wallpaper="none"]) .chat-wallpaper::after {
+html.dark[data-wallpaper]:not([data-wallpaper="none"]) body::before {
   filter: brightness(1.45) saturate(1.1);
+}
+
+/* Messenger surfaces go translucent so the wallpaper reads through them. */
+html[data-wallpaper]:not([data-wallpaper="none"]) .chat-wallpaper {
+  background-color: color-mix(in oklab, var(--color-background) 62%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+html[data-wallpaper]:not([data-wallpaper="none"]) .chat-glass {
+  background-color: color-mix(in oklab, var(--color-sidebar) 62%, transparent);
+  backdrop-filter: blur(2px);
 }
 
 .scroll-rail {
