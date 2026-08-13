@@ -507,7 +507,7 @@ export function ChatPane({
               Room profile
             </Link>
           ) : null}
-          {typeof window !== "undefined" && !window.opener ? (
+          {typeof window !== "undefined" && !window.opener && !isPopout ? (
             <button
               type="button"
               onClick={() => {
