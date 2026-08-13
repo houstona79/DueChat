@@ -293,6 +293,37 @@ html.dark {
 }
 
 /* Slim, unobtrusive scrollbars for the horizontal action rails. */
+/* Optional blue chat wallpaper (Sidebar > Background). */
+.chat-wallpaper {
+  position: relative;
+  isolation: isolate;
+}
+
+html[data-wallpaper]:not([data-wallpaper="none"]) .chat-wallpaper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--color-background);
+  pointer-events: none;
+}
+
+html[data-wallpaper]:not([data-wallpaper="none"]) .chat-wallpaper {
+  background-color: transparent;
+}
+
+html[data-wallpaper]:not([data-wallpaper="none"]) .chat-wallpaper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--chat-wallpaper);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
 .scroll-rail {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;

@@ -340,7 +340,7 @@ export function ChatPane({
 
   return (
     <section
-      className="flex h-full min-h-0 flex-col bg-background"
+      className="chat-wallpaper flex h-full min-h-0 flex-col bg-background"
       aria-label={`Conversation: ${title}`}
     >
       <header className="flex shrink-0 flex-col gap-2 border-b border-border px-3 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] short:gap-1 short:py-1.5 short:pt-[max(0.375rem,env(safe-area-inset-top))] lg:flex-row lg:flex-wrap lg:items-center lg:gap-3 lg:px-4">
