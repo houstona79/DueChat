@@ -3,8 +3,8 @@
  * Bump this whenever new desktop binaries are published so installed
  * desktop apps prompt their users to update.
  */
-export const DESKTOP_VERSION = "1.2.8";
+export const DESKTOP_VERSION = "1.2.9";
 
 /** Human-readable notes shown in the desktop update prompt. */
 export const DESKTOP_RELEASE_NOTES =
-  "Backgrounds now apply across the whole messenger — pick one in the sidebar and both the room list and chat update instantly. Available for macOS, Windows and Linux.";
+  "Chat rooms and IMs now always stay inside the desktop app — no more links jumping out to your web browser. Room windows are also resizable, and the trivia panel closes properly.";
