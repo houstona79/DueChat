@@ -39,5 +39,20 @@ export function openRoomWindow(roomId: string, kind: RoomWindowKind = "room"): b
       .catch(() => window.location.assign(url));
     return true;
   }
-  return false;
+
+  // Web: open a sized browser window. If the browser blocks it, fall back to
+  // in-app navigation so the click is never a no-op.
+  const size = kind === "im" ? { w: 400, h: 620 } : { w: 520, h: 780 };
+  const features = `popup=yes,width=${size.w},height=${size.h},noopener=no`;
+  try {
+    const win = window.open(url, `duechat-${kind}-${roomId}`, features);
+    if (win) {
+      win.focus();
+      return true;
+    }
+  } catch {
+    // ignore and fall through
+  }
+  window.location.assign(url);
+  return true;
 }
