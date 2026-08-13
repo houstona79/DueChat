@@ -494,9 +494,14 @@ export function ChatPane({
           {typeof window !== "undefined" && !window.opener ? (
             <button
               type="button"
-              onClick={() => {
+              onClick={async () => {
                 const roomUrl = new URL(`/chat/${room.id}`, window.location.origin);
                 roomUrl.searchParams.set("popout", "1");
+                if (window.duechatDesktop) {
+                  const opened = await window.duechatDesktop.openRoomWindow(roomUrl.toString());
+                  if (!opened) setError("DueChat could not open the room window. Restart the app and try again.");
+                  return;
+                }
                 const popup = window.open(
                   roomUrl.toString(),
                   `duechat-room-${room.id}`,

@@ -3,8 +3,8 @@
  * Bump this whenever new desktop binaries are published so installed
  * desktop apps prompt their users to update.
  */
-export const DESKTOP_VERSION = "1.2.0";
+export const DESKTOP_VERSION = "1.2.1";
 
 /** Human-readable notes shown in the desktop update prompt. */
 export const DESKTOP_RELEASE_NOTES =
-  "Chat rooms now open in their own desktop window instead of your browser, plus call and clipboard reliability fixes.";
+  "Chat rooms now use a direct desktop window command, so pop-outs stay inside DueChat instead of opening your browser.";
