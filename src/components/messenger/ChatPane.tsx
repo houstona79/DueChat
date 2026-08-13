@@ -328,6 +328,9 @@ export function ChatPane({
     }
   };
 
+  const searchStr = useRouterState({ select: (s) => s.location.searchStr });
+  const isPopout = /(^|[?&])popout=1(&|$)/.test(searchStr ?? "");
+
   const runModeration = async (action: () => Promise<void>, keys: string[]) => {
     try {
       await action();
