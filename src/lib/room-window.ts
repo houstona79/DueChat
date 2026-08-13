@@ -23,6 +23,14 @@ export function roomWindowUrl(roomId: string): string {
  * Returns true when a window was opened (so callers can preventDefault).
  */
 export function openRoomWindow(roomId: string, kind: RoomWindowKind = "room"): boolean {
+  return openDetachedRoomWindow(roomId, kind);
+}
+
+/**
+ * Opens the room in a real window: a native DueChat window in the desktop apps,
+ * a sized browser window on the web. Falls back to in-app navigation.
+ */
+export function openDetachedRoomWindow(roomId: string, kind: RoomWindowKind = "room"): boolean {
   if (typeof window === "undefined") return false;
   if (window.opener) return false;
   // Already inside a pop-out window: switch rooms in place instead of stacking
