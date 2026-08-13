@@ -5,6 +5,7 @@ import bgNight from "@/assets/bg-blue-night.jpg";
 import bgGeo from "@/assets/bg-blue-geo.jpg";
 
 const KEY = "duechat.wallpaper";
+const EVENT = "duechat:wallpaper";
 
 export type WallpaperId = "none" | "waves" | "night" | "geo";
 
@@ -23,6 +24,11 @@ export function applyWallpaper(id: WallpaperId) {
   root.setAttribute("data-wallpaper", found.id);
   try {
     localStorage.setItem(KEY, found.id);
+  } catch {
+    /* ignore */
+  }
+  try {
+    window.dispatchEvent(new CustomEvent(EVENT, { detail: found.id }));
   } catch {
     /* ignore */
   }
@@ -45,6 +51,12 @@ export function useWallpaper() {
     const next = readStoredWallpaper();
     setWallpaper(next);
     applyWallpaper(next);
+    const onChange = (e: Event) => {
+      const id = (e as CustomEvent<WallpaperId>).detail;
+      if (id) setWallpaper(id);
+    };
+    window.addEventListener(EVENT, onChange);
+    return () => window.removeEventListener(EVENT, onChange);
   }, []);
 
   const setAndApply = useCallback((next: WallpaperId) => {
