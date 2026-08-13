@@ -9,6 +9,8 @@ export function isDesktopShell(): boolean {
   return typeof window !== "undefined" && !!window.duechatDesktop;
 }
 
+export type RoomWindowKind = "room" | "im";
+
 export function roomWindowUrl(roomId: string): string {
   const url = new URL(`/chat/${roomId}`, window.location.origin);
   url.searchParams.set("popout", "1");
@@ -16,9 +18,9 @@ export function roomWindowUrl(roomId: string): string {
 }
 
 /** Returns true when the desktop window was requested. */
-export function openRoomWindow(roomId: string): boolean {
+export function openRoomWindow(roomId: string, kind: RoomWindowKind = "room"): boolean {
   if (!isDesktopShell() || typeof window === "undefined") return false;
   if (window.opener) return false;
-  void window.duechatDesktop!.openRoomWindow(roomWindowUrl(roomId));
+  void window.duechatDesktop!.openRoomWindow(roomWindowUrl(roomId), kind);
   return true;
 }
