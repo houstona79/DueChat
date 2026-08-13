@@ -1,4 +1,10 @@
-import { createFileRoute, Outlet, useNavigate, useParams } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Outlet,
+  useNavigate,
+  useParams,
+  useRouterState,
+} from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { MessagesSquare, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,8 +54,24 @@ function ChatLayout() {
 
   const params = useParams({ strict: false }) as { roomId?: string };
   const activeRoomId = params.roomId;
+  const search = useRouterState({ select: (s) => s.location.searchStr });
+  const popout = /(^|[?&])popout=1(&|$)/.test(search ?? "");
 
   if (myBan) return <BannedScreen reason={myBan.reason} />;
+
+  if (popout && activeRoomId) {
+    return (
+      <>
+        <main id="main-content" className="fixed inset-0 overflow-hidden overscroll-none">
+          <Outlet />
+        </main>
+        <ProfileViewer />
+        {user?.id ? (
+          <IncomingCallWatcher rooms={rooms} profiles={profiles} meId={user.id} />
+        ) : null}
+      </>
+    );
+  }
 
   return (
     <>
