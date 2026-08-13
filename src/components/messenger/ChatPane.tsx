@@ -34,7 +34,7 @@ import { GifPicker } from "./GifPicker";
 import { EmojiText } from "./EmojiText";
 import { hasImageEmoji, isImageEmojiOnly } from "@/lib/image-emojis";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { openProfile } from "./ProfileViewer";
