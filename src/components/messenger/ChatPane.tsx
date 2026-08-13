@@ -34,7 +34,7 @@ import { GifPicker } from "./GifPicker";
 import { EmojiText } from "./EmojiText";
 import { hasImageEmoji, isImageEmojiOnly } from "@/lib/image-emojis";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { openProfile } from "./ProfileViewer";
@@ -214,6 +214,29 @@ export function ChatPane({
     setShowTrivia((v) => (which === "trivia" ? !v : false));
     setShowInvite((v) => (which === "invite" ? !v : false));
   };
+
+  const closeOverlayPanels = useCallback(() => {
+    setShowFeed(false);
+    setShowMedia(false);
+    setShowGames(false);
+    setShowTrivia(false);
+    setShowInvite(false);
+  }, []);
+
+  /** Switching rooms should never carry a slide-out panel (e.g. trivia) with it. */
+  useEffect(() => {
+    closeOverlayPanels();
+    setShowMembers(!room.is_direct);
+  }, [room.id, room.is_direct, closeOverlayPanels]);
+
+  /** Escape always closes whatever slide-out panel is open. */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeOverlayPanels();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [closeOverlayPanels]);
 
   type TimelineItem =
     | { kind: "message"; id: string; at: string; message: (typeof messages)[number] }
