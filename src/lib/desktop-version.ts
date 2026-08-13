@@ -3,8 +3,8 @@
  * Bump this whenever new desktop binaries are published so installed
  * desktop apps prompt their users to update.
  */
-export const DESKTOP_VERSION = "1.2.6";
+export const DESKTOP_VERSION = "1.2.7";
 
 /** Human-readable notes shown in the desktop update prompt. */
 export const DESKTOP_RELEASE_NOTES =
-  "Mac fix: clicking a room or DM now always opens a fixed DueChat window — previously a slow-loading window could stay hidden and the click did nothing. Re-download and replace your current DueChat app to get the update.";
+  "Chat rooms now always stay inside the DueChat desktop app — room and DM links never hand off to your web browser, and pop-out windows have a Rooms button to get back to the room list.";
