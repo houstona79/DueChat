@@ -15,16 +15,23 @@ const windowSize = (kind) =>
 const roomWindows = new Map();
 
 /** Any DueChat host (app/preview/published) plus localhost during development. */
+const TRUSTED_HOST_SUFFIXES = [
+  ".duechat.com",
+  ".lovable.app",
+  ".lovableproject.com",
+  ".lovable.dev",
+];
+const TRUSTED_HOSTS = ["duechat.com", "lovable.app"];
+
 const isTrustedOrigin = (rawUrl) => {
   if (!rawUrl) return false;
   try {
     const { hostname, protocol } = new URL(rawUrl);
-    if (protocol === "http:" && (hostname === "localhost" || hostname === "127.0.0.1")) return true;
-    if (protocol !== "https:") return false;
+    if (hostname === "localhost" || hostname === "127.0.0.1") return true;
+    if (protocol !== "https:" && protocol !== "http:") return false;
     return (
-      hostname === "duechat.com" ||
-      hostname.endsWith(".duechat.com") ||
-      hostname.endsWith(".lovable.app")
+      TRUSTED_HOSTS.includes(hostname) ||
+      TRUSTED_HOST_SUFFIXES.some((suffix) => hostname.endsWith(suffix))
     );
   } catch {
     return false;
