@@ -1,4 +1,5 @@
-const { app, BrowserWindow, Menu, session, systemPreferences, shell, clipboard, dialog } = require("electron");
+const { app, BrowserWindow, Menu, session, systemPreferences, shell, clipboard, dialog, ipcMain } = require("electron");
+const path = require("path");
 
 const APP_URL = "https://app.duechat.com";
 const DEV_URL = "http://localhost:8080";
@@ -277,7 +278,7 @@ const createRoomWindow = (url, features = "") => {
     minWidth: 375,
     minHeight: 500,
     title: "DueChat",
-    icon: require("path").join(__dirname, "icons", "icon.png"),
+    icon: path.join(__dirname, "icons", "icon.png"),
     show: false,
     webPreferences: {
       contextIsolation: true,
@@ -285,6 +286,7 @@ const createRoomWindow = (url, features = "") => {
       webSecurity: true,
       backgroundThrottling: false,
       autoplayPolicy: "no-user-gesture-required",
+      preload: path.join(__dirname, "preload.cjs"),
     },
   });
 
@@ -306,13 +308,14 @@ const createWindow = () => {
     minWidth: 375,
     minHeight: 600,
     title: "DueChat",
-    icon: require("path").join(__dirname, "icons", "icon.png"),
+    icon: path.join(__dirname, "icons", "icon.png"),
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
       webSecurity: true,
       backgroundThrottling: false,
       autoplayPolicy: "no-user-gesture-required",
+      preload: path.join(__dirname, "preload.cjs"),
     },
   });
 
@@ -341,6 +344,14 @@ const createWindow = () => {
 };
 
 app.whenReady().then(async () => {
+  ipcMain.handle("duechat:open-room-window", (event, rawUrl) => {
+    if (typeof rawUrl !== "string" || !isTrustedOrigin(rawUrl)) return false;
+    const senderWindow = BrowserWindow.fromWebContents(event.sender);
+    const senderUrl = event.sender.getURL();
+    if (!senderWindow || !isTrustedOrigin(senderUrl)) return false;
+    createRoomWindow(rawUrl, "width=520,height=780");
+    return true;
+  });
   allowMediaPermissions();
   buildAppMenu();
   await requestMediaAccess();
