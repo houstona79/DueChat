@@ -39,6 +39,7 @@ import {
 } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 import { openRoomWindow } from "@/lib/room-window";
+import { supportsFloatingRooms, useFloatingRooms } from "@/lib/floating-rooms";
 
 export function Sidebar({
   rooms,
@@ -99,6 +100,19 @@ export function Sidebar({
     queryClient.clear();
     await supabase.auth.signOut();
     void navigate({ to: "/auth", replace: true });
+  };
+
+  const floating = useFloatingRooms();
+  /**
+   * Rooms open as an in-app floating window when there's space for one; small
+   * screens and pop-out windows keep plain navigation.
+   */
+  const openRoom = (roomId: string, kind: "room" | "im", title: string): boolean => {
+    if (floating && supportsFloatingRooms()) {
+      floating.open(roomId, kind, title);
+      return true;
+    }
+    return openRoomWindow(roomId, kind);
   };
 
   return (
@@ -238,7 +252,8 @@ export function Sidebar({
                     to="/chat/$roomId"
                     params={{ roomId: room.id }}
                     onClick={(e) => {
-                      if (openRoomWindow(room.id, "im")) e.preventDefault();
+                      const title = partner?.display_name ?? "Direct message";
+                      if (openRoom(room.id, "im", title)) e.preventDefault();
                     }}
                     className={cn(
                       "flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors",
@@ -314,7 +329,7 @@ export function Sidebar({
                     to="/chat/$roomId"
                     params={{ roomId: room.id }}
                     onClick={(e) => {
-                      if (openRoomWindow(room.id)) e.preventDefault();
+                      if (openRoom(room.id, "room", room.name)) e.preventDefault();
                     }}
                     className={cn(
                       "flex items-center gap-3 rounded-2xl px-3 py-3 transition-colors",

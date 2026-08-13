@@ -13,6 +13,8 @@ import { Sidebar } from "@/components/messenger/Sidebar";
 import { ProfileViewer } from "@/components/messenger/ProfileViewer";
 import { IncomingCallWatcher } from "@/components/messenger/IncomingCallWatcher";
 import { DirectMessageAlerts } from "@/components/messenger/DirectMessageAlerts";
+import { FloatingRoomWindows } from "@/components/messenger/FloatingRoomWindows";
+import { FloatingRoomsProvider } from "@/lib/floating-rooms";
 import { SupportWidget } from "@/components/support/SupportWidget";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { useMyBan } from "@/hooks/use-my-ban";
@@ -74,7 +76,7 @@ function ChatLayout() {
   }
 
   return (
-    <>
+    <FloatingRoomsProvider>
       <main
         id="main-content"
         className="fixed inset-0 grid overflow-hidden overscroll-none grid-cols-1 md:grid-cols-[260px_minmax(0,1fr)] lg:grid-cols-[340px_minmax(0,1fr)]"
@@ -117,6 +119,7 @@ function ChatLayout() {
           )}
         </div>
       </main>
+      <FloatingRoomWindows />
       <ProfileViewer />
       {user?.id ? <IncomingCallWatcher rooms={rooms} profiles={profiles} meId={user.id} /> : null}
       {user?.id ? (
@@ -127,7 +130,7 @@ function ChatLayout() {
           activeRoomId={activeRoomId}
         />
       ) : null}
-    </>
+    </FloatingRoomsProvider>
   );
 }
 
