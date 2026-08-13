@@ -39,6 +39,7 @@ import {
 } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 import { openRoomWindow } from "@/lib/room-window";
+import { supportsFloatingRooms, useFloatingRooms } from "@/lib/floating-rooms";
 
 export function Sidebar({
   rooms,
