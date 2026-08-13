@@ -3,6 +3,9 @@ const path = require("path");
 
 const APP_URL = "https://app.duechat.com";
 const DEV_URL = "http://localhost:8080";
+const ROOM_WINDOW_WIDTH = 520;
+const ROOM_WINDOW_HEIGHT = 780;
+const roomWindows = new Map();
 
 /** Any DueChat host (app/preview/published) plus localhost during development. */
 const isTrustedOrigin = (rawUrl) => {
@@ -254,30 +257,33 @@ const checkForUpdates = async ({ silent = true } = {}) => {
   }
 };
 
-/** Read width/height out of a window.open features string. */
-const parseWindowFeatures = (features) => {
-  const out = {};
-  for (const part of String(features || "").split(",")) {
-    const [key, value] = part.split("=");
-    const num = parseInt(value, 10);
-    if (key && !Number.isNaN(num)) out[key.trim()] = num;
-  }
-  return out;
-};
-
 /**
  * Open trusted room links ourselves instead of relying on Chromium's implicit
  * window.open handling. This is consistent across macOS, Windows and Linux and
  * keeps the default session, including the member's signed-in state.
  */
-const createRoomWindow = (url, features = "") => {
-  const parsed = parseWindowFeatures(features);
+const createRoomWindow = (url, parentWindow) => {
+  const roomKey = new URL(url).pathname;
+  const existingWindow = roomWindows.get(roomKey);
+  if (existingWindow && !existingWindow.isDestroyed()) {
+    if (existingWindow.isMinimized()) existingWindow.restore();
+    existingWindow.show();
+    existingWindow.focus();
+    return existingWindow;
+  }
+
   const roomWindow = new BrowserWindow({
-    width: parsed.width || 520,
-    height: parsed.height || 780,
-    minWidth: 375,
-    minHeight: 500,
-    title: "DueChat",
+    width: ROOM_WINDOW_WIDTH,
+    height: ROOM_WINDOW_HEIGHT,
+    minWidth: ROOM_WINDOW_WIDTH,
+    minHeight: ROOM_WINDOW_HEIGHT,
+    maxWidth: ROOM_WINDOW_WIDTH,
+    maxHeight: ROOM_WINDOW_HEIGHT,
+    resizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    parent: parentWindow && !parentWindow.isDestroyed() ? parentWindow : undefined,
+    title: "DueChat Room",
     icon: path.join(__dirname, "icons", "icon.png"),
     show: false,
     webPreferences: {
@@ -290,9 +296,11 @@ const createRoomWindow = (url, features = "") => {
     },
   });
 
+  roomWindows.set(roomKey, roomWindow);
+  roomWindow.on("closed", () => roomWindows.delete(roomKey));
   attachContextMenu(roomWindow.webContents);
-  roomWindow.webContents.setWindowOpenHandler(({ url: nextUrl, features: nextFeatures }) => {
-    if (isTrustedOrigin(nextUrl)) createRoomWindow(nextUrl, nextFeatures);
+  roomWindow.webContents.setWindowOpenHandler(({ url: nextUrl }) => {
+    if (isTrustedOrigin(nextUrl)) createRoomWindow(nextUrl, roomWindow);
     else void shell.openExternal(nextUrl);
     return { action: "deny" };
   });
@@ -324,9 +332,9 @@ const createWindow = () => {
 
   // Room pop-outs (window.open on our own origin) must open as a real desktop
   // window. Only genuinely external links go to the user's browser.
-  mainWindow.webContents.setWindowOpenHandler(({ url, features }) => {
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (isTrustedOrigin(url)) {
-      createRoomWindow(url, features);
+      createRoomWindow(url, mainWindow);
       return { action: "deny" };
     }
     void shell.openExternal(url);
@@ -349,7 +357,7 @@ app.whenReady().then(async () => {
     const senderWindow = BrowserWindow.fromWebContents(event.sender);
     const senderUrl = event.sender.getURL();
     if (!senderWindow || !isTrustedOrigin(senderUrl)) return false;
-    createRoomWindow(rawUrl, "width=520,height=780");
+    createRoomWindow(rawUrl, senderWindow);
     return true;
   });
   allowMediaPermissions();

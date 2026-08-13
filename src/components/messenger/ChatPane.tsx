@@ -497,24 +497,21 @@ export function ChatPane({
               onClick={async () => {
                 const roomUrl = new URL(`/chat/${room.id}`, window.location.origin);
                 roomUrl.searchParams.set("popout", "1");
-                if (window.duechatDesktop) {
-                  const opened = await window.duechatDesktop.openRoomWindow(roomUrl.toString());
-                  if (!opened) setError("DueChat could not open the room window. Restart the app and try again.");
+                if (!window.duechatDesktop) {
+                  setError("Fixed room windows are available in the latest DueChat desktop app.");
                   return;
                 }
-                const popup = window.open(
-                  roomUrl.toString(),
-                  `duechat-room-${room.id}`,
-                  "popup=yes,width=520,height=780,resizable=yes,scrollbars=yes",
-                );
-                if (!popup) setError("The room window was blocked. Allow pop-ups for DueChat and try again.");
+                const opened = await window.duechatDesktop.openRoomWindow(roomUrl.toString());
+                if (!opened) {
+                  setError("DueChat could not open the fixed room window. Restart the app and try again.");
+                }
               }}
               className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border text-xs font-medium text-muted-foreground hover:bg-secondary lg:w-auto lg:gap-1.5 lg:px-2.5"
-              aria-label="Open this room in a separate window"
-              title="Open in separate window"
+              aria-label="Open this room in a fixed window"
+              title="Open in fixed window"
             >
               <ExternalLink className="size-4" />
-              <span className="hidden lg:inline">Pop out</span>
+              <span className="hidden lg:inline">Room window</span>
             </button>
           ) : null}
           <button
