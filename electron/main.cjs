@@ -386,8 +386,8 @@ app.whenReady().then(async () => {
     const senderWindow = BrowserWindow.fromWebContents(event.sender);
     const senderUrl = event.sender.getURL();
     if (!senderWindow || !isTrustedOrigin(senderUrl)) return false;
-    createRoomWindow(rawUrl, senderWindow, kind === "im" ? "im" : "room");
-    return true;
+    const created = createRoomWindow(rawUrl, senderWindow, kind === "im" ? "im" : "room");
+    return !!created;
   });
   allowMediaPermissions();
   buildAppMenu();
