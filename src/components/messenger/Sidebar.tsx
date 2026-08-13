@@ -13,7 +13,7 @@ import { NotificationsPanel } from "./NotificationsPanel";
 import { RoomInvites } from "./RoomInvites";
 import { WaterUpdates } from "./WaterUpdates";
 import { ThemeToggle } from "@/components/system/ThemeToggle";
-import { ThemeSkinButton } from "@/components/system/ThemePicker";
+import { ThemeSkinSwatches } from "@/components/system/ThemePicker";
 import { LanguageSwitcher } from "@/components/system/LanguageSwitcher";
 import { AccessibilityButton } from "@/components/system/AccessibilitySettings";
 import { supabase } from "@/integrations/supabase/client";
@@ -144,7 +144,6 @@ export function Sidebar({
               <NotebookPen className="size-4" />
             </Link>
             <ThemeToggle />
-            <ThemeSkinButton />
             <LanguageSwitcher className="size-9 justify-center rounded-xl border-0 bg-transparent p-0 text-muted-foreground hover:bg-secondary" />
             <AccessibilityButton />
             <button
@@ -202,7 +201,8 @@ export function Sidebar({
           </Link>
         ) : null}
 
-        <div className="mt-3 flex items-center gap-2 rounded-xl bg-secondary px-3 py-2 short:mt-2 short:py-1.5">
+        <ThemeSkinSwatches className="mt-3 rounded-xl bg-secondary px-3 py-2 short:mt-2 short:py-1.5" />
+        <div className="mt-2 flex items-center gap-2 rounded-xl bg-secondary px-3 py-2 short:py-1.5">
           <Search className="size-4 text-muted-foreground" aria-hidden />
           <input
             value={query}

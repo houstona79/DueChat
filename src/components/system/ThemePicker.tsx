@@ -35,6 +35,34 @@ export function ThemePicker() {
   );
 }
 
+/** Horizontal row of colour swatches for the messenger sidebar. */
+export function ThemeSkinSwatches({ className }: { className?: string }) {
+  const { skin, setSkin } = useSkin();
+
+  return (
+    <div className={cn("flex items-center justify-between gap-2", className)}>
+      <span className="text-[11px] font-medium text-muted-foreground">Theme</span>
+      <div className="flex items-center gap-1.5">
+        {SKINS.map((s) => (
+          <button
+            key={s.id}
+            type="button"
+            aria-pressed={skin === s.id}
+            aria-label={s.label}
+            title={s.label}
+            onClick={() => setSkin(s.id)}
+            className={cn(
+              "size-6 rounded-full border-2 transition-transform hover:scale-110",
+              skin === s.id ? "border-foreground scale-110" : "border-transparent",
+            )}
+            style={{ background: s.swatch }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /** Compact messenger header control that cycles through the colour themes. */
 export function ThemeSkinButton({ className }: { className?: string }) {
   const { skin, setSkin } = useSkin();
