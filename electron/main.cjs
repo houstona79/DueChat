@@ -15,16 +15,23 @@ const windowSize = (kind) =>
 const roomWindows = new Map();
 
 /** Any DueChat host (app/preview/published) plus localhost during development. */
+const TRUSTED_HOST_SUFFIXES = [
+  ".duechat.com",
+  ".lovable.app",
+  ".lovableproject.com",
+  ".lovable.dev",
+];
+const TRUSTED_HOSTS = ["duechat.com", "lovable.app"];
+
 const isTrustedOrigin = (rawUrl) => {
   if (!rawUrl) return false;
   try {
     const { hostname, protocol } = new URL(rawUrl);
-    if (protocol === "http:" && (hostname === "localhost" || hostname === "127.0.0.1")) return true;
-    if (protocol !== "https:") return false;
+    if (hostname === "localhost" || hostname === "127.0.0.1") return true;
+    if (protocol !== "https:" && protocol !== "http:") return false;
     return (
-      hostname === "duechat.com" ||
-      hostname.endsWith(".duechat.com") ||
-      hostname.endsWith(".lovable.app")
+      TRUSTED_HOSTS.includes(hostname) ||
+      TRUSTED_HOST_SUFFIXES.some((suffix) => hostname.endsWith(suffix))
     );
   } catch {
     return false;
@@ -353,6 +360,45 @@ const createRoomWindow = (url, parentWindow, kind = "room") => {
   return roomWindow;
 };
 
+/**
+ * Safety net: every webContents in the app (main window, room windows, iframes,
+ * child windows) keeps DueChat URLs inside the app. Only genuinely external
+ * links are handed to the system browser.
+ */
+const applyNavigationPolicy = (webContents) => {
+  webContents.setWindowOpenHandler(({ url }) => {
+    if (isTrustedOrigin(url)) {
+      const owner = BrowserWindow.fromWebContents(webContents);
+      try {
+        if (new URL(url).pathname.startsWith("/chat/")) {
+          createRoomWindow(url, owner);
+          return { action: "deny" };
+        }
+      } catch {
+        /* fall through to loading in place */
+      }
+      if (owner && !owner.isDestroyed()) void owner.loadURL(url);
+      return { action: "deny" };
+    }
+    void shell.openExternal(url);
+    return { action: "deny" };
+  });
+  const blockExternal = (event, url) => {
+    if (!isTrustedOrigin(url)) {
+      event.preventDefault();
+      void shell.openExternal(url);
+    }
+  };
+  webContents.on("will-navigate", blockExternal);
+  // Iframed room views navigate as frames, which will-navigate does not cover.
+  webContents.on("will-frame-navigate", (event) => {
+    if (!isTrustedOrigin(event.url)) {
+      event.preventDefault();
+      void shell.openExternal(event.url);
+    }
+  });
+};
+
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 1400,
@@ -407,6 +453,12 @@ const createWindow = () => {
 };
 
 app.whenReady().then(async () => {
+  // Applies to every webContents created from now on, including iframes and
+  // any window Chromium creates itself.
+  app.on("web-contents-created", (_event, contents) => {
+    applyNavigationPolicy(contents);
+    attachContextMenu(contents);
+  });
   ipcMain.handle("duechat:open-room-window", (event, rawUrl, kind) => {
     if (typeof rawUrl !== "string" || !isTrustedOrigin(rawUrl)) return false;
     if (!new URL(rawUrl).pathname.startsWith("/chat/")) return false;
