@@ -3,8 +3,8 @@
  * Bump this whenever new desktop binaries are published so installed
  * desktop apps prompt their users to update.
  */
-export const DESKTOP_VERSION = "1.2.7";
+export const DESKTOP_VERSION = "1.2.8";
 
 /** Human-readable notes shown in the desktop update prompt. */
 export const DESKTOP_RELEASE_NOTES =
-  "Chat rooms now always stay inside the DueChat desktop app — room and DM links never hand off to your web browser, and pop-out windows have a Rooms button to get back to the room list.";
+  "Backgrounds now apply across the whole messenger — pick one in the sidebar and both the room list and chat update instantly. Available for macOS, Windows and Linux.";
