@@ -215,6 +215,29 @@ export function ChatPane({
     setShowInvite((v) => (which === "invite" ? !v : false));
   };
 
+  const closeOverlayPanels = useCallback(() => {
+    setShowFeed(false);
+    setShowMedia(false);
+    setShowGames(false);
+    setShowTrivia(false);
+    setShowInvite(false);
+  }, []);
+
+  /** Switching rooms should never carry a slide-out panel (e.g. trivia) with it. */
+  useEffect(() => {
+    closeOverlayPanels();
+    setShowMembers(!room.is_direct);
+  }, [room.id, room.is_direct, closeOverlayPanels]);
+
+  /** Escape always closes whatever slide-out panel is open. */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeOverlayPanels();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [closeOverlayPanels]);
+
   type TimelineItem =
     | { kind: "message"; id: string; at: string; message: (typeof messages)[number] }
     | {
