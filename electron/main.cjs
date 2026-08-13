@@ -270,7 +270,12 @@ const checkForUpdates = async ({ silent = true } = {}) => {
  * keeps the default session, including the member's signed-in state.
  */
 const createRoomWindow = (url, parentWindow, kind = "room") => {
-  const roomKey = new URL(url).pathname;
+  if (!isTrustedOrigin(url)) return null;
+  const parsedUrl = new URL(url);
+  if (!parsedUrl.pathname.startsWith("/chat/")) return null;
+  parsedUrl.searchParams.set("popout", "1");
+  const safeUrl = parsedUrl.toString();
+  const roomKey = parsedUrl.pathname;
   const existingWindow = roomWindows.get(roomKey);
   if (existingWindow && !existingWindow.isDestroyed()) {
     if (existingWindow.isMinimized()) existingWindow.restore();
@@ -313,7 +318,7 @@ const createRoomWindow = (url, parentWindow, kind = "room") => {
     return { action: "deny" };
   });
   roomWindow.once("ready-to-show", () => roomWindow.show());
-  void roomWindow.loadURL(url);
+  void roomWindow.loadURL(safeUrl);
   return roomWindow;
 };
 
@@ -341,7 +346,7 @@ const createWindow = () => {
   // Room pop-outs (window.open on our own origin) must open as a real desktop
   // window. Only genuinely external links go to the user's browser.
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    if (isTrustedOrigin(url)) {
+    if (isTrustedOrigin(url) && new URL(url).pathname.startsWith("/chat/")) {
       createRoomWindow(url, mainWindow);
       return { action: "deny" };
     }
@@ -362,6 +367,7 @@ const createWindow = () => {
 app.whenReady().then(async () => {
   ipcMain.handle("duechat:open-room-window", (event, rawUrl, kind) => {
     if (typeof rawUrl !== "string" || !isTrustedOrigin(rawUrl)) return false;
+    if (!new URL(rawUrl).pathname.startsWith("/chat/")) return false;
     const senderWindow = BrowserWindow.fromWebContents(event.sender);
     const senderUrl = event.sender.getURL();
     if (!senderWindow || !isTrustedOrigin(senderUrl)) return false;
