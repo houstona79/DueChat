@@ -25,6 +25,9 @@ export function roomWindowUrl(roomId: string): string {
 export function openRoomWindow(roomId: string, kind: RoomWindowKind = "room"): boolean {
   if (typeof window === "undefined") return false;
   if (window.opener) return false;
+  // Already inside a pop-out window: switch rooms in place instead of stacking
+  // more windows, so the room list acts like normal navigation.
+  if (/(^|[?&])popout=1(&|$)/.test(window.location.search)) return false;
   const url = roomWindowUrl(roomId);
 
   if (isDesktopShell()) {
