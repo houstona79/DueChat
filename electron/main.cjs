@@ -453,6 +453,12 @@ const createWindow = () => {
 };
 
 app.whenReady().then(async () => {
+  // Applies to every webContents created from now on, including iframes and
+  // any window Chromium creates itself.
+  app.on("web-contents-created", (_event, contents) => {
+    applyNavigationPolicy(contents);
+    attachContextMenu(contents);
+  });
   ipcMain.handle("duechat:open-room-window", (event, rawUrl, kind) => {
     if (typeof rawUrl !== "string" || !isTrustedOrigin(rawUrl)) return false;
     if (!new URL(rawUrl).pathname.startsWith("/chat/")) return false;
