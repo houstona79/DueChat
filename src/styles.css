@@ -302,3 +302,122 @@ html.dark {
 .scroll-rail::-webkit-scrollbar {
   display: none;
 }
+
+/* ---- Messenger colour themes (Settings > Appearance) ----
+ * Each skin re-tints the accent family only; light/dark surfaces stay intact.
+ */
+html[data-skin="ocean"] {
+  --primary: oklch(0.5 0.12 210);
+  --ring: oklch(0.5 0.12 210);
+  --bubble-me: oklch(0.5 0.12 210);
+  --sidebar-primary: oklch(0.5 0.12 210);
+  --sidebar-ring: oklch(0.5 0.12 210);
+  --accent-1: oklch(0.5 0.12 210);
+  --accent-2: oklch(0.46 0.11 175);
+  --accent-3: oklch(0.5 0.1 240);
+  --accent-4: oklch(0.5 0.12 190);
+}
+html.dark[data-skin="ocean"] {
+  --primary: oklch(0.74 0.12 200);
+  --ring: oklch(0.74 0.12 200);
+  --bubble-me: oklch(0.74 0.12 200);
+  --sidebar-primary: oklch(0.74 0.12 200);
+  --sidebar-ring: oklch(0.74 0.12 200);
+  --accent-1: oklch(0.74 0.12 200);
+  --accent-2: oklch(0.75 0.15 175);
+  --accent-3: oklch(0.7 0.12 240);
+  --accent-4: oklch(0.78 0.11 190);
+}
+
+html[data-skin="plum"] {
+  --primary: oklch(0.46 0.19 320);
+  --ring: oklch(0.46 0.19 320);
+  --bubble-me: oklch(0.46 0.19 320);
+  --sidebar-primary: oklch(0.46 0.19 320);
+  --sidebar-ring: oklch(0.46 0.19 320);
+  --accent-1: oklch(0.46 0.19 320);
+  --accent-2: oklch(0.47 0.15 350);
+  --accent-3: oklch(0.45 0.16 290);
+  --accent-4: oklch(0.5 0.14 335);
+}
+html.dark[data-skin="plum"] {
+  --primary: oklch(0.7 0.17 320);
+  --ring: oklch(0.7 0.17 320);
+  --bubble-me: oklch(0.7 0.17 320);
+  --sidebar-primary: oklch(0.7 0.17 320);
+  --sidebar-ring: oklch(0.7 0.17 320);
+  --accent-1: oklch(0.7 0.17 320);
+  --accent-2: oklch(0.73 0.15 350);
+  --accent-3: oklch(0.68 0.17 290);
+  --accent-4: oklch(0.76 0.13 335);
+}
+
+html[data-skin="ember"] {
+  --primary: oklch(0.52 0.15 45);
+  --ring: oklch(0.52 0.15 45);
+  --bubble-me: oklch(0.52 0.15 45);
+  --sidebar-primary: oklch(0.52 0.15 45);
+  --sidebar-ring: oklch(0.52 0.15 45);
+  --accent-1: oklch(0.52 0.15 45);
+  --accent-2: oklch(0.5 0.13 70);
+  --accent-3: oklch(0.5 0.14 30);
+  --accent-4: oklch(0.55 0.12 55);
+}
+html.dark[data-skin="ember"] {
+  --primary: oklch(0.74 0.15 55);
+  --ring: oklch(0.74 0.15 55);
+  --bubble-me: oklch(0.74 0.15 55);
+  --sidebar-primary: oklch(0.74 0.15 55);
+  --sidebar-ring: oklch(0.74 0.15 55);
+  --accent-1: oklch(0.74 0.15 55);
+  --accent-2: oklch(0.8 0.14 80);
+  --accent-3: oklch(0.75 0.14 35);
+  --accent-4: oklch(0.78 0.12 65);
+}
+
+html[data-skin="forest"] {
+  --primary: oklch(0.46 0.13 155);
+  --ring: oklch(0.46 0.13 155);
+  --bubble-me: oklch(0.46 0.13 155);
+  --sidebar-primary: oklch(0.46 0.13 155);
+  --sidebar-ring: oklch(0.46 0.13 155);
+  --accent-1: oklch(0.46 0.13 155);
+  --accent-2: oklch(0.46 0.12 175);
+  --accent-3: oklch(0.48 0.12 130);
+  --accent-4: oklch(0.48 0.11 195);
+}
+html.dark[data-skin="forest"] {
+  --primary: oklch(0.72 0.14 155);
+  --ring: oklch(0.72 0.14 155);
+  --bubble-me: oklch(0.72 0.14 155);
+  --sidebar-primary: oklch(0.72 0.14 155);
+  --sidebar-ring: oklch(0.72 0.14 155);
+  --accent-1: oklch(0.72 0.14 155);
+  --accent-2: oklch(0.75 0.14 175);
+  --accent-3: oklch(0.78 0.15 130);
+  --accent-4: oklch(0.74 0.12 195);
+}
+
+html[data-skin="slate"] {
+  --primary: oklch(0.42 0.03 264);
+  --ring: oklch(0.42 0.03 264);
+  --bubble-me: oklch(0.42 0.03 264);
+  --sidebar-primary: oklch(0.42 0.03 264);
+  --sidebar-ring: oklch(0.42 0.03 264);
+  --accent-1: oklch(0.42 0.03 264);
+  --accent-2: oklch(0.45 0.04 240);
+  --accent-3: oklch(0.45 0.04 290);
+  --accent-4: oklch(0.48 0.03 264);
+}
+html.dark[data-skin="slate"] {
+  --primary: oklch(0.74 0.03 264);
+  --ring: oklch(0.74 0.03 264);
+  --bubble-me: oklch(0.74 0.03 264);
+  --bubble-me-foreground: oklch(0.18 0.02 264);
+  --sidebar-primary: oklch(0.74 0.03 264);
+  --sidebar-ring: oklch(0.74 0.03 264);
+  --accent-1: oklch(0.78 0.03 264);
+  --accent-2: oklch(0.76 0.04 240);
+  --accent-3: oklch(0.76 0.04 290);
+  --accent-4: oklch(0.8 0.03 264);
+}
