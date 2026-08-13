@@ -362,6 +362,7 @@ const createRoomWindow = (url, parentWindow, kind = "room") => {
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
+  const mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
     minWidth: 375,
