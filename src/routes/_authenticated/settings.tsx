@@ -417,6 +417,8 @@ function SettingsPage() {
           {forwardNote ? <p className="mt-2 text-[11px] text-primary">{forwardNote}</p> : null}
         </div>
 
+        <MemberMailbox defaultHandle={me.mail_handle ?? me.username ?? null} />
+
         <div>
           <span className="block text-[11px] font-medium text-muted-foreground">Date of birth</span>
           {me.birth_date ? (
