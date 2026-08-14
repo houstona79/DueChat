@@ -200,6 +200,7 @@ export function ChatPane({
   const { data: bans = [] } = useRoomBans(room.id, canModerate);
   const { data: silences = [] } = useRoomSilences(room.id, joined && !room.is_direct);
   const { data: hands = [] } = useRoomHands(room.id, joined && !room.is_direct);
+  const { data: karaokeQueue = [] } = useKaraokeQueue(room.id, joined && !room.is_direct);
   const { data: blocks = [] } = useBlocks(meId);
   const mySilence = silences.find((s) => s.user_id === meId && isActive(s)) ?? null;
   const { data: siteRoles } = useSiteRoles();
