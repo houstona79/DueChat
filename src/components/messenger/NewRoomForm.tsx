@@ -53,15 +53,15 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
 
   return (
     <Dialog open onOpenChange={(next) => { if (!next) onDone(); }}>
-      <DialogContent className="flex max-h-[90dvh] w-[calc(100vw-1.5rem)] max-w-md flex-col gap-0 overflow-hidden p-0 sm:max-w-md">
-        <DialogHeader className="border-b px-4 py-3 text-left">
+      <DialogContent className="flex max-h-[90dvh] w-[calc(100vw-1.5rem)] max-w-md flex-col gap-0 overflow-hidden p-0 sm:max-w-lg md:max-w-2xl landscape-short:max-h-[96dvh] landscape-short:w-[calc(100vw-2rem)] landscape-short:max-w-3xl">
+        <DialogHeader className="border-b px-4 py-3 text-left landscape-short:py-2">
           <DialogTitle className="text-base">Create a room</DialogTitle>
-          <DialogDescription className="text-xs">
+          <DialogDescription className="text-xs landscape-short:hidden">
             Set the name, audience and privacy for your new room.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
+          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 landscape-short:py-2">
       <label className="block text-[11px] font-medium text-muted-foreground" htmlFor="room-name">
         Room name
       </label>
