@@ -8,6 +8,7 @@ import {
   Hand,
   Lock,
   Mic,
+  Mic2,
   MoreHorizontal,
   Newspaper,
   Phone,
@@ -47,6 +48,7 @@ import { RoomFeed } from "./RoomFeed";
 import { RadioPlayer } from "./RadioPlayer";
 import { GamesPanel } from "./GamesPanel";
 import { TriviaBot } from "./TriviaBot";
+import { KaraokePanel } from "./KaraokePanel";
 import { RoomBanner } from "./RoomBanner";
 import { RatingControl } from "./RoomRating";
 import { YouTubeEmbed } from "./YouTubeEmbed";
