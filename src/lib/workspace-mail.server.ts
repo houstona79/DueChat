@@ -239,9 +239,9 @@ export async function checkAccess(domain: string) {
   }
   try {
     await accessToken();
-    checks.token = "ok";
+    checks["token"] = "ok";
   } catch (err) {
-    checks.token = err instanceof Error ? err.message : "failed";
+    checks["token"] = err instanceof Error ? err.message : "failed";
     return {
       ok: false,
       reason: "google_error" as MailboxReason,
@@ -252,9 +252,9 @@ export async function checkAccess(domain: string) {
   }
   try {
     await directory(`/users?domain=${encodeURIComponent(domain)}&maxResults=1`);
-    checks.directory = "ok";
+    checks["directory"] = "ok";
   } catch (err) {
-    checks.directory = err instanceof Error ? err.message : "failed";
+    checks["directory"] = err instanceof Error ? err.message : "failed";
     return {
       ok: false,
       reason: "google_error" as MailboxReason,

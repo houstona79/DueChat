@@ -152,7 +152,7 @@ export function MemberMailboxes({ isOwner = false }: { isOwner?: boolean }) {
                 name={r.profile?.display_name ?? r.address}
                 src={r.profile?.avatar_url ?? null}
                 accent={accentFor(r.profile?.username ?? r.address)}
-                size={36}
+                size="sm"
               />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold">{r.address}</p>
