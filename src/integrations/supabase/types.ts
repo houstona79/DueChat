@@ -416,6 +416,50 @@ export type Database = {
         }
         Relationships: []
       }
+      karaoke_queue: {
+        Row: {
+          artist: string | null
+          created_at: string
+          id: string
+          played_at: string | null
+          room_id: string
+          singer_name: string | null
+          title: string
+          user_id: string
+          youtube_url: string
+        }
+        Insert: {
+          artist?: string | null
+          created_at?: string
+          id?: string
+          played_at?: string | null
+          room_id: string
+          singer_name?: string | null
+          title: string
+          user_id: string
+          youtube_url: string
+        }
+        Update: {
+          artist?: string | null
+          created_at?: string
+          id?: string
+          played_at?: string | null
+          room_id?: string
+          singer_name?: string | null
+          title?: string
+          user_id?: string
+          youtube_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "karaoke_queue_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       message_logs: {
         Row: {
           archived_at: string
