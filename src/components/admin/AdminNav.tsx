@@ -7,7 +7,6 @@ import {
   Gauge,
   Hash,
   Headset,
-  Inbox,
   Mail,
   MessageSquare,
   MonitorSmartphone,
