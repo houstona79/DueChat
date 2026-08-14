@@ -1281,12 +1281,15 @@ export function ChatPane({
           </div>
         )}
 
-          {showFeed || showMedia || showGames || showTrivia || showInvite || showKaraoke ? (
+          {showFeed || showMedia || showGames || showTrivia || showInvite || showKaraoke || showMembers ? (
             <button
               type="button"
               aria-label="Close panel"
-              onClick={closeOverlayPanels}
-              className="absolute inset-0 z-10 bg-background/50 sm:hidden"
+              onClick={() => {
+                closeOverlayPanels();
+                setShowMembers(false);
+              }}
+              className="absolute inset-0 z-10 bg-background/50 md:hidden"
             />
           ) : null}
 
