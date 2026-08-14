@@ -32,6 +32,7 @@ import { NotificationAudit } from "@/components/messenger/NotificationAudit";
 import { AlertComposer } from "@/components/messenger/AlertComposer";
 import { AdminNav, TAB_META, type AdminTab } from "@/components/admin/AdminNav";
 import { MailHandles } from "@/components/admin/MailHandles";
+import { MemberMailboxes } from "@/components/admin/MemberMailboxes";
 import { SupportInbox } from "@/components/admin/SupportInbox";
 import { SupportLogs } from "@/components/admin/SupportLogs";
 import { GiveCreditsDialog } from "@/components/admin/GiveCreditsDialog";
@@ -824,6 +825,7 @@ function AdminPage() {
       )}
 
       {tab === "mail" && isOwner && <MailHandles isOwner={isOwner} />}
+      {tab === "mailboxes" && isOwner && <MemberMailboxes isOwner={isOwner} />}
 
       {tab === "reports" && <ReportQueue />}
 
