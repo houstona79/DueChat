@@ -176,6 +176,7 @@ export const ROOM_CATEGORIES = [
   "Help",
   "General",
   "Music",
+  "Karaoke",
   "Radio",
   "Gaming",
   "Tech",
