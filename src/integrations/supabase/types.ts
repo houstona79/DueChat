@@ -460,6 +460,42 @@ export type Database = {
           },
         ]
       }
+      member_mailboxes: {
+        Row: {
+          address: string
+          created_at: string
+          id: string
+          last_error: string | null
+          provider: string
+          provider_user_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          provider?: string
+          provider_user_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          provider?: string
+          provider_user_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       message_logs: {
         Row: {
           archived_at: string
