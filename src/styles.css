@@ -7,6 +7,9 @@
 /* Landscape phones: very little vertical room, so compact the chrome. */
 @custom-variant short (@media (max-height: 520px));
 
+/* Sideways phones/tablets: wide but short, so dialogs need different sizing. */
+@custom-variant landscape-short (@media (orientation: landscape) and (max-height: 640px));
+
 /*
  * Design system definition.
  *
