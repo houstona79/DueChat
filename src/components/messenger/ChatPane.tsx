@@ -587,6 +587,26 @@ export function ChatPane({
               Trivia
             </button>
           ) : null}
+          {!room.is_direct ? (
+            <button
+              onClick={() => togglePanel("karaoke")}
+              className={cn(
+                "hidden h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium lg:flex",
+                showKaraoke
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:bg-secondary",
+              )}
+              aria-label="Show karaoke queue"
+              aria-pressed={showKaraoke}
+              title="Karaoke"
+            >
+              <Mic2 className="size-4" />
+              Karaoke
+              {karaokeQueue.filter((s) => !s.played_at).length
+                ? ` (${karaokeQueue.filter((s) => !s.played_at).length})`
+                : ""}
+            </button>
+          ) : null}
           <button
             onClick={() => togglePanel("members")}
             className={cn(
@@ -758,6 +778,11 @@ export function ChatPane({
               {!room.is_direct ? (
                 <DropdownMenuItem onSelect={() => togglePanel("trivia")}>
                   <Bot className="size-4" /> Trivia bot
+                </DropdownMenuItem>
+              ) : null}
+              {!room.is_direct ? (
+                <DropdownMenuItem onSelect={() => togglePanel("karaoke")}>
+                  <Mic2 className="size-4" /> Karaoke queue
                 </DropdownMenuItem>
               ) : null}
               {!room.is_direct && joined ? (
