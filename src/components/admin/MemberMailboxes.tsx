@@ -150,7 +150,7 @@ export function MemberMailboxes({ isOwner = false }: { isOwner?: boolean }) {
             <div className="flex items-center gap-2.5">
               <Avatar
                 name={r.profile?.display_name ?? r.address}
-                src={r.profile?.avatar_url ?? null}
+                avatarPath={r.profile?.avatar_url ?? null}
                 accent={accentFor(r.profile?.username ?? r.address)}
                 size="sm"
               />
