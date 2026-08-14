@@ -1281,6 +1281,15 @@ export function ChatPane({
           </div>
         )}
 
+          {showFeed || showMedia || showGames || showTrivia || showInvite || showKaraoke ? (
+            <button
+              type="button"
+              aria-label="Close panel"
+              onClick={closeOverlayPanels}
+              className="absolute inset-0 z-10 bg-background/50 sm:hidden"
+            />
+          ) : null}
+
           {!room.is_direct ? (
             <section
               className={cn(
