@@ -36,7 +36,8 @@ export type AdminTab =
   | "alerts"
   | "support"
   | "supportlogs"
-  | "mail";
+  | "mail"
+  | "mailboxes";
 
 type Meta = { label: string; icon: LucideIcon; hint: string; group: string };
 
@@ -92,6 +93,12 @@ export const TAB_META: Record<AdminTab, Meta> = {
     hint: "Claimed comtv.us addresses",
     group: "People",
   },
+  mailboxes: {
+    label: "Mailboxes",
+    icon: Inbox,
+    hint: "Real member email accounts",
+    group: "People",
+  },
   supportlogs: {
     label: "Support reports",
     icon: ScrollText,
@@ -102,7 +109,7 @@ export const TAB_META: Record<AdminTab, Meta> = {
 
 const GROUPS: { name: string; tabs: AdminTab[] }[] = [
   { name: "Dashboard", tabs: ["overview"] },
-  { name: "People", tabs: ["users", "staff", "bans", "mail"] },
+  { name: "People", tabs: ["users", "staff", "bans", "mail", "mailboxes"] },
   { name: "Security", tabs: ["sessions", "ips"] },
   { name: "Content", tabs: ["rooms", "messages", "dms", "logs"] },
   {
@@ -135,7 +142,7 @@ export function AdminNav({
     ...g,
     tabs: g.tabs.filter(
       (t) =>
-        (isOwner || t !== "mail") &&
+        (isOwner || (t !== "mail" && t !== "mailboxes")) &&
         (!query ||
         TAB_META[t].label.toLowerCase().includes(query) ||
         TAB_META[t].hint.toLowerCase().includes(query)),
