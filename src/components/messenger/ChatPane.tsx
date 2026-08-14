@@ -1382,6 +1382,52 @@ export function ChatPane({
             </section>
           ) : null}
 
+          {!room.is_direct ? (
+            <section
+              className={cn(
+                "absolute inset-y-0 right-0 z-20 flex w-full max-w-[92%] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl transition-transform duration-200 ease-out sm:max-w-sm",
+                showKaraoke ? "translate-x-0" : "pointer-events-none translate-x-full",
+              )}
+              aria-hidden={!showKaraoke}
+              role="region"
+              aria-label="Karaoke queue"
+            >
+              <div className="flex items-center justify-between border-b border-border px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+                <h3 className="text-sm font-semibold">Karaoke</h3>
+                <button
+                  onClick={() => setShowKaraoke(false)}
+                  className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+                  aria-label="Close karaoke queue"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                <KaraokePanel
+                  roomId={room.id}
+                  meId={meId}
+                  joined={joined}
+                  canModerate={canModerate}
+                  queue={karaokeQueue}
+                  profiles={profiles}
+                  nowPlayingUrl={room.youtube_url}
+                  onStage={async (song) => {
+                    const previous = karaokeQueue.find(
+                      (s) => !s.played_at && s.youtube_url === room.youtube_url && s.id !== song.id,
+                    );
+                    if (previous) await markKaraokeSongPlayed(previous.id);
+                    await setRoomYouTube(room.id, {
+                      url: song.youtube_url,
+                      title: song.artist ? `${song.title} — ${song.artist}` : song.title,
+                    });
+                    await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+                    await queryClient.invalidateQueries({ queryKey: ["karaoke-queue", room.id] });
+                  }}
+                />
+              </div>
+            </section>
+          ) : null}
+
           {call ? (
             <CallOverlay
               title={title}
