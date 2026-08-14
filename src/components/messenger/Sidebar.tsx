@@ -176,13 +176,6 @@ export function Sidebar({
             >
               <LogOut className="size-4" />
             </button>
-            <button
-              onClick={() => setCreating((v) => !v)}
-              aria-label="Create chat room"
-              className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground"
-            >
-              <Plus className="size-4" />
-            </button>
           </div>
         </div>
 
