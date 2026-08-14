@@ -7,6 +7,7 @@ import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { ProfileFeed } from "@/components/messenger/ProfileFeed";
 import { InviteCard } from "@/components/messenger/InviteCard";
 import { BlockList } from "@/components/messenger/BlockList";
+import { MemberMailbox } from "@/components/messenger/MemberMailbox";
 import { AccessibilitySettings } from "@/components/system/AccessibilitySettings";
 import { LanguageSettings } from "@/components/system/LanguageSettings";
 import { ImageCropper } from "@/components/messenger/ImageCropper";
