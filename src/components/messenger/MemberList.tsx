@@ -156,12 +156,12 @@ export function MemberList({
       role="region"
       aria-label="Room members"
     >
-      <header className="flex items-center justify-between px-4 py-3">
+      <header className="flex items-center justify-between px-3 py-2 md:px-4 md:py-3">
         <h3 className="text-sm font-semibold">Members · {members.length}</h3>
         <button
           onClick={onClose}
           aria-label="Hide members"
-          className="grid size-10 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+          className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary md:size-10"
         >
           <X className="size-4" />
         </button>
