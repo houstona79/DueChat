@@ -56,6 +56,7 @@ import { GiftDialog } from "./GiftDialog";
 import { EditRoomDialog } from "./EditRoomDialog";
 import {
   useBlocks,
+  useKaraokeQueue,
   useMessages,
   useRoomAdmins,
   useRoomBans,
@@ -64,6 +65,7 @@ import {
   useRoomSilences,
 } from "@/hooks/use-chat";
 import { grantMic, lowerHand, raiseHand, revokeMic } from "@/lib/hands";
+import { markKaraokeSongPlayed } from "@/lib/karaoke";
 import { useOpenDirect } from "@/hooks/use-direct";
 import { blockUser, isBlocked, unblockUser } from "@/lib/blocks";
 import { takePendingCall } from "@/lib/call-invites";
@@ -172,6 +174,7 @@ export function ChatPane({
   const [showMedia, setShowMedia] = useState(false);
   const [showGames, setShowGames] = useState(false);
   const [showTrivia, setShowTrivia] = useState(false);
+  const [showKaraoke, setShowKaraoke] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
   const [statusDraft, setStatusDraft] = useState<string | null>(null);
   const [editingRoom, setEditingRoom] = useState(false);
@@ -208,13 +211,16 @@ export function ChatPane({
   const giftProfile = giftTo ? profileOf(giftTo) : undefined;
 
   /** Only one docked/slide-out panel at a time — keeps small screens readable. */
-  const togglePanel = (which: "members" | "feed" | "media" | "games" | "trivia" | "invite") => {
+  const togglePanel = (
+    which: "members" | "feed" | "media" | "games" | "trivia" | "invite" | "karaoke",
+  ) => {
     setShowMembers((v) => (which === "members" ? !v : false));
     setShowFeed((v) => (which === "feed" ? !v : false));
     setShowMedia((v) => (which === "media" ? !v : false));
     setShowGames((v) => (which === "games" ? !v : false));
     setShowTrivia((v) => (which === "trivia" ? !v : false));
     setShowInvite((v) => (which === "invite" ? !v : false));
+    setShowKaraoke((v) => (which === "karaoke" ? !v : false));
   };
 
   const closeOverlayPanels = useCallback(() => {
@@ -223,6 +229,7 @@ export function ChatPane({
     setShowGames(false);
     setShowTrivia(false);
     setShowInvite(false);
+    setShowKaraoke(false);
   }, []);
 
   /** Switching rooms should never carry a slide-out panel (e.g. trivia) with it. */
