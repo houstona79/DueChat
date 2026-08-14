@@ -2,7 +2,7 @@ import { RatingBadge } from "./RoomRating";
 import { RoomCrownMarks } from "@/components/rooms/RoomCrown";
 import { useRoomCrowns } from "@/lib/room-crowns";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, NotebookPen, Plus, Search, Settings, Shield, ShieldCheck, Users } from "lucide-react";
+import { LogOut, Mail, NotebookPen, Plus, Search, Settings, Shield, ShieldCheck, Users } from "lucide-react";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
@@ -158,6 +158,13 @@ export function Sidebar({
               className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
             >
               <NotebookPen className="size-4" />
+            </Link>
+            <Link
+              to="/mail"
+              aria-label="Mailbox"
+              className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
+            >
+              <Mail className="size-4" />
             </Link>
             <ThemeToggle />
             <LanguageSwitcher className="size-9 justify-center rounded-xl border-0 bg-transparent p-0 text-muted-foreground hover:bg-secondary" />
