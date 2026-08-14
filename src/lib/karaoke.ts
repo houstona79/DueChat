@@ -77,11 +77,11 @@ export const KARAOKE_PICKS = [
   { title: "I Will Survive", artist: "Gloria Gaynor" },
   { title: "Bohemian Rhapsody", artist: "Queen" },
   { title: "Wannabe", artist: "Spice Girls" },
-  { title: "Shallow", antml: false, artistName: "" , artist: "Lady Gaga & Bradley Cooper" },
+  { title: "Shallow", artist: "Lady Gaga & Bradley Cooper" },
   { title: "Before He Cheats", artist: "Carrie Underwood" },
   { title: "Livin' on a Prayer", artist: "Bon Jovi" },
   { title: "Someone Like You", artist: "Adele" },
-  { title: "國Africa", artist: "Toto" },
+  { title: "Africa", artist: "Toto" },
   { title: "Total Eclipse of the Heart", artist: "Bonnie Tyler" },
   { title: "Jolene", artist: "Dolly Parton" },
 ] as const;
