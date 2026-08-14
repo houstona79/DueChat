@@ -1,15 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { MAIL_DOMAIN } from "@/lib/chat";
-
-const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
-const HANDLE_RE = /^[a-z0-9]([a-z0-9._-]{1,22})[a-z0-9]$/;
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const RESERVED = new Set([
-  "admin","administrator","postmaster","abuse","support","help","root","info",
-  "noreply","no-reply","notify","mail","webmaster","security","billing","staff",
-  "duechat","owner","moderator",
-]);
+import {
+  MAILBOX_EMAIL_RE as EMAIL_RE,
+  MAILBOX_HANDLE_RE as HANDLE_RE,
+  MAILBOX_OWNER_USER_ID as OWNER_USER_ID,
+  RESERVED_MAILBOX_HANDLES as RESERVED,
+} from "@/lib/workspace-mail-rules";
 
 export type MailboxRow = {
   address: string;
