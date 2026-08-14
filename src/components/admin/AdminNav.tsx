@@ -38,7 +38,8 @@ export type AdminTab =
   | "support"
   | "supportlogs"
   | "mail"
-  | "mailboxes";
+  | "mailboxes"
+  | "zohomail";
 
 type Meta = { label: string; icon: LucideIcon; hint: string; group: string };
 
@@ -100,6 +101,12 @@ export const TAB_META: Record<AdminTab, Meta> = {
     hint: "Real member email accounts",
     group: "People",
   },
+  zohomail: {
+    label: "Zoho Mail",
+    icon: Inbox,
+    hint: "Zoho mailboxes and requests",
+    group: "People",
+  },
   supportlogs: {
     label: "Support reports",
     icon: ScrollText,
@@ -110,7 +117,7 @@ export const TAB_META: Record<AdminTab, Meta> = {
 
 const GROUPS: { name: string; tabs: AdminTab[] }[] = [
   { name: "Dashboard", tabs: ["overview"] },
-  { name: "People", tabs: ["users", "staff", "bans", "mail", "mailboxes"] },
+  { name: "People", tabs: ["users", "staff", "bans", "mail", "mailboxes", "zohomail"] },
   { name: "Security", tabs: ["sessions", "ips"] },
   { name: "Content", tabs: ["rooms", "messages", "dms", "logs"] },
   {
@@ -143,7 +150,7 @@ export function AdminNav({
     ...g,
     tabs: g.tabs.filter(
       (t) =>
-        (isOwner || (t !== "mail" && t !== "mailboxes")) &&
+        (isOwner || (t !== "mail" && t !== "mailboxes" && t !== "zohomail")) &&
         (!query ||
         TAB_META[t].label.toLowerCase().includes(query) ||
         TAB_META[t].hint.toLowerCase().includes(query)),
