@@ -152,7 +152,7 @@ export function MemberList({
 
   return (
     <section
-      className="flex h-full w-full flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] md:w-[260px] lg:w-[300px]"
+      className="absolute inset-y-0 right-0 z-20 flex h-full w-[280px] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl md:static md:w-[260px] lg:w-[300px]"
       role="region"
       aria-label="Room members"
     >
