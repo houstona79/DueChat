@@ -341,7 +341,7 @@ export function Sidebar({
                       if (openRoom(room.id, "room", room.name)) e.preventDefault();
                     }}
                     className={cn(
-                      "flex items-center gap-3 rounded-2xl px-3 py-3 transition-colors",
+                      "flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors sm:py-3",
                       room.id === activeRoomId ? "bg-accent" : "hover:bg-secondary",
                     )}
                   >
@@ -351,11 +351,11 @@ export function Sidebar({
                           src={room.icon_url}
                           alt={`${room.name} icon`}
                           loading="lazy"
-                          className="size-11 rounded-2xl object-cover"
+                          className="size-9 rounded-2xl object-cover sm:size-11"
                         />
                         {onlineCount > 0 ? (
                           <span
-                            className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-card bg-online"
+                            className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full border-2 border-card bg-online sm:size-3"
                             aria-hidden
                           />
                         ) : null}
@@ -365,6 +365,7 @@ export function Sidebar({
                         name={room.name}
                         accent={accentFor(room.id)}
                         online={onlineCount > 0}
+                        className="size-9 sm:size-11"
                       />
                     )}
                     <span className="min-w-0 flex-1">

@@ -15,12 +15,14 @@ export function Avatar({
   online,
   avatarPath,
   size = "md",
+  className,
 }: {
   name: string;
   accent: string;
   online?: boolean;
   avatarPath?: string | null;
   size?: "md" | "sm" | "lg";
+  className?: string;
 }) {
   const { data: url } = useQuery({
     queryKey: ["avatar-url", avatarPath],
@@ -33,7 +35,7 @@ export function Avatar({
     size === "lg" ? "size-16 text-lg" : size === "md" ? "size-11 text-sm" : "size-9 text-xs";
 
   return (
-    <span className="relative inline-flex shrink-0">
+    <span className={cn("relative inline-flex shrink-0", className)}>
       {url ? (
         <img
           src={url}

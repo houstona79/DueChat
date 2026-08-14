@@ -381,7 +381,7 @@ export function ChatPane({
       className="chat-wallpaper flex h-full min-h-0 flex-col bg-background"
       aria-label={`Conversation: ${title}`}
     >
-      <header className="flex shrink-0 flex-col gap-2 border-b border-border px-3 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] short:gap-1 short:py-1.5 short:pt-[max(0.375rem,env(safe-area-inset-top))] lg:flex-row lg:flex-wrap lg:items-center lg:gap-3 lg:px-4">
+      <header className="flex shrink-0 flex-col gap-1.5 border-b border-border px-2 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] short:gap-1 short:py-1.5 short:pt-[max(0.375rem,env(safe-area-inset-top))] sm:px-3 sm:py-3 sm:pt-[max(0.75rem,env(safe-area-inset-top))] lg:flex-row lg:flex-wrap lg:items-center lg:gap-3 lg:px-4">
         <div className="flex min-w-0 items-center gap-2 lg:min-w-[220px] lg:flex-1 lg:gap-3">
           {isPopout ? (
             <Link
@@ -610,7 +610,7 @@ export function ChatPane({
           <button
             onClick={() => togglePanel("members")}
             className={cn(
-              "flex h-11 shrink-0 items-center gap-1.5 rounded-xl border border-border px-3 text-xs font-medium lg:h-10 lg:px-2.5",
+              "flex h-9 shrink-0 items-center gap-1 rounded-xl border border-border px-2 text-[11px] font-medium sm:h-11 sm:gap-1.5 sm:px-3 sm:text-xs lg:h-10 lg:px-2.5",
               showMembers
                 ? "bg-primary/15 text-primary"
                 : "text-muted-foreground hover:bg-secondary",
@@ -619,7 +619,7 @@ export function ChatPane({
             aria-pressed={showMembers}
             title="Show members"
           >
-            <Users className="size-4" />
+            <Users className="size-3.5 sm:size-4" />
             {members.length}
           </button>
           {!room.is_direct && joined ? (
@@ -681,14 +681,14 @@ export function ChatPane({
           <button
             onClick={() => setTalking((v) => !v)}
             className={cn(
-              "flex h-11 shrink-0 items-center gap-1.5 rounded-xl px-3 text-xs font-semibold lg:h-10 lg:px-2.5",
+              "flex h-9 shrink-0 items-center gap-1 rounded-xl px-2 text-[11px] font-semibold sm:h-11 sm:gap-1.5 sm:px-3 sm:text-xs lg:h-10 lg:px-2.5",
               talking ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
             )}
             aria-label={talking ? "Leave room voice" : "Join room voice with push to talk"}
             aria-pressed={talking}
             title="Talk"
           >
-            <Mic className="size-4" />
+            <Mic className="size-3.5 sm:size-4" />
             Talk
           </button>
           {!room.is_direct && joined ? (
@@ -713,19 +713,19 @@ export function ChatPane({
               setShowCams((v) => !v);
             }}
             className={cn(
-              "flex h-11 shrink-0 items-center gap-1.5 rounded-xl px-3 text-xs font-semibold lg:h-10 lg:px-2.5",
+              "flex h-9 shrink-0 items-center gap-1 rounded-xl px-2 text-[11px] font-semibold sm:h-11 sm:gap-1.5 sm:px-3 sm:text-xs lg:h-10 lg:px-2.5",
               showCams ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
             )}
             aria-label="Show room cameras"
             aria-pressed={showCams}
             title="Cams"
           >
-            <Video className="size-4" />
+            <Video className="size-3.5 sm:size-4" />
             Cams
           </button>
           <button
             onClick={() => setCall("video")}
-            className="grid size-11 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary lg:size-10"
+            className="grid size-9 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary sm:size-11 lg:size-10"
             aria-label="Start video call"
           >
             <Video className="size-4" />
@@ -959,7 +959,7 @@ export function ChatPane({
           <>
             <div
               ref={scroller}
-              className="min-h-0 flex-1 overflow-y-auto px-4 py-5"
+              className="min-h-0 flex-1 overflow-y-auto px-3 py-3 sm:px-4 sm:py-5"
               role="log"
               aria-live="polite"
               aria-relevant="additions text"
@@ -1100,7 +1100,7 @@ export function ChatPane({
                       ) : (
                         <div
                           className={cn(
-                            "max-w-[78%] px-4 py-2.5 text-sm leading-relaxed",
+                            "max-w-[92%] px-3 py-2 text-sm leading-relaxed sm:max-w-[78%] sm:px-4 sm:py-2.5",
                             mine
                               ? "rounded-3xl rounded-br-md bg-bubble-me text-bubble-me-foreground"
                               : "rounded-3xl rounded-bl-md bg-bubble-them text-bubble-them-foreground",
@@ -1126,13 +1126,13 @@ export function ChatPane({
               })}
             </div>
 
-            <footer className="border-t border-border px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+            <footer className="border-t border-border px-2 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:px-3 sm:py-3 sm:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
               {error ? (
                 <p role="alert" className="px-2 pb-2 text-xs text-destructive">
                   {error}
                 </p>
               ) : null}
-              <div className="flex items-end gap-2 rounded-2xl bg-secondary p-2">
+              <div className="flex items-end gap-1.5 rounded-2xl bg-secondary p-1.5 sm:gap-2 sm:p-2">
                 <EmojiPicker
                   onSelect={(emoji) => {
                     const el = inputRef.current;
@@ -1195,15 +1195,15 @@ export function ChatPane({
                       : `Message ${room.name}`
                   }
                   aria-label="Message"
-                  className="max-h-32 min-h-11 w-full resize-none bg-transparent px-2 py-2 text-base outline-none placeholder:text-muted-foreground disabled:opacity-70 lg:min-h-9 lg:py-1.5 lg:text-sm"
+                  className="max-h-32 min-h-9 w-full resize-none bg-transparent px-1.5 py-1.5 text-sm outline-none placeholder:text-muted-foreground disabled:opacity-70 sm:min-h-11 sm:px-2 sm:py-2 sm:text-base lg:min-h-9 lg:py-1.5 lg:text-sm"
                 />
                 <button
                   onClick={() => void submit()}
                   disabled={draft.trim().length === 0 || Boolean(mySilence)}
                   aria-label="Send message"
-                  className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40 lg:size-10"
+                  className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40 sm:size-11 lg:size-10"
                 >
-                  <SendHorizonal className="size-5 lg:size-4" />
+                  <SendHorizonal className="size-4 sm:size-5 lg:size-4" />
                 </button>
               </div>
             </footer>
