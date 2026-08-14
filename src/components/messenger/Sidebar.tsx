@@ -224,6 +224,15 @@ export function Sidebar({
           </Link>
         ) : null}
 
+        {me ? (
+          <button
+            onClick={() => setCreating(true)}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2.5 text-sm font-medium text-primary-foreground short:mt-2 short:py-2"
+          >
+            <Plus className="size-4" />
+            Create a room
+          </button>
+        ) : null}
         <ThemeSkinSwatches className="mt-3 rounded-xl bg-secondary px-3 py-2 short:mt-2 short:py-1.5" />
         <WallpaperPicker className="mt-2 rounded-xl bg-secondary px-3 py-2 short:py-1.5" />
         <div className="mt-2 flex items-center gap-2 rounded-xl bg-secondary px-3 py-2 short:py-1.5">
