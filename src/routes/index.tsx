@@ -3,6 +3,7 @@ import { Headset, MessagesSquare, Radio, Video } from "lucide-react";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import peopleBg from "@/assets/landing-people-devices.jpg.asset.json";
 import { SupportWidget } from "@/components/support/SupportWidget";
+import { HomeLogin } from "@/components/auth/HomeLogin";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -58,12 +59,6 @@ function Landing() {
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
-            to="/auth"
-            className="rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground"
-          >
-            Create your account
-          </Link>
-          <Link
             to="/chat"
             className="rounded-xl border border-border bg-secondary px-5 py-2.5 text-sm font-medium"
           >
@@ -82,6 +77,7 @@ function Landing() {
             Download app
           </Link>
         </div>
+        <HomeLogin />
         <ul className="mt-12 grid gap-4 text-left sm:grid-cols-3">
           <Feature icon={<MessagesSquare className="size-4" />} title="Shared rooms">
             Create a room, invite the team, and everyone sees new messages instantly.
