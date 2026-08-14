@@ -610,7 +610,7 @@ export function ChatPane({
           <button
             onClick={() => togglePanel("members")}
             className={cn(
-              "flex h-11 shrink-0 items-center gap-1.5 rounded-xl border border-border px-3 text-xs font-medium lg:h-10 lg:px-2.5",
+              "flex h-9 shrink-0 items-center gap-1 rounded-xl border border-border px-2 text-[11px] font-medium sm:h-11 sm:gap-1.5 sm:px-3 sm:text-xs lg:h-10 lg:px-2.5",
               showMembers
                 ? "bg-primary/15 text-primary"
                 : "text-muted-foreground hover:bg-secondary",
@@ -619,7 +619,7 @@ export function ChatPane({
             aria-pressed={showMembers}
             title="Show members"
           >
-            <Users className="size-4" />
+            <Users className="size-3.5 sm:size-4" />
             {members.length}
           </button>
           {!room.is_direct && joined ? (
@@ -681,14 +681,14 @@ export function ChatPane({
           <button
             onClick={() => setTalking((v) => !v)}
             className={cn(
-              "flex h-11 shrink-0 items-center gap-1.5 rounded-xl px-3 text-xs font-semibold lg:h-10 lg:px-2.5",
+              "flex h-9 shrink-0 items-center gap-1 rounded-xl px-2 text-[11px] font-semibold sm:h-11 sm:gap-1.5 sm:px-3 sm:text-xs lg:h-10 lg:px-2.5",
               talking ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
             )}
             aria-label={talking ? "Leave room voice" : "Join room voice with push to talk"}
             aria-pressed={talking}
             title="Talk"
           >
-            <Mic className="size-4" />
+            <Mic className="size-3.5 sm:size-4" />
             Talk
           </button>
           {!room.is_direct && joined ? (
@@ -713,19 +713,19 @@ export function ChatPane({
               setShowCams((v) => !v);
             }}
             className={cn(
-              "flex h-11 shrink-0 items-center gap-1.5 rounded-xl px-3 text-xs font-semibold lg:h-10 lg:px-2.5",
+              "flex h-9 shrink-0 items-center gap-1 rounded-xl px-2 text-[11px] font-semibold sm:h-11 sm:gap-1.5 sm:px-3 sm:text-xs lg:h-10 lg:px-2.5",
               showCams ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
             )}
             aria-label="Show room cameras"
             aria-pressed={showCams}
             title="Cams"
           >
-            <Video className="size-4" />
+            <Video className="size-3.5 sm:size-4" />
             Cams
           </button>
           <button
             onClick={() => setCall("video")}
-            className="grid size-11 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary lg:size-10"
+            className="grid size-9 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary sm:size-11 lg:size-10"
             aria-label="Start video call"
           >
             <Video className="size-4" />
