@@ -7,8 +7,6 @@ import { ProfilePhotos } from "@/components/messenger/ProfilePhotos";
 import { ProfileFeed } from "@/components/messenger/ProfileFeed";
 import { InviteCard } from "@/components/messenger/InviteCard";
 import { BlockList } from "@/components/messenger/BlockList";
-import { MemberMailbox } from "@/components/messenger/MemberMailbox";
-import { ZohoMailbox } from "@/components/messenger/ZohoMailbox";
 import { AccessibilitySettings } from "@/components/system/AccessibilitySettings";
 import { LanguageSettings } from "@/components/system/LanguageSettings";
 import { ImageCropper } from "@/components/messenger/ImageCropper";
@@ -417,10 +415,6 @@ function SettingsPage() {
           </div>
           {forwardNote ? <p className="mt-2 text-[11px] text-primary">{forwardNote}</p> : null}
         </div>
-
-        <MemberMailbox defaultHandle={me.mail_handle ?? me.username ?? null} />
-
-        <ZohoMailbox defaultHandle={me.mail_handle ?? me.username ?? null} />
 
         <div>
           <span className="block text-[11px] font-medium text-muted-foreground">Date of birth</span>

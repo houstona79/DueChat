@@ -460,6 +460,42 @@ export type Database = {
           },
         ]
       }
+      mail_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          read_at: string | null
+          recipient_deleted: boolean
+          recipient_id: string
+          sender_deleted: boolean
+          sender_id: string
+          subject: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          recipient_deleted?: boolean
+          recipient_id: string
+          sender_deleted?: boolean
+          sender_id: string
+          subject?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          recipient_deleted?: boolean
+          recipient_id?: string
+          sender_deleted?: boolean
+          sender_id?: string
+          subject?: string
+        }
+        Relationships: []
+      }
       member_mailboxes: {
         Row: {
           address: string
