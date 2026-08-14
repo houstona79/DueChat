@@ -15,6 +15,7 @@ import {
 } from "@/lib/chat";
 import { fetchBlocks } from "@/lib/blocks";
 import { fetchRoomHands } from "@/lib/hands";
+import { fetchKaraokeQueue } from "@/lib/karaoke";
 import { claimDailyCredits, fetchGiftItems } from "@/lib/credits";
 import { fetchMyRoomInvites, fetchSentRoomInvites } from "@/lib/room-invites";
 
@@ -106,6 +107,15 @@ export function useRoomHands(roomId: string, enabled: boolean) {
   });
 }
 
+/** The karaoke song queue for a room. */
+export function useKaraokeQueue(roomId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["karaoke-queue", roomId],
+    queryFn: () => fetchKaraokeQueue(roomId),
+    enabled,
+  });
+}
+
 /** My credit balance, topped up with today's free allowance on first read. */
 export function useCredits(userId: string | undefined) {
   return useQuery({
@@ -192,6 +202,17 @@ export function useChatRealtime() {
           (payload.old as { room_id?: string } | null)?.room_id;
         if (roomId) void queryClient.invalidateQueries({ queryKey: ["room-hands", roomId] });
       })
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "karaoke_queue" },
+        (payload) => {
+          const roomId =
+            (payload.new as { room_id?: string } | null)?.room_id ??
+            (payload.old as { room_id?: string } | null)?.room_id;
+          if (roomId)
+            void queryClient.invalidateQueries({ queryKey: ["karaoke-queue", roomId] });
+        },
+      )
       .subscribe();
 
     return () => {
