@@ -30,7 +30,7 @@ async function fetchZohoMailboxes(): Promise<Row[]> {
   const { data: profiles } = await supabase
     .from("profiles")
     .select("id, username, display_name, avatar_url")
-    .in("user_id" in rows[0] ? "id" : "id", rows.map((r) => r.user_id));
+    .in("id", rows.map((r) => r.user_id));
   const byId = new Map(
     ((profiles ?? []) as Array<{
       id: string;
