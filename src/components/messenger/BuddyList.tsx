@@ -96,44 +96,44 @@ export function BuddyList({
   };
 
   return (
-    <section className="mb-2">
-      <div className="flex items-center gap-1 px-3 pb-1 pt-2">
+    <section className="mb-2 w-full max-w-[280px]">
+      <div className="flex items-center gap-1 px-2 pb-0.5 pt-1.5">
         <button
           onClick={() => setCollapsed((v) => !v)}
-          className="flex min-w-0 flex-1 items-center gap-1 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground hover:text-foreground"
+          className="flex min-w-0 flex-1 items-center gap-0.5 text-left text-[10px] font-semibold uppercase tracking-wide text-muted-foreground hover:text-foreground"
           aria-expanded={!collapsed}
         >
           {collapsed ? (
-            <ChevronRight className="size-3.5" aria-hidden />
+            <ChevronRight className="size-3" aria-hidden />
           ) : (
-            <ChevronDown className="size-3.5" aria-hidden />
+            <ChevronDown className="size-3" aria-hidden />
           )}
           Buddies · {onlineCount}/{buddyProfiles.length}
         </button>
         <button
           onClick={() => setAdding((v) => !v)}
           aria-label={adding ? "Close buddy search" : "Add a buddy"}
-          className="grid size-7 place-items-center rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground"
+          className="grid size-6 place-items-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
         >
-          {adding ? <X className="size-3.5" /> : <UserPlus className="size-3.5" />}
+          {adding ? <X className="size-3" /> : <UserPlus className="size-3" />}
         </button>
       </div>
 
       {adding ? (
-        <div className="mx-2 mb-2 rounded-2xl border border-border bg-card p-2">
+        <div className="mx-2 mb-1.5 rounded-lg border border-border bg-card p-1.5">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Find people by name"
             aria-label="Find people to add"
-            className="w-full rounded-xl bg-secondary px-3 py-2 text-sm outline-none placeholder:text-muted-foreground"
+            className="w-full rounded-md bg-secondary px-2 py-1 text-xs outline-none placeholder:text-muted-foreground"
           />
           <ul className="mt-1">
             {candidates.map((p) => (
               <li key={p.id}>
                 <button
                   onClick={() => void add(p.id, p.display_name)}
-                  className="flex w-full items-center gap-2 rounded-xl px-2 py-1.5 text-left hover:bg-secondary"
+                  className="flex w-full items-center gap-1.5 rounded-md px-1.5 py-1 text-left hover:bg-secondary"
                 >
                   <Avatar
                     name={p.display_name}
@@ -141,31 +141,32 @@ export function BuddyList({
                     avatarPath={p.avatar_url}
                     online={isOnline(p)}
                     size="sm"
+                    className="[&>img]:size-5 [&>img]:rounded-md [&>span]:size-5 [&>span]:rounded-md [&>span]:text-[9px]"
                   />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm">{p.display_name}</span>
-                    <span className="block truncate text-xs text-muted-foreground">
+                    <span className="block truncate text-xs leading-tight">{p.display_name}</span>
+                    <span className="block truncate text-[10px] leading-tight text-muted-foreground">
                       @{p.username}
                     </span>
                   </span>
-                  <UserPlus className="size-4 shrink-0 text-primary" aria-hidden />
+                  <UserPlus className="size-3.5 shrink-0 text-primary" aria-hidden />
                 </button>
               </li>
             ))}
             {candidates.length === 0 ? (
-              <li className="px-2 py-2 text-xs text-muted-foreground">No people to add.</li>
+              <li className="px-2 py-1.5 text-[11px] text-muted-foreground">No people to add.</li>
             ) : null}
           </ul>
         </div>
       ) : null}
 
       {!collapsed ? (
-        <ul className="space-y-0.5">
+        <ul>
           {groups.flatMap((g) => [
             g.people.length > 0 ? (
               <li
                 key={g.key}
-                className="px-3 pb-0.5 pt-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground"
+                className="px-2 pb-px pt-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground"
               >
                 {g.label} · {g.people.length}
               </li>
@@ -174,12 +175,12 @@ export function BuddyList({
               const role = siteRoleOf(roles, p.id);
               const online = isOnline(p);
               return (
-                <li key={p.id} className="group flex items-center gap-1 pr-2">
+                <li key={p.id} className="group flex items-center gap-0.5 pr-1.5">
                   <button
                     onClick={() => void openDirect(p.id)}
                     disabled={dmPending === p.id}
                     aria-label={`Message ${p.display_name}`}
-                    className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl px-3 py-2 text-left hover:bg-secondary disabled:opacity-60"
+                    className="flex min-w-0 flex-1 items-center gap-1.5 rounded-md px-2 py-[3px] text-left hover:bg-secondary disabled:opacity-60"
                   >
                     <Avatar
                       name={p.display_name}
@@ -187,12 +188,13 @@ export function BuddyList({
                       avatarPath={p.avatar_url}
                       online={online}
                       size="sm"
+                      className="[&>img]:size-[18px] [&>img]:rounded-[4px] [&>span]:size-[18px] [&>span]:rounded-[4px] [&>span]:text-[9px] [&>span:last-child]:size-2 [&>span:last-child]:border"
                     />
                     <span className="min-w-0 flex-1">
-                      <span className="flex min-w-0 items-center gap-1.5">
+                      <span className="flex min-w-0 items-center gap-1">
                         {countryFlag(p.country) ? (
                           <span
-                            className="shrink-0 text-sm leading-none"
+                            className="shrink-0 text-[11px] leading-none"
                             role="img"
                             aria-label={`Flag of ${p.country}`}
                             title={p.country ?? undefined}
@@ -202,7 +204,7 @@ export function BuddyList({
                         ) : null}
                         <span
                           className={cn(
-                            "truncate text-sm font-medium",
+                            "truncate text-[12px] font-medium leading-tight",
                             online ? siteRoleTextClass(role) : "text-muted-foreground",
                           )}
                           style={online ? nameColorStyle(role, p.name_color) : undefined}
@@ -211,7 +213,7 @@ export function BuddyList({
                         </span>
                         {decorationGlyph(p.decoration) ? (
                           <span
-                            className="shrink-0 text-sm leading-none"
+                            className="shrink-0 text-[11px] leading-none"
                             role="img"
                             aria-label={decorationLabel(p.decoration) ?? undefined}
                             title={decorationLabel(p.decoration) ?? undefined}
@@ -222,7 +224,7 @@ export function BuddyList({
                         {siteRoleLabel(role) ? (
                           <span
                             className={cn(
-                              "shrink-0 rounded-full px-1.5 py-px text-[11px] font-semibold uppercase tracking-wide",
+                              "shrink-0 rounded-full px-1 text-[9px] font-semibold uppercase tracking-wide",
                               siteRoleBadgeClass(role),
                             )}
                           >
@@ -230,31 +232,36 @@ export function BuddyList({
                           </span>
                         ) : null}
                       </span>
-                      <span className="block truncate text-xs text-muted-foreground">
-                        {dmPending === p.id
-                          ? "Opening chat…"
-                          : online
-                            ? p.status_message || "Online"
-                            : "Offline"}
-                      </span>
+                      {dmPending === p.id ? (
+                        <span className="block truncate text-[10px] leading-tight text-muted-foreground">
+                          Opening chat…
+                        </span>
+                      ) : p.status_message ? (
+                        <span className="block truncate text-[10px] leading-tight text-muted-foreground">
+                          {p.status_message}
+                        </span>
+                      ) : null}
                     </span>
-                    <MessageCircle className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                    <MessageCircle
+                      className="size-3.5 shrink-0 text-muted-foreground opacity-0 group-hover:opacity-100"
+                      aria-hidden
+                    />
                   </button>
                   {lockedFor(p) ? (
                     <span
-                      className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground/60"
+                      className="grid size-6 shrink-0 place-items-center rounded-md text-muted-foreground/60"
                       title="Staff buddy link — stays while the role is held"
                       aria-label={`${p.display_name} is a locked staff buddy`}
                     >
-                      <Lock className="size-4" aria-hidden />
+                      <Lock className="size-3" aria-hidden />
                     </span>
                   ) : (
                     <button
                       onClick={() => void remove(p.id, p.display_name)}
                       aria-label={`Remove ${p.display_name} from buddies`}
-                      className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-secondary hover:text-destructive"
+                      className="grid size-6 shrink-0 place-items-center rounded-md text-muted-foreground opacity-0 hover:bg-secondary hover:text-destructive group-hover:opacity-100"
                     >
-                      <UserMinus className="size-4" />
+                      <UserMinus className="size-3" />
                     </button>
                   )}
                 </li>
@@ -262,7 +269,7 @@ export function BuddyList({
             }),
           ])}
           {buddyProfiles.length === 0 ? (
-            <li className="px-3 py-2 text-xs text-muted-foreground">
+            <li className="px-2 py-1.5 text-[11px] text-muted-foreground">
               No buddies yet — tap the add icon to build your list.
             </li>
           ) : null}
