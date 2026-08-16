@@ -4,10 +4,19 @@ export type Theme = "light" | "dark";
 const KEY = "duechat.theme";
 const SKIN_KEY = "duechat.skin";
 
-export type SkinId = "msn" | "midnight" | "ocean" | "plum" | "ember" | "forest" | "slate";
+export type SkinId =
+  | "msn"
+  | "yahoo"
+  | "midnight"
+  | "ocean"
+  | "plum"
+  | "ember"
+  | "forest"
+  | "slate";
 
 export const SKINS: { id: SkinId; label: string; swatch: string }[] = [
   { id: "msn", label: "MSN", swatch: "linear-gradient(180deg,#eaf4ff,#3c8ee0)" },
+  { id: "yahoo", label: "Yahoo!", swatch: "linear-gradient(180deg,#efe3ff,#6b2fa0)" },
   { id: "midnight", label: "Midnight", swatch: "oklch(0.649 0.176 262)" },
   { id: "ocean", label: "Ocean", swatch: "oklch(0.72 0.13 195)" },
   { id: "plum", label: "Plum", swatch: "oklch(0.68 0.17 320)" },
