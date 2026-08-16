@@ -1099,6 +1099,7 @@ export function ChatPane({
                         <MessageVideo video={videoEmbedOf(m.body)!} />
                       ) : (
                         <div
+                          data-chat-bubble={mine ? "me" : "them"}
                           className={cn(
                             "max-w-[92%] px-3 py-2 text-sm leading-relaxed sm:max-w-[78%] sm:px-4 sm:py-2.5",
                             mine
