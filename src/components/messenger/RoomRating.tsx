@@ -2,19 +2,24 @@ import { useState } from "react";
 import { Baby, Check, Wine } from "lucide-react";
 import { ROOM_RATING_LABEL, type RoomRating as Rating } from "@/lib/chat";
 import { cn } from "@/lib/utils";
+import ratingGAsset from "@/assets/rating-g.png.asset.json";
+import ratingRAsset from "@/assets/rating-r.png.asset.json";
+
+const RATING_ASSET: Record<Rating, { url: string; label: string }> = {
+  G: { url: ratingGAsset.url, label: "G rating — all ages" },
+  R: { url: ratingRAsset.url, label: "R rating — adults only" },
+};
 
 export function RatingBadge({ rating, className }: { rating: Rating; className?: string }) {
+  const asset = RATING_ASSET[rating];
   return (
-    <span
+    <img
+      src={asset.url}
+      alt={asset.label}
       title={ROOM_RATING_LABEL[rating]}
-      className={cn(
-        "inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide",
-        rating === "R" ? "bg-destructive/15 text-destructive" : "bg-primary/15 text-primary",
-        className,
-      )}
-    >
-      {rating}
-    </span>
+      loading="lazy"
+      className={cn("inline-block size-5 shrink-0 object-contain align-text-bottom", className)}
+    />
   );
 }
 
