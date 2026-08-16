@@ -63,12 +63,12 @@ export function GifPicker({
           aria-label={copy.label}
           className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-background/60 hover:text-foreground"
         >
-          {media === "stickers" ? <YahooStickerIcon className="size-5" /> : <YahooGifIcon className="size-5" />}
+          {media === "stickers" ? <YahooStickerIcon className="size-6" /> : <YahooGifIcon className="size-6" />}
         </button>
       </PopoverTrigger>
       <PopoverContent align="start" side="top" className="w-[min(22rem,calc(100vw-2rem))] p-3">
         <div className="mb-2 flex items-center gap-2 rounded-xl bg-secondary px-2.5 py-1.5">
-          <YahooSearchIcon className="size-4 shrink-0" />
+          <YahooSearchIcon className="size-5 shrink-0" />
           <input
             value={term}
             onChange={(e) => setTerm(e.target.value)}

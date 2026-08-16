@@ -118,7 +118,7 @@ export function KaraokePanel({
                       aria-label={`Put ${song.title} on stage`}
                       title="Put on stage"
                     >
-                      <Play className="size-4" />
+                      <Play className="size-6" />
                     </button>
                   ) : null}
                   {canModerate ? (
@@ -131,7 +131,7 @@ export function KaraokePanel({
                       aria-label={`Mark ${song.title} as sung`}
                       title="Mark as sung"
                     >
-                      <Mic2 className="size-4" />
+                      <Mic2 className="size-6" />
                     </button>
                   ) : null}
                   {mine || canModerate ? (
@@ -144,7 +144,7 @@ export function KaraokePanel({
                       aria-label={`Remove ${song.title}`}
                       title="Remove"
                     >
-                      <Trash2 className="size-4" />
+                      <Trash2 className="size-6" />
                     </button>
                   ) : null}
                 </li>
@@ -207,7 +207,7 @@ export function KaraokePanel({
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 rounded-xl bg-secondary px-3 py-2 text-xs font-medium text-muted-foreground"
               >
-                <YahooSearchIcon className="size-3.5" /> Find on YouTube
+                <YahooSearchIcon className="size-6" /> Find on YouTube
               </a>
             </div>
             {error ? <p className="text-[11px] text-destructive">{error}</p> : null}
@@ -270,7 +270,7 @@ export function KaraokePanel({
                     aria-label={`Queue ${song.title} again`}
                     title="Sing again"
                   >
-                    <Undo2 className="size-4" />
+                    <Undo2 className="size-6" />
                   </button>
                 ) : null}
               </li>

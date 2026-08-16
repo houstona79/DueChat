@@ -119,7 +119,7 @@ export function ProfilePhotos({
                 aria-label="Delete photo"
                 className="absolute right-1 top-1 grid size-8 place-items-center rounded-xl bg-background/80 text-muted-foreground backdrop-blur hover:text-destructive"
               >
-                <Trash2 className="size-3.5" />
+                <Trash2 className="size-6" />
               </button>
             ) : null}
           </div>
@@ -133,7 +133,7 @@ export function ProfilePhotos({
             className="grid aspect-square place-items-center rounded-2xl border border-dashed border-border text-muted-foreground hover:bg-secondary disabled:opacity-60"
           >
             <span className="flex flex-col items-center gap-1 text-[11px]">
-              <YahooAttachIcon className="size-5" />
+              <YahooAttachIcon className="size-6" />
               {upload.isPending ? "Uploading…" : "Add photo"}
             </span>
           </button>
@@ -193,7 +193,7 @@ export function ProfilePhotos({
             aria-label="Close photo"
             className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] grid size-10 place-items-center rounded-xl bg-card text-muted-foreground"
           >
-            <X className="size-4" />
+            <X className="size-6" />
           </button>
         </div>
       ) : null}
