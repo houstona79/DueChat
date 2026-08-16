@@ -1306,6 +1306,41 @@ export type Database = {
           },
         ]
       }
+      room_wallpapers: {
+        Row: {
+          created_at: string
+          id: string
+          room_id: string
+          updated_at: string
+          user_id: string
+          wallpaper_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          room_id: string
+          updated_at?: string
+          user_id: string
+          wallpaper_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          room_id?: string
+          updated_at?: string
+          user_id?: string
+          wallpaper_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_wallpapers_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rooms: {
         Row: {
           banner_url: string | null
