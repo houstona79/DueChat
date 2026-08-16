@@ -366,21 +366,22 @@ html[data-wallpaper]:not([data-wallpaper="none"]) .chat-glass {
   background-color: color-mix(in oklab, var(--color-sidebar) var(--contrast-veil), transparent);
 }
 
-/* Solidify incoming bubbles and lift text contrast over busy/photo backgrounds. */
-html[data-wallpaper]:not([data-wallpaper="none"]) {
-  --bubble-them: color-mix(in oklab, var(--bubble-them) 94%, var(--color-background));
-  --muted-foreground: color-mix(in oklab, var(--muted-foreground) 72%, var(--foreground));
+/* Solidify incoming bubbles and lift text contrast over busy/photo backgrounds.
+   Scoped to the chat surface so the base tokens on :root stay intact. */
+html[data-wallpaper]:not([data-wallpaper="none"]) .chat-wallpaper {
+  --color-bubble-them: color-mix(in oklab, var(--bubble-them) 94%, var(--card));
+  --color-muted-foreground: color-mix(in oklab, var(--muted-foreground) 72%, var(--foreground));
 }
 
-html:not(.dark)[data-wallpaper-tone="dark"],
-html.dark[data-wallpaper-tone="light"] {
-  --bubble-them: var(--color-card);
-  --bubble-them-foreground: var(--foreground);
-  --muted-foreground: color-mix(in oklab, var(--muted-foreground) 45%, var(--foreground));
+html:not(.dark)[data-wallpaper-tone="dark"] .chat-wallpaper,
+html.dark[data-wallpaper-tone="light"] .chat-wallpaper {
+  --color-bubble-them: var(--card);
+  --color-bubble-them-foreground: var(--foreground);
+  --color-muted-foreground: color-mix(in oklab, var(--muted-foreground) 45%, var(--foreground));
 }
 
 /* A soft outline separates bubbles from the wallpaper behind them. */
-html[data-wallpaper]:not([data-wallpaper="none"]) [data-chat-bubble] {
+html[data-wallpaper]:not([data-wallpaper="none"]) [data-chat-bubble]:not(.bg-transparent) {
   box-shadow: 0 1px 2px color-mix(in oklab, black 22%, transparent);
 }
 
