@@ -61,7 +61,7 @@ export function AppIcon({
       width={128}
       height={128}
       draggable={false}
-      className={cn("size-6 shrink-0 select-none object-contain", className)}
+      className={cn("size-6 sm:size-[34px] shrink-0 select-none object-contain", className)}
     />
   );
 }
