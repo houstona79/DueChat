@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { ChevronDown, Droplets, LocateFixed, MapPin, Search, Waves } from "lucide-react";
+import { ChevronDown, Droplets, LocateFixed, MapPin, Waves } from "lucide-react";
+import { YahooSearchIcon } from "@/components/icons/YahooIcons";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -137,7 +138,7 @@ export function WaterUpdates() {
           {picking ? (
             <div className="space-y-2">
               <div className="flex items-center gap-2 rounded-xl bg-background px-2.5 py-2">
-                <Search className="size-4 text-muted-foreground" aria-hidden />
+                <YahooSearchIcon className="size-4" />
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}

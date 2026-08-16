@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Mic2, Play, Search, Trash2, Undo2 } from "lucide-react";
+import { Mic2, Play, Trash2, Undo2 } from "lucide-react";
+import { YahooSearchIcon } from "@/components/icons/YahooIcons";
 import { cn } from "@/lib/utils";
 import type { Profile } from "@/lib/chat";
 import { youtubeEmbedUrl } from "@/lib/chat";
@@ -206,7 +207,7 @@ export function KaraokePanel({
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 rounded-xl bg-secondary px-3 py-2 text-xs font-medium text-muted-foreground"
               >
-                <Search className="size-3.5" /> Find on YouTube
+                <YahooSearchIcon className="size-3.5" /> Find on YouTube
               </a>
             </div>
             {error ? <p className="text-[11px] text-destructive">{error}</p> : null}
