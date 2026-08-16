@@ -349,6 +349,138 @@ html[data-wallpaper]:not([data-wallpaper="none"]) .chat-glass {
   display: none;
 }
 
+/* ---- MSN Messenger skin ----
+ * Classic Windows-era Messenger look: silver/blue glossy chrome, square
+ * corners, Tahoma type, white conversation area with blue name headers.
+ */
+html[data-skin="msn"] {
+  --radius: 0.25rem;
+  --font-display: Tahoma, "Segoe UI", Verdana, ui-sans-serif, sans-serif;
+  --font-body: Tahoma, "Segoe UI", Verdana, ui-sans-serif, sans-serif;
+  --background: oklch(0.985 0.006 240);
+  --foreground: oklch(0.25 0.02 250);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.25 0.02 250);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.25 0.02 250);
+  --primary: oklch(0.52 0.14 250);
+  --primary-foreground: oklch(0.99 0.005 250);
+  --secondary: oklch(0.94 0.018 240);
+  --secondary-foreground: oklch(0.3 0.03 250);
+  --muted: oklch(0.945 0.014 240);
+  --muted-foreground: oklch(0.52 0.03 250);
+  --accent: oklch(0.88 0.045 240);
+  --accent-foreground: oklch(0.26 0.04 250);
+  --border: oklch(0.855 0.025 240);
+  --input: oklch(0.855 0.025 240);
+  --ring: oklch(0.55 0.15 250);
+  --surface: oklch(0.965 0.012 240);
+  --sidebar: oklch(0.955 0.02 240);
+  --sidebar-foreground: oklch(0.25 0.025 250);
+  --sidebar-primary: oklch(0.52 0.14 250);
+  --sidebar-primary-foreground: oklch(0.99 0.005 250);
+  --sidebar-accent: oklch(0.87 0.05 240);
+  --sidebar-accent-foreground: oklch(0.25 0.04 250);
+  --sidebar-border: oklch(0.85 0.03 240);
+  --sidebar-ring: oklch(0.55 0.15 250);
+  --bubble-me: oklch(0.97 0.012 240);
+  --bubble-me-foreground: oklch(0.34 0.14 250);
+  --bubble-them: oklch(1 0 0);
+  --bubble-them-foreground: oklch(0.3 0.03 250);
+  --online: oklch(0.62 0.17 145);
+  --accent-1: oklch(0.48 0.15 250);
+  --accent-2: oklch(0.5 0.13 200);
+  --accent-3: oklch(0.52 0.14 145);
+  --accent-4: oklch(0.52 0.15 300);
+  --shadow-panel: 0 2px 10px -2px oklch(0.35 0.05 250 / 0.35);
+}
+
+html.dark[data-skin="msn"] {
+  --background: oklch(0.24 0.025 250);
+  --foreground: oklch(0.94 0.01 240);
+  --card: oklch(0.29 0.03 250);
+  --card-foreground: oklch(0.94 0.01 240);
+  --popover: oklch(0.29 0.03 250);
+  --popover-foreground: oklch(0.94 0.01 240);
+  --primary: oklch(0.7 0.14 245);
+  --primary-foreground: oklch(0.18 0.03 250);
+  --secondary: oklch(0.33 0.03 250);
+  --secondary-foreground: oklch(0.94 0.01 240);
+  --muted: oklch(0.32 0.03 250);
+  --muted-foreground: oklch(0.72 0.02 240);
+  --accent: oklch(0.37 0.05 250);
+  --accent-foreground: oklch(0.95 0.01 240);
+  --border: oklch(0.38 0.035 250);
+  --input: oklch(0.38 0.035 250);
+  --surface: oklch(0.27 0.028 250);
+  --sidebar: oklch(0.27 0.03 250);
+  --sidebar-accent: oklch(0.37 0.05 250);
+  --sidebar-border: oklch(0.38 0.035 250);
+  --bubble-me: oklch(0.31 0.035 250);
+  --bubble-me-foreground: oklch(0.85 0.1 245);
+  --bubble-them: oklch(0.3 0.03 250);
+  --bubble-them-foreground: oklch(0.93 0.012 240);
+  --online: oklch(0.75 0.18 145);
+  --accent-1: oklch(0.72 0.14 245);
+  --accent-2: oklch(0.74 0.12 200);
+  --accent-3: oklch(0.75 0.14 145);
+  --accent-4: oklch(0.74 0.14 300);
+}
+
+/* Glossy Messenger chrome: gradient sidebar + beveled panel edges. */
+html[data-skin="msn"] .chat-glass {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-primary) 16%, white) 0%,
+    var(--color-sidebar) 22%,
+    var(--color-sidebar) 100%
+  );
+}
+
+html.dark[data-skin="msn"] .chat-glass {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-primary) 28%, black) 0%,
+    var(--color-sidebar) 22%,
+    var(--color-sidebar) 100%
+  );
+}
+
+html[data-skin="msn"] h1,
+html[data-skin="msn"] h2,
+html[data-skin="msn"] h3 {
+  letter-spacing: 0;
+}
+
+/* Glossy blue title bar across the top of the contact list. */
+html[data-skin="msn"] .app-titlebar {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-primary) 62%, white) 0%,
+    var(--color-primary) 46%,
+    color-mix(in oklab, var(--color-primary) 86%, black) 100%
+  );
+  border-bottom: 1px solid color-mix(in oklab, var(--color-primary) 80%, black);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 55%, transparent);
+  color: var(--color-primary-foreground);
+}
+
+html[data-skin="msn"] .app-titlebar a,
+html[data-skin="msn"] .app-titlebar button,
+html[data-skin="msn"] .app-titlebar .text-muted-foreground {
+  color: var(--color-primary-foreground);
+}
+
+html[data-skin="msn"] .app-titlebar a:hover,
+html[data-skin="msn"] .app-titlebar button:hover {
+  background-color: color-mix(in oklab, white 24%, transparent);
+}
+
+/* MSN never had pill-shaped anything — flatten the roundest utilities. */
+html[data-skin="msn"] .rounded-full:not(img):not(.size-3):not(.size-2\.5) {
+  border-radius: 0.25rem;
+}
+
 /* ---- Messenger colour themes (Settings > Appearance) ----
  * Each skin re-tints the accent family only; light/dark surfaces stay intact.
  */

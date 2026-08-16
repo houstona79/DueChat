@@ -118,7 +118,7 @@ export function Sidebar({
   return (
     <div className="chat-glass flex h-full min-h-0 flex-col bg-sidebar">
       <header className="shrink-0 px-4 pb-3 pt-[max(1.25rem,env(safe-area-inset-top))] short:pb-1.5 short:pt-[max(0.5rem,env(safe-area-inset-top))] sm:px-5">
-        <div className="flex items-center justify-between gap-2">
+        <div className="app-titlebar -mx-4 -mt-[max(1.25rem,env(safe-area-inset-top))] mb-1 flex items-center justify-between gap-2 px-3 pb-2 pt-[max(1.25rem,env(safe-area-inset-top))] sm:-mx-5 sm:px-4">
           <a href="https://www.duechat.com" aria-label="Go to DueChat" className="inline-block">
             <img
               src={duechatLogo.url}
