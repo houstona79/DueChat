@@ -481,6 +481,138 @@ html[data-skin="msn"] .rounded-full:not(img):not(.size-3):not(.size-2\.5) {
   border-radius: 0.25rem;
 }
 
+/* ---- Yahoo! Messenger skin ----
+ * Early-2000s Yahoo look: violet/purple chrome, Verdana type, cream-white
+ * conversation area, squared corners, yellow-gold highlight accents.
+ */
+html[data-skin="yahoo"] {
+  --radius: 0.25rem;
+  --font-display: Verdana, Tahoma, "Segoe UI", ui-sans-serif, sans-serif;
+  --font-body: Verdana, Tahoma, "Segoe UI", ui-sans-serif, sans-serif;
+  --background: oklch(0.985 0.008 300);
+  --foreground: oklch(0.24 0.03 300);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.24 0.03 300);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.24 0.03 300);
+  --primary: oklch(0.44 0.19 300);
+  --primary-foreground: oklch(0.99 0.005 300);
+  --secondary: oklch(0.94 0.025 300);
+  --secondary-foreground: oklch(0.3 0.05 300);
+  --muted: oklch(0.945 0.018 300);
+  --muted-foreground: oklch(0.5 0.04 300);
+  --accent: oklch(0.9 0.05 300);
+  --accent-foreground: oklch(0.26 0.06 300);
+  --border: oklch(0.85 0.03 300);
+  --input: oklch(0.85 0.03 300);
+  --ring: oklch(0.5 0.2 300);
+  --surface: oklch(0.965 0.015 300);
+  --sidebar: oklch(0.955 0.025 300);
+  --sidebar-foreground: oklch(0.24 0.035 300);
+  --sidebar-primary: oklch(0.44 0.19 300);
+  --sidebar-primary-foreground: oklch(0.99 0.005 300);
+  --sidebar-accent: oklch(0.88 0.06 300);
+  --sidebar-accent-foreground: oklch(0.25 0.06 300);
+  --sidebar-border: oklch(0.85 0.035 300);
+  --sidebar-ring: oklch(0.5 0.2 300);
+  --bubble-me: oklch(0.97 0.018 300);
+  --bubble-me-foreground: oklch(0.36 0.17 300);
+  --bubble-them: oklch(1 0 0);
+  --bubble-them-foreground: oklch(0.3 0.04 300);
+  --online: oklch(0.62 0.17 145);
+  --accent-1: oklch(0.45 0.19 300);
+  --accent-2: oklch(0.62 0.16 60);
+  --accent-3: oklch(0.5 0.15 260);
+  --accent-4: oklch(0.52 0.18 340);
+  --shadow-panel: 0 2px 10px -2px oklch(0.3 0.08 300 / 0.35);
+}
+
+html.dark[data-skin="yahoo"] {
+  --background: oklch(0.22 0.035 300);
+  --foreground: oklch(0.94 0.012 300);
+  --card: oklch(0.27 0.04 300);
+  --card-foreground: oklch(0.94 0.012 300);
+  --popover: oklch(0.27 0.04 300);
+  --popover-foreground: oklch(0.94 0.012 300);
+  --primary: oklch(0.7 0.16 300);
+  --primary-foreground: oklch(0.17 0.04 300);
+  --secondary: oklch(0.32 0.04 300);
+  --secondary-foreground: oklch(0.94 0.012 300);
+  --muted: oklch(0.31 0.04 300);
+  --muted-foreground: oklch(0.72 0.03 300);
+  --accent: oklch(0.36 0.06 300);
+  --accent-foreground: oklch(0.95 0.012 300);
+  --border: oklch(0.37 0.045 300);
+  --input: oklch(0.37 0.045 300);
+  --surface: oklch(0.25 0.038 300);
+  --sidebar: oklch(0.25 0.04 300);
+  --sidebar-accent: oklch(0.36 0.06 300);
+  --sidebar-border: oklch(0.37 0.045 300);
+  --bubble-me: oklch(0.3 0.045 300);
+  --bubble-me-foreground: oklch(0.86 0.11 300);
+  --bubble-them: oklch(0.29 0.04 300);
+  --bubble-them-foreground: oklch(0.93 0.014 300);
+  --online: oklch(0.75 0.18 145);
+  --accent-1: oklch(0.72 0.16 300);
+  --accent-2: oklch(0.8 0.15 85);
+  --accent-3: oklch(0.72 0.14 260);
+  --accent-4: oklch(0.74 0.16 340);
+}
+
+/* Purple gradient contact-list chrome. */
+html[data-skin="yahoo"] .chat-glass {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-primary) 20%, white) 0%,
+    var(--color-sidebar) 24%,
+    var(--color-sidebar) 100%
+  );
+}
+
+html.dark[data-skin="yahoo"] .chat-glass {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-primary) 30%, black) 0%,
+    var(--color-sidebar) 24%,
+    var(--color-sidebar) 100%
+  );
+}
+
+html[data-skin="yahoo"] h1,
+html[data-skin="yahoo"] h2,
+html[data-skin="yahoo"] h3 {
+  letter-spacing: 0;
+}
+
+/* Glossy purple title bar with a gold hairline, like Yahoo! Messenger. */
+html[data-skin="yahoo"] .app-titlebar {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-primary) 58%, white) 0%,
+    var(--color-primary) 44%,
+    color-mix(in oklab, var(--color-primary) 84%, black) 100%
+  );
+  border-bottom: 1px solid color-mix(in oklab, var(--color-accent-2) 60%, black);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 50%, transparent);
+  color: var(--color-primary-foreground);
+}
+
+html[data-skin="yahoo"] .app-titlebar a,
+html[data-skin="yahoo"] .app-titlebar button,
+html[data-skin="yahoo"] .app-titlebar .text-muted-foreground {
+  color: var(--color-primary-foreground);
+}
+
+html[data-skin="yahoo"] .app-titlebar a:hover,
+html[data-skin="yahoo"] .app-titlebar button:hover {
+  background-color: color-mix(in oklab, white 22%, transparent);
+}
+
+/* Squared-off legacy widgets. */
+html[data-skin="yahoo"] .rounded-full:not(img):not(.size-3):not(.size-2\.5) {
+  border-radius: 0.25rem;
+}
+
 /* ---- Messenger colour themes (Settings > Appearance) ----
  * Each skin re-tints the accent family only; light/dark surfaces stay intact.
  */
