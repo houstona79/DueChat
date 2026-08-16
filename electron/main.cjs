@@ -366,6 +366,19 @@ const createRoomWindow = (url, parentWindow, kind = "room") => {
  * links are handed to the system browser.
  */
 const applyNavigationPolicy = (webContents) => {
+  // Media embeds (YouTube, Facebook, TikTok, Vimeo, Snapchat, Spotify, radio)
+  // legitimately navigate inside iframes and must not be pushed to the browser.
+  const EMBED_HOSTS =
+    /(^|\.)(youtube\.com|youtube-nocookie\.com|youtu\.be|ytimg\.com|google\.com|gstatic\.com|doubleclick\.net|facebook\.com|facebook\.net|fbcdn\.net|fb\.watch|tiktok\.com|vimeo\.com|snapchat\.com|spotify\.com|scdn\.co)$/i;
+  const isEmbedFrameUrl = (url) => {
+    try {
+      const u = new URL(url);
+      if (u.protocol !== "https:" && u.protocol !== "http:") return false;
+      return EMBED_HOSTS.test(u.hostname);
+    } catch {
+      return false;
+    }
+  };
   webContents.setWindowOpenHandler(({ url }) => {
     if (isTrustedOrigin(url)) {
       const owner = BrowserWindow.fromWebContents(webContents);
@@ -392,7 +405,7 @@ const applyNavigationPolicy = (webContents) => {
   webContents.on("will-navigate", blockExternal);
   // Iframed room views navigate as frames, which will-navigate does not cover.
   webContents.on("will-frame-navigate", (event) => {
-    if (!isTrustedOrigin(event.url)) {
+    if (!isTrustedOrigin(event.url) && !isEmbedFrameUrl(event.url)) {
       event.preventDefault();
       void shell.openExternal(event.url);
     }
