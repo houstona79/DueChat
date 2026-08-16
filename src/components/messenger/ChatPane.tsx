@@ -157,6 +157,7 @@ export function ChatPane({
   meId: string;
 }) {
   const queryClient = useQueryClient();
+  useThreadWallpaper(room.id);
   const members = memberships.filter((m) => m.room_id === room.id);
   const joined = members.some((m) => m.user_id === meId);
   const onlineCount = members.filter((m) =>
