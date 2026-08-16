@@ -5,7 +5,13 @@ import bgNight from "@/assets/bg-blue-night.jpg";
 import bgGeo from "@/assets/bg-blue-geo.jpg";
 
 const KEY = "duechat.wallpaper";
+const ROOM_PREFIX = "duechat.wallpaper.room:";
 const EVENT = "duechat:wallpaper";
+
+/** Storage key of the thread whose wallpaper is currently being shown, if any. */
+let activeScope: string | null = null;
+
+const scopeKey = (threadId: string) => `${ROOM_PREFIX}${threadId}`;
 
 export type WallpaperId =
   | "none"
@@ -61,7 +67,7 @@ export function applyWallpaper(id: WallpaperId) {
   root.setAttribute("data-wallpaper-kind", found.kind);
   root.setAttribute("data-wallpaper-tone", found.tone);
   try {
-    localStorage.setItem(KEY, found.id);
+    localStorage.setItem(activeScope ? scopeKey(activeScope) : KEY, found.id);
   } catch {
     /* ignore */
   }
@@ -72,14 +78,34 @@ export function applyWallpaper(id: WallpaperId) {
   }
 }
 
-export function readStoredWallpaper(): WallpaperId {
+export function readStoredWallpaper(threadId?: string | null): WallpaperId {
   try {
+    if (threadId) {
+      const scoped = localStorage.getItem(scopeKey(threadId));
+      if (WALLPAPERS.some((w) => w.id === scoped)) return scoped as WallpaperId;
+    }
     const stored = localStorage.getItem(KEY);
     if (WALLPAPERS.some((w) => w.id === stored)) return stored as WallpaperId;
   } catch {
     /* ignore */
   }
   return "none";
+}
+
+/**
+ * Scope wallpaper changes to one chat thread: picking a background while the
+ * thread is open saves and restores that choice per room.
+ */
+export function useThreadWallpaper(threadId: string | null | undefined) {
+  useEffect(() => {
+    if (!threadId) return;
+    activeScope = threadId;
+    applyWallpaper(readStoredWallpaper(threadId));
+    return () => {
+      if (activeScope === threadId) activeScope = null;
+      applyWallpaper(readStoredWallpaper());
+    };
+  }, [threadId]);
 }
 
 export function useWallpaper() {
