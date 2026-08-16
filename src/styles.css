@@ -659,6 +659,138 @@ html[data-skin="yahoo"] .rounded-full:not(img):not(.size-3):not(.size-2\.5) {
   border-radius: 0.25rem;
 }
 
+/* ---- AOL / AIM skin ----
+ * Late-90s AOL Instant Messenger: deep AOL blue chrome, running-man yellow
+ * accents, Arial type, plain white conversation area, squared widgets.
+ */
+html[data-skin="aol"] {
+  --radius: 0.2rem;
+  --font-display: Arial, Helvetica, "Helvetica Neue", ui-sans-serif, sans-serif;
+  --font-body: Arial, Helvetica, "Helvetica Neue", ui-sans-serif, sans-serif;
+  --background: oklch(0.985 0.006 250);
+  --foreground: oklch(0.22 0.03 255);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.03 255);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.03 255);
+  --primary: oklch(0.42 0.17 258);
+  --primary-foreground: oklch(0.99 0.004 250);
+  --secondary: oklch(0.93 0.03 250);
+  --secondary-foreground: oklch(0.28 0.05 255);
+  --muted: oklch(0.94 0.018 250);
+  --muted-foreground: oklch(0.49 0.035 255);
+  --accent: oklch(0.9 0.07 95);
+  --accent-foreground: oklch(0.28 0.06 90);
+  --border: oklch(0.84 0.025 250);
+  --input: oklch(0.84 0.025 250);
+  --ring: oklch(0.48 0.18 258);
+  --surface: oklch(0.965 0.012 250);
+  --sidebar: oklch(0.95 0.02 250);
+  --sidebar-foreground: oklch(0.22 0.03 255);
+  --sidebar-primary: oklch(0.42 0.17 258);
+  --sidebar-primary-foreground: oklch(0.99 0.004 250);
+  --sidebar-accent: oklch(0.87 0.05 250);
+  --sidebar-accent-foreground: oklch(0.24 0.05 255);
+  --sidebar-border: oklch(0.84 0.03 250);
+  --sidebar-ring: oklch(0.48 0.18 258);
+  --bubble-me: oklch(0.97 0.014 250);
+  --bubble-me-foreground: oklch(0.36 0.16 258);
+  --bubble-them: oklch(1 0 0);
+  --bubble-them-foreground: oklch(0.28 0.03 255);
+  --online: oklch(0.62 0.17 145);
+  --accent-1: oklch(0.42 0.17 258);
+  --accent-2: oklch(0.62 0.16 85);
+  --accent-3: oklch(0.48 0.14 235);
+  --accent-4: oklch(0.5 0.17 20);
+  --shadow-panel: 0 2px 10px -2px oklch(0.28 0.08 258 / 0.35);
+}
+
+html.dark[data-skin="aol"] {
+  --background: oklch(0.21 0.03 255);
+  --foreground: oklch(0.94 0.01 250);
+  --card: oklch(0.26 0.035 255);
+  --card-foreground: oklch(0.94 0.01 250);
+  --popover: oklch(0.26 0.035 255);
+  --popover-foreground: oklch(0.94 0.01 250);
+  --primary: oklch(0.7 0.15 255);
+  --primary-foreground: oklch(0.16 0.04 255);
+  --secondary: oklch(0.31 0.035 255);
+  --secondary-foreground: oklch(0.94 0.01 250);
+  --muted: oklch(0.3 0.035 255);
+  --muted-foreground: oklch(0.72 0.025 250);
+  --accent: oklch(0.4 0.07 95);
+  --accent-foreground: oklch(0.96 0.03 95);
+  --border: oklch(0.36 0.04 255);
+  --input: oklch(0.36 0.04 255);
+  --surface: oklch(0.24 0.032 255);
+  --sidebar: oklch(0.24 0.035 255);
+  --sidebar-accent: oklch(0.35 0.055 255);
+  --sidebar-border: oklch(0.36 0.04 255);
+  --bubble-me: oklch(0.29 0.04 255);
+  --bubble-me-foreground: oklch(0.86 0.1 255);
+  --bubble-them: oklch(0.28 0.035 255);
+  --bubble-them-foreground: oklch(0.93 0.012 250);
+  --online: oklch(0.75 0.18 145);
+  --accent-1: oklch(0.72 0.15 255);
+  --accent-2: oklch(0.82 0.16 90);
+  --accent-3: oklch(0.72 0.13 235);
+  --accent-4: oklch(0.74 0.16 25);
+}
+
+/* Buddy List chrome: AOL blue fading into the list surface. */
+html[data-skin="aol"] .chat-glass {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-primary) 22%, white) 0%,
+    var(--color-sidebar) 22%,
+    var(--color-sidebar) 100%
+  );
+}
+
+html.dark[data-skin="aol"] .chat-glass {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-primary) 32%, black) 0%,
+    var(--color-sidebar) 22%,
+    var(--color-sidebar) 100%
+  );
+}
+
+html[data-skin="aol"] h1,
+html[data-skin="aol"] h2,
+html[data-skin="aol"] h3 {
+  letter-spacing: 0;
+}
+
+/* Deep blue title bar with the AOL yellow hairline. */
+html[data-skin="aol"] .app-titlebar {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-primary) 62%, white) 0%,
+    var(--color-primary) 46%,
+    color-mix(in oklab, var(--color-primary) 82%, black) 100%
+  );
+  border-bottom: 2px solid var(--color-accent-2);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 48%, transparent);
+  color: var(--color-primary-foreground);
+}
+
+html[data-skin="aol"] .app-titlebar a,
+html[data-skin="aol"] .app-titlebar button,
+html[data-skin="aol"] .app-titlebar .text-muted-foreground {
+  color: var(--color-primary-foreground);
+}
+
+html[data-skin="aol"] .app-titlebar a:hover,
+html[data-skin="aol"] .app-titlebar button:hover {
+  background-color: color-mix(in oklab, white 22%, transparent);
+}
+
+/* Squared-off 90s widgets. */
+html[data-skin="aol"] .rounded-full:not(img):not(.size-3):not(.size-2\.5) {
+  border-radius: 0.2rem;
+}
+
 /* ---- Messenger colour themes (Settings > Appearance) ----
  * Each skin re-tints the accent family only; light/dark surfaces stay intact.
  */
