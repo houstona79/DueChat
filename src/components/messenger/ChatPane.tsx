@@ -402,7 +402,7 @@ export function ChatPane({
               className="-ml-1 grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary md:hidden"
               aria-label="Back to rooms"
             >
-              <ArrowLeft className="size-5 sm:size-[34px]" />
+              <ArrowLeft className="size-5" />
             </Link>
           )}
           <Avatar
@@ -739,7 +739,7 @@ export function ChatPane({
               className="grid size-11 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary lg:hidden"
               aria-label="More room options"
             >
-              <MoreHorizontal className="size-5 sm:size-[34px]" />
+              <MoreHorizontal className="size-5" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel className="truncate">{title}</DropdownMenuLabel>
