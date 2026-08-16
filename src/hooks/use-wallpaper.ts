@@ -29,25 +29,27 @@ export type Wallpaper = {
   /** CSS background-image value: a url() for photos, a gradient for colors. */
   src: string | null;
   kind: "none" | "photo" | "color";
+  /** Perceived brightness of the background, used to auto-tune text contrast. */
+  tone: "neutral" | "light" | "dark";
 };
 
 const gradient = (from: string, to: string) => `linear-gradient(160deg, ${from} 0%, ${to} 100%)`;
 
 export const WALLPAPERS: Wallpaper[] = [
-  { id: "none", label: "None", src: null, kind: "none" },
-  { id: "waves", label: "Blue waves", src: `url(${bgWaves})`, kind: "photo" },
-  { id: "night", label: "Night sky", src: `url(${bgNight})`, kind: "photo" },
-  { id: "geo", label: "Blue facets", src: `url(${bgGeo})`, kind: "photo" },
-  { id: "sky", label: "Sky blue", src: gradient("#9fd4ff", "#3d7fd4"), kind: "color" },
-  { id: "ice", label: "Ice", src: gradient("#eaf4ff", "#b9cfe6"), kind: "color" },
-  { id: "teal", label: "Teal", src: gradient("#8fe3d9", "#1f7f83"), kind: "color" },
-  { id: "grape", label: "Grape", src: gradient("#d3b3f0", "#5b1d8f"), kind: "color" },
-  { id: "gold", label: "Gold", src: gradient("#ffe9a8", "#d99a15"), kind: "color" },
-  { id: "rose", label: "Rose", src: gradient("#ffd3e2", "#c2557f"), kind: "color" },
-  { id: "forest", label: "Forest", src: gradient("#bfe6a8", "#2e6b3c"), kind: "color" },
-  { id: "sunset", label: "Sunset", src: gradient("#ffc48a", "#b64a6a"), kind: "color" },
-  { id: "slate", label: "Slate", src: gradient("#cfd8e3", "#5a6675"), kind: "color" },
-  { id: "midnight", label: "Midnight", src: gradient("#31456b", "#0c1226"), kind: "color" },
+  { id: "none", label: "None", src: null, kind: "none", tone: "neutral" },
+  { id: "waves", label: "Blue waves", src: `url(${bgWaves})`, kind: "photo", tone: "dark" },
+  { id: "night", label: "Night sky", src: `url(${bgNight})`, kind: "photo", tone: "dark" },
+  { id: "geo", label: "Blue facets", src: `url(${bgGeo})`, kind: "photo", tone: "dark" },
+  { id: "sky", label: "Sky blue", src: gradient("#9fd4ff", "#3d7fd4"), kind: "color", tone: "light" },
+  { id: "ice", label: "Ice", src: gradient("#eaf4ff", "#b9cfe6"), kind: "color", tone: "light" },
+  { id: "teal", label: "Teal", src: gradient("#8fe3d9", "#1f7f83"), kind: "color", tone: "light" },
+  { id: "grape", label: "Grape", src: gradient("#d3b3f0", "#5b1d8f"), kind: "color", tone: "dark" },
+  { id: "gold", label: "Gold", src: gradient("#ffe9a8", "#d99a15"), kind: "color", tone: "light" },
+  { id: "rose", label: "Rose", src: gradient("#ffd3e2", "#c2557f"), kind: "color", tone: "light" },
+  { id: "forest", label: "Forest", src: gradient("#bfe6a8", "#2e6b3c"), kind: "color", tone: "light" },
+  { id: "sunset", label: "Sunset", src: gradient("#ffc48a", "#b64a6a"), kind: "color", tone: "light" },
+  { id: "slate", label: "Slate", src: gradient("#cfd8e3", "#5a6675"), kind: "color", tone: "light" },
+  { id: "midnight", label: "Midnight", src: gradient("#31456b", "#0c1226"), kind: "color", tone: "dark" },
 ];
 
 export function applyWallpaper(id: WallpaperId) {
@@ -57,6 +59,7 @@ export function applyWallpaper(id: WallpaperId) {
   else root.style.removeProperty("--chat-wallpaper");
   root.setAttribute("data-wallpaper", found.id);
   root.setAttribute("data-wallpaper-kind", found.kind);
+  root.setAttribute("data-wallpaper-tone", found.tone);
   try {
     localStorage.setItem(KEY, found.id);
   } catch {
