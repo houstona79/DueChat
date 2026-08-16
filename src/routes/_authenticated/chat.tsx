@@ -79,7 +79,7 @@ function ChatLayout() {
     <FloatingRoomsProvider>
       <main
         id="main-content"
-        className="fixed inset-0 grid overflow-hidden overscroll-none grid-cols-1 md:grid-cols-[250px_minmax(0,1fr)] lg:grid-cols-[280px_minmax(0,1fr)]"
+        className="fixed inset-0 grid overflow-hidden overscroll-none grid-cols-1 md:grid-cols-[300px_minmax(0,1fr)] lg:grid-cols-[360px_minmax(0,1fr)]"
       >
         <div
           className={
@@ -101,17 +101,17 @@ function ChatLayout() {
             <Outlet />
           ) : (
             <div className="grid h-full place-items-center bg-background px-6 text-center">
-              <div className="max-w-sm">
+              <div className="max-w-[15rem]">
                 <img
                   src={duechatLogo.url}
                   alt="DueChat"
-                  className="mx-auto h-16 w-auto object-contain"
+                  className="mx-auto h-9 w-auto object-contain"
                 />
-                <span className="mx-auto mt-4 grid size-14 place-items-center rounded-2xl bg-primary/15 text-primary">
-                  <MessagesSquare className="size-7" />
+                <span className="mx-auto mt-3 grid size-9 place-items-center rounded-lg bg-primary/15 text-primary">
+                  <MessagesSquare className="size-4.5" />
                 </span>
-                <h2 className="mt-5 text-xl font-semibold">Pick a room</h2>
-                <p className="mt-2 text-sm text-muted-foreground">
+                <h2 className="mt-3 text-sm font-semibold">Pick a room</h2>
+                <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
                   Choose a room on the left, or create a new one to start talking.
                 </p>
               </div>

@@ -96,7 +96,7 @@ export function BuddyList({
   };
 
   return (
-    <section className="mb-2 w-full max-w-[280px]">
+    <section className="mb-2 w-full">
       <div className="flex items-center gap-1 px-2 pb-0.5 pt-1.5">
         <button
           onClick={() => setCollapsed((v) => !v)}
