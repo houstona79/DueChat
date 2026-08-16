@@ -79,7 +79,7 @@ function ChatLayout() {
     <FloatingRoomsProvider>
       <main
         id="main-content"
-        className="fixed inset-0 grid overflow-hidden overscroll-none grid-cols-1 md:grid-cols-[300px_minmax(0,1fr)] lg:grid-cols-[360px_minmax(0,1fr)]"
+        className="fixed inset-0 grid overflow-hidden overscroll-none grid-cols-1 md:grid-cols-[320px_minmax(0,1fr)] lg:grid-cols-[400px_minmax(0,1fr)]"
       >
         <div
           className={
