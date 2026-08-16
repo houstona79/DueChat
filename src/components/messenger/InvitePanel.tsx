@@ -64,11 +64,11 @@ export function InvitePanel({
           aria-label="Close invites"
           className="grid size-10 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
         >
-          <X className="size-4" />
+          <X className="size-6" />
         </button>
       </header>
       <div className="mx-3 mb-2 flex items-center gap-2 rounded-xl bg-secondary px-3 py-2">
-        <YahooSearchIcon className="size-4" />
+        <YahooSearchIcon className="size-6" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -119,7 +119,7 @@ export function InvitePanel({
                     : "bg-primary text-primary-foreground disabled:opacity-60",
                 )}
               >
-                {invited ? <Check className="size-4" /> : <UserPlus className="size-4" />}
+                {invited ? <Check className="size-6" /> : <UserPlus className="size-6" />}
                 {invited ? "Invited" : "Invite"}
               </button>
             </li>

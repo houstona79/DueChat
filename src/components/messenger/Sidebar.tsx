@@ -134,7 +134,7 @@ export function Sidebar({
                 aria-label="Admin panel"
                 className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
               >
-                <ShieldCheck className="size-4" />
+                <ShieldCheck className="size-6" />
               </Link>
             ) : null}
             {isModerator ? (
@@ -143,7 +143,7 @@ export function Sidebar({
                 aria-label="Moderator panel"
                 className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
               >
-                <Shield className="size-4" />
+                <Shield className="size-6" />
               </Link>
             ) : null}
             <Link
@@ -151,21 +151,21 @@ export function Sidebar({
               aria-label="Profile settings"
               className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
             >
-              <Settings className="size-4" />
+              <Settings className="size-6" />
             </Link>
             <Link
               to="/blogs"
               aria-label="Blogs"
               className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
             >
-              <NotebookPen className="size-4" />
+              <NotebookPen className="size-6" />
             </Link>
             <Link
               to="/mail"
               aria-label="Mailbox"
               className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
             >
-              <Mail className="size-4" />
+              <Mail className="size-6" />
             </Link>
             <ThemeToggle />
             <LanguageSwitcher className="size-9 justify-center rounded-xl border-0 bg-transparent p-0 text-muted-foreground hover:bg-secondary" />
@@ -175,7 +175,7 @@ export function Sidebar({
               aria-label="Sign out"
               className="grid size-9 place-items-center rounded-xl text-muted-foreground hover:bg-secondary"
             >
-              <LogOut className="size-4" />
+              <LogOut className="size-6" />
             </button>
           </div>
         </div>
@@ -223,14 +223,14 @@ export function Sidebar({
             onClick={() => setCreating(true)}
             className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2.5 text-sm font-medium text-primary-foreground short:mt-2 short:py-2"
           >
-            <Plus className="size-4" />
+            <Plus className="size-6" />
             Create a room
           </button>
         ) : null}
         <ThemeSkinSwatches className="mt-3 rounded-xl bg-secondary px-3 py-2 short:mt-2 short:py-1.5" />
         <WallpaperPicker className="mt-2 rounded-xl bg-secondary px-3 py-2 short:py-1.5" />
         <div className="mt-2 flex items-center gap-2 rounded-xl bg-secondary px-3 py-2 short:py-1.5">
-          <YahooSearchIcon className="size-4" />
+          <YahooSearchIcon className="size-6" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}

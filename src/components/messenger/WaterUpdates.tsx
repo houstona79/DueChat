@@ -95,7 +95,7 @@ export function WaterUpdates() {
         className="flex w-full items-center gap-2 text-left"
       >
         <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary">
-          <Droplets className="size-4" />
+          <Droplets className="size-6" />
         </span>
         <span className="min-w-0 flex-1">
           <span className="block truncate text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -138,7 +138,7 @@ export function WaterUpdates() {
           {picking ? (
             <div className="space-y-2">
               <div className="flex items-center gap-2 rounded-xl bg-background px-2.5 py-2">
-                <YahooSearchIcon className="size-4" />
+                <YahooSearchIcon className="size-6" />
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
@@ -161,7 +161,7 @@ export function WaterUpdates() {
                 onClick={useMyLocation}
                 className="flex w-full items-center gap-2 rounded-xl px-2 py-2 text-xs text-muted-foreground hover:bg-secondary"
               >
-                <LocateFixed className="size-3.5" aria-hidden /> Use my location
+                <LocateFixed className="size-6" aria-hidden /> Use my location
               </button>
               {results.map((r) => (
                 <button

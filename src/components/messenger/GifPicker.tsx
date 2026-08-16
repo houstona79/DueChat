@@ -63,7 +63,7 @@ export function GifPicker({
           aria-label={copy.label}
           className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-background/60 hover:text-foreground"
         >
-          {media === "stickers" ? <YahooStickerIcon className="size-5" /> : <YahooGifIcon className="size-5" />}
+          {media === "stickers" ? <YahooStickerIcon className="size-6" /> : <YahooGifIcon className="size-6" />}
         </button>
       </PopoverTrigger>
       <PopoverContent align="start" side="top" className="w-[min(22rem,calc(100vw-2rem))] p-3">
