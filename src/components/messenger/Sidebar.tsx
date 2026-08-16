@@ -2,7 +2,8 @@ import { RatingBadge } from "./RoomRating";
 import { RoomCrownMarks } from "@/components/rooms/RoomCrown";
 import { useRoomCrowns } from "@/lib/room-crowns";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, Mail, NotebookPen, Plus, Search, Settings, Shield, ShieldCheck, Users } from "lucide-react";
+import { LogOut, Mail, NotebookPen, Plus, Settings, Shield, ShieldCheck, Users } from "lucide-react";
+import { YahooSearchIcon } from "@/components/icons/YahooIcons";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
@@ -229,7 +230,7 @@ export function Sidebar({
         <ThemeSkinSwatches className="mt-3 rounded-xl bg-secondary px-3 py-2 short:mt-2 short:py-1.5" />
         <WallpaperPicker className="mt-2 rounded-xl bg-secondary px-3 py-2 short:py-1.5" />
         <div className="mt-2 flex items-center gap-2 rounded-xl bg-secondary px-3 py-2 short:py-1.5">
-          <Search className="size-4 text-muted-foreground" aria-hidden />
+          <YahooSearchIcon className="size-4" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}

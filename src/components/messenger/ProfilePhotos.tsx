@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ImagePlus, Trash2, X } from "lucide-react";
+import { Trash2, X } from "lucide-react";
+import { YahooAttachIcon } from "@/components/icons/YahooIcons";
 import { ImageCropper } from "./ImageCropper";
 import {
   MAX_PROFILE_PHOTOS,
@@ -132,7 +133,7 @@ export function ProfilePhotos({
             className="grid aspect-square place-items-center rounded-2xl border border-dashed border-border text-muted-foreground hover:bg-secondary disabled:opacity-60"
           >
             <span className="flex flex-col items-center gap-1 text-[11px]">
-              <ImagePlus className="size-5" />
+              <YahooAttachIcon className="size-5" />
               {upload.isPending ? "Uploading…" : "Add photo"}
             </span>
           </button>

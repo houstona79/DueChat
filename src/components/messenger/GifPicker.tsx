@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { ImagePlay, Loader2, Search, Sticker } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { YahooGifIcon, YahooSearchIcon, YahooStickerIcon } from "@/components/icons/YahooIcons";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -62,12 +63,12 @@ export function GifPicker({
           aria-label={copy.label}
           className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-background/60 hover:text-foreground"
         >
-          {media === "stickers" ? <Sticker className="size-5" /> : <ImagePlay className="size-5" />}
+          {media === "stickers" ? <YahooStickerIcon className="size-5" /> : <YahooGifIcon className="size-5" />}
         </button>
       </PopoverTrigger>
       <PopoverContent align="start" side="top" className="w-[min(22rem,calc(100vw-2rem))] p-3">
         <div className="mb-2 flex items-center gap-2 rounded-xl bg-secondary px-2.5 py-1.5">
-          <Search className="size-4 shrink-0 text-muted-foreground" />
+          <YahooSearchIcon className="size-4 shrink-0" />
           <input
             value={term}
             onChange={(e) => setTerm(e.target.value)}

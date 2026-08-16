@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Check, Search, UserPlus, X } from "lucide-react";
+import { Check, UserPlus, X } from "lucide-react";
+import { YahooSearchIcon } from "@/components/icons/YahooIcons";
 import { Avatar } from "./Avatar";
 import { accentFor, isOnline, type Membership, type Profile } from "@/lib/chat";
 import { inviteToRoom } from "@/lib/room-invites";
@@ -67,7 +68,7 @@ export function InvitePanel({
         </button>
       </header>
       <div className="mx-3 mb-2 flex items-center gap-2 rounded-xl bg-secondary px-3 py-2">
-        <Search className="size-4 text-muted-foreground" aria-hidden />
+        <YahooSearchIcon className="size-4" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}

@@ -13,7 +13,6 @@ import {
   Newspaper,
   Phone,
   Radio,
-  SendHorizonal,
   Users,
   UserPlus,
   Video,
@@ -29,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import duechatLogo from "@/assets/duechat-logo.png.asset.json";
 import { EmojiPicker } from "./EmojiPicker";
+import { YahooSendIcon } from "@/components/icons/YahooIcons";
 import { RoomCrownMarks } from "@/components/rooms/RoomCrown";
 import { useRoomCrowns } from "@/lib/room-crowns";
 import { GifPicker } from "./GifPicker";
@@ -1203,7 +1203,7 @@ export function ChatPane({
                   aria-label="Send message"
                   className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40 sm:size-11 lg:size-10"
                 >
-                  <SendHorizonal className="size-4 sm:size-5 lg:size-4" />
+                  <YahooSendIcon className="size-5 sm:size-6 lg:size-5" />
                 </button>
               </div>
             </footer>
