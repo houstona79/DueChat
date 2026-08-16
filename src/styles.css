@@ -328,6 +328,11 @@ html.dark[data-wallpaper]:not([data-wallpaper="none"]) body::before {
   filter: brightness(1.45) saturate(1.1);
 }
 
+/* Solid color backgrounds are already tuned, so skip the photo brightening. */
+html.dark[data-wallpaper-kind="color"] body::before {
+  filter: none;
+}
+
 /* Messenger surfaces go translucent so the wallpaper reads through them. */
 html[data-wallpaper]:not([data-wallpaper="none"]) .chat-wallpaper {
   background-color: color-mix(in oklab, var(--color-background) 62%, transparent);
