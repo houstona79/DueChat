@@ -67,6 +67,7 @@ import {
 import { grantMic, lowerHand, raiseHand, revokeMic } from "@/lib/hands";
 import { markKaraokeSongPlayed } from "@/lib/karaoke";
 import { useOpenDirect } from "@/hooks/use-direct";
+import { useThreadWallpaper } from "@/hooks/use-wallpaper";
 import { blockUser, isBlocked, unblockUser } from "@/lib/blocks";
 import { takePendingCall } from "@/lib/call-invites";
 import {
