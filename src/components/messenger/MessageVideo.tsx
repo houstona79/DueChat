@@ -1,6 +1,6 @@
 type VideoKind =
   | { kind: "file"; src: string }
-  | { kind: "embed"; src: string; title: string; portrait?: boolean };
+  | { kind: "embed"; src: string; title: string; portrait?: boolean; link?: string };
 
 export function videoEmbedOf(body: string): VideoKind | null {
   const trimmed = body.trim();
@@ -59,24 +59,33 @@ export function videoEmbedOf(body: string): VideoKind | null {
   if (
     host === "facebook.com" ||
     host === "m.facebook.com" ||
+    host === "mbasic.facebook.com" ||
     host === "web.facebook.com" ||
     host === "fb.watch" ||
+    host === "fb.gg" ||
     host === "fb.com"
   ) {
+    // Modern share links: /share/v/<id>/ (video) and /share/r/<id>/ (reel)
+    const share = url.pathname.match(/^\/share\/([a-z])\//i);
     const isVideo =
       host === "fb.watch" ||
+      !!share ||
       /\/(videos|reel|watch|video\.php|story\.php)/i.test(url.pathname) ||
       url.pathname.startsWith("/watch") ||
       url.searchParams.has("v");
     if (isVideo) {
-      const portrait = /\/reel/i.test(url.pathname);
+      const portrait = /\/reel/i.test(url.pathname) || share?.[1]?.toLowerCase() === "r";
+      const params = new URLSearchParams({
+        href: trimmed,
+        show_text: "false",
+        width: portrait ? "320" : "560",
+      });
       return {
         kind: "embed",
-        src: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(
-          trimmed,
-        )}&show_text=false`,
+        src: `https://www.facebook.com/plugins/video.php?${params.toString()}`,
         title: "Facebook video",
         portrait,
+        link: trimmed,
       };
     }
   }
@@ -135,6 +144,16 @@ export function MessageVideo({ video }: { video: VideoKind }) {
           className={video.portrait ? "aspect-[9/16] w-full border-0" : "aspect-video w-full border-0"}
         />
       )}
+      {video.kind === "embed" && video.link ? (
+        <a
+          href={video.link}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="block px-3 py-1.5 text-xs text-muted-foreground underline-offset-2 hover:underline"
+        >
+          Open on Facebook
+        </a>
+      ) : null}
     </div>
   );
 }
