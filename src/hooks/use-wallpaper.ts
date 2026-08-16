@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
+import { supabase } from "@/integrations/supabase/client";
+
 import bgWaves from "@/assets/bg-blue-waves.jpg";
 import bgNight from "@/assets/bg-blue-night.jpg";
 import bgGeo from "@/assets/bg-blue-geo.jpg";
@@ -76,6 +78,39 @@ export function applyWallpaper(id: WallpaperId) {
   } catch {
     /* ignore */
   }
+  if (activeScope) void saveRoomWallpaper(activeScope, found.id);
+}
+
+/** Persist a room's background to the account so it syncs across devices. */
+async function saveRoomWallpaper(roomId: string, wallpaperId: WallpaperId) {
+  try {
+    const { data } = await supabase.auth.getUser();
+    const userId = data.user?.id;
+    if (!userId) return;
+    await supabase
+      .from("room_wallpapers")
+      .upsert(
+        { user_id: userId, room_id: roomId, wallpaper_id: wallpaperId },
+        { onConflict: "user_id,room_id" },
+      );
+  } catch {
+    /* offline or signed out: the local copy still applies */
+  }
+}
+
+async function fetchRoomWallpaper(roomId: string): Promise<WallpaperId | null> {
+  try {
+    const { data } = await supabase
+      .from("room_wallpapers")
+      .select("wallpaper_id")
+      .eq("room_id", roomId)
+      .maybeSingle();
+    const id = data?.wallpaper_id;
+    if (id && WALLPAPERS.some((w) => w.id === id)) return id as WallpaperId;
+  } catch {
+    /* ignore */
+  }
+  return null;
 }
 
 export function readStoredWallpaper(threadId?: string | null): WallpaperId {
@@ -99,9 +134,21 @@ export function readStoredWallpaper(threadId?: string | null): WallpaperId {
 export function useThreadWallpaper(threadId: string | null | undefined) {
   useEffect(() => {
     if (!threadId) return;
+    let cancelled = false;
     activeScope = threadId;
     applyWallpaper(readStoredWallpaper(threadId));
+    // Pull the account-level choice so a pick made on another device wins.
+    void fetchRoomWallpaper(threadId).then((remote) => {
+      if (cancelled || !remote || activeScope !== threadId) return;
+      try {
+        localStorage.setItem(scopeKey(threadId), remote);
+      } catch {
+        /* ignore */
+      }
+      applyWallpaper(remote);
+    });
     return () => {
+      cancelled = true;
       if (activeScope === threadId) activeScope = null;
       applyWallpaper(readStoredWallpaper());
     };
