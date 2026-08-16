@@ -66,6 +66,7 @@ import {
 } from "@/hooks/use-chat";
 import { grantMic, lowerHand, raiseHand, revokeMic } from "@/lib/hands";
 import { markKaraokeSongPlayed } from "@/lib/karaoke";
+import { AppIcon } from "@/components/icons/AppIcons";
 import { useOpenDirect } from "@/hooks/use-direct";
 import { useThreadWallpaper } from "@/hooks/use-wallpaper";
 import { blockUser, isBlocked, unblockUser } from "@/lib/blocks";
@@ -569,7 +570,7 @@ export function ChatPane({
             aria-pressed={showGames}
             title="Games"
           >
-            <Gamepad2 className="size-4" />
+            <AppIcon name="games" className={"size-4"} />
             Games
           </button>
           {!room.is_direct ? (
@@ -585,7 +586,7 @@ export function ChatPane({
               aria-pressed={showTrivia}
               title="Trivia bot"
             >
-              <Bot className="size-4" />
+              <AppIcon name="bot" className={"size-4"} />
               Trivia
             </button>
           ) : null}
@@ -602,7 +603,7 @@ export function ChatPane({
               aria-pressed={showKaraoke}
               title="Karaoke"
             >
-              <Mic2 className="size-4" />
+              <AppIcon name="mic" className={"size-4"} />
               Karaoke
               {karaokeQueue.filter((s) => !s.played_at).length
                 ? ` (${karaokeQueue.filter((s) => !s.played_at).length})`
@@ -621,7 +622,7 @@ export function ChatPane({
             aria-pressed={showMembers}
             title="Show members"
           >
-            <Users className="size-3.5 sm:size-4" />
+            <AppIcon name="members" className={"size-3.5 sm:size-4"} />
             {members.length}
           </button>
           {!room.is_direct && joined ? (
@@ -637,7 +638,7 @@ export function ChatPane({
               aria-pressed={showInvite}
               title="Invite people"
             >
-              <UserPlus className="size-4" />
+              <AppIcon name="invite" className={"size-4"} />
               Invite
             </button>
           ) : null}
@@ -654,7 +655,7 @@ export function ChatPane({
               aria-pressed={showFeed}
               title="Room feed"
             >
-              <Newspaper className="size-4" />
+              <AppIcon name="feed" className={"size-4"} />
             </button>
           ) : null}
           {!room.is_direct ? (
@@ -670,7 +671,7 @@ export function ChatPane({
               aria-pressed={showMedia}
               title="Radio & video"
             >
-              <Radio className="size-4" />
+              <AppIcon name="radio" className={"size-4"} />
             </button>
           ) : null}
           <button
@@ -678,7 +679,7 @@ export function ChatPane({
             className="hidden size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary lg:grid"
             aria-label="Start voice call"
           >
-            <Phone className="size-4" />
+            <AppIcon name="phone" className={"size-4"} />
           </button>
           <button
             onClick={() => setTalking((v) => !v)}
@@ -690,7 +691,7 @@ export function ChatPane({
             aria-pressed={talking}
             title="Talk"
           >
-            <Mic className="size-3.5 sm:size-4" />
+            <AppIcon name="mic" className={"size-3.5 sm:size-4"} />
             Talk
           </button>
           {!room.is_direct && joined ? (
@@ -704,7 +705,7 @@ export function ChatPane({
               aria-pressed={Boolean(myHand)}
               title="Raise hand"
             >
-              <Hand className="size-4" />
+              <AppIcon name="hand" className={"size-4"} />
               {hands.length > 0 ? hands.length : "Hand"}
             </button>
           ) : null}
@@ -722,7 +723,7 @@ export function ChatPane({
             aria-pressed={showCams}
             title="Cams"
           >
-            <Video className="size-3.5 sm:size-4" />
+            <AppIcon name="video" className={"size-3.5 sm:size-4"} />
             Cams
           </button>
           <button
@@ -730,7 +731,7 @@ export function ChatPane({
             className="grid size-9 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary sm:size-11 lg:size-10"
             aria-label="Start video call"
           >
-            <Video className="size-4" />
+            <AppIcon name="video" className={"size-4"} />
           </button>
           {/* Everything else folds into one menu on phones and tablets. */}
           <DropdownMenu>
@@ -744,26 +745,26 @@ export function ChatPane({
               <DropdownMenuLabel className="truncate">{title}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={() => setCall("voice")}>
-                <Phone className="size-4" /> Voice call
+                <AppIcon name="phone" className={"size-4"} /> Voice call
               </DropdownMenuItem>
               {!room.is_direct && joined ? (
                 <DropdownMenuItem onSelect={() => void toggleHand()}>
-                  <Hand className="size-4" /> {myHand ? "Lower hand" : "Raise hand"}
+                  <AppIcon name="hand" className={"size-4"} /> {myHand ? "Lower hand" : "Raise hand"}
                   {hands.length > 0 ? ` (${hands.length})` : ""}
                 </DropdownMenuItem>
               ) : null}
               {!room.is_direct ? (
                 <DropdownMenuItem onSelect={() => togglePanel("media")}>
-                  <Radio className="size-4" /> Radio &amp; video
+                  <AppIcon name="radio" className={"size-4"} /> Radio &amp; video
                 </DropdownMenuItem>
               ) : null}
               {!room.is_direct && joined ? (
                 <DropdownMenuItem onSelect={() => togglePanel("feed")}>
-                  <Newspaper className="size-4" /> Room feed
+                  <AppIcon name="feed" className={"size-4"} /> Room feed
                 </DropdownMenuItem>
               ) : null}
               <DropdownMenuItem onSelect={() => togglePanel("games")}>
-                <Gamepad2 className="size-4" /> Games
+                <AppIcon name="games" className={"size-4"} /> Games
               </DropdownMenuItem>
               {!room.is_direct ? (
                 <DropdownMenuItem asChild>
@@ -779,17 +780,17 @@ export function ChatPane({
               ) : null}
               {!room.is_direct ? (
                 <DropdownMenuItem onSelect={() => togglePanel("trivia")}>
-                  <Bot className="size-4" /> Trivia bot
+                  <AppIcon name="bot" className={"size-4"} /> Trivia bot
                 </DropdownMenuItem>
               ) : null}
               {!room.is_direct ? (
                 <DropdownMenuItem onSelect={() => togglePanel("karaoke")}>
-                  <Mic2 className="size-4" /> Karaoke queue
+                  <AppIcon name="mic" className={"size-4"} /> Karaoke queue
                 </DropdownMenuItem>
               ) : null}
               {!room.is_direct && joined ? (
                 <DropdownMenuItem onSelect={() => togglePanel("invite")}>
-                  <UserPlus className="size-4" /> Invite people
+                  <AppIcon name="invite" className={"size-4"} /> Invite people
                 </DropdownMenuItem>
               ) : null}
               {!room.is_direct && isSuper ? (
@@ -867,7 +868,7 @@ export function ChatPane({
               aria-label="Raised hands"
             >
               <span className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
-                <Hand className="size-3.5" aria-hidden />
+                <AppIcon name="hand" className={"size-3.5"} />
                 Mic queue
               </span>
               {hands.map((hand) => {
@@ -1003,7 +1004,7 @@ export function ChatPane({
                   return (
                     <div key={m.id} className="mt-4 flex justify-center">
                       <span className="flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-[11px] font-medium text-primary">
-                        <Video className="size-3" />
+                        <AppIcon name="video" className={"size-3"} />
                         {liveNotice === "on"
                           ? `${name} ${mine ? "are" : "is"} live on camera`
                           : `${name} stopped the camera`}{" "}
@@ -1235,7 +1236,7 @@ export function ChatPane({
               ) : needsCode ? (
                 <>
                   <h3 className="flex items-center justify-center gap-2 text-lg font-semibold">
-                    <Lock className="size-4 text-primary" aria-hidden />
+                    <AppIcon name="lock" className={"size-4"} />
                     {title} is locked
                   </h3>
                   <p className="mt-2 text-sm text-muted-foreground">
