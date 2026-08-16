@@ -1207,7 +1207,7 @@ export function ChatPane({
                   aria-label="Send message"
                   className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40 sm:size-11 lg:size-10"
                 >
-                  <YahooSendIcon className="size-5 sm:size-6 lg:size-5" />
+                  <YahooSendIcon className="size-6" />
                 </button>
               </div>
             </footer>

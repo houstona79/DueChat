@@ -68,7 +68,7 @@ export function GifPicker({
       </PopoverTrigger>
       <PopoverContent align="start" side="top" className="w-[min(22rem,calc(100vw-2rem))] p-3">
         <div className="mb-2 flex items-center gap-2 rounded-xl bg-secondary px-2.5 py-1.5">
-          <YahooSearchIcon className="size-4 shrink-0" />
+          <YahooSearchIcon className="size-5 shrink-0" />
           <input
             value={term}
             onChange={(e) => setTerm(e.target.value)}
