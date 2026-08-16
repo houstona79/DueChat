@@ -67,6 +67,7 @@ import {
 import { grantMic, lowerHand, raiseHand, revokeMic } from "@/lib/hands";
 import { markKaraokeSongPlayed } from "@/lib/karaoke";
 import { useOpenDirect } from "@/hooks/use-direct";
+import { useThreadWallpaper } from "@/hooks/use-wallpaper";
 import { blockUser, isBlocked, unblockUser } from "@/lib/blocks";
 import { takePendingCall } from "@/lib/call-invites";
 import {
@@ -157,6 +158,7 @@ export function ChatPane({
   meId: string;
 }) {
   const queryClient = useQueryClient();
+  useThreadWallpaper(room.id);
   const members = memberships.filter((m) => m.room_id === room.id);
   const joined = members.some((m) => m.user_id === meId);
   const onlineCount = members.filter((m) =>
