@@ -47,8 +47,8 @@ export function AppIcon({
   title,
 }: {
   name: AppIconName;
-  className?: string;
-  title?: string;
+  className?: string | undefined;
+  title?: string | undefined;
 }) {
   const icon = APP_ICONS[name];
   return (
