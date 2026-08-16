@@ -54,6 +54,34 @@ export function videoEmbedOf(body: string): VideoKind | null {
   }
 
   // Snapchat Spotlight
+  // Facebook / Watch — the official plugin resolves any fb video permalink,
+  // including fb.watch short links.
+  if (
+    host === "facebook.com" ||
+    host === "m.facebook.com" ||
+    host === "web.facebook.com" ||
+    host === "fb.watch" ||
+    host === "fb.com"
+  ) {
+    const isVideo =
+      host === "fb.watch" ||
+      /\/(videos|reel|watch|video\.php|story\.php)/i.test(url.pathname) ||
+      url.pathname.startsWith("/watch") ||
+      url.searchParams.has("v");
+    if (isVideo) {
+      const portrait = /\/reel/i.test(url.pathname);
+      return {
+        kind: "embed",
+        src: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(
+          trimmed,
+        )}&show_text=false`,
+        title: "Facebook video",
+        portrait,
+      };
+    }
+  }
+
+  // Snapchat Spotlight
   if (host === "snapchat.com" || host === "story.snapchat.com") {
     const m =
       url.pathname.match(/^\/spotlight\/([\w-]+)/) ??
