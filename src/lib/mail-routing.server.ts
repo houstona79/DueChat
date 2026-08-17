@@ -600,15 +600,21 @@ export async function requestMemberDestination(
   try {
     const { acct, list } = await listAddresses(domain, token);
     const found = list.find((a) => a.email.toLowerCase() === email.toLowerCase());
-    if (found)
+    if (found?.verified)
       return {
         email,
-        verified: Boolean(found.verified),
+        verified: true,
         known: true,
-        message: found.verified
-          ? `${email} is already confirmed.`
-          : `${email} is registered — click the link in the email Cloudflare sent you.`,
+        message: `${email} is already confirmed.`,
       };
+    if (found) {
+      // Registered but never confirmed: Cloudflare confirmation links are
+      // single-use and expire (clicking an old one shows an error page), so
+      // drop the stale entry and register again to trigger a fresh email.
+      await cf(`/accounts/${acct}/email/routing/addresses/${found.tag}`, token, {
+        method: "DELETE",
+      }).catch(() => undefined);
+    }
     await cf(`/accounts/${acct}/email/routing/addresses`, token, {
       method: "POST",
       body: JSON.stringify({ email }),
@@ -617,7 +623,7 @@ export async function requestMemberDestination(
       email,
       verified: false,
       known: true,
-      message: `Cloudflare just emailed ${email} — click the confirmation link, then re-check here.`,
+      message: `A fresh confirmation email was just sent to ${email} — open the newest one and click the link (older links expire), then re-check here.`,
     };
   } catch (err) {
     return {
