@@ -366,7 +366,7 @@ function SettingsPage() {
             {me.mail_forward_to
               ? me.mail_forward_verified
                 ? `Confirmed — mail to your handle goes straight to ${me.mail_forward_to}.`
-                : `${me.mail_forward_to} isn't confirmed yet, so mail still goes to the shared DueChat inbox. Check that inbox for the confirmation email.`
+                : `${me.mail_forward_to} isn't confirmed yet, so your handle isn't receiving mail. Open the newest confirmation email from Cloudflare and click the link — older links expire and show an error page.`
               : "Add your own inbox to receive handle mail directly. You'll get a confirmation email you need to click first."}
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
