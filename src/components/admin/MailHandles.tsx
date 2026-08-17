@@ -187,8 +187,9 @@ export function MailHandles({ isOwner = false }: { isOwner?: boolean }) {
             </button>
           </div>
           <p className="text-[11px] text-muted-foreground">
-            Re-writes every claimed handle's forwarding rule, sending mail to each member's own
-            confirmed inbox when they have one, otherwise the shared DueChat inbox.
+            Re-writes every claimed handle's forwarding rule, sending mail only to each member's own
+            confirmed inbox. Handles without a confirmed inbox have their rule removed, so no one
+            else's mail lands in your inbox.
           </p>
           {resync.isError && (
             <p className="text-xs text-destructive">Could not re-sync right now.</p>

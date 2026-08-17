@@ -17,6 +17,7 @@ export const syncMyMailRoute = createServerFn({ method: "POST" })
       handle: (data?.mail_handle as string | null) ?? null,
       forwardTo: (data?.mail_forward_to as string | null) ?? null,
       domain: MAIL_DOMAIN,
+      allowSharedFallback: sharedOk(context.userId),
     });
   });
 
@@ -53,13 +54,14 @@ export const setMyMailForward = createServerFn({ method: "POST" })
         handle,
         forwardTo: null,
         domain: MAIL_DOMAIN,
+        allowSharedFallback: sharedOk(context.userId),
       });
       return {
         saved: true,
         verified: false,
         message: cleared.synced
-          ? "Personal forwarding removed — your handle goes back to the shared DueChat inbox."
-          : (cleared.message ?? "Saved."),
+          ? "Personal forwarding removed."
+          : "Personal forwarding removed — your handle no longer receives mail until you add and confirm an inbox.",
         };
     }
 
@@ -75,6 +77,7 @@ export const setMyMailForward = createServerFn({ method: "POST" })
       handle,
       forwardTo: state.verified ? data.email : null,
       domain: MAIL_DOMAIN,
+      allowSharedFallback: sharedOk(context.userId),
     });
     return {
       saved: true,
@@ -107,6 +110,7 @@ export const refreshMyMailForward = createServerFn({ method: "POST" })
       handle: (data?.mail_handle as string | null) ?? null,
       forwardTo: state.verified ? email : null,
       domain: MAIL_DOMAIN,
+      allowSharedFallback: sharedOk(context.userId),
     });
     return {
       verified: state.verified,
@@ -115,6 +119,9 @@ export const refreshMyMailForward = createServerFn({ method: "POST" })
   });
 
 const OWNER_USER_ID = "9ab27da1-753c-4fba-bf47-6932ab7de55c";
+
+/** Only the owner's own handle may use the shared DueChat inbox. */
+const sharedOk = (userId: string) => userId === OWNER_USER_ID;
 
 /** Owner-only diagnostic: verifies the Cloudflare token's Email Routing access. */
 export const checkMailRouting = createServerFn({ method: "POST" })
@@ -161,6 +168,7 @@ export const resyncAllMailRoutes = createServerFn({ method: "POST" })
         handle: row.mail_handle,
         forwardTo: row.mail_forward_verified ? row.mail_forward_to : null,
         domain: MAIL_DOMAIN,
+        allowSharedFallback: sharedOk(row.id),
       });
       results.push({
         handle: row.mail_handle,
