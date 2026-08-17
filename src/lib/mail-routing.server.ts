@@ -366,6 +366,11 @@ export async function syncCloudflareRoute(opts: {
   domain: string;
   /** The member's own inbox; used only when Cloudflare has confirmed it. */
   forwardTo?: string | null;
+  /**
+   * Only the owner's own handle may fall back to the shared DueChat inbox.
+   * For everyone else we never point a handle at someone else's mailbox.
+   */
+  allowSharedFallback?: boolean;
 }): Promise<{ synced: boolean; reason?: MailRouteReason; message?: string }> {
   const token = process.env["CLOUDFLARE_API_TOKEN"];
   const shared = process.env["CLOUDFLARE_EMAIL_DESTINATION"];
@@ -375,18 +380,11 @@ export async function syncCloudflareRoute(opts: {
       reason: "missing_token",
       message: "Mail forwarding isn't connected: no Cloudflare API token is saved.",
     };
-  let destination = shared;
+  let destination = opts.allowSharedFallback ? shared : undefined;
   if (opts.forwardTo) {
     const state = await memberDestinationStatus(opts.forwardTo, opts.domain);
     if (state.verified) destination = opts.forwardTo;
   }
-  if (!destination)
-    return {
-      synced: false,
-      reason: "missing_destination",
-      message: "Mail forwarding isn't connected: no verified destination address is saved.",
-    };
-
   let zone: string;
   try {
     zone = await zoneId(opts.domain, token);
@@ -406,6 +404,23 @@ export async function syncCloudflareRoute(opts: {
   }
   const mine = rules.find((r) => r.name === ruleName);
   const address = opts.handle ? `${opts.handle}@${opts.domain}` : null;
+
+  // No confirmed inbox of their own: remove any rule rather than delivering
+  // this member's mail to somebody else's mailbox.
+  if (!destination) {
+    try {
+      if (mine)
+        await cf(`/zones/${zone}/email/routing/rules/${mine.tag}`, token, { method: "DELETE" });
+    } catch {
+      /* ignore cleanup failures */
+    }
+    return {
+      synced: false,
+      reason: "destination_unverified",
+      message:
+        "Forwarding is paused until you confirm your own inbox — mail to your handle is never sent to anyone else's mailbox.",
+    };
+  }
 
   try {
     if (!address) {
