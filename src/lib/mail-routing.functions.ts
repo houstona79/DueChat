@@ -168,6 +168,7 @@ export const resyncAllMailRoutes = createServerFn({ method: "POST" })
         handle: row.mail_handle,
         forwardTo: row.mail_forward_verified ? row.mail_forward_to : null,
         domain: MAIL_DOMAIN,
+        allowSharedFallback: sharedOk(row.id),
       });
       results.push({
         handle: row.mail_handle,
