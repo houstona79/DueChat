@@ -1071,3 +1071,34 @@ html.dark[data-skin="slate"] {
   --accent-3: oklch(0.76 0.04 290);
   --accent-4: oklch(0.8 0.03 264);
 }
+
+/* Phone room chrome: solid brand-blue bar with white title and icons. */
+@media (max-width: 767px) {
+  .live-room-header.phone-chrome {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+    border-bottom-color: color-mix(in oklab, var(--color-primary) 72%, black);
+  }
+
+  .live-room-header.phone-chrome h2,
+  .live-room-header.phone-chrome a,
+  .live-room-header.phone-chrome button,
+  .live-room-header.phone-chrome p {
+    color: var(--color-primary-foreground);
+  }
+
+  .live-room-header.phone-chrome .text-muted-foreground,
+  .live-room-header.phone-chrome p.text-muted-foreground {
+    color: color-mix(in oklab, var(--color-primary-foreground) 80%, transparent);
+  }
+
+  .live-room-header.phone-chrome button:hover,
+  .live-room-header.phone-chrome a:hover {
+    background-color: color-mix(in oklab, var(--color-primary-foreground) 16%, transparent);
+  }
+
+  .live-room-header.phone-chrome .live-badge {
+    background-color: color-mix(in oklab, var(--color-primary-foreground) 22%, transparent);
+    color: var(--color-primary-foreground);
+  }
+}
