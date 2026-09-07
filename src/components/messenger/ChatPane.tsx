@@ -913,20 +913,20 @@ export function ChatPane({
                 setTalking(true);
                 setShowCams(true);
               }}
-              className="zam-orb grid size-9 place-items-center rounded-full"
+              className="zam-orb grid size-7 place-items-center rounded-full"
               aria-label="View cams"
               title="View cams"
             >
-              <AppIcon name="video" className="size-5" />
+              <AppIcon name="video" className="size-4" />
             </button>
             <button
               type="button"
               onClick={() => togglePanel("games")}
-              className="zam-orb grid size-9 place-items-center rounded-full"
+              className="zam-orb grid size-7 place-items-center rounded-full"
               aria-label="Games and gifts"
               title="Games"
             >
-              <AppIcon name="games" className="size-5" />
+              <AppIcon name="games" className="size-4" />
             </button>
             <button
               type="button"
@@ -934,11 +934,11 @@ export function ChatPane({
                 togglePanel("members");
                 setShowMembers(true);
               }}
-              className="zam-orb grid size-9 place-items-center rounded-full"
+              className="zam-orb grid size-7 place-items-center rounded-full"
               aria-label="Show members"
               title="Members"
             >
-              <AppIcon name="members" className="size-5" />
+              <AppIcon name="members" className="size-4" />
             </button>
           </div>
           <span className="shrink-0">
@@ -1020,7 +1020,7 @@ export function ChatPane({
               }}
               className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold hover:bg-secondary"
             >
-              <AppIcon name="video" className="size-5" /> Cams
+              <AppIcon name="video" className="size-4" /> Cams
             </button>
           </div>
         </div>
@@ -1464,7 +1464,7 @@ export function ChatPane({
                 </p>
               ) : null}
               {!room.is_direct ? (
-                <div className="zam-toolbar mb-1.5 hidden items-center gap-2 rounded-md border border-border bg-secondary/60 px-2 py-1 lg:flex">
+                <div className="zam-toolbar mb-1 hidden items-center gap-2 rounded-md border border-border bg-secondary/60 px-2 py-0.5 lg:flex">
                   <button
                     type="button"
                     onClick={() => setTypeStyle((s) => ({ ...s, bold: !s.bold }))}
