@@ -1456,7 +1456,109 @@ export function ChatPane({
                   {error}
                 </p>
               ) : null}
+              {!room.is_direct ? (
+                <div className="zam-toolbar mb-1.5 hidden items-center gap-2 rounded-md border border-border bg-secondary/60 px-2 py-1 lg:flex">
+                  <button
+                    type="button"
+                    onClick={() => setTypeStyle((s) => ({ ...s, bold: !s.bold }))}
+                    aria-pressed={typeStyle.bold}
+                    className={cn(
+                      "size-6 rounded text-[13px] font-bold",
+                      typeStyle.bold ? "bg-primary/20 text-primary" : "hover:bg-secondary",
+                    )}
+                    title="Bold"
+                  >
+                    B
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTypeStyle((s) => ({ ...s, italic: !s.italic }))}
+                    aria-pressed={typeStyle.italic}
+                    className={cn(
+                      "size-6 rounded text-[13px] italic",
+                      typeStyle.italic ? "bg-primary/20 text-primary" : "hover:bg-secondary",
+                    )}
+                    title="Italic"
+                  >
+                    I
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTypeStyle((s) => ({ ...s, underline: !s.underline }))}
+                    aria-pressed={typeStyle.underline}
+                    className={cn(
+                      "size-6 rounded text-[13px] underline",
+                      typeStyle.underline ? "bg-primary/20 text-primary" : "hover:bg-secondary",
+                    )}
+                    title="Underline"
+                  >
+                    U
+                  </button>
+                  <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                    Size:
+                    <select
+                      value={typeStyle.size}
+                      onChange={(e) => setTypeStyle((s) => ({ ...s, size: Number(e.target.value) }))}
+                      className="rounded border border-border bg-background px-1 py-0.5 text-[11px] text-foreground outline-none"
+                      aria-label="Text size"
+                    >
+                      {[1, 2, 3, 4].map((n) => (
+                        <option key={n} value={n}>
+                          {n}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <span className="mx-1 h-5 w-px bg-border" aria-hidden />
+                  <button
+                    type="button"
+                    onClick={() => togglePanel("invite")}
+                    className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-semibold hover:bg-secondary"
+                  >
+                    <AppIcon name="invite" className="size-5" /> Invite
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTalking(false);
+                      setShowCams(false);
+                    }}
+                    className={cn(
+                      "flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-semibold",
+                      talking ? "hover:bg-secondary" : "bg-primary/15 text-primary",
+                    )}
+                    aria-pressed={!talking}
+                  >
+                    <AppIcon name="mic" className="size-5" /> Mute
+                  </button>
+                  <span className="ml-auto flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setTalking((v) => !v)}
+                      aria-pressed={talking}
+                      className={cn(
+                        "flex items-center gap-1.5 rounded-md border border-border px-3 py-1 text-[11px] font-semibold",
+                        talking ? "bg-primary text-primary-foreground" : "bg-background hover:bg-secondary",
+                      )}
+                    >
+                      <AppIcon name="lock" className="size-5" /> Lock On Mic
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void toggleHand()}
+                      aria-pressed={Boolean(myHand)}
+                      className={cn(
+                        "flex items-center gap-1.5 rounded-md border border-border px-3 py-1 text-[11px] font-semibold",
+                        myHand ? "bg-primary/15 text-primary" : "bg-background hover:bg-secondary",
+                      )}
+                    >
+                      <AppIcon name="hand" className="size-5" /> Raise Hand
+                    </button>
+                  </span>
+                </div>
+              ) : null}
               <div className="flex items-end gap-1.5 rounded-2xl bg-secondary p-1.5 sm:gap-2 sm:p-2">
+
                 <EmojiPicker
                   onSelect={(emoji) => {
                     const el = inputRef.current;
