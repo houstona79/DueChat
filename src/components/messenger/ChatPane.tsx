@@ -571,14 +571,14 @@ export function ChatPane({
           <button
             onClick={() => togglePanel("games")}
             className={cn(
-              "hidden h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium lg:flex",
+              "flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2 text-[11px] font-medium lg:hidden",
               showGames ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
             )}
             aria-label="Show games"
             aria-pressed={showGames}
             title="Games"
           >
-            <AppIcon name="games" className={"size-6 sm:size-[34px]"} />
+            <AppIcon name="games" className={"size-5 sm:size-6"} />
             Games
           </button>
           {!room.is_direct ? (
