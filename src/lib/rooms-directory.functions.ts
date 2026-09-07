@@ -5,6 +5,7 @@ export type DirectoryRoom = {
   name: string;
   slug: string;
   topic: string | null;
+  description: string | null;
   category: string;
   rating: "G" | "R";
   name_color: string | null;

@@ -38,6 +38,8 @@ export type Room = {
   name: string;
   slug: string;
   topic: string | null;
+  /** One or two lines about the room, shown on browse cards. */
+  description: string | null;
   created_by: string;
   created_at: string;
   is_direct: boolean;
@@ -66,7 +68,7 @@ export type Room = {
 };
 
 export const ROOM_COLS =
-  "id, name, slug, topic, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label, trivia_enabled, staff_only, status_message, invisible, locked, name_color";
+  "id, name, slug, topic, description, created_by, created_at, is_direct, direct_key, radio_url, radio_name, rating, youtube_url, youtube_title, category, icon_url, banner_url, website_url, website_label, trivia_enabled, staff_only, status_message, invisible, locked, name_color";
 
 /** The 25 room-name colors owners can pick from. */
 export const ROOM_NAME_COLORS: { hex: string; label: string }[] = [
@@ -100,6 +102,7 @@ export const ROOM_NAME_COLORS: { hex: string; label: string }[] = [
 export type RoomSettings = {
   name: string;
   topic: string | null;
+  description: string | null;
   category: string;
   rating: RoomRating;
   status_message: string | null;
@@ -329,7 +332,7 @@ export async function createRoom(
   name: string,
   topic: string,
   category = "General",
-  options: { invisible?: boolean; lockCode?: string | null } = {},
+  options: { invisible?: boolean; lockCode?: string | null; description?: string | null } = {},
 ) {
   const { data, error } = await supabase
     .from("rooms")
@@ -337,6 +340,7 @@ export async function createRoom(
       name: name.trim(),
       slug: slugify(name),
       topic: topic.trim() || null,
+      description: options.description?.trim() || null,
       created_by: userId,
       category,
       invisible: options.invisible ?? false,

@@ -22,6 +22,7 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
   const queryClient = useQueryClient();
   const [name, setName] = useState("");
   const [topic, setTopic] = useState("");
+  const [description, setDescription] = useState("");
   const [rating, setRating] = useState<RoomRating>("G");
   const [category, setCategory] = useState<string>("General");
   const [invisible, setInvisible] = useState(false);
@@ -38,6 +39,7 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
       const room = await createRoom(userId, name, topic, category, {
         invisible,
         lockCode: lockCode.trim() || null,
+        description: description.trim() || null,
       });
       if (rating !== "G") await setRoomRating(room.id, rating);
       await queryClient.invalidateQueries({ queryKey: ["rooms"] });
@@ -87,6 +89,21 @@ export function NewRoomForm({ userId, onDone }: { userId: string; onDone: () => 
         maxLength={120}
         placeholder="Weekly reviews"
         className="mt-1 w-full rounded-xl bg-secondary px-3 py-2 text-base outline-none placeholder:text-muted-foreground sm:text-sm"
+      />
+      <label
+        className="mt-2 block text-[11px] font-medium text-muted-foreground"
+        htmlFor="room-description"
+      >
+        Description (optional)
+      </label>
+      <textarea
+        id="room-description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        maxLength={200}
+        rows={2}
+        placeholder="What is this room about? Shown on the browse page."
+        className="mt-1 w-full resize-none rounded-xl bg-secondary px-3 py-2 text-base outline-none placeholder:text-muted-foreground sm:text-sm"
       />
       <label
         className="mt-2 block text-[11px] font-medium text-muted-foreground"

@@ -97,9 +97,9 @@ function RoomCard({
             </span>
             {note ? <span className="font-medium text-foreground">{note}</span> : null}
           </span>
-          {room.topic ? (
+          {room.description || room.topic ? (
             <span className="mt-1 line-clamp-2 block text-xs text-muted-foreground">
-              {room.topic}
+              {room.description || room.topic}
             </span>
           ) : null}
         </span>
@@ -176,6 +176,7 @@ function RoomsDirectoryPage() {
       return (
         r.name.toLowerCase().includes(q) ||
         (r.topic ?? "").toLowerCase().includes(q) ||
+        (r.description ?? "").toLowerCase().includes(q) ||
         (r.category ?? "").toLowerCase().includes(q)
       );
     });
