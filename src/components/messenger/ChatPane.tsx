@@ -831,7 +831,109 @@ export function ChatPane({
         </div>
       </header>
       {!room.is_direct ? (
-        <div className="room-strip flex shrink-0 items-center gap-2 border-b border-border bg-secondary/50 px-2 py-1.5 sm:gap-3 sm:px-3 sm:py-2 lg:py-1">
+        <div className="zam-menubar hidden shrink-0 items-center gap-0.5 border-b border-border bg-background px-2 py-0.5 lg:flex">
+          {([
+            {
+              label: "File",
+              items: [
+                { label: "Room profile", run: () => window.open(`/r/${room.slug}`, "_blank") },
+                {
+                  label: "Copy room URL",
+                  run: () => void navigator.clipboard.writeText(`${window.location.origin}/r/${room.slug}`),
+                },
+                { label: "Leave room", run: () => void leave() },
+              ],
+            },
+            {
+              label: "Edit",
+              items: [
+                { label: "Edit room", run: () => setEditingRoom(true), hide: !isOwner },
+                { label: "Set alert", run: () => setStatusDraft(room.status_message ?? ""), hide: !isSuper },
+                { label: "Room feed", run: () => togglePanel("feed") },
+              ],
+            },
+            {
+              label: "Option",
+              items: [
+                { label: "Radio & video", run: () => togglePanel("media") },
+                { label: "Karaoke queue", run: () => togglePanel("karaoke") },
+                { label: "Games", run: () => togglePanel("games") },
+              ],
+            },
+            {
+              label: "Action",
+              items: [
+                { label: myHand ? "Lower hand" : "Raise hand", run: () => void toggleHand() },
+                { label: showCams ? "Hide cams" : "Show cams", run: () => { setTalking(true); setShowCams((v) => !v); } },
+                { label: "Invite people", run: () => togglePanel("invite") },
+              ],
+            },
+            {
+              label: "Help",
+              items: [
+                { label: "Trivia bot", run: () => togglePanel("trivia") },
+                { label: "Members", run: () => { togglePanel("members"); setShowMembers(true); } },
+              ],
+            },
+          ] as const).map((menu) => (
+            <DropdownMenu key={menu.label}>
+              <DropdownMenuTrigger className="rounded px-2 py-0.5 text-[12px] text-foreground hover:bg-secondary">
+                {menu.label}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                {menu.items
+                  .filter((it) => !("hide" in it && it.hide))
+                  .map((it) => (
+                    <DropdownMenuItem key={it.label} onSelect={() => it.run()}>
+                      {it.label}
+                    </DropdownMenuItem>
+                  ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ))}
+        </div>
+      ) : null}
+      {!room.is_direct ? (
+        <div className="room-strip zam-strip flex shrink-0 items-center gap-2 border-b border-border bg-secondary/50 px-2 py-1.5 sm:gap-3 sm:px-3 sm:py-2 lg:py-1.5">
+          <div className="hidden shrink-0 leading-tight lg:block">
+            <p className="text-[11px] font-semibold">Raised Hands: {hands.length}</p>
+            <p className="text-[11px] font-semibold">Webcam: {showCams ? 1 : 0}</p>
+          </div>
+          <div className="hidden shrink-0 items-center gap-2 lg:flex">
+            <button
+              type="button"
+              onClick={() => {
+                setTalking(true);
+                setShowCams(true);
+              }}
+              className="zam-orb grid size-9 place-items-center rounded-full"
+              aria-label="View cams"
+              title="View cams"
+            >
+              <AppIcon name="video" className="size-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => togglePanel("games")}
+              className="zam-orb grid size-9 place-items-center rounded-full"
+              aria-label="Games and gifts"
+              title="Games"
+            >
+              <AppIcon name="games" className="size-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                togglePanel("members");
+                setShowMembers(true);
+              }}
+              className="zam-orb grid size-9 place-items-center rounded-full"
+              aria-label="Show members"
+              title="Members"
+            >
+              <AppIcon name="members" className="size-5" />
+            </button>
+          </div>
           <span className="shrink-0">
             <RatingControl
               rating={room.rating}
@@ -852,11 +954,6 @@ export function ChatPane({
               style={room.name_color ? { color: room.name_color } : undefined}
             >
               {room.name}
-            </p>
-            <p className="truncate text-[11px] text-muted-foreground lg:text-[10px]">
-              Owner: {profileOf(room.created_by)?.display_name ?? "—"}
-              {"  |  "}Members: {members.length}
-              {"  |  "}Online: {onlineCount}
             </p>
             <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] font-medium lg:mt-0 lg:gap-x-2 lg:text-[10px]">
               <button
@@ -895,30 +992,33 @@ export function ChatPane({
               ) : null}
             </div>
           </div>
-          <div className="hidden shrink-0 flex-col gap-1 sm:flex lg:flex-row lg:items-center lg:gap-2">
+          <div className="hidden shrink-0 leading-tight text-[11px] lg:block">
+            <p>
+              <span className="text-muted-foreground">Owner: </span>
+              <span className="font-semibold">{profileOf(room.created_by)?.display_name ?? "—"}</span>
+            </p>
+            <p>
+              <span className="text-muted-foreground">Members: </span>
+              <span className="font-semibold">{members.length}</span>
+              <span className="text-muted-foreground"> · Online: </span>
+              <span className="font-semibold">{onlineCount}</span>
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-col gap-1 sm:flex-row sm:items-center sm:gap-2 lg:hidden">
             <button
               type="button"
               onClick={() => {
                 setTalking(true);
                 setShowCams(true);
               }}
-              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold hover:bg-secondary lg:px-1.5 lg:py-0.5"
+              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold hover:bg-secondary"
             >
-              <AppIcon name="video" className="size-5 lg:size-4" /> View cams
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setTalking(true);
-                setShowCams(true);
-              }}
-              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold hover:bg-secondary lg:px-1.5 lg:py-0.5"
-            >
-              <AppIcon name="video" className="size-5 lg:size-4" /> My cam
+              <AppIcon name="video" className="size-5" /> Cams
             </button>
           </div>
         </div>
       ) : null}
+
       {!room.is_direct && (room.status_message || room.topic) ? (
         <div
           className="room-alerts shrink-0 space-y-0.5 border-b border-border bg-background px-2 py-1.5 text-[11px] leading-snug short:hidden sm:px-3 sm:py-2"
