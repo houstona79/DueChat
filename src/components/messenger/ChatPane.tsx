@@ -1425,9 +1425,17 @@ export function ChatPane({
                   onClick={() => void submit()}
                   disabled={draft.trim().length === 0 || Boolean(mySilence)}
                   aria-label="Send message"
-                  className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40 sm:size-11 lg:size-10"
+                  className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40 sm:size-11 lg:hidden"
                 >
                   <YahooSendIcon className="size-6 sm:size-[34px]" />
+                </button>
+                <button
+                  onClick={() => void submit()}
+                  disabled={draft.trim().length === 0 || Boolean(mySilence)}
+                  className="classic-send hidden shrink-0 items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-[12px] font-semibold text-foreground transition-opacity hover:bg-secondary disabled:opacity-40 lg:inline-flex"
+                >
+                  Send
+                  <span aria-hidden>▸</span>
                 </button>
               </div>
             </footer>
