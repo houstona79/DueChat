@@ -1099,7 +1099,10 @@ export function ChatPane({
           <>
             <div
               ref={scroller}
-              className="min-h-0 flex-1 overflow-y-auto px-2 py-2 sm:px-3 sm:py-3 lg:px-4 lg:py-5"
+              className={cn(
+                "min-h-0 flex-1 overflow-y-auto px-2 py-2 sm:px-3 sm:py-3",
+                room.is_direct ? "lg:px-4 lg:py-5" : "classic-log lg:px-3 lg:py-2",
+              )}
               role="log"
               aria-live="polite"
               aria-relevant="additions text"
@@ -1175,7 +1178,7 @@ export function ChatPane({
                 const author = profileOf(m.user_id);
                 const authorName = author?.display_name ?? "Someone";
                 const roleOfAuthor = siteRoleOf(siteRoles, m.user_id);
-                if (phone) {
+                if (phone || !room.is_direct) {
                   const media = gifUrlOf(m.body);
                   const video = videoEmbedOf(m.body);
                   return (
@@ -1183,33 +1186,43 @@ export function ChatPane({
                       key={m.id}
                       className={cn(
                         "flex items-start gap-2 px-0.5",
-                        grouped ? "mt-1" : "mt-2.5",
+                        phone ? (grouped ? "mt-1" : "mt-2.5") : "mt-0.5",
                       )}
                     >
-                      <button
-                        type="button"
-                        onClick={() => openProfile(m.user_id)}
-                        aria-label={`View ${authorName}'s profile`}
-                        className="mt-0.5 shrink-0 rounded-full hover:opacity-80"
+                      {phone ? (
+                        <button
+                          type="button"
+                          onClick={() => openProfile(m.user_id)}
+                          aria-label={`View ${authorName}'s profile`}
+                          className="mt-0.5 shrink-0 rounded-full hover:opacity-80"
+                        >
+                          <Avatar
+                            name={authorName}
+                            accent={accentFor(m.user_id)}
+                            avatarPath={author?.avatar_url ?? null}
+                            online={author ? isOnline(author) : false}
+                            size="sm"
+                          />
+                        </button>
+                      ) : null}
+                      <div
+                        className={cn(
+                          "min-w-0 flex-1 leading-snug",
+                          phone ? "text-[13px]" : "text-[13px] leading-[1.45]",
+                        )}
                       >
-                        <Avatar
-                          name={authorName}
-                          accent={accentFor(m.user_id)}
-                          avatarPath={author?.avatar_url ?? null}
-                          online={author ? isOnline(author) : false}
-                          size="sm"
-                        />
-                      </button>
-                      <div className="min-w-0 flex-1 text-[13px] leading-snug">
-                        <span
+                        <button
+                          type="button"
+                          onClick={() => openProfile(m.user_id)}
                           className={cn(
-                            "mr-1 font-bold",
+                            "mr-1 font-bold hover:underline",
                             siteRoleTextClass(roleOfAuthor) ?? "text-primary",
                           )}
                           style={nameColorStyle(roleOfAuthor, author?.name_color)}
                         >
                           {mine ? "You" : authorName}
-                        </span>
+                          {phone ? "" : ":"}
+                        </button>
                         {media ? (
                           <img
                             src={media}
@@ -1412,9 +1425,17 @@ export function ChatPane({
                   onClick={() => void submit()}
                   disabled={draft.trim().length === 0 || Boolean(mySilence)}
                   aria-label="Send message"
-                  className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40 sm:size-11 lg:size-10"
+                  className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40 sm:size-11 lg:hidden"
                 >
                   <YahooSendIcon className="size-6 sm:size-[34px]" />
+                </button>
+                <button
+                  onClick={() => void submit()}
+                  disabled={draft.trim().length === 0 || Boolean(mySilence)}
+                  className="classic-send hidden shrink-0 items-center gap-1 rounded-md border border-border bg-background px-3 py-1.5 text-[12px] font-semibold text-foreground transition-opacity hover:bg-secondary disabled:opacity-40 lg:inline-flex"
+                >
+                  Send
+                  <span aria-hidden>▸</span>
                 </button>
               </div>
             </footer>
@@ -1453,6 +1474,19 @@ export function ChatPane({
                   aria-pressed={talking}
                 >
                   <AppIcon name="mic" className="size-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTalking((v) => !v)}
+                  aria-pressed={talking}
+                  className={cn(
+                    "mx-auto hidden items-center gap-1.5 rounded-md border border-border px-4 py-1 text-[12px] font-semibold sm:inline-flex",
+                    talking
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-background hover:bg-secondary",
+                  )}
+                >
+                  Push to Talk
                 </button>
                 <span className="ml-auto flex items-center gap-1.5">
                   <button

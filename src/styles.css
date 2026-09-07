@@ -1266,3 +1266,18 @@ html.dark[data-skin="slate"] {
     min-height: 1.75rem;
   }
 }
+
+/* Classic voice-room transcript: dense inline lines on a flat panel */
+@media (min-width: 1024px) {
+  .classic-log {
+    background: color-mix(in oklab, var(--color-card) 96%, transparent);
+    border: 1px solid var(--color-border);
+    border-radius: 0.25rem;
+    margin: 0.25rem;
+    font-family: Tahoma, Verdana, "Segoe UI", sans-serif;
+  }
+
+  .classic-send {
+    border-radius: 0.25rem;
+  }
+}
