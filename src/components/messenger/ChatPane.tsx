@@ -838,73 +838,73 @@ export function ChatPane({
         </div>
       </header>
       {!room.is_direct ? (
-        <div className="zam-menubar hidden shrink-0 items-center gap-0.5 border-b border-border bg-background px-2 py-0.5 lg:flex">
-          {([
-            {
-              label: "File",
-              items: [
-                { label: "Room profile", run: () => window.open(`/r/${room.slug}`, "_blank") },
-                {
-                  label: "Copy room URL",
-                  run: () => void navigator.clipboard.writeText(`${window.location.origin}/r/${room.slug}`),
-                },
-                { label: "Leave room", run: () => void leave() },
-              ],
-            },
-            {
-              label: "Edit",
-              items: [
-                { label: "Edit room", run: () => setEditingRoom(true), hide: !isOwner },
-                { label: "Set alert", run: () => setStatusDraft(room.status_message ?? ""), hide: !isSuper },
-                { label: "Room feed", run: () => togglePanel("feed") },
-              ],
-            },
-            {
-              label: "Option",
-              items: [
-                { label: "Radio & video", run: () => togglePanel("media") },
-                { label: "Karaoke queue", run: () => togglePanel("karaoke") },
-                { label: "Games", run: () => togglePanel("games") },
-              ],
-            },
-            {
-              label: "Action",
-              items: [
-                { label: myHand ? "Lower hand" : "Raise hand", run: () => void toggleHand() },
-                { label: showCams ? "Hide cams" : "Show cams", run: () => { setTalking(true); setShowCams((v) => !v); } },
-                { label: "Invite people", run: () => togglePanel("invite") },
-              ],
-            },
-            {
-              label: "Help",
-              items: [
-                { label: "Trivia bot", run: () => togglePanel("trivia") },
-                { label: "Members", run: () => { togglePanel("members"); setShowMembers(true); } },
-              ],
-            },
-          ] as const).map((menu) => (
-            <DropdownMenu key={menu.label}>
-              <DropdownMenuTrigger className="rounded px-2 py-0.5 text-[12px] text-foreground hover:bg-secondary">
-                {menu.label}
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
-                {menu.items
-                  .filter((it) => !("hide" in it && it.hide))
-                  .map((it) => (
-                    <DropdownMenuItem key={it.label} onSelect={() => it.run()}>
-                      {it.label}
-                    </DropdownMenuItem>
-                  ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ))}
-        </div>
-      ) : null}
-      {!room.is_direct ? (
-        <div className="room-strip zam-strip flex shrink-0 items-center gap-2 border-b border-border bg-secondary/50 px-2 py-1.5 sm:gap-3 sm:px-3 sm:py-2 lg:py-1.5">
-          <div className="hidden shrink-0 leading-tight lg:block">
-            <p className="text-[11px] font-semibold">Raised Hands: {hands.length}</p>
-            <p className="text-[11px] font-semibold">Webcam: {showCams ? 1 : 0}</p>
+        <div className="room-strip zam-strip flex shrink-0 items-center gap-2 border-b border-border bg-secondary/50 px-2 py-1.5 sm:gap-3 sm:px-3 sm:py-2 lg:gap-2 lg:px-2 lg:py-1">
+          <div className="zam-menubar hidden shrink-0 items-center gap-0.5 lg:flex">
+            {([
+              {
+                label: "File",
+                items: [
+                  { label: "Room profile", run: () => window.open(`/r/${room.slug}`, "_blank") },
+                  {
+                    label: "Copy room URL",
+                    run: () => void navigator.clipboard.writeText(`${window.location.origin}/r/${room.slug}`),
+                  },
+                  { label: "Leave room", run: () => void leave() },
+                ],
+              },
+              {
+                label: "Edit",
+                items: [
+                  { label: "Edit room", run: () => setEditingRoom(true), hide: !isOwner },
+                  { label: "Set alert", run: () => setStatusDraft(room.status_message ?? ""), hide: !isSuper },
+                  { label: "Room feed", run: () => togglePanel("feed") },
+                ],
+              },
+              {
+                label: "Option",
+                items: [
+                  { label: "Radio & video", run: () => togglePanel("media") },
+                  { label: "Karaoke queue", run: () => togglePanel("karaoke") },
+                  { label: "Games", run: () => togglePanel("games") },
+                ],
+              },
+              {
+                label: "Action",
+                items: [
+                  { label: myHand ? "Lower hand" : "Raise hand", run: () => void toggleHand() },
+                  { label: showCams ? "Hide cams" : "Show cams", run: () => { setTalking(true); setShowCams((v) => !v); } },
+                  { label: "Invite people", run: () => togglePanel("invite") },
+                ],
+              },
+              {
+                label: "Help",
+                items: [
+                  { label: "Trivia bot", run: () => togglePanel("trivia") },
+                  { label: "Members", run: () => { togglePanel("members"); setShowMembers(true); } },
+                ],
+              },
+            ] as const).map((menu) => (
+              <DropdownMenu key={menu.label}>
+                <DropdownMenuTrigger className="rounded px-1.5 py-0.5 text-[11px] font-semibold text-foreground hover:bg-secondary">
+                  {menu.label}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  {menu.items
+                    .filter((it) => !("hide" in it && it.hide))
+                    .map((it) => (
+                      <DropdownMenuItem key={it.label} onSelect={() => it.run()}>
+                        {it.label}
+                      </DropdownMenuItem>
+                    ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ))}
+            <span className="mx-1 h-4 w-px bg-border" aria-hidden />
+          </div>
+          <div className="hidden shrink-0 items-center gap-2 text-[11px] font-semibold lg:flex">
+            <span>Hands: {hands.length}</span>
+            <span className="text-muted-foreground">·</span>
+            <span>Cam: {showCams ? 1 : 0}</span>
           </div>
           <div className="hidden shrink-0 items-center gap-2 lg:flex">
             <button
