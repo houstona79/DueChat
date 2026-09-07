@@ -1475,6 +1475,19 @@ export function ChatPane({
                 >
                   <AppIcon name="mic" className="size-5" />
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setTalking((v) => !v)}
+                  aria-pressed={talking}
+                  className={cn(
+                    "mx-auto hidden items-center gap-1.5 rounded-md border border-border px-4 py-1 text-[12px] font-semibold sm:inline-flex",
+                    talking
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-background hover:bg-secondary",
+                  )}
+                >
+                  Push to Talk
+                </button>
                 <span className="ml-auto flex items-center gap-1.5">
                   <button
                     type="button"
