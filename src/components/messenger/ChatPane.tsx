@@ -670,7 +670,7 @@ export function ChatPane({
             <button
               onClick={() => togglePanel("media")}
               className={cn(
-                "hidden size-10 shrink-0 place-items-center rounded-xl lg:grid",
+                "grid size-9 shrink-0 place-items-center rounded-xl lg:hidden",
                 showMedia
                   ? "bg-primary/15 text-primary"
                   : "text-muted-foreground hover:bg-secondary",
@@ -679,7 +679,7 @@ export function ChatPane({
               aria-pressed={showMedia}
               title="Radio & video"
             >
-              <AppIcon name="radio" className={"size-6 sm:size-[34px]"} />
+              <AppIcon name="radio" className={"size-5 sm:size-6"} />
             </button>
           ) : null}
           <button
