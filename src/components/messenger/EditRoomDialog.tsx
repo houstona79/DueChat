@@ -23,6 +23,7 @@ export function EditRoomDialog({ room, onDone }: { room: Room; onDone: () => voi
   const queryClient = useQueryClient();
   const [name, setName] = useState(room.name);
   const [topic, setTopic] = useState(room.topic ?? "");
+  const [description, setDescription] = useState(room.description ?? "");
   const [category, setCategory] = useState(room.category || "General");
   const [rating, setRating] = useState<RoomRating>(room.rating);
   const [status, setStatus] = useState(room.status_message ?? "");
@@ -42,6 +43,7 @@ export function EditRoomDialog({ room, onDone }: { room: Room; onDone: () => voi
       await updateRoomSettings(room.id, {
         name: name.trim(),
         topic: topic.trim() || null,
+        description: description.trim() || null,
         category,
         rating,
         status_message: status.trim() || null,
@@ -130,6 +132,21 @@ export function EditRoomDialog({ room, onDone }: { room: Room; onDone: () => voi
               onChange={(e) => setTopic(e.target.value)}
               maxLength={120}
               className="mt-1 w-full rounded-xl bg-secondary px-3 py-2 text-base outline-none sm:text-sm"
+            />
+            <label
+              className="mt-2 block text-[11px] font-medium text-muted-foreground"
+              htmlFor="edit-room-description"
+            >
+              Description (optional)
+            </label>
+            <textarea
+              id="edit-room-description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              maxLength={200}
+              rows={2}
+              placeholder="What is this room about? Shown on the browse page."
+              className="mt-1 w-full resize-none rounded-xl bg-secondary px-3 py-2 text-base outline-none placeholder:text-muted-foreground sm:text-sm"
             />
             <label
               className="mt-2 block text-[11px] font-medium text-muted-foreground"
