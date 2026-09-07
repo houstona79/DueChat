@@ -511,7 +511,7 @@ export function ChatPane({
                   setError(err instanceof Error ? err.message : "Could not change the category.");
                 }
               }}
-              className="hidden shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground outline-none lg:block"
+              className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground outline-none lg:hidden"
             >
               {[...new Set([...ROOM_CATEGORIES, room.category || "General"])].map((c) => (
                 <option key={c} value={c}>
