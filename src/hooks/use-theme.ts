@@ -5,6 +5,7 @@ const KEY = "duechat.theme";
 const SKIN_KEY = "duechat.skin";
 
 export type SkinId =
+  | "paltalk"
   | "msn"
   | "yahoo"
   | "aol"
@@ -16,6 +17,7 @@ export type SkinId =
   | "slate";
 
 export const SKINS: { id: SkinId; label: string; swatch: string }[] = [
+  { id: "paltalk", label: "PalTalk", swatch: "linear-gradient(180deg,#2f80d1,#0b5cad)" },
   { id: "msn", label: "MSN", swatch: "linear-gradient(180deg,#eaf4ff,#3c8ee0)" },
   { id: "yahoo", label: "Yahoo!", swatch: "linear-gradient(180deg,#efe3ff,#6b2fa0)" },
   { id: "aol", label: "AOL", swatch: "linear-gradient(180deg,#d6e9ff,#0a4ea8)" },
@@ -38,16 +40,21 @@ export function applySkin(skin: SkinId) {
 
 export function readStoredSkin(): SkinId {
   try {
+    if (localStorage.getItem("duechat.paltalk-redesign") !== "1") {
+      localStorage.setItem("duechat.paltalk-redesign", "1");
+      localStorage.setItem(SKIN_KEY, "paltalk");
+      return "paltalk";
+    }
     const stored = localStorage.getItem(SKIN_KEY);
     if (SKINS.some((s) => s.id === stored)) return stored as SkinId;
   } catch {
     /* ignore */
   }
-  return "msn";
+  return "paltalk";
 }
 
 export function useSkin() {
-  const [skin, setSkin] = useState<SkinId>("msn");
+  const [skin, setSkin] = useState<SkinId>("paltalk");
 
   useEffect(() => {
     const next = readStoredSkin();

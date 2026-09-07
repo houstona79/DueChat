@@ -117,9 +117,9 @@ export function Sidebar({
   };
 
   return (
-    <div className="chat-glass flex h-full min-h-0 flex-col bg-sidebar">
+    <div className="chat-glass room-directory flex h-full min-h-0 flex-col bg-sidebar">
       <header className="shrink-0 px-4 pb-3 pt-[max(1.25rem,env(safe-area-inset-top))] short:pb-1.5 short:pt-[max(0.5rem,env(safe-area-inset-top))] sm:px-5">
-        <div className="app-titlebar -mx-4 -mt-[max(1.25rem,env(safe-area-inset-top))] mb-1 flex items-center justify-between gap-2 px-3 pb-2 pt-[max(1.25rem,env(safe-area-inset-top))] sm:-mx-5 sm:px-4">
+        <div className="app-titlebar -mx-4 -mt-[max(1.25rem,env(safe-area-inset-top))] mb-1 flex items-center justify-between gap-2 px-3 pb-3 pt-[max(1.25rem,env(safe-area-inset-top))] sm:-mx-5 sm:px-4">
           <a href="https://www.duechat.com" aria-label="Go to DueChat" className="inline-block">
             <img
               src={duechatLogo.url}
@@ -183,7 +183,7 @@ export function Sidebar({
         {me ? (
           <Link
             to="/settings"
-            className="mt-4 flex items-center gap-3 rounded-2xl bg-secondary px-3 py-2.5 hover:bg-accent short:hidden"
+            className="profile-strip mt-4 flex items-center gap-3 rounded-lg bg-secondary px-3 py-2.5 hover:bg-accent short:hidden"
           >
             <Avatar
               name={me.display_name}
@@ -221,15 +221,15 @@ export function Sidebar({
         {me ? (
           <button
             onClick={() => setCreating(true)}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2.5 text-sm font-medium text-primary-foreground short:mt-2 short:py-2"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground short:mt-2 short:py-2"
           >
             <Plus className="size-6" />
             Create a room
           </button>
         ) : null}
-        <ThemeSkinSwatches className="mt-3 rounded-xl bg-secondary px-3 py-2 short:mt-2 short:py-1.5" />
-        <WallpaperPicker className="mt-2 rounded-xl bg-secondary px-3 py-2 short:py-1.5" />
-        <div className="mt-2 flex items-center gap-2 rounded-xl bg-secondary px-3 py-2 short:py-1.5">
+        <ThemeSkinSwatches className="mt-3 rounded-lg bg-secondary px-3 py-2 short:mt-2 short:py-1.5" />
+        <WallpaperPicker className="mt-2 rounded-lg bg-secondary px-3 py-2 short:py-1.5" />
+        <div className="room-search mt-2 flex items-center gap-2 rounded-lg bg-secondary px-3 py-2 short:py-1.5">
           <YahooSearchIcon className="size-6 sm:size-[34px]" />
           <input
             value={query}
@@ -292,7 +292,7 @@ export function Sidebar({
           </section>
         ) : null}
 
-        <div className="flex flex-wrap gap-1.5 px-3 pb-2 pt-2">
+        <div className="room-categories flex flex-wrap gap-1.5 px-3 pb-2 pt-2">
           <button
             onClick={() => setCategory(null)}
             className={cn(
@@ -342,7 +342,7 @@ export function Sidebar({
                       if (openRoom(room.id, "room", room.name)) e.preventDefault();
                     }}
                     className={cn(
-                      "flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors sm:py-3",
+                      "room-row flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors sm:py-3",
                       room.id === activeRoomId ? "bg-accent" : "hover:bg-secondary",
                     )}
                   >
