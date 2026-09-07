@@ -460,7 +460,7 @@ export function ChatPane({
           </div>
         </div>
         {!room.is_direct && members.length > 0 ? (
-          <div className="min-w-0 hidden lg:block">
+          <div className="min-w-0 hidden lg:hidden">
             <MemberAvatars
               members={members}
               profiles={profiles}
@@ -486,7 +486,7 @@ export function ChatPane({
           {!room.is_direct && isSuper ? (
             <button
               onClick={() => setStatusDraft(room.status_message ?? "")}
-              className="hidden shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70 lg:block"
+              className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70 lg:hidden"
             >
               Room status
             </button>
@@ -494,7 +494,7 @@ export function ChatPane({
           {!room.is_direct && isOwner ? (
             <button
               onClick={() => setEditingRoom(true)}
-              className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70"
+              className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70 lg:hidden"
             >
               Edit room
             </button>
@@ -511,7 +511,7 @@ export function ChatPane({
                   setError(err instanceof Error ? err.message : "Could not change the category.");
                 }
               }}
-              className="hidden shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground outline-none lg:block"
+              className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground outline-none lg:hidden"
             >
               {[...new Set([...ROOM_CATEGORIES, room.category || "General"])].map((c) => (
                 <option key={c} value={c}>
@@ -521,7 +521,7 @@ export function ChatPane({
             </select>
           ) : null}
           {!room.is_direct ? (
-            <span className="hidden shrink-0 lg:inline-flex">
+            <span className="shrink-0 lg:hidden">
               <RatingControl
                 rating={room.rating}
                 canEdit={isOwner}
@@ -544,7 +544,7 @@ export function ChatPane({
               params={{ slug: room.slug }}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium text-muted-foreground hover:bg-secondary lg:flex"
+              className="flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2 text-[11px] font-medium text-muted-foreground hover:bg-secondary lg:hidden"
               aria-label="View room profile in a new tab"
               title="View room profile (new tab)"
             >
@@ -561,32 +561,31 @@ export function ChatPane({
                   setError("DueChat could not open the window. Allow pop-ups for DueChat and try again.");
                 }
               }}
-              className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border text-xs font-medium text-muted-foreground hover:bg-secondary lg:w-auto lg:gap-1.5 lg:px-2.5"
+              className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-border text-[11px] font-medium text-muted-foreground hover:bg-secondary lg:hidden"
               aria-label={room.is_direct ? "Open this IM in a fixed window" : "Open this room in a fixed window"}
               title="Open in fixed window"
             >
               <ExternalLink className="size-4" />
-              <span className="hidden lg:inline">{room.is_direct ? "IM window" : "Room window"}</span>
             </button>
           ) : null}
           <button
             onClick={() => togglePanel("games")}
             className={cn(
-              "hidden h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium lg:flex",
+              "flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2 text-[11px] font-medium lg:hidden",
               showGames ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-secondary",
             )}
             aria-label="Show games"
             aria-pressed={showGames}
             title="Games"
           >
-            <AppIcon name="games" className={"size-6 sm:size-[34px]"} />
+            <AppIcon name="games" className={"size-5 sm:size-6"} />
             Games
           </button>
           {!room.is_direct ? (
             <button
               onClick={() => togglePanel("trivia")}
               className={cn(
-                "hidden h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium lg:flex",
+                "flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2 text-[11px] font-medium lg:hidden",
                 showTrivia
                   ? "bg-primary/15 text-primary"
                   : "text-muted-foreground hover:bg-secondary",
@@ -595,7 +594,7 @@ export function ChatPane({
               aria-pressed={showTrivia}
               title="Trivia bot"
             >
-              <AppIcon name="bot" className={"size-6 sm:size-[34px]"} />
+              <AppIcon name="bot" className={"size-5 sm:size-6"} />
               Trivia
             </button>
           ) : null}
@@ -603,7 +602,7 @@ export function ChatPane({
             <button
               onClick={() => togglePanel("karaoke")}
               className={cn(
-                "hidden h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium lg:flex",
+                "flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2 text-[11px] font-medium lg:hidden",
                 showKaraoke
                   ? "bg-primary/15 text-primary"
                   : "text-muted-foreground hover:bg-secondary",
@@ -612,7 +611,7 @@ export function ChatPane({
               aria-pressed={showKaraoke}
               title="Karaoke"
             >
-              <AppIcon name="mic" className={"size-6 sm:size-[34px]"} />
+              <AppIcon name="mic" className={"size-5 sm:size-6"} />
               Karaoke
               {karaokeQueue.filter((s) => !s.played_at).length
                 ? ` (${karaokeQueue.filter((s) => !s.played_at).length})`
@@ -655,7 +654,7 @@ export function ChatPane({
             <button
               onClick={() => togglePanel("feed")}
               className={cn(
-                "hidden size-10 shrink-0 place-items-center rounded-xl lg:grid",
+                "grid size-9 shrink-0 place-items-center rounded-xl lg:hidden",
                 showFeed
                   ? "bg-primary/15 text-primary"
                   : "text-muted-foreground hover:bg-secondary",
@@ -664,14 +663,14 @@ export function ChatPane({
               aria-pressed={showFeed}
               title="Room feed"
             >
-              <AppIcon name="feed" className={"size-6 sm:size-[34px]"} />
+              <AppIcon name="feed" className={"size-5 sm:size-6"} />
             </button>
           ) : null}
           {!room.is_direct ? (
             <button
               onClick={() => togglePanel("media")}
               className={cn(
-                "hidden size-10 shrink-0 place-items-center rounded-xl lg:grid",
+                "grid size-9 shrink-0 place-items-center rounded-xl lg:hidden",
                 showMedia
                   ? "bg-primary/15 text-primary"
                   : "text-muted-foreground hover:bg-secondary",
@@ -680,15 +679,15 @@ export function ChatPane({
               aria-pressed={showMedia}
               title="Radio & video"
             >
-              <AppIcon name="radio" className={"size-6 sm:size-[34px]"} />
+              <AppIcon name="radio" className={"size-5 sm:size-6"} />
             </button>
           ) : null}
           <button
             onClick={() => setCall("voice")}
-            className="hidden size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary lg:grid"
+            className="grid size-9 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary lg:hidden"
             aria-label="Start voice call"
           >
-            <AppIcon name="phone" className={"size-6 sm:size-[34px]"} />
+            <AppIcon name="phone" className={"size-5 sm:size-6"} />
           </button>
           <button
             onClick={() => setTalking((v) => !v)}
@@ -742,13 +741,13 @@ export function ChatPane({
           >
             <AppIcon name="video" className={"size-6 sm:size-[34px]"} />
           </button>
-          {/* Everything else folds into one menu on phones and tablets. */}
+          {/* Everything else folds into one menu on all sizes. */}
           <DropdownMenu>
             <DropdownMenuTrigger
-              className="grid size-11 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary lg:hidden"
+              className="grid size-9 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary sm:size-11 lg:size-8"
               aria-label="More room options"
             >
-              <MoreHorizontal className="size-5" />
+              <MoreHorizontal className="size-5 lg:size-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel className="truncate">{title}</DropdownMenuLabel>
@@ -802,20 +801,37 @@ export function ChatPane({
                   <AppIcon name="invite" className={"size-6 sm:size-[34px]"} /> Invite people
                 </DropdownMenuItem>
               ) : null}
-              {!room.is_direct && isSuper ? (
+              {typeof window !== "undefined" && !window.opener && !isPopout ? (
+                <DropdownMenuItem
+                  onSelect={() => {
+                    const opened = openRoomWindow(room.id, room.is_direct ? "im" : "room");
+                    if (!opened) {
+                      setError("DueChat could not open the window. Allow pop-ups for DueChat and try again.");
+                    }
+                  }}
+                >
+                  <ExternalLink className="size-4" /> Open room window
+                </DropdownMenuItem>
+              ) : null}
+              {!room.is_direct && isOwner ? (
                 <>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onSelect={() => setStatusDraft(room.status_message ?? "")}>
-                    Set room status
+                  <DropdownMenuItem onSelect={() => setEditingRoom(true)}>
+                    Edit room
                   </DropdownMenuItem>
                 </>
+              ) : null}
+              {!room.is_direct && isSuper ? (
+                <DropdownMenuItem onSelect={() => setStatusDraft(room.status_message ?? "")}>
+                  Set room status
+                </DropdownMenuItem>
               ) : null}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </header>
       {!room.is_direct ? (
-        <div className="room-strip flex shrink-0 items-start gap-2 border-b border-border bg-secondary/50 px-2 py-1.5 sm:gap-3 sm:px-3 sm:py-2">
+        <div className="room-strip flex shrink-0 items-center gap-2 border-b border-border bg-secondary/50 px-2 py-1.5 sm:gap-3 sm:px-3 sm:py-2 lg:py-1">
           <span className="shrink-0">
             <RatingControl
               rating={room.rating}
@@ -832,17 +848,17 @@ export function ChatPane({
           </span>
           <div className="min-w-0 flex-1">
             <p
-              className="truncate text-sm font-bold text-primary"
+              className="truncate text-sm font-bold text-primary lg:text-[13px]"
               style={room.name_color ? { color: room.name_color } : undefined}
             >
               {room.name}
             </p>
-            <p className="truncate text-[11px] text-muted-foreground">
+            <p className="truncate text-[11px] text-muted-foreground lg:text-[10px]">
               Owner: {profileOf(room.created_by)?.display_name ?? "—"}
               {"  |  "}Members: {members.length}
               {"  |  "}Online: {onlineCount}
             </p>
-            <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] font-medium">
+            <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] font-medium lg:mt-0 lg:gap-x-2 lg:text-[10px]">
               <button
                 type="button"
                 onClick={async () => {
@@ -857,7 +873,7 @@ export function ChatPane({
                 }}
                 className="text-primary underline-offset-2 hover:underline"
               >
-                Copy room URL to clipboard
+                Copy room URL
               </button>
               <Link
                 to="/r/$slug"
@@ -879,16 +895,16 @@ export function ChatPane({
               ) : null}
             </div>
           </div>
-          <div className="hidden shrink-0 flex-col gap-1 sm:flex">
+          <div className="hidden shrink-0 flex-col gap-1 sm:flex lg:flex-row lg:items-center lg:gap-2">
             <button
               type="button"
               onClick={() => {
                 setTalking(true);
                 setShowCams(true);
               }}
-              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold hover:bg-secondary"
+              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold hover:bg-secondary lg:px-1.5 lg:py-0.5"
             >
-              <AppIcon name="video" className="size-5" /> View cams
+              <AppIcon name="video" className="size-5 lg:size-4" /> View cams
             </button>
             <button
               type="button"
@@ -896,9 +912,9 @@ export function ChatPane({
                 setTalking(true);
                 setShowCams(true);
               }}
-              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold hover:bg-secondary"
+              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold hover:bg-secondary lg:px-1.5 lg:py-0.5"
             >
-              <AppIcon name="video" className="size-5" /> My cam
+              <AppIcon name="video" className="size-5 lg:size-4" /> My cam
             </button>
           </div>
         </div>
