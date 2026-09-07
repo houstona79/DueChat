@@ -20,6 +20,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedBlogsRouteImport } from './routes/_authenticated/blogs'
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
+import { Route as AuthenticatedFriendsRouteImport } from './routes/_authenticated/friends'
 import { Route as AuthenticatedMailRouteImport } from './routes/_authenticated/mail'
 import { Route as AuthenticatedModeratorRouteImport } from './routes/_authenticated/moderator'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -85,6 +86,11 @@ const AuthenticatedBlogsRoute = AuthenticatedBlogsRouteImport.update({
 const AuthenticatedChatRoute = AuthenticatedChatRouteImport.update({
   id: '/chat',
   path: '/chat',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFriendsRoute = AuthenticatedFriendsRouteImport.update({
+  id: '/friends',
+  path: '/friends',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMailRoute = AuthenticatedMailRouteImport.update({
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/blogs': typeof AuthenticatedBlogsRoute
   '/chat': typeof AuthenticatedChatRouteWithChildren
+  '/friends': typeof AuthenticatedFriendsRoute
   '/mail': typeof AuthenticatedMailRoute
   '/moderator': typeof AuthenticatedModeratorRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/blogs': typeof AuthenticatedBlogsRoute
   '/chat': typeof AuthenticatedChatRouteWithChildren
+  '/friends': typeof AuthenticatedFriendsRoute
   '/mail': typeof AuthenticatedMailRoute
   '/moderator': typeof AuthenticatedModeratorRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -209,6 +217,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/blogs': typeof AuthenticatedBlogsRoute
   '/_authenticated/chat': typeof AuthenticatedChatRouteWithChildren
+  '/_authenticated/friends': typeof AuthenticatedFriendsRoute
   '/_authenticated/mail': typeof AuthenticatedMailRoute
   '/_authenticated/moderator': typeof AuthenticatedModeratorRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
@@ -235,6 +244,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/blogs'
     | '/chat'
+    | '/friends'
     | '/mail'
     | '/moderator'
     | '/settings'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/blogs'
     | '/chat'
+    | '/friends'
     | '/mail'
     | '/moderator'
     | '/settings'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/blogs'
     | '/_authenticated/chat'
+    | '/_authenticated/friends'
     | '/_authenticated/mail'
     | '/_authenticated/moderator'
     | '/_authenticated/settings'
@@ -395,6 +407,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChatRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/friends': {
+      id: '/_authenticated/friends'
+      path: '/friends'
+      fullPath: '/friends'
+      preLoaderRoute: typeof AuthenticatedFriendsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/mail': {
       id: '/_authenticated/mail'
       path: '/mail'
@@ -497,6 +516,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedBlogsRoute: typeof AuthenticatedBlogsRoute
   AuthenticatedChatRoute: typeof AuthenticatedChatRouteWithChildren
+  AuthenticatedFriendsRoute: typeof AuthenticatedFriendsRoute
   AuthenticatedMailRoute: typeof AuthenticatedMailRoute
   AuthenticatedModeratorRoute: typeof AuthenticatedModeratorRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
@@ -507,6 +527,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedBlogsRoute: AuthenticatedBlogsRoute,
   AuthenticatedChatRoute: AuthenticatedChatRouteWithChildren,
+  AuthenticatedFriendsRoute: AuthenticatedFriendsRoute,
   AuthenticatedMailRoute: AuthenticatedMailRoute,
   AuthenticatedModeratorRoute: AuthenticatedModeratorRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
