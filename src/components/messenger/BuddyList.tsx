@@ -147,6 +147,13 @@ export function BuddyList({
           {tab === "find" ? <X className="size-3.5" /> : <UserPlus className="size-3.5" />}
           Add Friends
         </button>
+        <Link
+          to="/friends"
+          className="-mb-px ml-auto rounded-t-md border border-b-0 border-transparent bg-secondary/70 px-3 py-1.5 text-[13px] font-bold text-muted-foreground hover:text-foreground"
+        >
+          Friends page
+        </Link>
+
       </div>
 
       <div className="rounded-b-md border border-t-0 border-border bg-card">
