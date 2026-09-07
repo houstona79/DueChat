@@ -3,8 +3,8 @@ const path = require("path");
 
 const APP_URL = "https://app.duechat.com";
 const DEV_URL = "http://localhost:8080";
-const ROOM_WINDOW_WIDTH = 520;
-const ROOM_WINDOW_HEIGHT = 780;
+const ROOM_WINDOW_WIDTH = 1000;
+const ROOM_WINDOW_HEIGHT = 850;
 // Direct messages get a narrower classic-IM sized window.
 const IM_WINDOW_WIDTH = 400;
 const IM_WINDOW_HEIGHT = 620;
@@ -295,13 +295,11 @@ const createRoomWindow = (url, parentWindow, kind = "room") => {
   const roomWindow = new BrowserWindow({
     width,
     height,
-    minWidth: width,
-    minHeight: height,
-    maxWidth: width,
-    maxHeight: height,
-    resizable: false,
-    maximizable: false,
-    fullscreenable: false,
+    minWidth: kind === "im" ? 360 : 700,
+    minHeight: kind === "im" ? 520 : 600,
+    resizable: true,
+    maximizable: true,
+    fullscreenable: true,
     title: kind === "im" ? "DueChat IM" : "DueChat Room",
     icon: path.join(__dirname, "icons", "icon.png"),
     // Show immediately: waiting for ready-to-show meant a slow or failed load

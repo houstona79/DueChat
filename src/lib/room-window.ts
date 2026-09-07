@@ -2,7 +2,7 @@
  * Desktop (Electron) room pop-out helpers.
  *
  * On the packaged Mac/Windows/Linux apps we expose an IPC bridge that opens a
- * fixed-size DueChat window. On the web there is no bridge, so callers keep
+ * dedicated DueChat window. On the web there is no bridge, so callers keep
  * normal in-app navigation instead of opening a browser window.
  */
 export function isDesktopShell(): boolean {
@@ -18,7 +18,7 @@ export function roomWindowUrl(roomId: string): string {
 }
 
 /**
- * Opens the room in a native fixed DueChat window in the desktop apps.
+ * Opens the room in a native DueChat window in the desktop apps.
  * Browser users navigate normally in the existing tab.
  * Returns true when a window was opened (so callers can preventDefault).
  */
@@ -53,7 +53,7 @@ export function openDetachedRoomWindow(roomId: string, kind: RoomWindowKind = "r
 
   // Web: open a sized browser window. If the browser blocks it, fall back to
   // in-app navigation so the click is never a no-op.
-  const size = kind === "im" ? { w: 400, h: 620 } : { w: 520, h: 780 };
+  const size = kind === "im" ? { w: 400, h: 620 } : { w: 1000, h: 850 };
   const features = `popup=yes,width=${size.w},height=${size.h},noopener=no`;
   try {
     const win = window.open(url, `duechat-${kind}-${roomId}`, features);
