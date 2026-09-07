@@ -742,13 +742,13 @@ export function ChatPane({
           >
             <AppIcon name="video" className={"size-6 sm:size-[34px]"} />
           </button>
-          {/* Everything else folds into one menu on phones and tablets. */}
+          {/* Everything else folds into one menu on all sizes. */}
           <DropdownMenu>
             <DropdownMenuTrigger
-              className="grid size-11 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary lg:hidden"
+              className="grid size-9 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary sm:size-11 lg:size-8"
               aria-label="More room options"
             >
-              <MoreHorizontal className="size-5" />
+              <MoreHorizontal className="size-5 lg:size-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel className="truncate">{title}</DropdownMenuLabel>
