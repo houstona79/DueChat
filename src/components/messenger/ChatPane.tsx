@@ -388,7 +388,7 @@ export function ChatPane({
       className="chat-wallpaper live-room flex h-full min-h-0 flex-col bg-background"
       aria-label={`Conversation: ${title}`}
     >
-      <header className="app-titlebar live-room-header phone-chrome flex shrink-0 flex-col gap-1.5 border-b border-border px-2 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] short:gap-1 short:py-1.5 short:pt-[max(0.375rem,env(safe-area-inset-top))] sm:px-3 sm:py-3 sm:pt-[max(0.75rem,env(safe-area-inset-top))] lg:flex-row lg:flex-wrap lg:items-center lg:gap-3 lg:px-4">
+      <header className="app-titlebar live-room-header phone-chrome flex shrink-0 flex-col gap-1 border-b border-border px-2 py-1.5 pt-[max(0.375rem,env(safe-area-inset-top))] short:gap-1 short:py-1 short:pt-[max(0.25rem,env(safe-area-inset-top))] sm:px-3 sm:py-2 sm:pt-[max(0.5rem,env(safe-area-inset-top))] lg:flex-row lg:flex-wrap lg:items-center lg:gap-3 lg:px-4 lg:py-3">
         <div className="flex min-w-0 items-center gap-2 lg:min-w-[220px] lg:flex-1 lg:gap-3">
           {isPopout ? (
             <Link
@@ -441,7 +441,7 @@ export function ChatPane({
                   }`}
             </p>
             {!room.is_direct && room.status_message ? (
-              <p className="truncate text-xs font-medium text-primary" title={room.status_message}>
+              <p className="truncate text-xs font-medium text-primary short:hidden" title={room.status_message}>
                 {room.status_message}
               </p>
             ) : null}
@@ -460,7 +460,7 @@ export function ChatPane({
           </div>
         </div>
         {!room.is_direct && members.length > 0 ? (
-          <div className="min-w-0 short:hidden">
+          <div className="min-w-0 hidden lg:block">
             <MemberAvatars
               members={members}
               profiles={profiles}
@@ -815,7 +815,7 @@ export function ChatPane({
         </div>
       </header>
       {!room.is_direct ? (
-        <div className="room-strip flex shrink-0 items-start gap-3 border-b border-border bg-secondary/50 px-2 py-2 sm:px-3">
+        <div className="room-strip flex shrink-0 items-start gap-2 border-b border-border bg-secondary/50 px-2 py-1.5 sm:gap-3 sm:px-3 sm:py-2">
           <span className="shrink-0">
             <RatingControl
               rating={room.rating}
@@ -905,7 +905,7 @@ export function ChatPane({
       ) : null}
       {!room.is_direct && (room.status_message || room.topic) ? (
         <div
-          className="room-alerts shrink-0 space-y-0.5 border-b border-border bg-background px-3 py-2 text-[11px] leading-snug short:hidden"
+          className="room-alerts shrink-0 space-y-0.5 border-b border-border bg-background px-2 py-1.5 text-[11px] leading-snug short:hidden sm:px-3 sm:py-2"
           role="note"
         >
           {room.status_message ? (
@@ -1083,7 +1083,7 @@ export function ChatPane({
           <>
             <div
               ref={scroller}
-              className="min-h-0 flex-1 overflow-y-auto px-3 py-3 sm:px-4 sm:py-5"
+              className="min-h-0 flex-1 overflow-y-auto px-2 py-2 sm:px-3 sm:py-3 lg:px-4 lg:py-5"
               role="log"
               aria-live="polite"
               aria-relevant="additions text"
@@ -1321,7 +1321,7 @@ export function ChatPane({
               })}
             </div>
 
-            <footer className="border-t border-border px-2 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:px-3 sm:py-3 sm:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+            <footer className="border-t border-border px-2 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] sm:px-3 sm:py-2 sm:pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:py-3 lg:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
               {error ? (
                 <p role="alert" className="px-2 pb-2 text-xs text-destructive">
                   {error}
@@ -1403,7 +1403,7 @@ export function ChatPane({
               </div>
             </footer>
             {!room.is_direct ? (
-              <div className="room-bottom-bar flex shrink-0 items-center gap-1.5 border-t border-border bg-secondary/60 px-2 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] sm:px-3">
+              <div className="room-bottom-bar flex shrink-0 items-center gap-1 border-t border-border bg-secondary/60 px-2 py-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] sm:gap-1.5 sm:px-3 sm:py-1.5 sm:pb-[max(0.375rem,env(safe-area-inset-bottom))]">
                 <button
                   type="button"
                   onClick={() => {
