@@ -602,7 +602,7 @@ export function ChatPane({
             <button
               onClick={() => togglePanel("karaoke")}
               className={cn(
-                "hidden h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium lg:flex",
+                "flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2 text-[11px] font-medium lg:hidden",
                 showKaraoke
                   ? "bg-primary/15 text-primary"
                   : "text-muted-foreground hover:bg-secondary",
@@ -611,7 +611,7 @@ export function ChatPane({
               aria-pressed={showKaraoke}
               title="Karaoke"
             >
-              <AppIcon name="mic" className={"size-6 sm:size-[34px]"} />
+              <AppIcon name="mic" className={"size-5 sm:size-6"} />
               Karaoke
               {karaokeQueue.filter((s) => !s.played_at).length
                 ? ` (${karaokeQueue.filter((s) => !s.played_at).length})`
