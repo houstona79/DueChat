@@ -486,7 +486,7 @@ export function ChatPane({
           {!room.is_direct && isSuper ? (
             <button
               onClick={() => setStatusDraft(room.status_message ?? "")}
-              className="hidden shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70 lg:block"
+              className="hidden shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70 lg:hidden"
             >
               Room status
             </button>
