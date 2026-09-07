@@ -1347,6 +1347,7 @@ export type Database = {
           category: string
           created_at: string
           created_by: string
+          description: string | null
           direct_key: string | null
           icon_url: string | null
           id: string
@@ -1373,6 +1374,7 @@ export type Database = {
           category?: string
           created_at?: string
           created_by: string
+          description?: string | null
           direct_key?: string | null
           icon_url?: string | null
           id?: string
@@ -1399,6 +1401,7 @@ export type Database = {
           category?: string
           created_at?: string
           created_by?: string
+          description?: string | null
           direct_key?: string | null
           icon_url?: string | null
           id?: string
@@ -1926,9 +1929,10 @@ export type Database = {
       is_site_banned: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       list_public_rooms: {
-        Args: { _limit?: number }
+        Args: { _limit: number }
         Returns: {
           category: string
+          description: string
           icon_url: string
           id: string
           member_count: number
