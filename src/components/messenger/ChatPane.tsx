@@ -1099,7 +1099,10 @@ export function ChatPane({
           <>
             <div
               ref={scroller}
-              className="min-h-0 flex-1 overflow-y-auto px-2 py-2 sm:px-3 sm:py-3 lg:px-4 lg:py-5"
+              className={cn(
+                "min-h-0 flex-1 overflow-y-auto px-2 py-2 sm:px-3 sm:py-3",
+                room.is_direct ? "lg:px-4 lg:py-5" : "classic-log lg:px-3 lg:py-2",
+              )}
               role="log"
               aria-live="polite"
               aria-relevant="additions text"
