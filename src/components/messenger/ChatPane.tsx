@@ -801,13 +801,30 @@ export function ChatPane({
                   <AppIcon name="invite" className={"size-6 sm:size-[34px]"} /> Invite people
                 </DropdownMenuItem>
               ) : null}
-              {!room.is_direct && isSuper ? (
+              {typeof window !== "undefined" && !window.opener && !isPopout ? (
+                <DropdownMenuItem
+                  onSelect={() => {
+                    const opened = openRoomWindow(room.id, room.is_direct ? "im" : "room");
+                    if (!opened) {
+                      setError("DueChat could not open the window. Allow pop-ups for DueChat and try again.");
+                    }
+                  }}
+                >
+                  <ExternalLink className="size-4" /> Open room window
+                </DropdownMenuItem>
+              ) : null}
+              {!room.is_direct && isOwner ? (
                 <>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onSelect={() => setStatusDraft(room.status_message ?? "")}>
-                    Set room status
+                  <DropdownMenuItem onSelect={() => setEditingRoom(true)}>
+                    Edit room
                   </DropdownMenuItem>
                 </>
+              ) : null}
+              {!room.is_direct && isSuper ? (
+                <DropdownMenuItem onSelect={() => setStatusDraft(room.status_message ?? "")}>
+                  Set room status
+                </DropdownMenuItem>
               ) : null}
             </DropdownMenuContent>
           </DropdownMenu>
