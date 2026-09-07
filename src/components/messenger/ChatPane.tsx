@@ -815,7 +815,7 @@ export function ChatPane({
         </div>
       </header>
       {!room.is_direct ? (
-        <div className="room-strip flex shrink-0 items-start gap-2 border-b border-border bg-secondary/50 px-2 py-1.5 sm:gap-3 sm:px-3 sm:py-2">
+        <div className="room-strip flex shrink-0 items-center gap-2 border-b border-border bg-secondary/50 px-2 py-1.5 sm:gap-3 sm:px-3 sm:py-2 lg:py-1">
           <span className="shrink-0">
             <RatingControl
               rating={room.rating}
@@ -832,17 +832,17 @@ export function ChatPane({
           </span>
           <div className="min-w-0 flex-1">
             <p
-              className="truncate text-sm font-bold text-primary"
+              className="truncate text-sm font-bold text-primary lg:text-[13px]"
               style={room.name_color ? { color: room.name_color } : undefined}
             >
               {room.name}
             </p>
-            <p className="truncate text-[11px] text-muted-foreground">
+            <p className="truncate text-[11px] text-muted-foreground lg:text-[10px]">
               Owner: {profileOf(room.created_by)?.display_name ?? "—"}
               {"  |  "}Members: {members.length}
               {"  |  "}Online: {onlineCount}
             </p>
-            <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] font-medium">
+            <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] font-medium lg:mt-0 lg:gap-x-2 lg:text-[10px]">
               <button
                 type="button"
                 onClick={async () => {
@@ -857,7 +857,7 @@ export function ChatPane({
                 }}
                 className="text-primary underline-offset-2 hover:underline"
               >
-                Copy room URL to clipboard
+                Copy room URL
               </button>
               <Link
                 to="/r/$slug"
@@ -879,16 +879,16 @@ export function ChatPane({
               ) : null}
             </div>
           </div>
-          <div className="hidden shrink-0 flex-col gap-1 sm:flex">
+          <div className="hidden shrink-0 flex-col gap-1 sm:flex lg:flex-row lg:items-center lg:gap-2">
             <button
               type="button"
               onClick={() => {
                 setTalking(true);
                 setShowCams(true);
               }}
-              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold hover:bg-secondary"
+              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold hover:bg-secondary lg:px-1.5 lg:py-0.5"
             >
-              <AppIcon name="video" className="size-5" /> View cams
+              <AppIcon name="video" className="size-5 lg:size-4" /> View cams
             </button>
             <button
               type="button"
@@ -896,9 +896,9 @@ export function ChatPane({
                 setTalking(true);
                 setShowCams(true);
               }}
-              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold hover:bg-secondary"
+              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold hover:bg-secondary lg:px-1.5 lg:py-0.5"
             >
-              <AppIcon name="video" className="size-5" /> My cam
+              <AppIcon name="video" className="size-5 lg:size-4" /> My cam
             </button>
           </div>
         </div>
