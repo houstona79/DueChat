@@ -26,8 +26,8 @@ export function FloatingRoomWindows() {
 
 function FloatingRoomWindow({ panel, index }: { panel: FloatingRoom; index: number }) {
   const ctx = useFloatingRooms();
-  const base = panel.kind === "im" ? { w: 400, h: 620 } : { w: 520, h: 780 };
-  const storeKey = `duechat.roomWindow.${panel.kind}`;
+  const base = panel.kind === "im" ? { w: 400, h: 620 } : { w: 900, h: 840 };
+  const storeKey = `duechat.roomWindow.v2.${panel.kind}`;
   const [size, setSize] = useState(() => {
     const fallback = {
       w: base.w,
