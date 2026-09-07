@@ -170,7 +170,9 @@ export function ChatPane({
   const partner = room.is_direct ? profileOf(counterpartId(room, meId) ?? "") : undefined;
   const title = room.is_direct ? (partner?.display_name ?? "Direct message") : room.name;
   const { open: openDirect } = useOpenDirect(meId);
+  const phone = useIsMobile();
   const [showMembers, setShowMembers] = useState(!room.is_direct);
+
   const roomCrowns = useRoomCrowns();
   const myCrowns = roomCrowns.get(room.id) ?? [];
   const [showFeed, setShowFeed] = useState(false);
