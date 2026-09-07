@@ -68,6 +68,8 @@ import { grantMic, lowerHand, raiseHand, revokeMic } from "@/lib/hands";
 import { markKaraokeSongPlayed } from "@/lib/karaoke";
 import { AppIcon } from "@/components/icons/AppIcons";
 import { useOpenDirect } from "@/hooks/use-direct";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 import { useThreadWallpaper } from "@/hooks/use-wallpaper";
 import { blockUser, isBlocked, unblockUser } from "@/lib/blocks";
 import { takePendingCall } from "@/lib/call-invites";
