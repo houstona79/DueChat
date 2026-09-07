@@ -494,7 +494,7 @@ export function ChatPane({
           {!room.is_direct && isOwner ? (
             <button
               onClick={() => setEditingRoom(true)}
-              className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70"
+              className="shrink-0 rounded-full bg-secondary px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-secondary/70 lg:hidden"
             >
               Edit room
             </button>
