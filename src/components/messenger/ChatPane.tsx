@@ -1177,7 +1177,7 @@ export function ChatPane({
                           accent={accentFor(m.user_id)}
                           avatarPath={author?.avatar_url ?? null}
                           online={author ? isOnline(author) : false}
-                          size="xs"
+                          size="sm"
                         />
                       </button>
                       <div className="min-w-0 flex-1 text-[13px] leading-snug">
