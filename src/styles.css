@@ -1184,3 +1184,52 @@ html.dark[data-skin="slate"] {
     display: none !important;
   }
 }
+
+/* ---- Compact desktop room layout: maximize the message list ---- */
+@media (min-width: 1024px) {
+  .live-room-header {
+    min-height: 3rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .live-room-header .text-sm {
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+  }
+
+  .live-room-header .text-xs {
+    font-size: 0.6875rem;
+    line-height: 1rem;
+  }
+
+  .room-strip {
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+  }
+
+  .room-strip .text-sm {
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+  }
+
+  .room-alerts {
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+  }
+
+  .room-banner {
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+  }
+
+  .room-bottom-bar {
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+  }
+
+  .room-bottom-bar button,
+  .room-bottom-bar span button {
+    min-height: 1.75rem;
+  }
+}
