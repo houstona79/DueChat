@@ -5,9 +5,10 @@ import { ArrowLeft, MessageSquare, Search, Trash2, UserRound } from "lucide-reac
 import { toast } from "sonner";
 import { Avatar } from "@/components/messenger/Avatar";
 import { useBuddies, useProfiles } from "@/hooks/use-chat";
-import { useMyProfile } from "@/hooks/use-auth";
+import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { useOpenDirect } from "@/hooks/use-direct";
 import { nameColorStyle, siteRoleLabel, siteRoleOf, useSiteRoles } from "@/hooks/use-roles";
+import type { AppRole } from "@/lib/roles";
 import { accentFor, isOnline, removeBuddy, type Profile } from "@/lib/chat";
 import { countryFlag } from "@/lib/country-flags";
 
@@ -32,7 +33,7 @@ export const Route = createFileRoute("/_authenticated/friends")({
 function FriendCard({
   friend,
   nickname,
-  roleLabel,
+  role,
   onPm,
   onDelete,
   pmPending,
@@ -40,13 +41,14 @@ function FriendCard({
 }: {
   friend: Profile;
   nickname: string | null;
-  roleLabel: string | null;
+  role: AppRole | null;
   onPm: () => void;
   onDelete: () => void;
   pmPending: boolean;
   deletePending: boolean;
 }) {
-  const online = isOnline(friend.last_seen_at);
+  const online = isOnline(friend);
+  const roleLabel = siteRoleLabel(role);
   return (
     <li className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
       <div className="flex items-start gap-3">
@@ -63,7 +65,7 @@ function FriendCard({
               to="/u/$username"
               params={{ username: friend.username }}
               className="truncate text-base font-semibold hover:underline"
-              style={nameColorStyle(friend.name_color)}
+              style={nameColorStyle(role, friend.name_color)}
             >
               {nickname || friend.display_name || friend.username}
             </Link>
@@ -124,7 +126,8 @@ function FriendCard({
 
 function FriendsPage() {
   const queryClient = useQueryClient();
-  const { data: me } = useMyProfile();
+  const { user } = useAuth();
+  const { data: me } = useMyProfile(user?.id);
   const { data: profiles = [], isLoading: profilesLoading } = useProfiles();
   const { data: buddies = [], isLoading: buddiesLoading } = useBuddies(me?.id);
   const { data: roles } = useSiteRoles(!!me?.id);
@@ -151,14 +154,14 @@ function FriendsPage() {
           : true,
       )
       .sort((a, b) => {
-        const oa = isOnline(a.last_seen_at) ? 0 : 1;
-        const ob = isOnline(b.last_seen_at) ? 0 : 1;
+        const oa = isOnline(a) ? 0 : 1;
+        const ob = isOnline(b) ? 0 : 1;
         if (oa !== ob) return oa - ob;
         return (a.display_name || a.username).localeCompare(b.display_name || b.username);
       });
   }, [buddies, profiles, search, nicknames]);
 
-  const onlineCount = friends.filter((f) => isOnline(f.last_seen_at)).length;
+  const onlineCount = friends.filter((f) => isOnline(f)).length;
   const loading = profilesLoading || buddiesLoading;
 
   async function handleDelete(friend: Profile) {
@@ -233,7 +236,7 @@ function FriendsPage() {
                 key={friend.id}
                 friend={friend}
                 nickname={nicknames.get(friend.id) ?? null}
-                roleLabel={role ? siteRoleLabel(role) : null}
+                role={role}
                 onPm={() => void openDirect(friend.id)}
                 onDelete={() => void handleDelete(friend)}
                 pmPending={pmPending === friend.id}
