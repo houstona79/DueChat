@@ -810,7 +810,119 @@ export function ChatPane({
           </DropdownMenu>
         </div>
       </header>
+      {!room.is_direct ? (
+        <div className="room-strip flex shrink-0 items-start gap-3 border-b border-border bg-secondary/50 px-2 py-2 sm:px-3">
+          <span className="shrink-0">
+            <RatingControl
+              rating={room.rating}
+              canEdit={isOwner}
+              onChange={async (next) => {
+                try {
+                  await setRoomRating(room.id, next);
+                  await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : "Could not change the room rating.");
+                }
+              }}
+            />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p
+              className="truncate text-sm font-bold text-primary"
+              style={room.name_color ? { color: room.name_color } : undefined}
+            >
+              {room.name}
+            </p>
+            <p className="truncate text-[11px] text-muted-foreground">
+              Owner: {profileOf(room.created_by)?.display_name ?? "—"}
+              {"  |  "}Members: {members.length}
+              {"  |  "}Online: {onlineCount}
+            </p>
+            <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] font-medium">
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(
+                      `${window.location.origin}/r/${room.slug}`,
+                    );
+                    setError("Room link copied to clipboard.");
+                  } catch {
+                    setError("Could not copy the room link.");
+                  }
+                }}
+                className="text-primary underline-offset-2 hover:underline"
+              >
+                Copy room URL to clipboard
+              </button>
+              <Link
+                to="/r/$slug"
+                params={{ slug: room.slug }}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline-offset-2 hover:underline"
+              >
+                Rate this room
+              </Link>
+              {isSuper ? (
+                <button
+                  type="button"
+                  onClick={() => setStatusDraft(room.status_message ?? "")}
+                  className="text-primary underline-offset-2 hover:underline"
+                >
+                  Set alert
+                </button>
+              ) : null}
+            </div>
+          </div>
+          <div className="hidden shrink-0 flex-col gap-1 sm:flex">
+            <button
+              type="button"
+              onClick={() => {
+                setTalking(true);
+                setShowCams(true);
+              }}
+              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold hover:bg-secondary"
+            >
+              <AppIcon name="video" className="size-5" /> View cams
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setTalking(true);
+                setShowCams(true);
+              }}
+              className="flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold hover:bg-secondary"
+            >
+              <AppIcon name="video" className="size-5" /> My cam
+            </button>
+          </div>
+        </div>
+      ) : null}
+      {!room.is_direct && (room.status_message || room.topic) ? (
+        <div
+          className="room-alerts shrink-0 space-y-0.5 border-b border-border bg-background px-3 py-2 text-[11px] leading-snug short:hidden"
+          role="note"
+        >
+          {room.status_message ? (
+            <p>
+              <span className="font-bold text-destructive">Alert: </span>
+              <span className="text-foreground">{room.status_message}</span>
+            </p>
+          ) : null}
+          {room.topic ? (
+            <p>
+              <span className="font-bold text-destructive">Alert: </span>
+              <span className="text-foreground">{room.topic}</span>
+            </p>
+          ) : null}
+          <p className="text-muted-foreground">
+            This is a {room.rating === "R" ? "R rated room intended for adults 18 and over" : "G rated room intended for a general audience including minors. Offensive language is not permitted"}.
+          </p>
+        </div>
+      ) : null}
       <div className="flex min-h-0 flex-1">
+
         <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
           {statusDraft !== null ? (
             <form
@@ -1216,7 +1328,80 @@ export function ChatPane({
                 </button>
               </div>
             </footer>
+            {!room.is_direct ? (
+              <div className="room-bottom-bar flex shrink-0 items-center gap-1.5 border-t border-border bg-secondary/60 px-2 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] sm:px-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTalking(false);
+                    setShowCams(false);
+                  }}
+                  className={cn(
+                    "rounded-md border border-border px-2.5 py-1 text-[11px] font-semibold",
+                    talking ? "bg-background hover:bg-secondary" : "bg-primary/15 text-primary",
+                  )}
+                  aria-pressed={!talking}
+                >
+                  Mute
+                </button>
+                <button
+                  type="button"
+                  onClick={() => togglePanel("media")}
+                  className="grid size-8 place-items-center rounded-md border border-border bg-background hover:bg-secondary"
+                  aria-label="Radio and video"
+                >
+                  <AppIcon name="radio" className="size-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTalking((v) => !v)}
+                  className={cn(
+                    "grid size-8 place-items-center rounded-md border border-border",
+                    talking ? "bg-primary/15 text-primary" : "bg-background hover:bg-secondary",
+                  )}
+                  aria-label="Push to talk"
+                  aria-pressed={talking}
+                >
+                  <AppIcon name="mic" className="size-5" />
+                </button>
+                <span className="ml-auto flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => void toggleHand()}
+                    className={cn(
+                      "flex items-center gap-1 rounded-md border border-border px-2 py-1 text-[11px] font-semibold",
+                      myHand ? "bg-primary/15 text-primary" : "bg-background hover:bg-secondary",
+                    )}
+                    aria-pressed={Boolean(myHand)}
+                  >
+                    <Hand className="size-3.5" /> Raise
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => togglePanel("invite")}
+                    className="flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold hover:bg-secondary"
+                  >
+                    <UserPlus className="size-3.5" /> Invite
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTalking(true);
+                      setShowCams((v) => !v);
+                    }}
+                    className={cn(
+                      "flex items-center gap-1 rounded-md border border-border px-2 py-1 text-[11px] font-semibold",
+                      showCams ? "bg-primary/15 text-primary" : "bg-background hover:bg-secondary",
+                    )}
+                    aria-pressed={showCams}
+                  >
+                    <Video className="size-3.5" /> Show cam
+                  </button>
+                </span>
+              </div>
+            ) : null}
           </>
+
         ) : (
           <div className="grid min-h-0 flex-1 place-items-center px-6 text-center">
             <div className="max-w-sm">
