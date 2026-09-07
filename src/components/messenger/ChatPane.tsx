@@ -187,6 +187,13 @@ export function ChatPane({
   const [editingRoom, setEditingRoom] = useState(false);
 
   const [draft, setDraft] = useState("");
+  const [typeStyle, setTypeStyle] = useState<{
+    bold: boolean;
+    italic: boolean;
+    underline: boolean;
+    size: number;
+  }>({ bold: false, italic: false, underline: false, size: 1 });
+
   const [call, setCall] = useState<"voice" | "video" | null>(null);
   const [talking, setTalking] = useState(false);
   const [showCams, setShowCams] = useState(false);
