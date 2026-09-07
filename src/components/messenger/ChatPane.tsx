@@ -1154,6 +1154,75 @@ export function ChatPane({
                   !isNotice(prev.message.body);
                 const author = profileOf(m.user_id);
                 const authorName = author?.display_name ?? "Someone";
+                const roleOfAuthor = siteRoleOf(siteRoles, m.user_id);
+                if (phone) {
+                  const media = gifUrlOf(m.body);
+                  const video = videoEmbedOf(m.body);
+                  return (
+                    <div
+                      key={m.id}
+                      className={cn(
+                        "flex items-start gap-2 px-0.5",
+                        grouped ? "mt-1" : "mt-2.5",
+                      )}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => openProfile(m.user_id)}
+                        aria-label={`View ${authorName}'s profile`}
+                        className="mt-0.5 shrink-0 rounded-full hover:opacity-80"
+                      >
+                        <Avatar
+                          name={authorName}
+                          accent={accentFor(m.user_id)}
+                          avatarPath={author?.avatar_url ?? null}
+                          online={author ? isOnline(author) : false}
+                          size="xs"
+                        />
+                      </button>
+                      <div className="min-w-0 flex-1 text-[13px] leading-snug">
+                        <span
+                          className={cn(
+                            "mr-1 font-bold",
+                            siteRoleTextClass(roleOfAuthor) ?? "text-primary",
+                          )}
+                          style={nameColorStyle(roleOfAuthor, author?.name_color)}
+                        >
+                          {mine ? "You" : authorName}
+                        </span>
+                        {media ? (
+                          <img
+                            src={media}
+                            alt={`GIF sent by ${authorName}`}
+                            loading="lazy"
+                            className="mt-1 max-h-40 rounded-xl border border-border object-cover"
+                          />
+                        ) : video ? (
+                          <MessageVideo video={video} />
+                        ) : (
+                          <span
+                            className={cn(
+                              "break-words text-foreground",
+                              (isEmojiOnly(m.body) || isImageEmojiOnly(m.body)) &&
+                                "text-2xl leading-tight",
+                            )}
+                          >
+                            {hasImageEmoji(m.body) ? (
+                              <EmojiText body={m.body} large={isImageEmojiOnly(m.body)} />
+                            ) : isEmojiOnly(m.body) || mine ? (
+                              m.body
+                            ) : (
+                              <TranslatedText text={m.body} auto />
+                            )}
+                          </span>
+                        )}
+                      </div>
+                      <span className="mt-0.5 shrink-0 text-[10px] text-muted-foreground">
+                        {formatTime(m.created_at)}
+                      </span>
+                    </div>
+                  );
+                }
                 return (
                   <div
                     key={m.id}
@@ -1163,6 +1232,7 @@ export function ChatPane({
                       grouped ? "mt-0.5" : "mt-4",
                     )}
                   >
+
                     {grouped ? (
                       <span className="size-9 shrink-0" aria-hidden="true" />
                     ) : (
