@@ -460,7 +460,7 @@ export function ChatPane({
           </div>
         </div>
         {!room.is_direct && members.length > 0 ? (
-          <div className="min-w-0 hidden lg:block">
+          <div className="min-w-0 hidden lg:hidden">
             <MemberAvatars
               members={members}
               profiles={profiles}
