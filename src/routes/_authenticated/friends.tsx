@@ -8,7 +8,7 @@ import { useBuddies, useProfiles } from "@/hooks/use-chat";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { useOpenDirect } from "@/hooks/use-direct";
 import { nameColorStyle, siteRoleLabel, siteRoleOf, useSiteRoles } from "@/hooks/use-roles";
-import type { AppRole } from "@/lib/roles";
+import type { AppRole } from "@/lib/admin";
 import { accentFor, isOnline, removeBuddy, type Profile } from "@/lib/chat";
 import { countryFlag } from "@/lib/country-flags";
 
