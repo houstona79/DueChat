@@ -684,10 +684,10 @@ export function ChatPane({
           ) : null}
           <button
             onClick={() => setCall("voice")}
-            className="hidden size-10 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary lg:grid"
+            className="grid size-9 shrink-0 place-items-center rounded-xl text-muted-foreground hover:bg-secondary lg:hidden"
             aria-label="Start voice call"
           >
-            <AppIcon name="phone" className={"size-6 sm:size-[34px]"} />
+            <AppIcon name="phone" className={"size-5 sm:size-6"} />
           </button>
           <button
             onClick={() => setTalking((v) => !v)}
