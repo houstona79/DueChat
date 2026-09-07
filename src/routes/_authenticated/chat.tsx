@@ -79,7 +79,7 @@ function ChatLayout() {
     <FloatingRoomsProvider>
       <main
         id="main-content"
-        className="fixed inset-0 grid overflow-hidden overscroll-none grid-cols-1 md:grid-cols-[320px_minmax(0,1fr)] lg:grid-cols-[400px_minmax(0,1fr)]"
+        className="messenger-shell fixed inset-0 grid overflow-hidden overscroll-none grid-cols-1 md:grid-cols-[300px_minmax(0,1fr)] lg:grid-cols-[320px_minmax(0,1fr)]"
       >
         <div
           className={
@@ -100,19 +100,20 @@ function ChatLayout() {
           {activeRoomId ? (
             <Outlet />
           ) : (
-            <div className="grid h-full place-items-center bg-background px-6 text-center">
-              <div className="max-w-[15rem]">
+            <div className="room-directory-empty grid h-full place-items-center bg-background px-6 text-center">
+              <div className="max-w-[18rem]">
                 <img
                   src={duechatLogo.url}
                   alt="DueChat"
                   className="mx-auto h-9 w-auto object-contain"
                 />
-                <span className="mx-auto mt-3 grid size-9 place-items-center rounded-lg bg-primary/15 text-primary">
-                  <MessagesSquare className="size-4.5" />
+                <span className="mx-auto mt-5 grid size-14 place-items-center rounded-xl bg-primary/15 text-primary">
+                  <MessagesSquare className="size-6" />
                 </span>
-                <h2 className="mt-3 text-sm font-semibold">Pick a room</h2>
-                <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
-                  Choose a room on the left, or create a new one to start talking.
+                <p className="mt-4 text-[10px] font-bold uppercase tracking-widest text-primary">Room directory</p>
+                <h2 className="mt-1 text-lg font-semibold">Choose a live room</h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  Browse categories on the left and join a conversation already in progress.
                 </p>
               </div>
             </div>

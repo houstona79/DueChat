@@ -203,7 +203,7 @@ html.dark {
   h2,
   h3 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
   }
 
   /* Accessibility: always-visible keyboard focus indicator */
@@ -393,6 +393,168 @@ html[data-wallpaper]:not([data-wallpaper="none"]) [data-chat-bubble]:not(.bg-tra
 
 .scroll-rail::-webkit-scrollbar {
   display: none;
+}
+
+/* ---- PalTalk-inspired room directory ----
+ * A modern, room-first social messenger: deep neutral panels, crisp classic
+ * blue actions, compact directory rows, and a persistent active-member rail.
+ */
+html[data-skin="paltalk"] {
+  --radius: 0.5rem;
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --background: oklch(0.975 0.008 245);
+  --foreground: oklch(0.24 0.025 250);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.24 0.025 250);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.24 0.025 250);
+  --primary: oklch(0.48 0.15 250);
+  --primary-foreground: oklch(0.99 0.004 245);
+  --secondary: oklch(0.94 0.022 245);
+  --secondary-foreground: oklch(0.29 0.04 250);
+  --muted: oklch(0.95 0.014 245);
+  --muted-foreground: oklch(0.5 0.035 250);
+  --accent: oklch(0.9 0.055 245);
+  --accent-foreground: oklch(0.28 0.07 250);
+  --border: oklch(0.87 0.024 245);
+  --input: oklch(0.87 0.024 245);
+  --ring: oklch(0.56 0.15 245);
+  --surface: oklch(0.96 0.012 245);
+  --sidebar: oklch(0.95 0.018 245);
+  --sidebar-foreground: oklch(0.24 0.025 250);
+  --sidebar-primary: oklch(0.48 0.15 250);
+  --sidebar-primary-foreground: oklch(0.99 0.004 245);
+  --sidebar-accent: oklch(0.89 0.06 245);
+  --sidebar-accent-foreground: oklch(0.28 0.07 250);
+  --sidebar-border: oklch(0.87 0.024 245);
+  --sidebar-ring: oklch(0.56 0.15 245);
+  --bubble-me: oklch(0.48 0.15 250);
+  --bubble-me-foreground: oklch(0.99 0.004 245);
+  --bubble-them: oklch(0.94 0.018 245);
+  --bubble-them-foreground: oklch(0.27 0.025 250);
+  --online: oklch(0.7 0.17 150);
+  --accent-1: oklch(0.53 0.16 250);
+  --accent-2: oklch(0.7 0.14 180);
+  --accent-3: oklch(0.76 0.15 85);
+  --accent-4: oklch(0.61 0.17 330);
+  --shadow-panel: 0 18px 48px -28px oklch(0.25 0.06 250 / 0.4);
+}
+
+html.dark[data-skin="paltalk"] {
+  --background: oklch(0.17 0.012 255);
+  --foreground: oklch(0.94 0.008 245);
+  --card: oklch(0.215 0.014 255);
+  --card-foreground: oklch(0.94 0.008 245);
+  --popover: oklch(0.215 0.014 255);
+  --popover-foreground: oklch(0.94 0.008 245);
+  --primary: oklch(0.62 0.155 248);
+  --primary-foreground: oklch(0.99 0.004 245);
+  --secondary: oklch(0.245 0.016 255);
+  --secondary-foreground: oklch(0.92 0.008 245);
+  --muted: oklch(0.23 0.014 255);
+  --muted-foreground: oklch(0.68 0.02 245);
+  --accent: oklch(0.29 0.045 250);
+  --accent-foreground: oklch(0.94 0.012 245);
+  --border: oklch(0.3 0.018 255);
+  --input: oklch(0.3 0.018 255);
+  --ring: oklch(0.62 0.155 248);
+  --surface: oklch(0.19 0.013 255);
+  --sidebar: oklch(0.19 0.014 255);
+  --sidebar-foreground: oklch(0.93 0.008 245);
+  --sidebar-primary: oklch(0.62 0.155 248);
+  --sidebar-primary-foreground: oklch(0.99 0.004 245);
+  --sidebar-accent: oklch(0.29 0.045 250);
+  --sidebar-accent-foreground: oklch(0.94 0.012 245);
+  --sidebar-border: oklch(0.29 0.018 255);
+  --sidebar-ring: oklch(0.62 0.155 248);
+  --bubble-me: oklch(0.49 0.145 250);
+  --bubble-me-foreground: oklch(0.99 0.004 245);
+  --bubble-them: oklch(0.245 0.016 255);
+  --bubble-them-foreground: oklch(0.92 0.008 245);
+  --online: oklch(0.76 0.17 150);
+  --accent-1: oklch(0.68 0.15 248);
+  --accent-2: oklch(0.76 0.13 180);
+  --accent-3: oklch(0.8 0.15 85);
+  --accent-4: oklch(0.72 0.16 330);
+  --shadow-panel: 0 24px 60px -30px oklch(0.08 0.02 255 / 0.9);
+}
+
+html[data-skin="paltalk"] .messenger-shell {
+  background: var(--color-background);
+}
+
+html[data-skin="paltalk"] .chat-glass {
+  background: var(--color-sidebar);
+}
+
+html[data-skin="paltalk"] .app-titlebar {
+  background: color-mix(in oklab, var(--color-sidebar) 92%, var(--color-primary));
+  border-bottom-color: var(--color-sidebar-border);
+  box-shadow: none;
+}
+
+html[data-skin="paltalk"] .room-directory .app-titlebar {
+  min-height: 4rem;
+}
+
+html[data-skin="paltalk"] .room-directory .profile-strip,
+html[data-skin="paltalk"] .room-directory .room-search {
+  border: 1px solid var(--color-sidebar-border);
+}
+
+html[data-skin="paltalk"] .room-categories {
+  border-bottom: 1px solid var(--color-sidebar-border);
+}
+
+html[data-skin="paltalk"] .room-row:hover,
+html[data-skin="paltalk"] .member-row:hover {
+  background: var(--color-secondary);
+}
+
+html[data-skin="paltalk"] .live-room-header {
+  min-height: 4rem;
+  background: var(--color-card);
+}
+
+html.dark[data-skin="paltalk"] .live-room-header {
+  background: color-mix(in oklab, var(--color-card) 94%, var(--color-primary));
+}
+
+html[data-skin="paltalk"] .live-badge {
+  background: var(--color-destructive);
+  color: var(--color-destructive-foreground);
+}
+
+html[data-skin="paltalk"] .active-members {
+  background: var(--color-sidebar);
+  box-shadow: none;
+}
+
+html[data-skin="paltalk"] .room-directory-empty {
+  background-image: radial-gradient(circle at center, color-mix(in oklab, var(--color-primary) 8%, transparent), transparent 45%);
+}
+
+@media (min-width: 1024px) {
+  html[data-skin="paltalk"] .messenger-shell {
+    padding: 1rem;
+    gap: 0;
+  }
+
+  html[data-skin="paltalk"] .messenger-shell > div:first-child {
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+    box-shadow: var(--shadow-panel);
+  }
+
+  html[data-skin="paltalk"] .messenger-shell > div:nth-child(2) {
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-left: 0;
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    box-shadow: var(--shadow-panel);
+  }
 }
 
 /* ---- MSN Messenger skin ----

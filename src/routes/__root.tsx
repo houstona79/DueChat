@@ -113,7 +113,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap",
       },
       {
         rel: "stylesheet",
@@ -135,7 +135,7 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var r=document.documentElement;try{var t=localStorage.getItem('duechat.theme');if(!t){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}r.classList.toggle('dark',t!=='light');}catch(e){}try{var s=localStorage.getItem('duechat.skin');r.setAttribute('data-skin',['msn','yahoo','midnight','ocean','plum','ember','forest','slate'].indexOf(s)>=0?s:'msn');}catch(e){}try{var a=JSON.parse(localStorage.getItem('duechat.a11y')||'{}');if(a.textScale){r.style.fontSize=Number(a.textScale)+'%';r.setAttribute('data-a11y-text',a.textScale);}['highContrast:contrast','reduceMotion:motion','underlineLinks:links','largeTargets:targets','focusRing:focus'].forEach(function(p){var k=p.split(':');if(a[k[0]])r.setAttribute('data-a11y-'+k[1],'true');});}catch(e){}})();`,
+            __html: `(function(){var r=document.documentElement;try{var t=localStorage.getItem('duechat.theme');if(!t){t='dark';}r.classList.toggle('dark',t!=='light');}catch(e){}try{var s=localStorage.getItem('duechat.skin');if(localStorage.getItem('duechat.paltalk-redesign')!=='1'){s='paltalk';localStorage.setItem('duechat.skin',s);localStorage.setItem('duechat.paltalk-redesign','1');}r.setAttribute('data-skin',['paltalk','msn','yahoo','aol','midnight','ocean','plum','ember','forest','slate'].indexOf(s)>=0?s:'paltalk');}catch(e){r.setAttribute('data-skin','paltalk');}try{var a=JSON.parse(localStorage.getItem('duechat.a11y')||'{}');if(a.textScale){r.style.fontSize=Number(a.textScale)+'%';r.setAttribute('data-a11y-text',a.textScale);}['highContrast:contrast','reduceMotion:motion','underlineLinks:links','largeTargets:targets','focusRing:focus'].forEach(function(p){var k=p.split(':');if(a[k[0]])r.setAttribute('data-a11y-'+k[1],'true');});}catch(e){}})();`,
           }}
         />
       </head>

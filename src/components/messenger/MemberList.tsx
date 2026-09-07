@@ -152,12 +152,12 @@ export function MemberList({
 
   return (
     <section
-      className="absolute inset-y-0 right-0 z-20 flex h-full w-[240px] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl md:static md:w-[260px] lg:w-[300px]"
+      className="active-members absolute inset-y-0 right-0 z-20 flex h-full w-[240px] flex-col border-l border-border bg-sidebar pb-[env(safe-area-inset-bottom)] shadow-xl md:static md:w-[230px] lg:w-[250px]"
       role="region"
       aria-label="Room members"
     >
       <header className="flex items-center justify-between px-3 py-2 md:px-4 md:py-3">
-        <h3 className="text-sm font-semibold">Members · {members.length}</h3>
+        <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Active · {members.length}</h3>
         <button
           onClick={onClose}
           aria-label="Hide members"
@@ -200,7 +200,7 @@ export function MemberList({
           const blocked = isBlocked(blocks, p.id);
           const glyph = decorationGlyph(p.decoration);
           return (
-            <li key={p.id} className="rounded-2xl px-2 py-2">
+            <li key={p.id} className="member-row rounded-lg px-2 py-2">
               <div className="flex items-center gap-3">
                 <button
                   type="button"
