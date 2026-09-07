@@ -521,7 +521,7 @@ export function ChatPane({
             </select>
           ) : null}
           {!room.is_direct ? (
-            <span className="hidden shrink-0 lg:inline-flex">
+            <span className="shrink-0 lg:hidden">
               <RatingControl
                 rating={room.rating}
                 canEdit={isOwner}
