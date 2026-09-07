@@ -544,7 +544,7 @@ export function ChatPane({
               params={{ slug: room.slug }}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden h-10 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2.5 text-xs font-medium text-muted-foreground hover:bg-secondary lg:flex"
+              className="flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-border px-2 text-[11px] font-medium text-muted-foreground hover:bg-secondary lg:hidden"
               aria-label="View room profile in a new tab"
               title="View room profile (new tab)"
             >
