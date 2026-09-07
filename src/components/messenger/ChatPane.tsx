@@ -1328,7 +1328,80 @@ export function ChatPane({
                 </button>
               </div>
             </footer>
+            {!room.is_direct ? (
+              <div className="room-bottom-bar flex shrink-0 items-center gap-1.5 border-t border-border bg-secondary/60 px-2 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] sm:px-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTalking(false);
+                    setShowCams(false);
+                  }}
+                  className={cn(
+                    "rounded-md border border-border px-2.5 py-1 text-[11px] font-semibold",
+                    talking ? "bg-background hover:bg-secondary" : "bg-primary/15 text-primary",
+                  )}
+                  aria-pressed={!talking}
+                >
+                  Mute
+                </button>
+                <button
+                  type="button"
+                  onClick={() => togglePanel("media")}
+                  className="grid size-8 place-items-center rounded-md border border-border bg-background hover:bg-secondary"
+                  aria-label="Radio and video"
+                >
+                  <AppIcon name="radio" className="size-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTalking((v) => !v)}
+                  className={cn(
+                    "grid size-8 place-items-center rounded-md border border-border",
+                    talking ? "bg-primary/15 text-primary" : "bg-background hover:bg-secondary",
+                  )}
+                  aria-label="Push to talk"
+                  aria-pressed={talking}
+                >
+                  <AppIcon name="mic" className="size-5" />
+                </button>
+                <span className="ml-auto flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => void toggleHand()}
+                    className={cn(
+                      "flex items-center gap-1 rounded-md border border-border px-2 py-1 text-[11px] font-semibold",
+                      myHand ? "bg-primary/15 text-primary" : "bg-background hover:bg-secondary",
+                    )}
+                    aria-pressed={Boolean(myHand)}
+                  >
+                    <Hand className="size-3.5" /> Raise
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => togglePanel("invite")}
+                    className="flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-[11px] font-semibold hover:bg-secondary"
+                  >
+                    <UserPlus className="size-3.5" /> Invite
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTalking(true);
+                      setShowCams((v) => !v);
+                    }}
+                    className={cn(
+                      "flex items-center gap-1 rounded-md border border-border px-2 py-1 text-[11px] font-semibold",
+                      showCams ? "bg-primary/15 text-primary" : "bg-background hover:bg-secondary",
+                    )}
+                    aria-pressed={showCams}
+                  >
+                    <Video className="size-3.5" /> Show cam
+                  </button>
+                </span>
+              </div>
+            ) : null}
           </>
+
         ) : (
           <div className="grid min-h-0 flex-1 place-items-center px-6 text-center">
             <div className="max-w-sm">
