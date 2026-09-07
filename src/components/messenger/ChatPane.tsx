@@ -1175,7 +1175,7 @@ export function ChatPane({
                 const author = profileOf(m.user_id);
                 const authorName = author?.display_name ?? "Someone";
                 const roleOfAuthor = siteRoleOf(siteRoles, m.user_id);
-                if (phone) {
+                if (phone || !room.is_direct) {
                   const media = gifUrlOf(m.body);
                   const video = videoEmbedOf(m.body);
                   return (
@@ -1183,33 +1183,43 @@ export function ChatPane({
                       key={m.id}
                       className={cn(
                         "flex items-start gap-2 px-0.5",
-                        grouped ? "mt-1" : "mt-2.5",
+                        phone ? (grouped ? "mt-1" : "mt-2.5") : "mt-0.5",
                       )}
                     >
-                      <button
-                        type="button"
-                        onClick={() => openProfile(m.user_id)}
-                        aria-label={`View ${authorName}'s profile`}
-                        className="mt-0.5 shrink-0 rounded-full hover:opacity-80"
+                      {phone ? (
+                        <button
+                          type="button"
+                          onClick={() => openProfile(m.user_id)}
+                          aria-label={`View ${authorName}'s profile`}
+                          className="mt-0.5 shrink-0 rounded-full hover:opacity-80"
+                        >
+                          <Avatar
+                            name={authorName}
+                            accent={accentFor(m.user_id)}
+                            avatarPath={author?.avatar_url ?? null}
+                            online={author ? isOnline(author) : false}
+                            size="sm"
+                          />
+                        </button>
+                      ) : null}
+                      <div
+                        className={cn(
+                          "min-w-0 flex-1 leading-snug",
+                          phone ? "text-[13px]" : "text-[13px] leading-[1.45]",
+                        )}
                       >
-                        <Avatar
-                          name={authorName}
-                          accent={accentFor(m.user_id)}
-                          avatarPath={author?.avatar_url ?? null}
-                          online={author ? isOnline(author) : false}
-                          size="sm"
-                        />
-                      </button>
-                      <div className="min-w-0 flex-1 text-[13px] leading-snug">
-                        <span
+                        <button
+                          type="button"
+                          onClick={() => openProfile(m.user_id)}
                           className={cn(
-                            "mr-1 font-bold",
+                            "mr-1 font-bold hover:underline",
                             siteRoleTextClass(roleOfAuthor) ?? "text-primary",
                           )}
                           style={nameColorStyle(roleOfAuthor, author?.name_color)}
                         >
                           {mine ? "You" : authorName}
-                        </span>
+                          {phone ? "" : ":"}
+                        </button>
                         {media ? (
                           <img
                             src={media}
