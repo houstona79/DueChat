@@ -654,7 +654,7 @@ export function ChatPane({
             <button
               onClick={() => togglePanel("feed")}
               className={cn(
-                "hidden size-10 shrink-0 place-items-center rounded-xl lg:grid",
+                "grid size-9 shrink-0 place-items-center rounded-xl lg:hidden",
                 showFeed
                   ? "bg-primary/15 text-primary"
                   : "text-muted-foreground hover:bg-secondary",
@@ -663,7 +663,7 @@ export function ChatPane({
               aria-pressed={showFeed}
               title="Room feed"
             >
-              <AppIcon name="feed" className={"size-6 sm:size-[34px]"} />
+              <AppIcon name="feed" className={"size-5 sm:size-6"} />
             </button>
           ) : null}
           {!room.is_direct ? (
