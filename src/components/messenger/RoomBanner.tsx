@@ -110,7 +110,7 @@ export function RoomBanner({
   };
 
   return (
-    <section className="border-b border-border" aria-label={`${roomName} branding`}>
+    <section className="room-banner border-b border-border" aria-label={`${roomName} branding`}>
       {hidden ? (
         <div className="flex items-center gap-2 px-3 py-1.5 sm:px-4">
           <button
