@@ -1628,7 +1628,18 @@ export function ChatPane({
                       : `Message ${room.name}`
                   }
                   aria-label="Message"
+                  style={
+                    room.is_direct
+                      ? undefined
+                      : {
+                          fontWeight: typeStyle.bold ? 700 : undefined,
+                          fontStyle: typeStyle.italic ? "italic" : undefined,
+                          textDecoration: typeStyle.underline ? "underline" : undefined,
+                          fontSize: `${13 + (typeStyle.size - 1) * 2}px`,
+                        }
+                  }
                   className="max-h-32 min-h-9 w-full resize-none bg-transparent px-1.5 py-1.5 text-sm outline-none placeholder:text-muted-foreground disabled:opacity-70 sm:min-h-11 sm:px-2 sm:py-2 sm:text-base lg:min-h-9 lg:py-1.5 lg:text-sm"
+
                 />
                 <button
                   onClick={() => void submit()}
