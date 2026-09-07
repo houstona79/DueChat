@@ -42,18 +42,9 @@ export const Route = createFileRoute("/rooms")({
 });
 
 function RoomThumb({ name, url }: { name: string; url: string | null }) {
-  return (
-    <span className="relative block h-28 w-full overflow-hidden rounded-t-3xl">
-      {url ? (
-        <img src={url} alt="" loading="lazy" className="size-full object-cover" />
-      ) : (
-        <span className="grid size-full place-items-center bg-gradient-to-br from-primary/70 via-primary/40 to-secondary text-3xl font-bold text-primary-foreground">
-          {initials(name)}
-        </span>
-      )}
-    </span>
-  );
+  return <RoomCover name={name} url={url} className="h-28 w-full rounded-t-3xl" />;
 }
+
 
 function RoomCard({
   room,
