@@ -10,7 +10,7 @@ import { RatingBadge } from "@/components/messenger/RoomRating";
 import { StarRow } from "@/components/rooms/StarRating";
 import { RoomCrownBadges } from "@/components/rooms/RoomCrown";
 import { crownsById, type RoomCrown } from "@/lib/room-crowns";
-import { initials } from "@/lib/chat";
+import { RoomCover } from "@/components/rooms/RoomCover";
 
 const title = "Browse rooms — DueChat";
 const description =
