@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Crown, Flame, Users } from "lucide-react";
+import { ArrowLeft, Crown, Flame, LogIn, Search, Users } from "lucide-react";
+import { useMemo, useState } from "react";
 import {
   getRoomsDirectory,
   type DirectoryRoom,
@@ -11,9 +12,9 @@ import { RoomCrownBadges } from "@/components/rooms/RoomCrown";
 import { crownsById, type RoomCrown } from "@/lib/room-crowns";
 import { initials } from "@/lib/chat";
 
-const title = "Top rooms & full room list — DueChat";
+const title = "Browse rooms — DueChat";
 const description =
-  "Browse every public DueChat chat room, see member counts and star ratings, and jump into the top-rated rooms.";
+  "Browse every public DueChat chat room with thumbnails, member counts and star ratings — then jump in and join.";
 
 export const Route = createFileRoute("/rooms")({
   loader: () => getRoomsDirectory(),
@@ -40,12 +41,16 @@ export const Route = createFileRoute("/rooms")({
   component: RoomsDirectoryPage,
 });
 
-function RoomIcon({ name, url }: { name: string; url: string | null }) {
-  return url ? (
-    <img src={url} alt="" loading="lazy" className="size-11 shrink-0 rounded-2xl object-cover" />
-  ) : (
-    <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-secondary text-xs font-bold">
-      {initials(name)}
+function RoomThumb({ name, url }: { name: string; url: string | null }) {
+  return (
+    <span className="relative block h-28 w-full overflow-hidden rounded-t-3xl">
+      {url ? (
+        <img src={url} alt="" loading="lazy" className="size-full object-cover" />
+      ) : (
+        <span className="grid size-full place-items-center bg-gradient-to-br from-primary/70 via-primary/40 to-secondary text-3xl font-bold text-primary-foreground">
+          {initials(name)}
+        </span>
+      )}
     </span>
   );
 }
@@ -63,18 +68,14 @@ function RoomCard({
 }) {
   const avg = room.rating_avg ? Number(room.rating_avg) : 0;
   return (
-    <li className="rounded-3xl border border-border bg-card p-4">
-      <Link
-        to="/r/$slug"
-        params={{ slug: room.slug }}
-        className="flex items-start gap-3 focus-visible:outline-none"
-      >
-        {rank ? (
-          <span className="mt-1 w-5 shrink-0 text-sm font-bold text-muted-foreground">{rank}</span>
-        ) : null}
-        <RoomIcon name={room.name} url={room.icon_url} />
-        <span className="min-w-0 flex-1">
+    <li className="group flex flex-col overflow-hidden rounded-3xl border border-border bg-card transition-shadow hover:shadow-md">
+      <Link to="/r/$slug" params={{ slug: room.slug }} className="focus-visible:outline-none">
+        <RoomThumb name={room.name} url={room.icon_url} />
+        <span className="block px-4 pt-3">
           <span className="flex flex-wrap items-center gap-2">
+            {rank ? (
+              <span className="w-5 shrink-0 text-sm font-bold text-muted-foreground">{rank}</span>
+            ) : null}
             <span
               className="truncate font-semibold"
               style={room.name_color ? { color: room.name_color } : undefined}
@@ -103,6 +104,16 @@ function RoomCard({
           ) : null}
         </span>
       </Link>
+      <span className="mt-auto block px-4 pb-4 pt-3">
+        <Link
+          to="/chat/$roomId"
+          params={{ roomId: room.id }}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none"
+        >
+          <LogIn className="size-4" aria-hidden />
+          Join room
+        </Link>
+      </span>
     </li>
   );
 }
@@ -124,7 +135,7 @@ function TrendingSection({
       {rooms.length === 0 ? (
         <p className="mt-2 text-sm text-muted-foreground">No room activity yet in this window.</p>
       ) : (
-        <ul className="mt-3 space-y-3">
+        <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {rooms.map((room, i) => (
             <RoomCard
               key={room.id}
@@ -149,10 +160,33 @@ function RoomsDirectoryPage() {
   };
   const crownMap = crownsById(crowns ?? []);
 
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("All");
+
+  const categories = useMemo(() => {
+    const set = new Set(all.map((r) => r.category || "General"));
+    return ["All", ...Array.from(set).sort((a, b) => a.localeCompare(b))];
+  }, [all]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return all.filter((r) => {
+      if (category !== "All" && (r.category || "General") !== category) return false;
+      if (!q) return true;
+      return (
+        r.name.toLowerCase().includes(q) ||
+        (r.topic ?? "").toLowerCase().includes(q) ||
+        (r.category ?? "").toLowerCase().includes(q)
+      );
+    });
+  }, [all, query, category]);
+
+  const browsing = query.trim() !== "" || category !== "All";
+
   return (
     <main
       id="main-content"
-      className="mx-auto w-full min-w-0 max-w-3xl px-3 py-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-5 sm:py-8"
+      className="mx-auto w-full min-w-0 max-w-5xl px-3 py-6 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-5 sm:py-8"
     >
       <Link
         to="/chat"
@@ -162,52 +196,97 @@ function RoomsDirectoryPage() {
         Back to DueChat
       </Link>
 
-      <h1 className="mt-6 text-2xl font-semibold">DueChat rooms</h1>
+      <h1 className="mt-6 text-2xl font-semibold">Browse rooms</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Top-rated rooms plus every public room on DueChat. Help lobbies and staff rooms aren’t
-        listed.
+        Every public DueChat room — pick one and join the conversation. Help lobbies and staff
+        rooms aren’t listed.
       </p>
 
-      <section className="mt-8">
-        <h2 className="flex items-center gap-2 text-sm font-semibold">
-          <Flame className="size-4 text-primary" aria-hidden />
-          Busiest rooms
-        </h2>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Top 3 rooms by people joining, for today, this week, and this month.
-        </p>
-        <div className="mt-4 space-y-6">
-          <TrendingSection label="Today" rooms={trending.day} crowns={crownMap} />
-          <TrendingSection label="This week" rooms={trending.week} crowns={crownMap} />
-          <TrendingSection label="This month" rooms={trending.month} crowns={crownMap} />
+      <div className="mt-5 flex flex-col gap-3">
+        <label className="relative block">
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search rooms by name, topic, or category…"
+            className="w-full rounded-2xl border border-border bg-card py-2.5 pl-9 pr-3 text-sm outline-none focus:border-primary"
+          />
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setCategory(cat)}
+              className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                category === cat
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
-      </section>
+      </div>
+
+      {!browsing && (
+        <>
+          <section className="mt-8">
+            <h2 className="flex items-center gap-2 text-sm font-semibold">
+              <Flame className="size-4 text-primary" aria-hidden />
+              Busiest rooms
+            </h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Top 3 rooms by people joining, for today, this week, and this month.
+            </p>
+            <div className="mt-4 space-y-6">
+              <TrendingSection label="Today" rooms={trending.day} crowns={crownMap} />
+              <TrendingSection label="This week" rooms={trending.week} crowns={crownMap} />
+              <TrendingSection label="This month" rooms={trending.month} crowns={crownMap} />
+            </div>
+          </section>
+
+          <section className="mt-10">
+            <h2 className="flex items-center gap-2 text-sm font-semibold">
+              <Crown className="size-4 text-primary" aria-hidden />
+              Top rooms
+            </h2>
+            {top.length === 0 ? (
+              <p className="mt-3 text-sm text-muted-foreground">
+                No rated rooms yet — rate a room to start the leaderboard.
+              </p>
+            ) : (
+              <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {top.map((room, i) => (
+                  <RoomCard
+                    key={room.id}
+                    room={room}
+                    rank={i + 1}
+                    crowns={crownMap.get(room.id) ?? []}
+                  />
+                ))}
+              </ul>
+            )}
+          </section>
+        </>
+      )}
 
       <section className="mt-10">
-        <h2 className="flex items-center gap-2 text-sm font-semibold">
-          <Crown className="size-4 text-primary" aria-hidden />
-          Top rooms
+        <h2 className="text-sm font-semibold">
+          {browsing ? `Matching rooms (${filtered.length})` : `All rooms (${all.length})`}
         </h2>
-        {top.length === 0 ? (
+        {filtered.length === 0 ? (
           <p className="mt-3 text-sm text-muted-foreground">
-            No rated rooms yet — rate a room to start the leaderboard.
+            {browsing ? "No rooms match your search." : "No public rooms yet."}
           </p>
         ) : (
-          <ul className="mt-4 space-y-3">
-            {top.map((room, i) => (
-              <RoomCard key={room.id} room={room} rank={i + 1} crowns={crownMap.get(room.id) ?? []} />
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="mt-10">
-        <h2 className="text-sm font-semibold">All rooms ({all.length})</h2>
-        {all.length === 0 ? (
-          <p className="mt-3 text-sm text-muted-foreground">No public rooms yet.</p>
-        ) : (
-          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-            {all.map((room) => (
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((room) => (
               <RoomCard key={room.id} room={room} crowns={crownMap.get(room.id) ?? []} />
             ))}
           </ul>
