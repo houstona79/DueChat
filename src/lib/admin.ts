@@ -81,7 +81,9 @@ export async function deleteMessage(messageId: string) {
 export async function fetchRecentMessages(limit = 100): Promise<Message[]> {
   const { data, error } = await supabase
     .from("messages")
-    .select("id, room_id, user_id, body, created_at")
+    .select(
+      "id, room_id, user_id, body, created_at, is_bold, is_italic, is_underlined, font_size",
+    )
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) throw error;
@@ -92,7 +94,9 @@ export async function fetchRecentMessages(limit = 100): Promise<Message[]> {
 export async function fetchRoomTranscript(roomId: string, limit = 300): Promise<Message[]> {
   const { data, error } = await supabase
     .from("messages")
-    .select("id, room_id, user_id, body, created_at")
+    .select(
+      "id, room_id, user_id, body, created_at, is_bold, is_italic, is_underlined, font_size",
+    )
     .eq("room_id", roomId)
     .order("created_at", { ascending: true })
     .limit(limit);

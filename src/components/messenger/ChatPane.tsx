@@ -111,6 +111,7 @@ import {
   type Profile,
   type Room,
   type RoomAdminTier,
+  type Message,
 } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 import { openRoomWindow } from "@/lib/room-window";
@@ -147,6 +148,16 @@ function liveNoticeOf(body: string): "on" | "off" | null {
 
 function isNotice(body: string) {
   return liveNoticeOf(body) !== null || giftNoticeOf(body) !== null;
+}
+
+function messageTextStyle(message: Message) {
+  const size = Math.min(4, Math.max(1, message.font_size ?? 1));
+  return {
+    fontWeight: message.is_bold ? 700 : undefined,
+    fontStyle: message.is_italic ? "italic" : undefined,
+    textDecoration: message.is_underlined ? "underline" : undefined,
+    fontSize: `${13 + (size - 1) * 2}px`,
+  } as const;
 }
 
 export function ChatPane({
@@ -313,7 +324,7 @@ export function ChatPane({
     }
     setDraft("");
     try {
-      await sendMessage(room.id, meId, text);
+      await sendMessage(room.id, meId, text, room.is_direct ? undefined : typeStyle);
       if (room.is_direct) playSound("message");
       await queryClient.invalidateQueries({ queryKey: ["messages", room.id] });
     } catch (err) {
@@ -1346,6 +1357,7 @@ export function ChatPane({
                               (isEmojiOnly(m.body) || isImageEmojiOnly(m.body)) &&
                                 "text-2xl leading-tight",
                             )}
+                            style={messageTextStyle(m)}
                           >
                             {hasImageEmoji(m.body) ? (
                               <EmojiText body={m.body} large={isImageEmojiOnly(m.body)} />
@@ -1438,6 +1450,7 @@ export function ChatPane({
                             (isEmojiOnly(m.body) || isImageEmojiOnly(m.body)) &&
                               "bg-transparent px-1 py-0.5 text-3xl leading-tight",
                           )}
+                          style={messageTextStyle(m)}
                         >
                           {hasImageEmoji(m.body) ? (
                             <EmojiText body={m.body} large={isImageEmojiOnly(m.body)} />
