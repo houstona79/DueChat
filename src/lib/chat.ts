@@ -130,7 +130,7 @@ export async function updateRoomSettings(roomId: string, settings: RoomSettings)
 }
 
 const PROFILE_COLS =
-  "id, username, display_name, avatar_url, status_message, name_color, birth_date, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, mail_handle, accepted_eula_at, profile_visibility, decoration, last_seen_at, created_at";
+  "id, username, display_name, avatar_url, status_message, name_color, country, gender, pronouns, gender_visibility, pronouns_visibility, bio, website_url, mail_handle, accepted_eula_at, profile_visibility, decoration, last_seen_at, created_at";
 
 export type RoomBranding = {
   icon_url: string | null;
