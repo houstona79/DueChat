@@ -587,6 +587,7 @@ export type Database = {
           is_italic: boolean
           is_underlined: boolean
           room_id: string
+          text_color: string | null
           user_id: string
         }
         Insert: {
@@ -598,6 +599,7 @@ export type Database = {
           is_italic?: boolean
           is_underlined?: boolean
           room_id: string
+          text_color?: string | null
           user_id: string
         }
         Update: {
@@ -609,6 +611,7 @@ export type Database = {
           is_italic?: boolean
           is_underlined?: boolean
           room_id?: string
+          text_color?: string | null
           user_id?: string
         }
         Relationships: [
