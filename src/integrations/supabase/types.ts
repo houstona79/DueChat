@@ -1978,6 +1978,14 @@ export type Database = {
         }[]
       }
       my_invite_code: { Args: never; Returns: string }
+      my_private_profile: {
+        Args: never
+        Returns: {
+          birth_date: string
+          mail_forward_to: string
+          mail_forward_verified: boolean
+        }[]
+      }
       profile_points: { Args: { _user_id: string }; Returns: number }
       public_room_profile: {
         Args: { _slug: string }

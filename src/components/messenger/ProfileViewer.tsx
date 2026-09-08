@@ -26,7 +26,8 @@ import {
   siteRoleTextClass,
   useSiteRoles,
 } from "@/hooks/use-roles";
-import { accentFor, isAdultProfile, isOnline, MAIL_DOMAIN } from "@/lib/chat";
+import { accentFor, isOnline, MAIL_DOMAIN } from "@/lib/chat";
+import { AdultBadge } from "@/components/messenger/AdultBadge";
 import { cn } from "@/lib/utils";
 
 /** Tiny global store so any list can open a profile card. */
@@ -237,9 +238,7 @@ export function ProfileViewer() {
                   </span>
                 </a>
               ) : null}
-              {isAdultProfile(profile) ? (
-                <p className="text-xs text-muted-foreground">Verified 18+</p>
-              ) : null}
+              <AdultBadge userId={profile.id} />
               <ProfilePhotos userId={profile.id} />
               <ProfileBlogs username={profile.username} />
               <ProfileFeed userId={profile.id} highlightUpdateId={highlightUpdateId} />
