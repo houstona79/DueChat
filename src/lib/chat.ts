@@ -271,6 +271,26 @@ export async function fetchProfiles(): Promise<Profile[]> {
   return data ?? [];
 }
 
+/** Private fields (birth date, mail forwarding) are readable by their owner only. */
+type PrivateProfile = {
+  birth_date: string | null;
+  mail_forward_to: string | null;
+  mail_forward_verified: boolean;
+};
+
+async function fetchMyPrivateFields(): Promise<PrivateProfile> {
+  const rpc = supabase as unknown as {
+    rpc: (name: string) => Promise<{ data: PrivateProfile[] | null; error: unknown }>;
+  };
+  const { data } = await rpc.rpc("my_private_profile");
+  const row = data?.[0];
+  return {
+    birth_date: row?.birth_date ?? null,
+    mail_forward_to: row?.mail_forward_to ?? null,
+    mail_forward_verified: row?.mail_forward_verified ?? false,
+  };
+}
+
 export async function fetchMyProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from("profiles")
@@ -278,7 +298,16 @@ export async function fetchMyProfile(userId: string): Promise<Profile | null> {
     .eq("id", userId)
     .maybeSingle();
   if (error) throw error;
-  return data;
+  if (!data) return null;
+  const priv = await fetchMyPrivateFields();
+  return { ...data, ...priv } as Profile;
+}
+
+/** Age check for another member without exposing their birth date. */
+export async function fetchIsAdult(userId: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc("is_adult", { _user_id: userId });
+  if (error) return false;
+  return Boolean(data);
 }
 
 export async function fetchRooms(): Promise<Room[]> {
