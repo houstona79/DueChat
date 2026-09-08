@@ -204,6 +204,17 @@ export type Message = {
   user_id: string;
   body: string;
   created_at: string;
+  is_bold: boolean;
+  is_italic: boolean;
+  is_underlined: boolean;
+  font_size: number;
+};
+
+export type MessageTextStyle = {
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
+  size: number;
 };
 
 export const ONLINE_WINDOW_MS = 90_000;
@@ -307,7 +318,9 @@ export async function fetchMemberships(): Promise<Membership[]> {
 export async function fetchMessages(roomId: string): Promise<Message[]> {
   const { data, error } = await supabase
     .from("messages")
-    .select("id, room_id, user_id, body, created_at")
+    .select(
+      "id, room_id, user_id, body, created_at, is_bold, is_italic, is_underlined, font_size",
+    )
     .eq("room_id", roomId)
     .order("created_at", { ascending: true })
     .limit(500);
@@ -315,10 +328,22 @@ export async function fetchMessages(roomId: string): Promise<Message[]> {
   return data ?? [];
 }
 
-export async function sendMessage(roomId: string, userId: string, body: string) {
-  const { error } = await supabase
-    .from("messages")
-    .insert({ room_id: roomId, user_id: userId, body });
+export async function sendMessage(
+  roomId: string,
+  userId: string,
+  body: string,
+  textStyle?: MessageTextStyle,
+) {
+  const size = Math.min(4, Math.max(1, Math.round(textStyle?.size ?? 1)));
+  const { error } = await supabase.from("messages").insert({
+    room_id: roomId,
+    user_id: userId,
+    body,
+    is_bold: textStyle?.bold ?? false,
+    is_italic: textStyle?.italic ?? false,
+    is_underlined: textStyle?.underline ?? false,
+    font_size: size,
+  });
   if (error) throw error;
 }
 
