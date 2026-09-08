@@ -581,21 +581,33 @@ export type Database = {
         Row: {
           body: string
           created_at: string
+          font_size: number
           id: string
+          is_bold: boolean
+          is_italic: boolean
+          is_underlined: boolean
           room_id: string
           user_id: string
         }
         Insert: {
           body: string
           created_at?: string
+          font_size?: number
           id?: string
+          is_bold?: boolean
+          is_italic?: boolean
+          is_underlined?: boolean
           room_id: string
           user_id: string
         }
         Update: {
           body?: string
           created_at?: string
+          font_size?: number
           id?: string
+          is_bold?: boolean
+          is_italic?: boolean
+          is_underlined?: boolean
           room_id?: string
           user_id?: string
         }
