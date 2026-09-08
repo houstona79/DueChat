@@ -157,6 +157,7 @@ function messageTextStyle(message: Message) {
     fontStyle: message.is_italic ? "italic" : undefined,
     textDecoration: message.is_underlined ? "underline" : undefined,
     fontSize: `${13 + (size - 1) * 2}px`,
+    color: message.text_color ?? undefined,
   } as const;
 }
 
@@ -203,7 +204,8 @@ export function ChatPane({
     italic: boolean;
     underline: boolean;
     size: number;
-  }>({ bold: false, italic: false, underline: false, size: 1 });
+    color: string | null;
+  }>({ bold: false, italic: false, underline: false, size: 1, color: null });
 
   const [call, setCall] = useState<"voice" | "video" | null>(null);
   const [talking, setTalking] = useState(false);
@@ -1529,6 +1531,29 @@ export function ChatPane({
                       ))}
                     </select>
                   </label>
+                  <label
+                    className="flex items-center gap-1 text-[11px] text-muted-foreground"
+                    title="Text color"
+                  >
+                    Color:
+                    <input
+                      type="color"
+                      value={typeStyle.color ?? "#111827"}
+                      onChange={(e) => setTypeStyle((s) => ({ ...s, color: e.target.value }))}
+                      className="h-5 w-7 cursor-pointer rounded border border-border bg-background p-0.5"
+                      aria-label="Text color"
+                    />
+                  </label>
+                  {typeStyle.color ? (
+                    <button
+                      type="button"
+                      onClick={() => setTypeStyle((s) => ({ ...s, color: null }))}
+                      className="rounded px-1.5 py-0.5 text-[11px] text-muted-foreground hover:bg-secondary"
+                      title="Use default text color"
+                    >
+                      Reset
+                    </button>
+                  ) : null}
                   <span className="mx-1 h-5 w-px bg-border" aria-hidden />
                   <button
                     type="button"
@@ -1649,6 +1674,7 @@ export function ChatPane({
                           fontStyle: typeStyle.italic ? "italic" : undefined,
                           textDecoration: typeStyle.underline ? "underline" : undefined,
                           fontSize: `${13 + (typeStyle.size - 1) * 2}px`,
+                           color: typeStyle.color ?? undefined,
                         }
                   }
                   className="max-h-32 min-h-9 w-full resize-none bg-transparent px-1.5 py-1.5 text-sm outline-none placeholder:text-muted-foreground disabled:opacity-70 sm:min-h-11 sm:px-2 sm:py-2 sm:text-base lg:min-h-9 lg:py-1.5 lg:text-sm"

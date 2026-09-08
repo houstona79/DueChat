@@ -208,6 +208,7 @@ export type Message = {
   is_italic: boolean;
   is_underlined: boolean;
   font_size: number;
+  text_color: string | null;
 };
 
 export type MessageTextStyle = {
@@ -215,6 +216,7 @@ export type MessageTextStyle = {
   italic: boolean;
   underline: boolean;
   size: number;
+  color: string | null;
 };
 
 export const ONLINE_WINDOW_MS = 90_000;
@@ -319,7 +321,7 @@ export async function fetchMessages(roomId: string): Promise<Message[]> {
   const { data, error } = await supabase
     .from("messages")
     .select(
-      "id, room_id, user_id, body, created_at, is_bold, is_italic, is_underlined, font_size",
+      "id, room_id, user_id, body, created_at, is_bold, is_italic, is_underlined, font_size, text_color",
     )
     .eq("room_id", roomId)
     .order("created_at", { ascending: true })
@@ -343,6 +345,7 @@ export async function sendMessage(
     is_italic: textStyle?.italic ?? false,
     is_underlined: textStyle?.underline ?? false,
     font_size: size,
+    text_color: textStyle?.color ?? null,
   });
   if (error) throw error;
 }

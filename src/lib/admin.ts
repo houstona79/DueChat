@@ -82,7 +82,7 @@ export async function fetchRecentMessages(limit = 100): Promise<Message[]> {
   const { data, error } = await supabase
     .from("messages")
     .select(
-      "id, room_id, user_id, body, created_at, is_bold, is_italic, is_underlined, font_size",
+      "id, room_id, user_id, body, created_at, is_bold, is_italic, is_underlined, font_size, text_color",
     )
     .order("created_at", { ascending: false })
     .limit(limit);
@@ -95,7 +95,7 @@ export async function fetchRoomTranscript(roomId: string, limit = 300): Promise<
   const { data, error } = await supabase
     .from("messages")
     .select(
-      "id, room_id, user_id, body, created_at, is_bold, is_italic, is_underlined, font_size",
+      "id, room_id, user_id, body, created_at, is_bold, is_italic, is_underlined, font_size, text_color",
     )
     .eq("room_id", roomId)
     .order("created_at", { ascending: true })
