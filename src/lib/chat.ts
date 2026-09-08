@@ -10,7 +10,8 @@ export type Profile = {
   avatar_url: string | null;
   status_message: string | null;
   name_color: string | null;
-  birth_date: string | null;
+  /** Owner-only: present on your own profile, absent on other members'. */
+  birth_date?: string | null;
   country: string | null;
   gender: string | null;
   pronouns: string | null;
