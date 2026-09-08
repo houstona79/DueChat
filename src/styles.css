@@ -122,6 +122,7 @@ html.dark {
   --accent-3: oklch(0.46 0.12 75);
   --accent-4: oklch(0.45 0.16 330);
   --shadow-panel: 0 24px 60px -34px oklch(0.4 0.03 264 / 0.28);
+  --desktop-window-edge: oklch(0.08 0 0);
   --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --chart-1: oklch(0.646 0.222 41.116);
@@ -185,6 +186,18 @@ html.dark {
   --sidebar-accent-foreground: oklch(0.945 0.01 264);
   --sidebar-border: oklch(0.3 0.022 264);
   --sidebar-ring: oklch(0.649 0.176 262);
+}
+
+/* Packaged desktop windows use a solid black edge like detached room windows. */
+@media (min-width: 768px) {
+  html[data-desktop-shell="true"] body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    border: 5px solid var(--desktop-window-edge);
+    pointer-events: none;
+  }
 }
 
 @layer base {
