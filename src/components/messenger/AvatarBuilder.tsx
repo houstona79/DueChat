@@ -72,16 +72,27 @@ function extraSvg(l: Look) {
 }
 
 export function avatarSvg(l: Look) {
+  const panda = l.style === "Panda";
+  const face = panda ? "#FBFBF9" : l.skin;
+  const dark = "#1F1A17";
+  const pandaBits = panda ? `
+<circle cx="56" cy="54" r="24" fill="${dark}"/><circle cx="56" cy="54" r="16" fill="#3A332E"/>
+<circle cx="144" cy="54" r="24" fill="${dark}"/><circle cx="144" cy="54" r="16" fill="#3A332E"/>
+<ellipse cx="100" cy="96" rx="46" ry="50" fill="${face}"/>
+<ellipse cx="82" cy="95" rx="13" ry="17" fill="${dark}" transform="rotate(-12 82 95)"/>
+<ellipse cx="118" cy="95" rx="13" ry="17" fill="${dark}" transform="rotate(12 118 95)"/>` : "";
+  const pandaNose = panda ? `<ellipse cx="100" cy="112" rx="7" ry="5" fill="${dark}"/><path d="M100 117 L100 121" stroke="${dark}" stroke-width="3" stroke-linecap="round"/>` : "";
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="400" height="400">
 <rect width="200" height="200" fill="${l.bg}"/>
 <path d="M36 200 Q40 150 100 150 Q160 150 164 200Z" fill="${l.shirt}"/>
-<rect x="88" y="130" width="24" height="24" fill="${l.skin}"/>
-${l.hair === "Long" ? hairSvg(l) : ""}
-<ellipse cx="58" cy="100" rx="8" ry="12" fill="${l.skin}"/><ellipse cx="142" cy="100" rx="8" ry="12" fill="${l.skin}"/>
-<ellipse cx="100" cy="96" rx="42" ry="48" fill="${l.skin}"/>
-<circle cx="74" cy="114" r="7" fill="#F28B8B" opacity="0.45"/><circle cx="126" cy="114" r="7" fill="#F28B8B" opacity="0.45"/>
-${l.hair !== "Long" ? hairSvg(l) : `<path d="M60 88 Q64 48 100 46 Q136 48 140 88 Q124 66 100 64 Q76 66 60 88Z" fill="${l.hairColor}"/>`}
-${eyesSvg(l)}${mouthSvg(l)}${extraSvg(l)}
+<rect x="88" y="130" width="24" height="24" fill="${face}"/>
+${!panda && l.hair === "Long" ? hairSvg(l) : ""}
+<ellipse cx="58" cy="100" rx="8" ry="12" fill="${face}"/><ellipse cx="142" cy="100" rx="8" ry="12" fill="${face}"/>
+<ellipse cx="100" cy="96" rx="42" ry="48" fill="${face}"/>
+${pandaBits}
+${!panda ? `<circle cx="74" cy="114" r="7" fill="#F28B8B" opacity="0.45"/><circle cx="126" cy="114" r="7" fill="#F28B8B" opacity="0.45"/>` : ""}
+${!panda ? (l.hair !== "Long" ? hairSvg(l) : `<path d="M60 88 Q64 48 100 46 Q136 48 140 88 Q124 66 100 64 Q76 66 60 88Z" fill="${l.hairColor}"/>`) : ""}
+${eyesSvg(l)}${pandaNose}${mouthSvg(l)}${extraSvg(l)}
 </svg>`;
 }
 
