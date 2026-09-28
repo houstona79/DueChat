@@ -1652,6 +1652,15 @@ export function ChatPane({
                     })();
                   }}
                 />
+                <VoiceRecorder
+                  userId={meId}
+                  disabled={Boolean(mySilence)}
+                  onError={setError}
+                  onSend={async (body) => {
+                    await sendMessage(room.id, meId, body);
+                    await queryClient.invalidateQueries({ queryKey: ["messages", room.id] });
+                  }}
+                />
                 <textarea
                   ref={inputRef}
                   rows={1}
