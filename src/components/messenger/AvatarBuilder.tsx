@@ -83,16 +83,19 @@ ${eyesSvg(l)}${mouthSvg(l)}${extraSvg(l)}
 }
 
 async function svgToPng(svg: string): Promise<Blob> {
-  const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+  // Data URLs render reliably on iPhone/Safari where blob SVGs can fail.
+  const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
   try {
     const img = new Image();
+    img.width = img.height = 400;
     await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
     const canvas = document.createElement("canvas");
     canvas.width = canvas.height = 400;
     canvas.getContext("2d")!.drawImage(img, 0, 0, 400, 400);
     return await new Promise((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error("Export failed"))), "image/png"));
-  } finally {
-    URL.revokeObjectURL(url);
+  } catch {
+    // Fall back to saving the drawing itself.
+    return new Blob([svg], { type: "image/svg+xml" });
   }
 }
 
@@ -138,7 +141,11 @@ export function AvatarBuilder({ userId }: { userId: string }) {
     setSaving(true);
     try {
       const blob = await svgToPng(svg);
-      await uploadAvatar(userId, new File([blob], "cartoon.png", { type: "image/png" }));
+      const isPng = blob.type === "image/png";
+      await uploadAvatar(
+        userId,
+        new File([blob], isPng ? "cartoon.png" : "cartoon.svg", { type: blob.type }),
+      );
       await qc.invalidateQueries();
       toast.success("You're now wearing your cartoon avatar!");
       setOpen(false);
