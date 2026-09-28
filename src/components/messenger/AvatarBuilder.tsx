@@ -93,7 +93,7 @@ ${!panda && l.hair === "Long" ? hairSvg(l) : ""}
 ${pandaBits}
 ${!panda ? `<circle cx="74" cy="114" r="7" fill="#F28B8B" opacity="0.45"/><circle cx="126" cy="114" r="7" fill="#F28B8B" opacity="0.45"/>` : ""}
 ${!panda ? (l.hair !== "Long" ? hairSvg(l) : `<path d="M60 88 Q64 48 100 46 Q136 48 140 88 Q124 66 100 64 Q76 66 60 88Z" fill="${l.hairColor}"/>`) : ""}
-${eyesSvg(l)}${pandaNose}${mouthSvg(l)}${extraSvg(l)}
+${eyesSvg(l, panda)}${pandaNose}${mouthSvg(l)}${extraSvg(l)}
 </svg>`;
 }
 
@@ -193,9 +193,14 @@ export function AvatarBuilder({ userId }: { userId: string }) {
           </button>
         </div>
         <div className="grid flex-1 gap-3">
-          <Choices label="Hair" options={HAIR} value={look.hair} onChange={set("hair")} />
-          <Swatches label="Hair color" colors={HAIR_COLOR} value={look.hairColor} onChange={set("hairColor")} />
-          <Swatches label="Skin" colors={SKIN} value={look.skin} onChange={set("skin")} />
+          <Choices label="Style" options={STYLE} value={look.style} onChange={set("style")} />
+          {look.style === "Human" && (
+            <>
+              <Choices label="Hair" options={HAIR} value={look.hair} onChange={set("hair")} />
+              <Swatches label="Hair color" colors={HAIR_COLOR} value={look.hairColor} onChange={set("hairColor")} />
+              <Swatches label="Skin" colors={SKIN} value={look.skin} onChange={set("skin")} />
+            </>
+          )}
           <Choices label="Eyes" options={EYES} value={look.eyes} onChange={set("eyes")} />
           <Choices label="Mouth" options={MOUTH} value={look.mouth} onChange={set("mouth")} />
           <Choices label="Extras" options={EXTRA} value={look.extra} onChange={set("extra")} />
