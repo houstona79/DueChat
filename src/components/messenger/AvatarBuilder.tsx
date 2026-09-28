@@ -13,7 +13,7 @@ const HAIR = ["Short", "Spiky", "Long", "Curly", "Bun", "Bald"] as const;
 const EYES = ["Happy", "Round", "Wink", "Sleepy", "Stars"] as const;
 const MOUTH = ["Smile", "Grin", "Open", "Smirk", "Tongue"] as const;
 const EXTRA = ["None", "Glasses", "Shades", "Cap", "Headphones", "Crown"] as const;
-const STYLE = ["Human", "Panda"] as const;
+const STYLE = ["Human", "Panda", "Eagle", "Moose"] as const;
 
 type Look = {
   style: (typeof STYLE)[number];
@@ -51,8 +51,8 @@ function eyesSvg(l: Look, panda = false) {
     default: return `<path d="M84 86 L87 93 L94 94 L89 99 L90 106 L84 102 L78 106 L79 99 L74 94 L81 93Z M116 86 L119 93 L126 94 L121 99 L122 106 L116 102 L110 106 L111 99 L106 94 L113 93Z" fill="#F5B800"/>`;
   }
 }
-function mouthSvg(l: Look) {
-  const d = "#7A2E2E";
+function mouthSvg(l: Look, color = "#7A2E2E") {
+  const d = color;
   switch (l.mouth) {
     case "Smile": return `<path d="M86 120 Q100 132 114 120" stroke="${d}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
     case "Grin": return `<path d="M82 116 Q100 140 118 116Z" fill="${d}"/><path d="M86 118 L114 118 L112 122 L88 122Z" fill="#fff"/>`;
@@ -74,26 +74,42 @@ function extraSvg(l: Look) {
 
 export function avatarSvg(l: Look) {
   const panda = l.style === "Panda";
-  const face = panda ? "#FBFBF9" : l.skin;
+  const eagle = l.style === "Eagle";
+  const moose = l.style === "Moose";
+  const animal = panda || eagle || moose;
+  const face = panda ? "#FBFBF9" : eagle ? "#F7F6F0" : moose ? "#8B5E3C" : l.skin;
   const dark = "#1F1A17";
-  const pandaBits = panda ? `
+  const styleBits = panda ? `
 <circle cx="56" cy="54" r="24" fill="${dark}"/><circle cx="56" cy="54" r="16" fill="#3A332E"/>
 <circle cx="144" cy="54" r="24" fill="${dark}"/><circle cx="144" cy="54" r="16" fill="#3A332E"/>
 <ellipse cx="100" cy="96" rx="46" ry="50" fill="${face}"/>
 <ellipse cx="82" cy="95" rx="13" ry="17" fill="${dark}" transform="rotate(-12 82 95)"/>
-<ellipse cx="118" cy="95" rx="13" ry="17" fill="${dark}" transform="rotate(12 118 95)"/>` : "";
-  const pandaNose = panda ? `<ellipse cx="100" cy="112" rx="7" ry="5" fill="${dark}"/><path d="M100 117 L100 121" stroke="${dark}" stroke-width="3" stroke-linecap="round"/>` : "";
+<ellipse cx="118" cy="95" rx="13" ry="17" fill="${dark}" transform="rotate(12 118 95)"/>`
+: eagle ? `
+<path d="M66 68 Q62 38 100 34 Q138 38 134 68 Q120 52 100 52 Q80 52 66 68Z" fill="#E3DFD2"/>
+<path d="M100 48 Q110 28 128 30 Q120 44 112 54Z" fill="#E3DFD2"/>
+<path d="M100 48 Q90 28 72 30 Q80 44 88 54Z" fill="#E3DFD2"/>
+<path d="M92 102 Q100 96 108 102 Q113 113 107 123 Q103 128 98 125 Q91 117 91 107Z" fill="#F2A63B" stroke="#D98A1F" stroke-width="2"/>
+<circle cx="100" cy="107" r="2" fill="#B87717"/>`
+: moose ? `
+<path d="M62 72 Q28 62 26 28 Q42 44 58 46 Q50 32 56 18 Q68 38 76 54Z" fill="#6B4A2F" stroke="#4E3520" stroke-width="2"/>
+<path d="M138 72 Q172 62 174 28 Q158 44 142 46 Q150 32 144 18 Q132 38 124 54Z" fill="#6B4A2F" stroke="#4E3520" stroke-width="2"/>
+<ellipse cx="100" cy="120" rx="27" ry="21" fill="#6B4A2F"/>
+<ellipse cx="90" cy="116" rx="4" ry="6" fill="#3E2A1C"/>
+<ellipse cx="110" cy="116" rx="4" ry="6" fill="#3E2A1C"/>` : "";
+  const styleNose = panda ? `<ellipse cx="100" cy="112" rx="7" ry="5" fill="${dark}"/><path d="M100 117 L100 121" stroke="${dark}" stroke-width="3" stroke-linecap="round"/>` : "";
+  const mouthColor = moose ? "#3E2A1C" : "#7A2E2E";
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="400" height="400">
 <rect width="200" height="200" fill="${l.bg}"/>
 <path d="M36 200 Q40 150 100 150 Q160 150 164 200Z" fill="${l.shirt}"/>
 <rect x="88" y="130" width="24" height="24" fill="${face}"/>
-${!panda && l.hair === "Long" ? hairSvg(l) : ""}
+${!animal && l.hair === "Long" ? hairSvg(l) : ""}
 <ellipse cx="58" cy="100" rx="8" ry="12" fill="${face}"/><ellipse cx="142" cy="100" rx="8" ry="12" fill="${face}"/>
 <ellipse cx="100" cy="96" rx="42" ry="48" fill="${face}"/>
-${pandaBits}
-${!panda ? `<circle cx="74" cy="114" r="7" fill="#F28B8B" opacity="0.45"/><circle cx="126" cy="114" r="7" fill="#F28B8B" opacity="0.45"/>` : ""}
-${!panda ? (l.hair !== "Long" ? hairSvg(l) : `<path d="M60 88 Q64 48 100 46 Q136 48 140 88 Q124 66 100 64 Q76 66 60 88Z" fill="${l.hairColor}"/>`) : ""}
-${eyesSvg(l, panda)}${pandaNose}${mouthSvg(l)}${extraSvg(l)}
+${styleBits}
+${!animal ? `<circle cx="74" cy="114" r="7" fill="#F28B8B" opacity="0.45"/><circle cx="126" cy="114" r="7" fill="#F28B8B" opacity="0.45"/>` : ""}
+${!animal ? (l.hair !== "Long" ? hairSvg(l) : `<path d="M60 88 Q64 48 100 46 Q136 48 140 88 Q124 66 100 64 Q76 66 60 88Z" fill="${l.hairColor}"/>`) : ""}
+${eyesSvg(l, panda)}${styleNose}${mouthSvg(l, mouthColor)}${extraSvg(l)}
 </svg>`;
 }
 
