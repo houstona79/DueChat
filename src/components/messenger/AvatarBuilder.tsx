@@ -20,7 +20,7 @@ type Look = {
   mouth: (typeof MOUTH)[number]; extra: (typeof EXTRA)[number];
 };
 
-const pick = <T,>(a: readonly T[]) => a[Math.floor(Math.random() * a.length)];
+const pick = <T,>(a: readonly T[]): T => a[Math.floor(Math.random() * a.length)]!;
 const randomLook = (): Look => ({
   skin: pick(SKIN), hairColor: pick(HAIR_COLOR), bg: pick(BG), shirt: pick(SHIRT),
   hair: pick(HAIR), eyes: pick(EYES), mouth: pick(MOUTH), extra: pick(EXTRA),
