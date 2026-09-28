@@ -119,6 +119,7 @@ import { playSound } from "@/lib/sounds";
 import { TranslatedText } from "@/components/system/TranslatedText";
 import { giftNoticeOf } from "@/lib/credits";
 import { MessageVideo, videoEmbedOf } from "./MessageVideo";
+import { VoiceRecorder, VoiceNotePlayer, voiceNotePath } from "./VoiceNote";
 
 function isEmojiOnly(body: string) {
   const trimmed = body.trim();
@@ -1350,6 +1351,8 @@ export function ChatPane({
                             loading="lazy"
                             className="mt-1 max-h-40 rounded-xl border border-border object-cover"
                           />
+                        ) : voiceNotePath(m.body) ? (
+                          <VoiceNotePlayer path={voiceNotePath(m.body)!} />
                         ) : video ? (
                           <MessageVideo video={video} />
                         ) : (
@@ -1439,6 +1442,8 @@ export function ChatPane({
                           loading="lazy"
                           className="max-h-56 max-w-[78%] rounded-2xl border border-border object-cover"
                         />
+                      ) : voiceNotePath(m.body) ? (
+                        <VoiceNotePlayer path={voiceNotePath(m.body)!} />
                       ) : videoEmbedOf(m.body) ? (
                         <MessageVideo video={videoEmbedOf(m.body)!} />
                       ) : (
@@ -1645,6 +1650,15 @@ export function ChatPane({
                         setError(err instanceof Error ? err.message : "Sticker failed to send.");
                       }
                     })();
+                  }}
+                />
+                <VoiceRecorder
+                  userId={meId}
+                  disabled={Boolean(mySilence)}
+                  onError={setError}
+                  onSend={async (body) => {
+                    await sendMessage(room.id, meId, body);
+                    await queryClient.invalidateQueries({ queryKey: ["messages", room.id] });
                   }}
                 />
                 <textarea
