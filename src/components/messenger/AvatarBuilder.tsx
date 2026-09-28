@@ -13,8 +13,10 @@ const HAIR = ["Short", "Spiky", "Long", "Curly", "Bun", "Bald"] as const;
 const EYES = ["Happy", "Round", "Wink", "Sleepy", "Stars"] as const;
 const MOUTH = ["Smile", "Grin", "Open", "Smirk", "Tongue"] as const;
 const EXTRA = ["None", "Glasses", "Shades", "Cap", "Headphones", "Crown"] as const;
+const STYLE = ["Human", "Panda"] as const;
 
 type Look = {
+  style: (typeof STYLE)[number];
   skin: string; hairColor: string; bg: string; shirt: string;
   hair: (typeof HAIR)[number]; eyes: (typeof EYES)[number];
   mouth: (typeof MOUTH)[number]; extra: (typeof EXTRA)[number];
@@ -22,6 +24,7 @@ type Look = {
 
 const pick = <T,>(a: readonly T[]): T => a[Math.floor(Math.random() * a.length)]!;
 const randomLook = (): Look => ({
+  style: pick(STYLE),
   skin: pick(SKIN), hairColor: pick(HAIR_COLOR), bg: pick(BG), shirt: pick(SHIRT),
   hair: pick(HAIR), eyes: pick(EYES), mouth: pick(MOUTH), extra: pick(EXTRA),
 });
