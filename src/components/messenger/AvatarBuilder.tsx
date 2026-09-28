@@ -13,8 +13,10 @@ const HAIR = ["Short", "Spiky", "Long", "Curly", "Bun", "Bald"] as const;
 const EYES = ["Happy", "Round", "Wink", "Sleepy", "Stars"] as const;
 const MOUTH = ["Smile", "Grin", "Open", "Smirk", "Tongue"] as const;
 const EXTRA = ["None", "Glasses", "Shades", "Cap", "Headphones", "Crown"] as const;
+const STYLE = ["Human", "Panda"] as const;
 
 type Look = {
+  style: (typeof STYLE)[number];
   skin: string; hairColor: string; bg: string; shirt: string;
   hair: (typeof HAIR)[number]; eyes: (typeof EYES)[number];
   mouth: (typeof MOUTH)[number]; extra: (typeof EXTRA)[number];
@@ -22,6 +24,7 @@ type Look = {
 
 const pick = <T,>(a: readonly T[]): T => a[Math.floor(Math.random() * a.length)]!;
 const randomLook = (): Look => ({
+  style: pick(STYLE),
   skin: pick(SKIN), hairColor: pick(HAIR_COLOR), bg: pick(BG), shirt: pick(SHIRT),
   hair: pick(HAIR), eyes: pick(EYES), mouth: pick(MOUTH), extra: pick(EXTRA),
 });
@@ -37,11 +40,12 @@ function hairSvg(l: Look) {
     default: return "";
   }
 }
-function eyesSvg(l: Look) {
-  const d = "#1F2937";
+function eyesSvg(l: Look, panda = false) {
+  const d = panda ? "#FFFFFF" : "#1F2937";
+  const p = panda ? "#1F1A17" : "#fff";
   switch (l.eyes) {
     case "Happy": return `<path d="M76 98 Q84 88 92 98 M108 98 Q116 88 124 98" stroke="${d}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
-    case "Round": return `<circle cx="84" cy="96" r="7" fill="${d}"/><circle cx="116" cy="96" r="7" fill="${d}"/><circle cx="86" cy="94" r="2" fill="#fff"/><circle cx="118" cy="94" r="2" fill="#fff"/>`;
+    case "Round": return `<circle cx="84" cy="96" r="7" fill="${d}"/><circle cx="116" cy="96" r="7" fill="${d}"/><circle cx="86" cy="94" r="2" fill="${p}"/><circle cx="118" cy="94" r="2" fill="${p}"/>`;
     case "Wink": return `<circle cx="84" cy="96" r="7" fill="${d}"/><path d="M108 97 Q116 91 124 97" stroke="${d}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
     case "Sleepy": return `<path d="M76 96 Q84 102 92 96 M108 96 Q116 102 124 96" stroke="${d}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
     default: return `<path d="M84 86 L87 93 L94 94 L89 99 L90 106 L84 102 L78 106 L79 99 L74 94 L81 93Z M116 86 L119 93 L126 94 L121 99 L122 106 L116 102 L110 106 L111 99 L106 94 L113 93Z" fill="#F5B800"/>`;
@@ -69,16 +73,27 @@ function extraSvg(l: Look) {
 }
 
 export function avatarSvg(l: Look) {
+  const panda = l.style === "Panda";
+  const face = panda ? "#FBFBF9" : l.skin;
+  const dark = "#1F1A17";
+  const pandaBits = panda ? `
+<circle cx="56" cy="54" r="24" fill="${dark}"/><circle cx="56" cy="54" r="16" fill="#3A332E"/>
+<circle cx="144" cy="54" r="24" fill="${dark}"/><circle cx="144" cy="54" r="16" fill="#3A332E"/>
+<ellipse cx="100" cy="96" rx="46" ry="50" fill="${face}"/>
+<ellipse cx="82" cy="95" rx="13" ry="17" fill="${dark}" transform="rotate(-12 82 95)"/>
+<ellipse cx="118" cy="95" rx="13" ry="17" fill="${dark}" transform="rotate(12 118 95)"/>` : "";
+  const pandaNose = panda ? `<ellipse cx="100" cy="112" rx="7" ry="5" fill="${dark}"/><path d="M100 117 L100 121" stroke="${dark}" stroke-width="3" stroke-linecap="round"/>` : "";
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="400" height="400">
 <rect width="200" height="200" fill="${l.bg}"/>
 <path d="M36 200 Q40 150 100 150 Q160 150 164 200Z" fill="${l.shirt}"/>
-<rect x="88" y="130" width="24" height="24" fill="${l.skin}"/>
-${l.hair === "Long" ? hairSvg(l) : ""}
-<ellipse cx="58" cy="100" rx="8" ry="12" fill="${l.skin}"/><ellipse cx="142" cy="100" rx="8" ry="12" fill="${l.skin}"/>
-<ellipse cx="100" cy="96" rx="42" ry="48" fill="${l.skin}"/>
-<circle cx="74" cy="114" r="7" fill="#F28B8B" opacity="0.45"/><circle cx="126" cy="114" r="7" fill="#F28B8B" opacity="0.45"/>
-${l.hair !== "Long" ? hairSvg(l) : `<path d="M60 88 Q64 48 100 46 Q136 48 140 88 Q124 66 100 64 Q76 66 60 88Z" fill="${l.hairColor}"/>`}
-${eyesSvg(l)}${mouthSvg(l)}${extraSvg(l)}
+<rect x="88" y="130" width="24" height="24" fill="${face}"/>
+${!panda && l.hair === "Long" ? hairSvg(l) : ""}
+<ellipse cx="58" cy="100" rx="8" ry="12" fill="${face}"/><ellipse cx="142" cy="100" rx="8" ry="12" fill="${face}"/>
+<ellipse cx="100" cy="96" rx="42" ry="48" fill="${face}"/>
+${pandaBits}
+${!panda ? `<circle cx="74" cy="114" r="7" fill="#F28B8B" opacity="0.45"/><circle cx="126" cy="114" r="7" fill="#F28B8B" opacity="0.45"/>` : ""}
+${!panda ? (l.hair !== "Long" ? hairSvg(l) : `<path d="M60 88 Q64 48 100 46 Q136 48 140 88 Q124 66 100 64 Q76 66 60 88Z" fill="${l.hairColor}"/>`) : ""}
+${eyesSvg(l, panda)}${pandaNose}${mouthSvg(l)}${extraSvg(l)}
 </svg>`;
 }
 
@@ -178,9 +193,14 @@ export function AvatarBuilder({ userId }: { userId: string }) {
           </button>
         </div>
         <div className="grid flex-1 gap-3">
-          <Choices label="Hair" options={HAIR} value={look.hair} onChange={set("hair")} />
-          <Swatches label="Hair color" colors={HAIR_COLOR} value={look.hairColor} onChange={set("hairColor")} />
-          <Swatches label="Skin" colors={SKIN} value={look.skin} onChange={set("skin")} />
+          <Choices label="Style" options={STYLE} value={look.style} onChange={set("style")} />
+          {look.style === "Human" && (
+            <>
+              <Choices label="Hair" options={HAIR} value={look.hair} onChange={set("hair")} />
+              <Swatches label="Hair color" colors={HAIR_COLOR} value={look.hairColor} onChange={set("hairColor")} />
+              <Swatches label="Skin" colors={SKIN} value={look.skin} onChange={set("skin")} />
+            </>
+          )}
           <Choices label="Eyes" options={EYES} value={look.eyes} onChange={set("eyes")} />
           <Choices label="Mouth" options={MOUTH} value={look.mouth} onChange={set("mouth")} />
           <Choices label="Extras" options={EXTRA} value={look.extra} onChange={set("extra")} />
