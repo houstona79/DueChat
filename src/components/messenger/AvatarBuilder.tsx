@@ -40,11 +40,12 @@ function hairSvg(l: Look) {
     default: return "";
   }
 }
-function eyesSvg(l: Look) {
-  const d = "#1F2937";
+function eyesSvg(l: Look, panda = false) {
+  const d = panda ? "#FFFFFF" : "#1F2937";
+  const p = panda ? "#1F1A17" : "#fff";
   switch (l.eyes) {
     case "Happy": return `<path d="M76 98 Q84 88 92 98 M108 98 Q116 88 124 98" stroke="${d}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
-    case "Round": return `<circle cx="84" cy="96" r="7" fill="${d}"/><circle cx="116" cy="96" r="7" fill="${d}"/><circle cx="86" cy="94" r="2" fill="#fff"/><circle cx="118" cy="94" r="2" fill="#fff"/>`;
+    case "Round": return `<circle cx="84" cy="96" r="7" fill="${d}"/><circle cx="116" cy="96" r="7" fill="${d}"/><circle cx="86" cy="94" r="2" fill="${p}"/><circle cx="118" cy="94" r="2" fill="${p}"/>`;
     case "Wink": return `<circle cx="84" cy="96" r="7" fill="${d}"/><path d="M108 97 Q116 91 124 97" stroke="${d}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
     case "Sleepy": return `<path d="M76 96 Q84 102 92 96 M108 96 Q116 102 124 96" stroke="${d}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
     default: return `<path d="M84 86 L87 93 L94 94 L89 99 L90 106 L84 102 L78 106 L79 99 L74 94 L81 93Z M116 86 L119 93 L126 94 L121 99 L122 106 L116 102 L110 106 L111 99 L106 94 L113 93Z" fill="#F5B800"/>`;
