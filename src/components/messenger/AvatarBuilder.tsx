@@ -141,7 +141,11 @@ export function AvatarBuilder({ userId }: { userId: string }) {
     setSaving(true);
     try {
       const blob = await svgToPng(svg);
-      await uploadAvatar(userId, new File([blob], "cartoon.png", { type: "image/png" }));
+      const isPng = blob.type === "image/png";
+      await uploadAvatar(
+        userId,
+        new File([blob], isPng ? "cartoon.png" : "cartoon.svg", { type: blob.type }),
+      );
       await qc.invalidateQueries();
       toast.success("You're now wearing your cartoon avatar!");
       setOpen(false);
