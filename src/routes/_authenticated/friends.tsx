@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, MessageSquare, Search, Trash2, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "@/components/messenger/Avatar";
+import { AvatarBuilder } from "@/components/messenger/AvatarBuilder";
 import { useBuddies, useProfiles } from "@/hooks/use-chat";
 import { useAuth, useMyProfile } from "@/hooks/use-auth";
 import { useOpenDirect } from "@/hooks/use-direct";
@@ -211,6 +212,7 @@ function FriendsPage() {
           className="w-full bg-transparent text-sm outline-none"
         />
       </label>
+      {user ? <AvatarBuilder userId={user.id} /> : null}
 
       {loading ? (
         <p className="text-sm text-muted-foreground">Loading your friends…</p>
